@@ -1,0 +1,163 @@
+---
+title: Rate Limits
+description: Understand ScrapeBadger API rate limits, tier-based limits, and best practices for handling rate limit errors.
+---
+
+ScrapeBadger uses tier-based rate limiting to ensure fair usage and reliable performance for all users.
+
+## How Rate Limiting Works
+
+<CardGroup cols={3}>
+  <Card title="Tier-Based Limits" icon="shield">
+    Your rate limit is determined by your account tier. All API keys inherit the same limit from your account.
+  </Card>
+  <Card title="Sliding Window" icon="clock">
+    We use a sliding window algorithm for accurate rate limiting. Limits are calculated per minute with smooth request distribution.
+  </Card>
+  <Card title="Real-Time Headers" icon="gauge">
+    Every response includes rate limit headers so you can monitor usage and implement smart retry logic.
+  </Card>
+</CardGroup>
+
+## Rate Limits by Tier
+
+| Tier | Requests/Minute | Description |
+|------|-----------------|-------------|
+| Free | 60 | Default tier for new accounts |
+| Basic | 300 | For small-scale applications |
+| Pro | 1,000 | For production applications |
+| Enterprise | 5,000 | For high-volume applications |
+
+## Rate Limit Headers
+
+Every API response includes these headers to help you track your rate limit usage:
+
+| Header | Description | Example |
+|--------|-------------|--------|
+| `X-RateLimit-Limit` | Maximum requests allowed per minute for your tier | `300` |
+| `X-RateLimit-Remaining` | Requests remaining in the current window | `287` |
+| `X-RateLimit-Reset` | Unix timestamp when the rate limit window resets | `1703123456` |
+| `Retry-After` | Seconds until you can retry (only on 429 responses) | `45` |
+
+## Rate Limit Exceeded Response
+
+When you exceed your rate limit, the API returns a `429 Too Many Requests` response:
+
+```json
+{
+  "detail": "Rate limit exceeded",
+  "limit": 300,
+  "remaining": 0,
+  "reset_at": 1703123456,
+  "tier": "basic"
+}
+```
+
+## Handling Rate Limits
+
+<CodeGroup>
+
+```bash cURL
+# Check rate limit headers in response
+curl -i -H "x-api-key: sb_live_xxx" \
+  https://scrapebadger.com/v1/twitter/tweets/123
+
+# Response headers:
+# X-RateLimit-Limit: 300
+# X-RateLimit-Remaining: 299
+# X-RateLimit-Reset: 1703123456
+```
+
+```javascript JavaScript
+async function fetchWithRateLimit(url, apiKey) {
+  const response = await fetch(url, {
+    headers: { 'x-api-key': apiKey }
+  });
+
+  const remaining = response.headers.get('X-RateLimit-Remaining');
+  const limit = response.headers.get('X-RateLimit-Limit');
+
+  if (response.status === 429) {
+    const retryAfter = response.headers.get('Retry-After');
+    console.log(`Rate limited. Retry in ${retryAfter} seconds`);
+    await new Promise(r => setTimeout(r, retryAfter * 1000));
+    return fetchWithRateLimit(url, apiKey);
+  }
+
+  console.log(`Requests remaining: ${remaining}/${limit}`);
+  return response.json();
+}
+```
+
+```python Python
+import time
+import requests
+
+def fetch_with_rate_limit(url: str, api_key: str):
+    response = requests.get(url, headers={"x-api-key": api_key})
+
+    remaining = response.headers.get("X-RateLimit-Remaining")
+    limit = response.headers.get("X-RateLimit-Limit")
+
+    if response.status_code == 429:
+        retry_after = int(response.headers.get("Retry-After", 60))
+        print(f"Rate limited. Retry in {retry_after} seconds")
+        time.sleep(retry_after)
+        return fetch_with_rate_limit(url, api_key)
+
+    print(f"Requests remaining: {remaining}/{limit}")
+    return response.json()
+```
+
+</CodeGroup>
+
+## Best Practices
+
+<CardGroup cols={2}>
+  <Card title="Monitor rate limit headers" icon="check">
+    Check `X-RateLimit-Remaining` on each response to proactively slow down before hitting limits.
+  </Card>
+  <Card title="Implement exponential backoff" icon="check">
+    When rate limited, wait the `Retry-After` time and consider increasing wait time on repeated limits.
+  </Card>
+  <Card title="Use request queuing" icon="check">
+    Queue requests and process them at a controlled rate to stay within your limits.
+  </Card>
+  <Card title="Cache responses" icon="check">
+    Cache API responses where appropriate to reduce the number of requests you need to make.
+  </Card>
+</CardGroup>
+
+<Warning>
+  **Avoid Rate Limit Abuse**
+
+  Repeatedly hitting rate limits or attempting to bypass them may result in temporary or permanent restrictions on your account.
+
+  - Don't create multiple accounts to circumvent limits
+  - Don't use rotating API keys to bypass rate limiting
+  - Contact support if you need higher limits
+</Warning>
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="How are rate limits applied?">
+    Rate limits are applied per API key using a sliding window algorithm. Each API key has its own separate rate limit counter based on your account tier.
+  </Accordion>
+  <Accordion title="What happens when I hit the rate limit?">
+    The API returns a 429 Too Many Requests response with details about when you can retry. Use the `Retry-After` header to know when to try again.
+  </Accordion>
+  <Accordion title="Do failed requests count against my rate limit?">
+    Yes, all requests (successful or not) count against your rate limit. However, rate limits are generous and designed to accommodate normal usage patterns.
+  </Accordion>
+  <Accordion title="Can I have different rate limits for different API keys?">
+    All API keys inherit the rate limit from your account tier. To get higher rate limits, upgrade your account tier.
+  </Accordion>
+  <Accordion title="How do I check my current rate limit usage?">
+    Every API response includes rate limit headers (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`) so you can track your usage in real-time.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+Need higher rate limits? Contact us at [sales@scrapebadger.com](mailto:sales@scrapebadger.com).

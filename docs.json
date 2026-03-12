@@ -1,68 +1,111 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "ScrapeBadger",
   "colors": {
     "primary": "#16A34A",
-    "light": "#07C983",
+    "light": "#22C55E",
     "dark": "#15803D"
   },
   "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/logo/light.png",
+    "dark": "/logo/dark.png"
+  },
+  "openapi": "https://scrapebadger.com/api/openapi.json",
   "navigation": {
     "tabs": [
       {
         "tab": "Guides",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Getting Started",
             "pages": [
               "index",
               "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "authentication",
+              "credits-and-pricing",
+              "rate-limits"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "API Reference",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Overview",
             "pages": [
               "api-reference/introduction"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Tweets",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api-reference/endpoint/tweets/get-tweets-by-ids",
+              "api-reference/endpoint/tweets/get-tweet-detail",
+              "api-reference/endpoint/tweets/get-tweet-retweeters",
+              "api-reference/endpoint/tweets/get-tweet-replies",
+              "api-reference/endpoint/tweets/get-tweet-favoriters",
+              "api-reference/endpoint/tweets/get-similar-tweets",
+              "api-reference/endpoint/tweets/advanced-search",
+              "api-reference/endpoint/tweets/get-tweet-edit-history",
+              "api-reference/endpoint/tweets/get-community-notes",
+              "api-reference/endpoint/tweets/get-tweet-quotes",
+              "api-reference/endpoint/tweets/get-article-detail"
+            ]
+          },
+          {
+            "group": "Users",
+            "pages": [
+              "api-reference/endpoint/users/batch-get-users-by-ids",
+              "api-reference/endpoint/users/batch-get-users-by-usernames",
+              "api-reference/endpoint/users/get-user-by-id",
+              "api-reference/endpoint/users/get-user-by-username",
+              "api-reference/endpoint/users/get-user-tweets",
+              "api-reference/endpoint/users/get-user-followers",
+              "api-reference/endpoint/users/get-user-following",
+              "api-reference/endpoint/users/get-user-subscriptions",
+              "api-reference/endpoint/users/search-users",
+              "api-reference/endpoint/users/get-user-mentions",
+              "api-reference/endpoint/users/get-user-articles"
+            ]
+          },
+          {
+            "group": "Lists",
+            "pages": [
+              "api-reference/endpoint/lists/get-list-details",
+              "api-reference/endpoint/lists/get-list-tweets",
+              "api-reference/endpoint/lists/search-list-tweets"
+            ]
+          },
+          {
+            "group": "Communities",
+            "pages": [
+              "api-reference/endpoint/communities/get-community-details",
+              "api-reference/endpoint/communities/get-community-tweets",
+              "api-reference/endpoint/communities/search-communities"
+            ]
+          },
+          {
+            "group": "Trends",
+            "pages": [
+              "api-reference/endpoint/trends/get-trending-topics",
+              "api-reference/endpoint/trends/get-trends-by-location"
+            ]
+          },
+          {
+            "group": "Geo",
+            "pages": [
+              "api-reference/endpoint/geo/search-places",
+              "api-reference/endpoint/geo/get-place-details"
+            ]
+          },
+          {
+            "group": "Spaces",
+            "pages": [
+              "api-reference/endpoint/spaces/get-broadcast-details",
+              "api-reference/endpoint/spaces/get-space-details"
             ]
           }
         ]
@@ -71,52 +114,35 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
+          "anchor": "Dashboard",
+          "href": "https://scrapebadger.com/dashboard",
+          "icon": "gauge"
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Pricing",
+          "href": "https://scrapebadger.com/pricing",
+          "icon": "credit-card"
         }
       ]
     }
-  },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
   },
   "navbar": {
     "links": [
       {
         "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "href": "mailto:support@scrapebadger.com"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "href": "https://scrapebadger.com/dashboard"
     }
-  },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/scrapebadger",
+      "github": "https://github.com/scrape-badger"
     }
   }
 }

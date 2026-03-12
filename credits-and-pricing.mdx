@@ -1,0 +1,76 @@
+---
+title: Credits & Pricing
+description: Understand the ScrapeBadger credit system, pricing tiers, and credit costs per endpoint.
+---
+
+ScrapeBadger uses a simple credit-based pricing model. Pay only for what you use with transparent, predictable costs.
+
+## How Credits Work
+
+<CardGroup cols={3}>
+  <Card title="Purchase Credits" icon="bolt">
+    Buy credit packages from your dashboard. Larger packages offer better value per credit.
+  </Card>
+  <Card title="Make API Calls" icon="credit-card">
+    Each API request deducts credits from your balance. Most endpoints cost 1 credit per call.
+  </Card>
+  <Card title="Track Usage" icon="chart-line">
+    Monitor your credit usage in real-time from your dashboard. Set up alerts for low balance.
+  </Card>
+</CardGroup>
+
+## Credit Costs by Endpoint
+
+| Category | Endpoints | Cost |
+|----------|-----------|------|
+| Twitter - Tweets | 11 endpoints | 1 credit per request |
+| Twitter - Users | 11 endpoints | 1 credit per request |
+| Twitter - Lists | 3 endpoints | 1 credit per request |
+| Twitter - Communities | 3 endpoints | 1 credit per request |
+| Twitter - Trends | 2 endpoints | 1 credit per request |
+| Twitter - Geo | 2 endpoints | 1 credit per request |
+| Twitter - Spaces | 2 endpoints | 1 credit per request |
+
+<Info>
+  Failed requests (4xx/5xx errors) do not consume credits. You are only charged for successful responses.
+</Info>
+
+## Free Credits
+
+New accounts receive free credits to get started. Use them to test the API and build your integration before purchasing more.
+
+<Card title="Create Free Account" icon="rocket" href="https://scrapebadger.com/auth/signup">
+  Sign up and get free credits to start building.
+</Card>
+
+## Credit Packages
+
+We offer a range of credit packages to suit different needs. Larger packages offer better value per credit.
+
+<Card title="View Pricing Plans" icon="credit-card" href="https://scrapebadger.com/pricing">
+  See all available credit packages and pricing.
+</Card>
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="What are credits?">
+    Credits are the unit of measurement for API usage. Each API call consumes a certain number of credits based on the endpoint.
+  </Accordion>
+  <Accordion title="Do credits expire?">
+    No, credits never expire. Once purchased, they remain in your account until you use them.
+  </Accordion>
+  <Accordion title="What happens when I run out of credits?">
+    When your credit balance reaches zero, API requests will return a 402 Payment Required error. You can purchase more credits at any time.
+  </Accordion>
+  <Accordion title="Do you offer refunds?">
+    Credits are non-refundable once purchased. However, if you experience technical issues, contact support and we will work with you.
+  </Accordion>
+  <Accordion title="Are there volume discounts?">
+    Yes! Our larger credit packages offer significant discounts. Check the [pricing page](https://scrapebadger.com/pricing) for current rates.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+Need help with billing? Contact us at [support@scrapebadger.com](mailto:support@scrapebadger.com).

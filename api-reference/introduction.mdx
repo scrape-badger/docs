@@ -1,33 +1,68 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: API Reference
+description: Complete Twitter API reference with 50+ endpoints. Auto-generated from our OpenAPI specification.
 ---
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+## Base URL
 
-## Welcome
+```
+https://scrapebadger.com/v1
+```
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
-
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
+All Twitter API endpoints are prefixed with this base URL. Authentication is required for all requests.
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+Include your API key in the `x-api-key` header with every request:
+
+```bash
+curl -X GET "https://scrapebadger.com/v1/twitter/users/elonmusk/by_username" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+See the [Authentication guide](/authentication) for more details.
+
+## Endpoint Categories
+
+| Category | Endpoints | Description |
+|----------|-----------|-------------|
+| [Tweets](/api-reference/endpoint/tweets/get-tweet-detail) | 11 | Get tweet details, replies, retweets, likes, edit history, community notes, and search |
+| [Users](/api-reference/endpoint/users/get-user-by-username) | 11 | Fetch user profiles, followers, following, mentions, articles, and batch lookups |
+| [Lists](/api-reference/endpoint/lists/get-list-details) | 3 | Access Twitter lists, their tweets, and search within lists |
+| [Communities](/api-reference/endpoint/communities/get-community-details) | 3 | Explore communities, their members, and content |
+| [Trends](/api-reference/endpoint/trends/get-trending-topics) | 2 | Get trending topics globally or for specific locations |
+| [Geo](/api-reference/endpoint/geo/search-places) | 2 | Search and retrieve geographic place information |
+| [Spaces](/api-reference/endpoint/spaces/get-space-details) | 2 | Access Twitter Spaces and live broadcasts |
+
+## Common Patterns
+
+### Pagination
+
+Most list endpoints support cursor-based pagination. The response includes a `next_cursor` field that you can pass to the `cursor` parameter to fetch the next page.
+
+```bash
+# First request
+curl "https://scrapebadger.com/v1/twitter/users/elonmusk/followers" \
+  -H "x-api-key: YOUR_API_KEY"
+
+# Response includes next_cursor
+# { "data": [...], "next_cursor": "abc123" }
+
+# Next page
+curl "https://scrapebadger.com/v1/twitter/users/elonmusk/followers?cursor=abc123" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+### Error Handling
+
+All errors return a JSON object with a `detail` field:
 
 ```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+{
+  "detail": "User not found"
+}
 ```
+
+### Credits
+
+All endpoints cost **1 credit per request**. Failed requests (4xx/5xx) do not consume credits. See [Credits & Pricing](/credits-and-pricing) for details.

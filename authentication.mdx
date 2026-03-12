@@ -1,0 +1,84 @@
+---
+title: Authentication
+description: Learn how to authenticate with the ScrapeBadger API using API keys.
+---
+
+All API requests require authentication using an API key. Learn how to create and manage your keys securely.
+
+## Getting an API Key
+
+<Steps>
+  <Step title="Sign in">
+    [Sign in](https://scrapebadger.com/auth/signin) to your ScrapeBadger account.
+  </Step>
+  <Step title="Navigate to API Keys">
+    Go to the [API Keys](https://scrapebadger.com/dashboard/api-keys) page in your dashboard.
+  </Step>
+  <Step title="Create a new key">
+    Click "Create New Key" and give it a descriptive name.
+  </Step>
+  <Step title="Copy your key">
+    Copy your key immediately — it won't be shown again.
+  </Step>
+</Steps>
+
+## Using Your API Key
+
+Include your API key in every request using one of these methods:
+
+### Header Authentication (Recommended)
+
+Pass your API key in the `x-api-key` header. This is the recommended method as it keeps your key out of URLs and logs.
+
+```bash
+curl -X GET "https://scrapebadger.com/v1/twitter/users/elonmusk/by_username" \
+  -H "x-api-key: sb_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+```
+
+### Query Parameter
+
+Alternatively, pass your API key as a query parameter. Note that this method may expose your key in logs and browser history.
+
+```bash
+curl -X GET "https://scrapebadger.com/v1/twitter/users/elonmusk/by_username?api_key=sb_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+```
+
+## Error Responses
+
+If authentication fails, the API returns one of these status codes:
+
+| Status | Name | Description |
+|--------|------|-------------|
+| `401` | Unauthorized | Missing or invalid API key. Check that you're including the key correctly. |
+| `402` | Payment Required | Insufficient credits. Purchase more credits to continue making requests. |
+| `403` | Forbidden | API key is disabled or account is restricted. Contact support if you believe this is an error. |
+
+```json Error Response Format
+{
+  "detail": "Invalid or missing API key"
+}
+```
+
+## Security Best Practices
+
+<CardGroup cols={1}>
+  <Card title="Never expose keys in client-side code" icon="shield">
+    API keys should only be used in server-side code. Never include them in frontend JavaScript, mobile apps, or public repositories.
+  </Card>
+  <Card title="Use separate keys for different environments" icon="key">
+    Create separate API keys for development, staging, and production. This makes it easier to rotate keys and track usage.
+  </Card>
+  <Card title="Rotate keys regularly" icon="triangle-exclamation">
+    Periodically create new API keys and deactivate old ones. If a key is compromised, you can disable it without affecting other keys.
+  </Card>
+</CardGroup>
+
+## Managing API Keys
+
+From your [dashboard](https://scrapebadger.com/dashboard/api-keys), you can:
+
+- Create multiple API keys for different projects
+- Rename keys for easier identification
+- Enable or disable keys without deleting them
+- View usage statistics per key
+- Delete keys that are no longer needed
