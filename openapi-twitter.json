@@ -1,0 +1,2641 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ScrapeBadger Twitter API",
+    "description": "The ScrapeBadger Twitter API provides programmatic access to Twitter/X data through a simple REST interface. Retrieve tweets, user profiles, followers, lists, communities, trends, and geographic data — all with a single API key.\n\nAll endpoints require authentication via the `x-api-key` header. Each request consumes credits from your account balance. Paginated endpoints return a `next_cursor` field that you can pass to subsequent requests to retrieve additional pages of results.\n\n**Base URL:** `https://scrapebadger.com/v1/twitter`\n\n**Rate Limits:** Requests are rate-limited per API key. If you exceed your limit, you will receive a `429` response. Implement exponential backoff and retry logic for production use.\n\n**Credits:** Each successful API call deducts credits from your balance. If your balance reaches zero, subsequent requests will return `402 Payment Required`.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "ScrapeBadger Support",
+      "url": "https://scrapebadger.com",
+      "email": "support@scrapebadger.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://scrapebadger.com",
+      "description": "Production"
+    }
+  ],
+  "security": [
+    {
+      "apiKey": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Tweets",
+      "description": "Retrieve tweets, search tweets, and access tweet metadata including replies, quotes, retweeters, favoriters, edit history, and community notes."
+    },
+    {
+      "name": "Users",
+      "description": "Retrieve user profiles, followers, following lists, mentions, subscriptions, and search for users."
+    },
+    {
+      "name": "Lists",
+      "description": "Access Twitter list details, list tweets, and search within lists."
+    },
+    {
+      "name": "Communities",
+      "description": "Retrieve community details, community tweets, and search for communities."
+    },
+    {
+      "name": "Trends",
+      "description": "Get trending topics globally or by location."
+    },
+    {
+      "name": "Geo",
+      "description": "Search for geographic places and retrieve place details."
+    },
+    {
+      "name": "Spaces",
+      "description": "Access Twitter Spaces and live broadcast details."
+    }
+  ],
+  "paths": {
+    "/v1/twitter/tweets/": {
+      "get": {
+        "operationId": "getTweetsByIds",
+        "summary": "Get tweets by IDs",
+        "description": "Retrieve multiple tweets by their IDs in a single request. Returns comprehensive tweet data for each requested ID including text, media attachments, engagement metrics, and all available metadata. Useful for bulk tweet lookups and monitoring specific tweets.",
+        "tags": ["Tweets"],
+        "parameters": [
+          {
+            "name": "tweets",
+            "in": "query",
+            "required": true,
+            "description": "Comma-separated list of tweet IDs to retrieve.",
+            "schema": {
+              "type": "string",
+              "example": "1234567890,9876543210"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved tweets.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TweetsResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/tweets/tweet/{tweet_id}": {
+      "get": {
+        "operationId": "getTweetDetail",
+        "summary": "Get tweet details",
+        "description": "Fetch detailed information about a single tweet. Returns comprehensive tweet data including author info, engagement stats, media attachments, polls, referenced tweets, and edit history. Use this for deep inspection of individual tweets.",
+        "tags": ["Tweets"],
+        "parameters": [
+          {
+            "name": "tweet_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric ID of the tweet.",
+            "schema": {
+              "type": "string",
+              "example": "1234567890123456789"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Pagination cursor from a previous response for fetching additional data.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved tweet details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TweetData"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/tweets/tweet/{tweet_id}/retweeters": {
+      "get": {
+        "operationId": "getTweetRetweeters",
+        "summary": "Get tweet retweeters",
+        "description": "Get the list of users who retweeted a specific tweet. Returns comprehensive user profile data for each retweeter with pagination support. Useful for analyzing tweet reach and audience engagement.",
+        "tags": ["Tweets"],
+        "parameters": [
+          {
+            "name": "tweet_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric ID of the tweet.",
+            "schema": {
+              "type": "string",
+              "example": "1234567890123456789"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Pagination cursor for fetching the next page of results.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved retweeters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsersResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/tweets/tweet/{tweet_id}/replies": {
+      "get": {
+        "operationId": "getTweetReplies",
+        "summary": "Get tweet replies",
+        "description": "Get replies to a specific tweet. Returns comprehensive tweet data for each reply including text, media, engagement metrics, and author information. Supports pagination for tweets with many replies.",
+        "tags": ["Tweets"],
+        "parameters": [
+          {
+            "name": "tweet_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric ID of the tweet.",
+            "schema": {
+              "type": "string",
+              "example": "1234567890123456789"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Pagination cursor for fetching the next page of results.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved replies.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TweetsResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/tweets/tweet/{tweet_id}/favoriters": {
+      "get": {
+        "operationId": "getTweetFavoriters",
+        "summary": "Get tweet favoriters",
+        "description": "Get the list of users who favorited (liked) a specific tweet. Returns comprehensive user profile data for each user who liked the tweet. Useful for audience analysis and engagement tracking.",
+        "tags": ["Tweets"],
+        "parameters": [
+          {
+            "name": "tweet_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric ID of the tweet.",
+            "schema": {
+              "type": "string",
+              "example": "1234567890123456789"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Pagination cursor for fetching the next page of results.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved favoriters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsersResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/tweets/tweet/{tweet_id}/similar": {
+      "get": {
+        "operationId": "getSimilarTweets",
+        "summary": "Get similar tweets",
+        "description": "Get tweets that are similar in content or topic to the specified tweet. Returns tweets that Twitter's algorithm considers related. Useful for content discovery and topic analysis.",
+        "tags": ["Tweets"],
+        "parameters": [
+          {
+            "name": "tweet_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric ID of the tweet.",
+            "schema": {
+              "type": "string",
+              "example": "1234567890123456789"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved similar tweets.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TweetsResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/tweets/advanced_search": {
+      "get": {
+        "operationId": "advancedSearchTweets",
+        "summary": "Advanced tweet search",
+        "description": "Search for tweets using advanced query syntax. Supports filtering by Top, Latest, or Media results. Use Twitter's advanced search operators in the query (e.g., `from:username`, `since:2024-01-01`, `min_faves:100`). Essential for monitoring, research, and content discovery.",
+        "tags": ["Tweets"],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "description": "Search query string. Supports Twitter advanced search operators like `from:`, `to:`, `since:`, `until:`, `min_faves:`, `min_retweets:`, `lang:`, etc.",
+            "schema": {
+              "type": "string",
+              "example": "from:elonmusk lang:en"
+            }
+          },
+          {
+            "name": "query_type",
+            "in": "query",
+            "required": false,
+            "description": "Type of search results to return.",
+            "schema": {
+              "type": "string",
+              "enum": ["Top", "Latest", "Media"],
+              "default": "Top"
+            }
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "description": "Number of tweets to return per page.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Pagination cursor for fetching the next page of results.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved search results.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TweetsResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/tweets/tweet/{tweet_id}/edit_history": {
+      "get": {
+        "operationId": "getTweetEditHistory",
+        "summary": "Get tweet edit history",
+        "description": "Get the edit history of a tweet. Returns all versions of the tweet in chronological order, from the original to the most recent edit. Useful for tracking changes to tweet content over time.",
+        "tags": ["Tweets"],
+        "parameters": [
+          {
+            "name": "tweet_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric ID of the tweet.",
+            "schema": {
+              "type": "string",
+              "example": "1234567890123456789"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved edit history.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TweetsResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/tweets/tweet/{tweet_id}/community_notes": {
+      "get": {
+        "operationId": "getTweetCommunityNotes",
+        "summary": "Get community notes",
+        "description": "Get community notes (formerly Birdwatch) attached to a specific tweet. Community notes provide crowd-sourced context and fact-checking for tweets. Returns note text, status, and creation date.",
+        "tags": ["Tweets"],
+        "parameters": [
+          {
+            "name": "tweet_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric ID of the tweet.",
+            "schema": {
+              "type": "string",
+              "example": "1234567890123456789"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved community notes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityNotesResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/tweets/tweet/{tweet_id}/quotes": {
+      "get": {
+        "operationId": "getTweetQuotes",
+        "summary": "Get tweet quotes",
+        "description": "Get tweets that quote the specified tweet. Returns comprehensive tweet data for each quote tweet including text, media, engagement metrics, and author information. Useful for tracking how a tweet is being discussed and shared.",
+        "tags": ["Tweets"],
+        "parameters": [
+          {
+            "name": "tweet_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric ID of the tweet.",
+            "schema": {
+              "type": "string",
+              "example": "1234567890123456789"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Pagination cursor for fetching the next page of results.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved quote tweets.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TweetsResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/tweets/article/{article_id}": {
+      "get": {
+        "operationId": "getArticleDetail",
+        "summary": "Get article by ID",
+        "description": "Get a Twitter Article (long-form post) by its unique ID. Returns the full article content including title, body text, cover image, and author information. Twitter Articles are long-form content published directly on the platform.",
+        "tags": ["Tweets"],
+        "parameters": [
+          {
+            "name": "article_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique ID of the article.",
+            "schema": {
+              "type": "string",
+              "example": "1234567890123456789"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved article.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleData"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/users/batch_by_ids": {
+      "get": {
+        "operationId": "getUsersByIds",
+        "summary": "Batch get users by IDs",
+        "description": "Fetch multiple user profiles by their numeric IDs in a single request. Returns comprehensive user profile data for each requested ID. More efficient than making individual requests when you need data for multiple users.",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "user_ids",
+            "in": "query",
+            "required": true,
+            "description": "Comma-separated list of numeric user IDs.",
+            "schema": {
+              "type": "string",
+              "example": "44196397,50393960"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved users.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsersResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/users/batch_by_usernames": {
+      "get": {
+        "operationId": "getUsersByUsernames",
+        "summary": "Batch get users by usernames",
+        "description": "Fetch multiple user profiles by their usernames (screen names) in a single request. Returns comprehensive user profile data for each requested username. More efficient than making individual requests when you need data for multiple users.",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "usernames",
+            "in": "query",
+            "required": true,
+            "description": "Comma-separated list of usernames (without the @ symbol).",
+            "schema": {
+              "type": "string",
+              "example": "elonmusk,jack"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved users.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsersResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/users/{user_id}/by_id": {
+      "get": {
+        "operationId": "getUserById",
+        "summary": "Get user by ID",
+        "description": "Get a user profile by their numeric Twitter ID. Returns comprehensive profile data including bio, follower/following counts, verification status, and account metadata. Use this when you have the numeric ID and need full profile details.",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric ID of the user.",
+            "schema": {
+              "type": "string",
+              "example": "44196397"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved user profile.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserData"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/users/{username}/by_username": {
+      "get": {
+        "operationId": "getUserByUsername",
+        "summary": "Get user by username",
+        "description": "Get a user profile by their username (screen name). Returns comprehensive profile data including bio, follower/following counts, verification status, and account metadata. The most common way to look up a user profile.",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "description": "The username (screen name) of the user, without the @ symbol.",
+            "schema": {
+              "type": "string",
+              "example": "elonmusk"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved user profile.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserData"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/users/{username}/latest_tweets": {
+      "get": {
+        "operationId": "getUserLatestTweets",
+        "summary": "Get user tweets",
+        "description": "Get the latest tweets from a specific user's timeline. Returns comprehensive tweet data including text, media, engagement metrics, and all metadata. Supports pagination to retrieve the full tweet history.",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "description": "The username (screen name) of the user.",
+            "schema": {
+              "type": "string",
+              "example": "elonmusk"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Pagination cursor for fetching the next page of results.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved user tweets.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TweetsResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/users/{username}/followers": {
+      "get": {
+        "operationId": "getUserFollowers",
+        "summary": "Get user followers",
+        "description": "Get the list of followers for a specific user. Returns comprehensive user profile data for each follower with pagination support. Useful for audience analysis and social graph exploration.",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "description": "The username (screen name) of the user.",
+            "schema": {
+              "type": "string",
+              "example": "elonmusk"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Pagination cursor for fetching the next page of results.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved followers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsersResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/users/{username}/followings": {
+      "get": {
+        "operationId": "getUserFollowings",
+        "summary": "Get user following",
+        "description": "Get the list of users that a specific user is following. Returns comprehensive user profile data for each followed account with pagination support. Useful for understanding a user's interests and network.",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "description": "The username (screen name) of the user.",
+            "schema": {
+              "type": "string",
+              "example": "elonmusk"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Pagination cursor for fetching the next page of results.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved following list.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsersResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/users/{user_id}/subscriptions": {
+      "get": {
+        "operationId": "getUserSubscriptions",
+        "summary": "Get user subscriptions",
+        "description": "Get the premium account subscriptions for a specific user. Returns the list of accounts that the user subscribes to for premium content. Requires the user's numeric ID.",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric ID of the user.",
+            "schema": {
+              "type": "string",
+              "example": "44196397"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Pagination cursor for fetching the next page of results.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved subscriptions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsersResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/users/search_users": {
+      "get": {
+        "operationId": "searchUsers",
+        "summary": "Search users",
+        "description": "Search for users by username, display name, or keywords in their bio. Returns matching user profiles with comprehensive data. Useful for finding accounts related to specific topics or interests.",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "description": "Search query to match against usernames, display names, and bios.",
+            "schema": {
+              "type": "string",
+              "example": "machine learning"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Pagination cursor for fetching the next page of results.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved search results.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsersResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/users/{username}/mentions": {
+      "get": {
+        "operationId": "getUserMentions",
+        "summary": "Get user mentions",
+        "description": "Get tweets that mention a specific user. Returns tweets containing @username from the latest search results. Useful for monitoring brand mentions, tracking conversations, and reputation management.",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "description": "The username (screen name) of the user.",
+            "schema": {
+              "type": "string",
+              "example": "elonmusk"
+            }
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "description": "Number of tweets to return per page.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Pagination cursor for fetching the next page of results.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved mentions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TweetsResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/users/{user_id}/articles": {
+      "get": {
+        "operationId": "getUserArticles",
+        "summary": "Get user articles",
+        "description": "Get long-form articles (Twitter Articles) written by a specific user. Returns article metadata including title, body text, cover image, and publication date. Requires the user's numeric ID.",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric ID of the user.",
+            "schema": {
+              "type": "string",
+              "example": "44196397"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Pagination cursor for fetching the next page of results.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved articles.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticlesResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/lists/{list_id}/detail": {
+      "get": {
+        "operationId": "getListDetail",
+        "summary": "Get list details",
+        "description": "Get detailed information about a Twitter list. Returns comprehensive list details including name, description, member count, subscriber count, visibility mode, and owner information. Useful for understanding list composition before fetching its tweets.",
+        "tags": ["Lists"],
+        "parameters": [
+          {
+            "name": "list_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric ID of the list.",
+            "schema": {
+              "type": "string",
+              "example": "1580582120482430976"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved list details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListData"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/lists/{list_id}/tweets": {
+      "get": {
+        "operationId": "getListTweets",
+        "summary": "Get list tweets",
+        "description": "Get tweets from a specific Twitter list. Returns comprehensive tweet data from the list's timeline including all metadata, media attachments, and engagement metrics. Supports pagination for lists with many tweets.",
+        "tags": ["Lists"],
+        "parameters": [
+          {
+            "name": "list_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric ID of the list.",
+            "schema": {
+              "type": "string",
+              "example": "1580582120482430976"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Pagination cursor for fetching the next page of results.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved list tweets.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TweetsResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/lists/{list_id}/search_tweets": {
+      "get": {
+        "operationId": "searchListTweets",
+        "summary": "Search list tweets",
+        "description": "Search for tweets within a specific Twitter list. Returns tweets from the list that match the given search query. Useful for finding specific content within curated tweet collections.",
+        "tags": ["Lists"],
+        "parameters": [
+          {
+            "name": "list_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric ID of the list.",
+            "schema": {
+              "type": "string",
+              "example": "1580582120482430976"
+            }
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "description": "Search query to filter tweets within the list.",
+            "schema": {
+              "type": "string",
+              "example": "artificial intelligence"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Pagination cursor for fetching the next page of results.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved search results.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TweetsResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/communities/{community_id}": {
+      "get": {
+        "operationId": "getCommunityDetail",
+        "summary": "Get community details",
+        "description": "Get detailed information about a Twitter community. Returns comprehensive community data including name, description, member count, join policy, banner image, creator/admin info, and community rules. Useful for understanding a community before exploring its content.",
+        "tags": ["Communities"],
+        "parameters": [
+          {
+            "name": "community_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric ID of the community.",
+            "schema": {
+              "type": "string",
+              "example": "1234567890"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved community details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityData"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/communities/{community_id}/tweets": {
+      "get": {
+        "operationId": "getCommunityTweets",
+        "summary": "Get community tweets",
+        "description": "Get tweets from a specific community. Returns tweets posted within the community, filterable by type (Top, Latest, or Media). Supports pagination for communities with extensive content.",
+        "tags": ["Communities"],
+        "parameters": [
+          {
+            "name": "community_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique numeric ID of the community.",
+            "schema": {
+              "type": "string",
+              "example": "1234567890"
+            }
+          },
+          {
+            "name": "tweet_type",
+            "in": "query",
+            "required": false,
+            "description": "Type of tweets to return from the community.",
+            "schema": {
+              "type": "string",
+              "enum": ["Top", "Latest", "Media"],
+              "default": "Top"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Pagination cursor for fetching the next page of results.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved community tweets.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TweetsResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/communities/search": {
+      "get": {
+        "operationId": "searchCommunities",
+        "summary": "Search communities",
+        "description": "Search for Twitter communities by name, description, or keywords. Returns matching communities with comprehensive information including member count, join policy, and description. Useful for discovering communities related to specific topics.",
+        "tags": ["Communities"],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "description": "Search query to match against community names and descriptions.",
+            "schema": {
+              "type": "string",
+              "example": "web development"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Pagination cursor for fetching the next page of results.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved communities.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunitiesResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/trends/": {
+      "get": {
+        "operationId": "getTrends",
+        "summary": "Get trending topics",
+        "description": "Get current trending topics on Twitter. Results can be filtered by category: trending (default), for-you, news, sports, or entertainment. Returns trend names, tweet counts, and context information.",
+        "tags": ["Trends"],
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "description": "Category to filter trends by.",
+            "schema": {
+              "type": "string",
+              "enum": ["trending", "for-you", "news", "sports", "entertainment"],
+              "default": "trending"
+            }
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "description": "Number of trends to return.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved trends.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrendsResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/trends/place/{woeid}": {
+      "get": {
+        "operationId": "getTrendsByPlace",
+        "summary": "Get trends by location",
+        "description": "Get trending topics for a specific geographic location identified by its WOEID (Where On Earth ID). Returns location-specific trends including trend names, tweet volumes, and search URLs. Use WOEID 1 for worldwide trends, or 23424977 for United States.",
+        "tags": ["Trends"],
+        "parameters": [
+          {
+            "name": "woeid",
+            "in": "path",
+            "required": true,
+            "description": "Where On Earth ID of the location. Use 1 for worldwide, 23424977 for US, 23424975 for UK, etc.",
+            "schema": {
+              "type": "string",
+              "example": "1"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved place trends.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlaceTrendsData"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/geo/search": {
+      "get": {
+        "operationId": "searchPlaces",
+        "summary": "Search places",
+        "description": "Search for geographic places that can be attached to tweets. At least one of `query`, `lat`/`long`, or `ip` must be provided. Results can be filtered by granularity (neighborhood, city, admin, country). Useful for geo-tagging and location-based analysis.",
+        "tags": ["Geo"],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "description": "Free-form text search for place names.",
+            "schema": {
+              "type": "string",
+              "example": "San Francisco"
+            }
+          },
+          {
+            "name": "lat",
+            "in": "query",
+            "required": false,
+            "description": "Latitude coordinate for location-based search.",
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "example": 37.7749
+            }
+          },
+          {
+            "name": "long",
+            "in": "query",
+            "required": false,
+            "description": "Longitude coordinate for location-based search.",
+            "schema": {
+              "type": "number",
+              "format": "double",
+              "example": -122.4194
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved places.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlacesResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/geo/places/{place_id}": {
+      "get": {
+        "operationId": "getPlaceDetail",
+        "summary": "Get place details",
+        "description": "Get detailed information about a specific geographic place. Returns comprehensive place data including full name, country, place type, bounding box coordinates, and additional attributes. Use place IDs obtained from the geo search endpoint.",
+        "tags": ["Geo"],
+        "parameters": [
+          {
+            "name": "place_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique ID of the place.",
+            "schema": {
+              "type": "string",
+              "example": "5a110d312052166f"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved place details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlaceData"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/spaces/broadcast/{broadcast_id}": {
+      "get": {
+        "operationId": "getBroadcastDetail",
+        "summary": "Get broadcast details",
+        "description": "Get details of a live video broadcast on Twitter. Returns broadcast metadata including title, current state, media key, dimensions, viewer counts, and timestamps. Useful for monitoring live content on the platform.",
+        "tags": ["Spaces"],
+        "parameters": [
+          {
+            "name": "broadcast_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique ID of the broadcast.",
+            "schema": {
+              "type": "string",
+              "example": "1rmGPkBbVzqKN"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved broadcast details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BroadcastData"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/spaces/{space_id}": {
+      "get": {
+        "operationId": "getSpaceDetail",
+        "summary": "Get Space details",
+        "description": "Get details of a Twitter Space (audio room). Returns Space metadata including title, current state, creator information, participant counts, and scheduling details. Useful for monitoring live audio content and upcoming events.",
+        "tags": ["Spaces"],
+        "parameters": [
+          {
+            "name": "space_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique ID of the Twitter Space.",
+            "schema": {
+              "type": "string",
+              "example": "1eaJbrPZRwOKX"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved Space details.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpaceData"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apiKey": {
+        "type": "apiKey",
+        "name": "x-api-key",
+        "in": "header",
+        "description": "Your ScrapeBadger API key. You can find this in your dashboard at https://scrapebadger.com/dashboard/api-keys."
+      }
+    },
+    "schemas": {
+      "TweetData": {
+        "type": "object",
+        "description": "Comprehensive tweet data including text, author info, engagement metrics, media, and metadata.",
+        "required": ["id", "text", "created_at"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique tweet identifier.",
+            "example": "1234567890123456789"
+          },
+          "text": {
+            "type": "string",
+            "description": "The tweet text content.",
+            "example": "Hello, world! This is a tweet."
+          },
+          "full_text": {
+            "type": ["string", "null"],
+            "description": "Full text of the tweet, including extended content beyond 280 characters."
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Timestamp when the tweet was created.",
+            "example": "Wed Oct 10 20:19:24 +0000 2018"
+          },
+          "lang": {
+            "type": ["string", "null"],
+            "description": "BCP 47 language tag of the tweet content.",
+            "example": "en"
+          },
+          "user_id": {
+            "type": ["string", "null"],
+            "description": "Numeric ID of the tweet author.",
+            "example": "44196397"
+          },
+          "username": {
+            "type": ["string", "null"],
+            "description": "Username (screen name) of the tweet author.",
+            "example": "elonmusk"
+          },
+          "user_name": {
+            "type": ["string", "null"],
+            "description": "Display name of the tweet author.",
+            "example": "Elon Musk"
+          },
+          "favorite_count": {
+            "type": "integer",
+            "description": "Number of times this tweet has been liked.",
+            "default": 0
+          },
+          "retweet_count": {
+            "type": "integer",
+            "description": "Number of times this tweet has been retweeted.",
+            "default": 0
+          },
+          "reply_count": {
+            "type": "integer",
+            "description": "Number of replies to this tweet.",
+            "default": 0
+          },
+          "quote_count": {
+            "type": "integer",
+            "description": "Number of times this tweet has been quoted.",
+            "default": 0
+          },
+          "view_count": {
+            "type": ["integer", "null"],
+            "description": "Number of times this tweet has been viewed."
+          },
+          "bookmark_count": {
+            "type": ["integer", "null"],
+            "description": "Number of times this tweet has been bookmarked."
+          },
+          "favorited": {
+            "type": "boolean",
+            "description": "Whether the authenticated user has liked this tweet.",
+            "default": false
+          },
+          "retweeted": {
+            "type": "boolean",
+            "description": "Whether the authenticated user has retweeted this tweet.",
+            "default": false
+          },
+          "bookmarked": {
+            "type": "boolean",
+            "description": "Whether the authenticated user has bookmarked this tweet.",
+            "default": false
+          },
+          "possibly_sensitive": {
+            "type": "boolean",
+            "description": "Whether the tweet is flagged as possibly containing sensitive content.",
+            "default": false
+          },
+          "is_quote_status": {
+            "type": "boolean",
+            "description": "Whether the tweet is a quote tweet.",
+            "default": false
+          },
+          "is_retweet": {
+            "type": "boolean",
+            "description": "Whether the tweet is a retweet.",
+            "default": false
+          },
+          "conversation_id": {
+            "type": ["string", "null"],
+            "description": "ID of the conversation thread this tweet belongs to."
+          },
+          "in_reply_to_status_id": {
+            "type": ["string", "null"],
+            "description": "ID of the tweet this is a reply to, if applicable."
+          },
+          "in_reply_to_user_id": {
+            "type": ["string", "null"],
+            "description": "ID of the user this tweet is replying to."
+          },
+          "media": {
+            "type": "array",
+            "description": "Media attachments (photos, videos, GIFs).",
+            "items": {
+              "$ref": "#/components/schemas/Media"
+            }
+          },
+          "urls": {
+            "type": "array",
+            "description": "URLs mentioned in the tweet.",
+            "items": {
+              "$ref": "#/components/schemas/URL"
+            }
+          },
+          "hashtags": {
+            "type": "array",
+            "description": "Hashtags in the tweet.",
+            "items": {
+              "$ref": "#/components/schemas/Hashtag"
+            }
+          },
+          "user_mentions": {
+            "type": "array",
+            "description": "Users mentioned in the tweet.",
+            "items": {
+              "$ref": "#/components/schemas/UserMention"
+            }
+          },
+          "poll": {
+            "oneOf": [
+              { "$ref": "#/components/schemas/Poll" },
+              { "type": "null" }
+            ],
+            "description": "Poll data if the tweet contains a poll."
+          },
+          "place": {
+            "oneOf": [
+              { "$ref": "#/components/schemas/Place" },
+              { "type": "null" }
+            ],
+            "description": "Geographic place associated with the tweet."
+          },
+          "quoted_status_id": {
+            "type": ["string", "null"],
+            "description": "ID of the quoted tweet, if this is a quote tweet."
+          },
+          "retweeted_status_id": {
+            "type": ["string", "null"],
+            "description": "ID of the original tweet, if this is a retweet."
+          },
+          "edit_tweet_ids": {
+            "type": ["array", "null"],
+            "description": "List of tweet IDs in the edit chain.",
+            "items": { "type": "string" }
+          },
+          "editable_until_msecs": {
+            "type": ["integer", "null"],
+            "description": "Timestamp (milliseconds) until the tweet can be edited."
+          },
+          "edits_remaining": {
+            "type": ["integer", "null"],
+            "description": "Number of remaining edits allowed."
+          },
+          "is_edit_eligible": {
+            "type": ["boolean", "null"],
+            "description": "Whether the tweet is eligible for editing."
+          },
+          "has_card": {
+            "type": ["boolean", "null"],
+            "description": "Whether the tweet has a link preview card."
+          },
+          "thumbnail_url": {
+            "type": ["string", "null"],
+            "description": "URL of the link preview thumbnail."
+          },
+          "thumbnail_title": {
+            "type": ["string", "null"],
+            "description": "Title of the link preview card."
+          },
+          "has_community_notes": {
+            "type": ["boolean", "null"],
+            "description": "Whether the tweet has community notes attached."
+          },
+          "source": {
+            "type": ["string", "null"],
+            "description": "Client application used to post the tweet.",
+            "example": "Twitter Web App"
+          }
+        }
+      },
+      "UserData": {
+        "type": "object",
+        "description": "Comprehensive user profile data including bio, metrics, verification status, and account metadata.",
+        "required": ["id", "username", "name", "created_at"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique numeric user identifier.",
+            "example": "44196397"
+          },
+          "username": {
+            "type": "string",
+            "description": "The user's screen name (handle).",
+            "example": "elonmusk"
+          },
+          "name": {
+            "type": "string",
+            "description": "The user's display name.",
+            "example": "Elon Musk"
+          },
+          "description": {
+            "type": ["string", "null"],
+            "description": "The user's bio/description.",
+            "example": "Mars & Cars, Chips & Dips"
+          },
+          "location": {
+            "type": ["string", "null"],
+            "description": "The user's self-reported location.",
+            "example": "Mars"
+          },
+          "url": {
+            "type": ["string", "null"],
+            "description": "URL in the user's profile."
+          },
+          "profile_image_url": {
+            "type": ["string", "null"],
+            "description": "URL of the user's profile image."
+          },
+          "profile_banner_url": {
+            "type": ["string", "null"],
+            "description": "URL of the user's profile banner."
+          },
+          "followers_count": {
+            "type": "integer",
+            "description": "Number of followers.",
+            "default": 0
+          },
+          "following_count": {
+            "type": "integer",
+            "description": "Number of accounts this user follows.",
+            "default": 0
+          },
+          "tweet_count": {
+            "type": "integer",
+            "description": "Total number of tweets posted.",
+            "default": 0
+          },
+          "listed_count": {
+            "type": "integer",
+            "description": "Number of lists this user appears on.",
+            "default": 0
+          },
+          "favourites_count": {
+            "type": ["integer", "null"],
+            "description": "Number of tweets this user has liked."
+          },
+          "media_count": {
+            "type": ["integer", "null"],
+            "description": "Number of media items posted."
+          },
+          "verified": {
+            "type": "boolean",
+            "description": "Whether the user is verified (legacy verification).",
+            "default": false
+          },
+          "verified_type": {
+            "type": ["string", "null"],
+            "description": "Type of verification (e.g., Government, Business)."
+          },
+          "is_blue_verified": {
+            "type": ["boolean", "null"],
+            "description": "Whether the user has a Twitter Blue/Premium subscription."
+          },
+          "created_at": {
+            "type": "string",
+            "description": "Account creation timestamp.",
+            "example": "Tue Jun 02 20:12:29 +0000 2009"
+          },
+          "created_at_datetime": {
+            "type": ["string", "null"],
+            "description": "Account creation date in ISO 8601 format."
+          },
+          "protected": {
+            "type": ["boolean", "null"],
+            "description": "Whether the user's tweets are protected (private)."
+          },
+          "possibly_sensitive": {
+            "type": ["boolean", "null"],
+            "description": "Whether the user's content may be sensitive."
+          },
+          "followed_by": {
+            "type": ["boolean", "null"],
+            "description": "Whether this user follows the authenticated user."
+          },
+          "following": {
+            "type": ["boolean", "null"],
+            "description": "Whether the authenticated user follows this user."
+          },
+          "can_dm": {
+            "type": ["boolean", "null"],
+            "description": "Whether the authenticated user can send a DM to this user."
+          },
+          "professional_type": {
+            "type": ["string", "null"],
+            "description": "Professional account type, if applicable."
+          },
+          "pinned_tweet_ids": {
+            "type": ["array", "null"],
+            "description": "IDs of the user's pinned tweets.",
+            "items": { "type": "string" }
+          }
+        }
+      },
+      "Media": {
+        "type": "object",
+        "description": "Media attachment in a tweet (photo, video, or animated GIF).",
+        "properties": {
+          "media_key": {
+            "type": ["string", "null"],
+            "description": "Unique identifier for the media."
+          },
+          "type": {
+            "type": ["string", "null"],
+            "description": "Type of media.",
+            "enum": ["photo", "video", "animated_gif"]
+          },
+          "url": {
+            "type": ["string", "null"],
+            "description": "URL of the media resource."
+          },
+          "preview_image_url": {
+            "type": ["string", "null"],
+            "description": "URL of the preview/thumbnail image."
+          },
+          "width": {
+            "type": ["integer", "null"],
+            "description": "Width of the media in pixels."
+          },
+          "height": {
+            "type": ["integer", "null"],
+            "description": "Height of the media in pixels."
+          },
+          "duration_ms": {
+            "type": ["integer", "null"],
+            "description": "Duration in milliseconds (for video/GIF)."
+          },
+          "view_count": {
+            "type": ["integer", "null"],
+            "description": "Number of views (for video)."
+          },
+          "alt_text": {
+            "type": ["string", "null"],
+            "description": "Alt text description of the media."
+          }
+        }
+      },
+      "URL": {
+        "type": "object",
+        "description": "URL entity in a tweet or user profile.",
+        "required": ["url"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "The shortened t.co URL."
+          },
+          "expanded_url": {
+            "type": ["string", "null"],
+            "description": "The fully expanded URL."
+          },
+          "display_url": {
+            "type": ["string", "null"],
+            "description": "Display-friendly version of the URL."
+          },
+          "unwound_url": {
+            "type": ["string", "null"],
+            "description": "Fully resolved URL after following redirects."
+          }
+        }
+      },
+      "Hashtag": {
+        "type": "object",
+        "description": "Hashtag entity in a tweet.",
+        "required": ["text"],
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "The hashtag text (without the # symbol).",
+            "example": "AI"
+          },
+          "indices": {
+            "type": ["array", "null"],
+            "description": "Start and end positions of the hashtag in the tweet text.",
+            "items": { "type": "integer" }
+          }
+        }
+      },
+      "UserMention": {
+        "type": "object",
+        "description": "User mention entity in a tweet.",
+        "properties": {
+          "id": {
+            "type": ["string", "null"],
+            "description": "Numeric ID of the mentioned user."
+          },
+          "username": {
+            "type": ["string", "null"],
+            "description": "Username of the mentioned user."
+          },
+          "name": {
+            "type": ["string", "null"],
+            "description": "Display name of the mentioned user."
+          },
+          "indices": {
+            "type": ["array", "null"],
+            "description": "Start and end positions of the mention in the tweet text.",
+            "items": { "type": "integer" }
+          }
+        }
+      },
+      "Poll": {
+        "type": "object",
+        "description": "Poll data in a tweet.",
+        "properties": {
+          "id": {
+            "type": ["string", "null"],
+            "description": "Unique poll identifier."
+          },
+          "voting_status": {
+            "type": ["string", "null"],
+            "description": "Current voting status.",
+            "enum": ["open", "closed"]
+          },
+          "end_datetime": {
+            "type": ["string", "null"],
+            "description": "When the poll ends or ended."
+          },
+          "duration_minutes": {
+            "type": ["integer", "null"],
+            "description": "Total duration of the poll in minutes."
+          },
+          "options": {
+            "type": "array",
+            "description": "Poll options with vote counts.",
+            "items": {
+              "$ref": "#/components/schemas/PollOption"
+            }
+          }
+        }
+      },
+      "PollOption": {
+        "type": "object",
+        "description": "A single poll option with its vote count.",
+        "required": ["position", "label", "votes"],
+        "properties": {
+          "position": {
+            "type": "integer",
+            "description": "Position of the option (1-indexed)."
+          },
+          "label": {
+            "type": "string",
+            "description": "Text label of the poll option."
+          },
+          "votes": {
+            "type": "integer",
+            "description": "Number of votes for this option."
+          }
+        }
+      },
+      "Place": {
+        "type": "object",
+        "description": "Geographic place information attached to a tweet.",
+        "properties": {
+          "id": {
+            "type": ["string", "null"],
+            "description": "Unique place identifier."
+          },
+          "full_name": {
+            "type": ["string", "null"],
+            "description": "Full human-readable place name.",
+            "example": "San Francisco, CA"
+          },
+          "name": {
+            "type": ["string", "null"],
+            "description": "Short place name.",
+            "example": "San Francisco"
+          },
+          "country": {
+            "type": ["string", "null"],
+            "description": "Country name.",
+            "example": "United States"
+          },
+          "country_code": {
+            "type": ["string", "null"],
+            "description": "ISO country code.",
+            "example": "US"
+          },
+          "place_type": {
+            "type": ["string", "null"],
+            "description": "Type of place.",
+            "enum": ["city", "country", "admin", "poi", "neighborhood"]
+          }
+        }
+      },
+      "ListData": {
+        "type": "object",
+        "description": "Twitter list metadata.",
+        "required": ["id", "name"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique list identifier.",
+            "example": "1580582120482430976"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the list.",
+            "example": "Tech Leaders"
+          },
+          "description": {
+            "type": ["string", "null"],
+            "description": "Description of the list."
+          },
+          "created_at": {
+            "type": ["string", "null"],
+            "description": "Timestamp when the list was created."
+          },
+          "member_count": {
+            "type": ["integer", "null"],
+            "description": "Number of members in the list."
+          },
+          "subscriber_count": {
+            "type": ["integer", "null"],
+            "description": "Number of subscribers to the list."
+          },
+          "mode": {
+            "type": ["string", "null"],
+            "description": "Visibility mode of the list.",
+            "enum": ["public", "private"]
+          },
+          "user_id": {
+            "type": ["string", "null"],
+            "description": "Numeric ID of the list owner."
+          },
+          "username": {
+            "type": ["string", "null"],
+            "description": "Username of the list owner."
+          }
+        }
+      },
+      "CommunityData": {
+        "type": "object",
+        "description": "Comprehensive Twitter community data.",
+        "required": ["id", "name"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique community identifier.",
+            "example": "1234567890"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the community.",
+            "example": "Web Developers"
+          },
+          "description": {
+            "type": ["string", "null"],
+            "description": "Description of the community."
+          },
+          "member_count": {
+            "type": ["integer", "null"],
+            "description": "Number of members."
+          },
+          "is_member": {
+            "type": ["boolean", "null"],
+            "description": "Whether the authenticated user is a member."
+          },
+          "role": {
+            "type": ["string", "null"],
+            "description": "Role of the authenticated user.",
+            "enum": ["member", "moderator", "admin", "non_member"]
+          },
+          "is_nsfw": {
+            "type": ["boolean", "null"],
+            "description": "Whether the community is marked as NSFW."
+          },
+          "join_policy": {
+            "type": ["string", "null"],
+            "description": "Join policy for the community.",
+            "enum": ["Open", "Closed"]
+          },
+          "invites_policy": {
+            "type": ["string", "null"],
+            "description": "Invites policy for the community."
+          },
+          "created_at": {
+            "type": ["integer", "null"],
+            "description": "Creation timestamp in milliseconds."
+          },
+          "created_at_datetime": {
+            "type": ["string", "null"],
+            "description": "Creation date in ISO 8601 format."
+          },
+          "banner": {
+            "oneOf": [
+              { "$ref": "#/components/schemas/CommunityBanner" },
+              { "type": "null" }
+            ],
+            "description": "Community banner image."
+          },
+          "creator_id": {
+            "type": ["string", "null"],
+            "description": "Numeric ID of the community creator."
+          },
+          "creator_username": {
+            "type": ["string", "null"],
+            "description": "Username of the community creator."
+          },
+          "creator_name": {
+            "type": ["string", "null"],
+            "description": "Display name of the community creator."
+          },
+          "admin_id": {
+            "type": ["string", "null"],
+            "description": "Numeric ID of the community admin."
+          },
+          "admin_username": {
+            "type": ["string", "null"],
+            "description": "Username of the community admin."
+          },
+          "admin_name": {
+            "type": ["string", "null"],
+            "description": "Display name of the community admin."
+          },
+          "rules": {
+            "type": ["array", "null"],
+            "description": "Community rules.",
+            "items": {
+              "$ref": "#/components/schemas/CommunityRule"
+            }
+          }
+        }
+      },
+      "CommunityBanner": {
+        "type": "object",
+        "description": "Community banner image information.",
+        "properties": {
+          "url": {
+            "type": ["string", "null"],
+            "description": "URL of the banner image."
+          },
+          "width": {
+            "type": ["integer", "null"],
+            "description": "Width of the banner in pixels."
+          },
+          "height": {
+            "type": ["integer", "null"],
+            "description": "Height of the banner in pixels."
+          }
+        }
+      },
+      "CommunityRule": {
+        "type": "object",
+        "description": "A community rule.",
+        "properties": {
+          "name": {
+            "type": ["string", "null"],
+            "description": "Name/title of the rule."
+          },
+          "description": {
+            "type": ["string", "null"],
+            "description": "Detailed description of the rule."
+          }
+        }
+      },
+      "TrendData": {
+        "type": "object",
+        "description": "A single trending topic.",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the trending topic or hashtag.",
+            "example": "#AI"
+          },
+          "url": {
+            "type": ["string", "null"],
+            "description": "Twitter search URL for this trend."
+          },
+          "query": {
+            "type": ["string", "null"],
+            "description": "Search query string for this trend."
+          },
+          "tweet_count": {
+            "type": ["integer", "null"],
+            "description": "Approximate number of tweets about this trend."
+          },
+          "domain_context": {
+            "type": ["string", "null"],
+            "description": "Contextual category of the trend (e.g., 'Entertainment', 'Sports')."
+          }
+        }
+      },
+      "PlaceTrendsData": {
+        "type": "object",
+        "description": "Trending topics for a specific geographic location.",
+        "required": ["woeid"],
+        "properties": {
+          "woeid": {
+            "type": "integer",
+            "description": "Where On Earth ID of the location.",
+            "example": 1
+          },
+          "name": {
+            "type": ["string", "null"],
+            "description": "Name of the location.",
+            "example": "Worldwide"
+          },
+          "country": {
+            "type": ["string", "null"],
+            "description": "Country name."
+          },
+          "trends": {
+            "type": "array",
+            "description": "List of trending topics at this location.",
+            "items": {
+              "$ref": "#/components/schemas/TrendData"
+            }
+          }
+        }
+      },
+      "PlaceData": {
+        "type": "object",
+        "description": "Geographic place data.",
+        "required": ["id", "name"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique place identifier.",
+            "example": "5a110d312052166f"
+          },
+          "name": {
+            "type": "string",
+            "description": "Place name.",
+            "example": "San Francisco"
+          },
+          "full_name": {
+            "type": ["string", "null"],
+            "description": "Full place name including region.",
+            "example": "San Francisco, CA"
+          },
+          "country": {
+            "type": ["string", "null"],
+            "description": "Country name.",
+            "example": "United States"
+          },
+          "country_code": {
+            "type": ["string", "null"],
+            "description": "ISO country code.",
+            "example": "US"
+          },
+          "place_type": {
+            "type": ["string", "null"],
+            "description": "Type of place.",
+            "enum": ["city", "country", "admin", "poi", "neighborhood"]
+          },
+          "url": {
+            "type": ["string", "null"],
+            "description": "Twitter URL for the place."
+          },
+          "bounding_box": {
+            "type": ["object", "null"],
+            "description": "Geographical bounding box coordinates.",
+            "properties": {
+              "type": {
+                "type": "string",
+                "example": "Polygon"
+              },
+              "coordinates": {
+                "type": "array",
+                "description": "Array of coordinate arrays defining the bounding box.",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": { "type": "number" }
+                  }
+                }
+              }
+            }
+          },
+          "attributes": {
+            "type": ["object", "null"],
+            "description": "Additional place attributes.",
+            "additionalProperties": { "type": "string" }
+          }
+        }
+      },
+      "ArticleData": {
+        "type": "object",
+        "description": "Twitter Article (long-form post) data.",
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique article identifier."
+          },
+          "title": {
+            "type": ["string", "null"],
+            "description": "Title of the article."
+          },
+          "text": {
+            "type": ["string", "null"],
+            "description": "Full body text of the article."
+          },
+          "cover_image_url": {
+            "type": ["string", "null"],
+            "description": "URL of the article's cover image."
+          },
+          "author_id": {
+            "type": ["string", "null"],
+            "description": "Numeric ID of the article author."
+          },
+          "author_username": {
+            "type": ["string", "null"],
+            "description": "Username of the article author."
+          },
+          "author_name": {
+            "type": ["string", "null"],
+            "description": "Display name of the article author."
+          },
+          "created_at": {
+            "type": ["string", "null"],
+            "description": "Timestamp when the article was published."
+          }
+        }
+      },
+      "CommunityNoteData": {
+        "type": "object",
+        "description": "Community note (fact-check) data.",
+        "properties": {
+          "id": {
+            "type": ["string", "null"],
+            "description": "Unique note identifier."
+          },
+          "text": {
+            "type": ["string", "null"],
+            "description": "Text content of the community note."
+          },
+          "created_at": {
+            "type": ["string", "null"],
+            "description": "Timestamp when the note was created."
+          },
+          "status": {
+            "type": ["string", "null"],
+            "description": "Current status of the note."
+          }
+        }
+      },
+      "SpaceData": {
+        "type": "object",
+        "description": "Twitter Space (audio room) data.",
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique Space identifier.",
+            "example": "1eaJbrPZRwOKX"
+          },
+          "title": {
+            "type": ["string", "null"],
+            "description": "Title of the Space."
+          },
+          "state": {
+            "type": ["string", "null"],
+            "description": "Current state of the Space (e.g., live, scheduled, ended)."
+          },
+          "created_at": {
+            "type": ["string", "null"],
+            "description": "Timestamp when the Space was created."
+          },
+          "started_at": {
+            "type": ["string", "null"],
+            "description": "Timestamp when the Space started."
+          },
+          "ended_at": {
+            "type": ["string", "null"],
+            "description": "Timestamp when the Space ended."
+          },
+          "creator_id": {
+            "type": ["string", "null"],
+            "description": "Numeric ID of the Space creator."
+          },
+          "creator_username": {
+            "type": ["string", "null"],
+            "description": "Username of the Space creator."
+          },
+          "creator_name": {
+            "type": ["string", "null"],
+            "description": "Display name of the Space creator."
+          },
+          "participant_count": {
+            "type": ["integer", "null"],
+            "description": "Current number of participants."
+          },
+          "total_participated": {
+            "type": ["integer", "null"],
+            "description": "Total number of users who participated."
+          },
+          "total_live_listeners": {
+            "type": ["integer", "null"],
+            "description": "Number of live listeners."
+          },
+          "is_ticketed": {
+            "type": ["boolean", "null"],
+            "description": "Whether the Space requires a ticket."
+          },
+          "scheduled_start": {
+            "type": ["string", "null"],
+            "description": "Scheduled start time for upcoming Spaces."
+          }
+        }
+      },
+      "BroadcastData": {
+        "type": "object",
+        "description": "Live video broadcast data.",
+        "required": ["id"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique broadcast identifier.",
+            "example": "1rmGPkBbVzqKN"
+          },
+          "title": {
+            "type": ["string", "null"],
+            "description": "Title of the broadcast."
+          },
+          "state": {
+            "type": ["string", "null"],
+            "description": "Current state of the broadcast (e.g., running, ended)."
+          },
+          "media_key": {
+            "type": ["string", "null"],
+            "description": "Media key for the broadcast stream."
+          },
+          "created_at": {
+            "type": ["string", "null"],
+            "description": "Timestamp when the broadcast was created."
+          },
+          "started_at": {
+            "type": ["string", "null"],
+            "description": "Timestamp when the broadcast started."
+          },
+          "width": {
+            "type": ["integer", "null"],
+            "description": "Video width in pixels."
+          },
+          "height": {
+            "type": ["integer", "null"],
+            "description": "Video height in pixels."
+          },
+          "total_viewers": {
+            "type": ["integer", "null"],
+            "description": "Total number of viewers."
+          }
+        }
+      },
+      "TweetsResponse": {
+        "type": "object",
+        "description": "Paginated list of tweets.",
+        "properties": {
+          "data": {
+            "type": ["array", "null"],
+            "description": "Array of tweet objects.",
+            "items": {
+              "$ref": "#/components/schemas/TweetData"
+            }
+          },
+          "next_cursor": {
+            "type": ["string", "null"],
+            "description": "Cursor for fetching the next page. Null if no more results."
+          }
+        }
+      },
+      "UsersResponse": {
+        "type": "object",
+        "description": "Paginated list of users.",
+        "properties": {
+          "data": {
+            "type": ["array", "null"],
+            "description": "Array of user objects.",
+            "items": {
+              "$ref": "#/components/schemas/UserData"
+            }
+          },
+          "next_cursor": {
+            "type": ["string", "null"],
+            "description": "Cursor for fetching the next page. Null if no more results."
+          }
+        }
+      },
+      "CommunitiesResponse": {
+        "type": "object",
+        "description": "Paginated list of communities.",
+        "properties": {
+          "data": {
+            "type": ["array", "null"],
+            "description": "Array of community objects.",
+            "items": {
+              "$ref": "#/components/schemas/CommunityData"
+            }
+          },
+          "next_cursor": {
+            "type": ["string", "null"],
+            "description": "Cursor for fetching the next page. Null if no more results."
+          }
+        }
+      },
+      "TrendsResponse": {
+        "type": "object",
+        "description": "List of trending topics.",
+        "properties": {
+          "data": {
+            "type": ["array", "null"],
+            "description": "Array of trend objects.",
+            "items": {
+              "$ref": "#/components/schemas/TrendData"
+            }
+          }
+        }
+      },
+      "PlacesResponse": {
+        "type": "object",
+        "description": "List of geographic places.",
+        "properties": {
+          "data": {
+            "type": ["array", "null"],
+            "description": "Array of place objects.",
+            "items": {
+              "$ref": "#/components/schemas/PlaceData"
+            }
+          }
+        }
+      },
+      "ArticlesResponse": {
+        "type": "object",
+        "description": "Paginated list of articles.",
+        "properties": {
+          "data": {
+            "type": ["array", "null"],
+            "description": "Array of article objects.",
+            "items": {
+              "$ref": "#/components/schemas/ArticleData"
+            }
+          },
+          "next_cursor": {
+            "type": ["string", "null"],
+            "description": "Cursor for fetching the next page. Null if no more results."
+          }
+        }
+      },
+      "CommunityNotesResponse": {
+        "type": "object",
+        "description": "List of community notes for a tweet.",
+        "properties": {
+          "data": {
+            "type": ["array", "null"],
+            "description": "Array of community note objects.",
+            "items": {
+              "$ref": "#/components/schemas/CommunityNoteData"
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Error response returned for failed requests.",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Human-readable error message describing what went wrong."
+          }
+        }
+      }
+    },
+    "responses": {
+      "Unauthorized": {
+        "description": "Authentication failed. The API key is missing, invalid, or expired.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "error": "Invalid or missing API key"
+            }
+          }
+        }
+      },
+      "PaymentRequired": {
+        "description": "Insufficient credits. Your account balance has been exhausted. Purchase more credits at https://scrapebadger.com/dashboard/billing.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "error": "Insufficient credits"
+            }
+          }
+        }
+      },
+      "RateLimitExceeded": {
+        "description": "Rate limit exceeded. Too many requests in a given time period. Implement exponential backoff and retry.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            },
+            "example": {
+              "error": "Rate limit exceeded. Please retry after a short delay."
+            }
+          }
+        }
+      }
+    }
+  }
+}
