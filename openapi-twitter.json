@@ -49,6 +49,22 @@
     {
       "name": "Spaces",
       "description": "Access Twitter Spaces and live broadcast details."
+    },
+    {
+      "name": "Stream Monitors",
+      "description": "Create and manage real-time stream monitors that track Twitter accounts and deliver new tweets via WebSocket or webhook."
+    },
+    {
+      "name": "Stream Webhooks",
+      "description": "Manage webhook endpoints for stream monitor delivery. Webhooks receive HMAC-SHA256 signed payloads when new tweets are detected."
+    },
+    {
+      "name": "Stream Logs",
+      "description": "Access delivery logs and billing logs for stream monitors. Track tweet detection latency, webhook delivery status, and credit consumption."
+    },
+    {
+      "name": "Filter Rules",
+      "description": "Create and manage filter rules that monitor Twitter using Advanced Search queries at configurable intervals. Delivered via WebSocket or webhook."
     }
   ],
   "paths": {
@@ -1485,6 +1501,930 @@
           "429": { "$ref": "#/components/responses/RateLimitExceeded" }
         }
       }
+    },
+    "/v1/twitter/stream/monitors": {
+      "post": {
+        "operationId": "createStreamMonitor",
+        "summary": "Create stream monitor",
+        "description": "Create a new stream monitor to track one or more Twitter accounts in real time. New tweets from monitored accounts are delivered via WebSocket and optionally via webhook. Each monitored account consumes credits per day based on volume pricing.",
+        "tags": ["Stream Monitors"],
+        "requestBody": {
+          "required": true,
+          "description": "Stream monitor configuration.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "usernames"],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100,
+                    "description": "Human-readable name for the stream monitor.",
+                    "example": "Tech Leaders Monitor"
+                  },
+                  "usernames": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "minItems": 1,
+                    "maxItems": 100,
+                    "description": "List of Twitter usernames to monitor (without @ symbol).",
+                    "example": ["elonmusk", "sama"]
+                  },
+                  "webhook_url": {
+                    "type": ["string", "null"],
+                    "description": "HTTPS URL to receive webhook deliveries. Must use HTTPS.",
+                    "example": "https://example.com/webhooks/twitter"
+                  },
+                  "webhook_secret": {
+                    "type": ["string", "null"],
+                    "description": "Secret used to sign webhook payloads with HMAC-SHA256."
+                  },
+                  "filter_types": {
+                    "type": ["array", "null"],
+                    "items": {
+                      "type": "string",
+                      "enum": ["original", "reply", "retweet", "quote"]
+                    },
+                    "description": "Filter which tweet types to deliver. Null or omitted means all types."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Stream monitor created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StreamMonitorResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      },
+      "get": {
+        "operationId": "listStreamMonitors",
+        "summary": "List stream monitors",
+        "description": "List all stream monitors for the authenticated API key. Supports pagination and optional filtering by status.",
+        "tags": ["Stream Monitors"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number for pagination.",
+            "schema": { "type": "integer", "default": 1, "minimum": 1 }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Number of monitors per page.",
+            "schema": { "type": "integer", "default": 20, "minimum": 1, "maximum": 100 }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Filter monitors by status.",
+            "schema": { "type": "string", "enum": ["active", "paused"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved stream monitors.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "monitors": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/StreamMonitorResponse" }
+                    },
+                    "total": { "type": "integer", "description": "Total number of monitors." },
+                    "page": { "type": "integer", "description": "Current page number." },
+                    "page_size": { "type": "integer", "description": "Number of items per page." }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/stream/monitors/{monitor_id}": {
+      "get": {
+        "operationId": "getStreamMonitor",
+        "summary": "Get stream monitor",
+        "description": "Retrieve details of a specific stream monitor by its ID. Returns full monitor configuration, status, and pricing information.",
+        "tags": ["Stream Monitors"],
+        "parameters": [
+          {
+            "name": "monitor_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique ID of the stream monitor.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved stream monitor.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StreamMonitorResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      },
+      "patch": {
+        "operationId": "updateStreamMonitor",
+        "summary": "Update stream monitor",
+        "description": "Update an existing stream monitor. All fields are optional; only provided fields will be updated. Use status field to pause or resume monitoring.",
+        "tags": ["Stream Monitors"],
+        "parameters": [
+          {
+            "name": "monitor_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique ID of the stream monitor.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Fields to update on the stream monitor.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100,
+                    "description": "Updated name for the stream monitor."
+                  },
+                  "usernames": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "minItems": 1,
+                    "maxItems": 100,
+                    "description": "Updated list of Twitter usernames to monitor."
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["active", "paused"],
+                    "description": "Set monitor status. Use \"paused\" to stop monitoring and \"active\" to resume."
+                  },
+                  "webhook_url": {
+                    "type": ["string", "null"],
+                    "description": "Updated webhook URL. Set to null to remove webhook delivery."
+                  },
+                  "webhook_secret": {
+                    "type": ["string", "null"],
+                    "description": "Updated webhook secret. Set to null to remove."
+                  },
+                  "filter_types": {
+                    "type": ["array", "null"],
+                    "items": {
+                      "type": "string",
+                      "enum": ["original", "reply", "retweet", "quote"]
+                    },
+                    "description": "Updated tweet type filter. Set to null to deliver all types."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Stream monitor updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StreamMonitorResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      },
+      "delete": {
+        "operationId": "deleteStreamMonitor",
+        "summary": "Delete stream monitor",
+        "description": "Permanently delete a stream monitor and stop all associated monitoring. This action cannot be undone.",
+        "tags": ["Stream Monitors"],
+        "parameters": [
+          {
+            "name": "monitor_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique ID of the stream monitor.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Stream monitor deleted successfully."
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/stream/webhooks": {
+      "post": {
+        "operationId": "createStreamWebhook",
+        "summary": "Create webhook",
+        "description": "Create a new webhook endpoint for a stream monitor. Webhooks receive HMAC-SHA256 signed POST requests when new tweets are detected.",
+        "tags": ["Stream Webhooks"],
+        "requestBody": {
+          "required": true,
+          "description": "Webhook configuration.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["monitor_id", "url"],
+                "properties": {
+                  "monitor_id": {
+                    "type": "string",
+                    "description": "The ID of the stream monitor to attach this webhook to."
+                  },
+                  "url": {
+                    "type": "string",
+                    "description": "HTTPS URL to receive webhook deliveries. Must use HTTPS.",
+                    "example": "https://example.com/webhooks/twitter"
+                  },
+                  "secret": {
+                    "type": ["string", "null"],
+                    "description": "Secret used to sign webhook payloads with HMAC-SHA256."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Webhook created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      },
+      "get": {
+        "operationId": "listStreamWebhooks",
+        "summary": "List webhooks",
+        "description": "List all webhooks for the authenticated API key. Optionally filter by monitor ID.",
+        "tags": ["Stream Webhooks"],
+        "parameters": [
+          {
+            "name": "monitor_id",
+            "in": "query",
+            "required": false,
+            "description": "Filter webhooks by stream monitor ID.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved webhooks.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "webhooks": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/WebhookListItem" }
+                    },
+                    "total": { "type": "integer", "description": "Total number of webhooks." }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/stream/webhooks/{webhook_id}": {
+      "delete": {
+        "operationId": "deleteStreamWebhook",
+        "summary": "Delete webhook",
+        "description": "Permanently delete a webhook endpoint. The stream monitor will continue operating but will no longer deliver to this webhook URL.",
+        "tags": ["Stream Webhooks"],
+        "parameters": [
+          {
+            "name": "webhook_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique ID of the webhook.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Webhook deleted successfully."
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/stream/webhooks/test": {
+      "post": {
+        "operationId": "testStreamWebhook",
+        "summary": "Test webhook",
+        "description": "Send a test payload to the webhook configured for a stream monitor. Returns the HTTP status code and response time from the webhook endpoint. Useful for verifying webhook connectivity before going live.",
+        "tags": ["Stream Webhooks"],
+        "requestBody": {
+          "required": true,
+          "description": "Test webhook request.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["monitor_id"],
+                "properties": {
+                  "monitor_id": {
+                    "type": "string",
+                    "description": "The ID of the stream monitor whose webhook to test."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook test result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean", "description": "Whether the webhook responded with a 2xx status code." },
+                    "status_code": { "type": ["integer", "null"], "description": "HTTP status code returned by the webhook endpoint." },
+                    "response_time_ms": { "type": ["number", "null"], "description": "Response time in milliseconds." },
+                    "error": { "type": ["string", "null"], "description": "Error message if the webhook test failed." }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/stream/logs": {
+      "get": {
+        "operationId": "listStreamDeliveryLogs",
+        "summary": "List delivery logs",
+        "description": "List tweet delivery logs for stream monitors. Shows each detected tweet with detection latency, delivery status, and webhook response details. Useful for monitoring stream health and debugging delivery issues.",
+        "tags": ["Stream Logs"],
+        "parameters": [
+          {
+            "name": "monitor_id",
+            "in": "query",
+            "required": false,
+            "description": "Filter logs by stream monitor ID.",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number for pagination.",
+            "schema": { "type": "integer", "default": 1, "minimum": 1 }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Number of logs per page.",
+            "schema": { "type": "integer", "default": 20, "minimum": 1, "maximum": 100 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved delivery logs.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "logs": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/TweetDeliveryLogResponse" }
+                    },
+                    "total": { "type": "integer", "description": "Total number of delivery logs." },
+                    "page": { "type": "integer", "description": "Current page number." },
+                    "page_size": { "type": "integer", "description": "Number of items per page." }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/stream/billing-logs": {
+      "get": {
+        "operationId": "listStreamBillingLogs",
+        "summary": "List billing logs",
+        "description": "List billing logs for stream monitors. Shows credit deductions with billing cadence details, tier rates, and account counts. Useful for tracking streaming costs and verifying billing accuracy.",
+        "tags": ["Stream Logs"],
+        "parameters": [
+          {
+            "name": "monitor_id",
+            "in": "query",
+            "required": false,
+            "description": "Filter logs by stream monitor ID.",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number for pagination.",
+            "schema": { "type": "integer", "default": 1, "minimum": 1 }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Number of logs per page.",
+            "schema": { "type": "integer", "default": 20, "minimum": 1, "maximum": 100 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved billing logs.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "logs": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/BillingLogResponse" }
+                    },
+                    "total": { "type": "integer", "description": "Total number of billing logs." },
+                    "page": { "type": "integer", "description": "Current page number." },
+                    "page_size": { "type": "integer", "description": "Number of items per page." }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/stream/filter-rules": {
+      "post": {
+        "operationId": "createFilterRule",
+        "summary": "Create filter rule",
+        "description": "Create a new filter rule that monitors Twitter using an Advanced Search query at a configurable polling interval. Matching tweets are delivered via WebSocket and optionally via webhook. Pricing is based on the polling interval tier.",
+        "tags": ["Filter Rules"],
+        "requestBody": {
+          "required": true,
+          "description": "Filter rule configuration.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["tag", "query", "interval_seconds"],
+                "properties": {
+                  "tag": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100,
+                    "description": "Human-readable label for the filter rule.",
+                    "example": "AI news tracker"
+                  },
+                  "query": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024,
+                    "description": "Twitter Advanced Search query. Supports operators like from:, to:, min_faves:, lang:, etc.",
+                    "example": "(\"artificial intelligence\" OR \"machine learning\") min_faves:100 lang:en"
+                  },
+                  "interval_seconds": {
+                    "type": "number",
+                    "minimum": 0.1,
+                    "maximum": 86400,
+                    "description": "Polling interval in seconds. Lower intervals detect tweets faster but cost more credits per day.",
+                    "example": 60
+                  },
+                  "max_results_per_poll": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100,
+                    "default": 20,
+                    "description": "Maximum number of tweets to return per poll cycle."
+                  },
+                  "webhook_url": {
+                    "type": ["string", "null"],
+                    "description": "HTTPS URL to receive webhook deliveries. Must use HTTPS.",
+                    "example": "https://example.com/webhooks/filter-rules"
+                  },
+                  "webhook_secret": {
+                    "type": ["string", "null"],
+                    "description": "Secret used to sign webhook payloads with HMAC-SHA256."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Filter rule created successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FilterRuleResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      },
+      "get": {
+        "operationId": "listFilterRules",
+        "summary": "List filter rules",
+        "description": "List all filter rules for the authenticated API key. Supports pagination and optional filtering by status.",
+        "tags": ["Filter Rules"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number for pagination.",
+            "schema": { "type": "integer", "default": 1, "minimum": 1 }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Number of rules per page.",
+            "schema": { "type": "integer", "default": 20, "minimum": 1, "maximum": 100 }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Filter rules by status.",
+            "schema": { "type": "string", "enum": ["active", "paused"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved filter rules.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "rules": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/FilterRuleResponse" }
+                    },
+                    "total": { "type": "integer", "description": "Total number of filter rules." },
+                    "page": { "type": "integer", "description": "Current page number." },
+                    "page_size": { "type": "integer", "description": "Number of items per page." }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/stream/filter-rules/{rule_id}": {
+      "get": {
+        "operationId": "getFilterRule",
+        "summary": "Get filter rule",
+        "description": "Retrieve details of a specific filter rule by its ID. Returns full rule configuration, status, and pricing information.",
+        "tags": ["Filter Rules"],
+        "parameters": [
+          {
+            "name": "rule_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique ID of the filter rule.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved filter rule.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FilterRuleResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      },
+      "patch": {
+        "operationId": "updateFilterRule",
+        "summary": "Update filter rule",
+        "description": "Update an existing filter rule. All fields are optional; only provided fields will be updated. Changing the interval may affect the pricing tier.",
+        "tags": ["Filter Rules"],
+        "parameters": [
+          {
+            "name": "rule_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique ID of the filter rule.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Fields to update on the filter rule.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tag": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100,
+                    "description": "Updated label for the filter rule."
+                  },
+                  "query": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 1024,
+                    "description": "Updated Twitter Advanced Search query."
+                  },
+                  "interval_seconds": {
+                    "type": "number",
+                    "minimum": 0.1,
+                    "maximum": 86400,
+                    "description": "Updated polling interval in seconds."
+                  },
+                  "max_results_per_poll": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 100,
+                    "description": "Updated maximum results per poll cycle."
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": ["active", "paused"],
+                    "description": "Set rule status. Use \"paused\" to stop polling and \"active\" to resume."
+                  },
+                  "webhook_url": {
+                    "type": ["string", "null"],
+                    "description": "Updated webhook URL. Set to null to remove webhook delivery."
+                  },
+                  "webhook_secret": {
+                    "type": ["string", "null"],
+                    "description": "Updated webhook secret. Set to null to remove."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Filter rule updated successfully.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FilterRuleResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      },
+      "delete": {
+        "operationId": "deleteFilterRule",
+        "summary": "Delete filter rule",
+        "description": "Permanently delete a filter rule and stop all associated polling. This action cannot be undone.",
+        "tags": ["Filter Rules"],
+        "parameters": [
+          {
+            "name": "rule_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique ID of the filter rule.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Filter rule deleted successfully."
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/stream/filter-rules/validate": {
+      "post": {
+        "operationId": "validateFilterRuleQuery",
+        "summary": "Validate filter rule query",
+        "description": "Validate a Twitter Advanced Search query without creating a filter rule. Returns whether the query syntax is valid and any errors found. Use this to test queries before creating filter rules.",
+        "tags": ["Filter Rules"],
+        "requestBody": {
+          "required": true,
+          "description": "Query to validate.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["query"],
+                "properties": {
+                  "query": {
+                    "type": "string",
+                    "description": "Twitter Advanced Search query to validate.",
+                    "example": "from:elonmusk min_faves:100"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Validation result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "valid": { "type": "boolean", "description": "Whether the query syntax is valid." },
+                    "query": { "type": "string", "description": "The query that was validated." },
+                    "error": { "type": ["string", "null"], "description": "Error message if the query is invalid." }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/stream/filter-rules/{rule_id}/logs": {
+      "get": {
+        "operationId": "getFilterRuleDeliveryLogs",
+        "summary": "Get filter rule delivery logs",
+        "description": "List tweet delivery logs for a specific filter rule. Shows each detected tweet with detection latency, delivery status, and webhook response details.",
+        "tags": ["Filter Rules"],
+        "parameters": [
+          {
+            "name": "rule_id",
+            "in": "path",
+            "required": true,
+            "description": "The unique ID of the filter rule.",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number for pagination.",
+            "schema": { "type": "integer", "default": 1, "minimum": 1 }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "description": "Number of logs per page.",
+            "schema": { "type": "integer", "default": 20, "minimum": 1, "maximum": 100 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved filter rule delivery logs.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "logs": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/FilterRuleDeliveryLogResponse" }
+                    },
+                    "total": { "type": "integer", "description": "Total number of delivery logs." },
+                    "page": { "type": "integer", "description": "Current page number." },
+                    "page_size": { "type": "integer", "description": "Number of items per page." }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/stream/filter-rules-pricing": {
+      "get": {
+        "operationId": "getFilterRulePricingTiers",
+        "summary": "Get filter rule pricing tiers",
+        "description": "Retrieve the pricing tiers for filter rules. Each tier defines a maximum polling interval and the corresponding credit cost per rule per day. Use this to estimate costs before creating filter rules.",
+        "tags": ["Filter Rules"],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved pricing tiers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tiers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "tier_label": { "type": "string", "description": "Human-readable tier name.", "example": "Real-time (0.1s)" },
+                          "max_interval_seconds": { "type": "number", "description": "Maximum polling interval for this tier in seconds.", "example": 1 },
+                          "credits_per_rule_per_day": { "type": "number", "description": "Credit cost per rule per day at this tier.", "example": 1000 }
+                        }
+                      },
+                      "description": "List of pricing tiers ordered by interval."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
     }
   },
   "components": {
@@ -2592,6 +3532,374 @@
           "error": {
             "type": "string",
             "description": "Human-readable error message describing what went wrong."
+          }
+        }
+      },
+      "StreamMonitorResponse": {
+        "type": "object",
+        "description": "Stream monitor configuration and status.",
+        "required": ["id", "name", "usernames", "status", "created_at", "updated_at"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique stream monitor identifier."
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable name of the monitor.",
+            "example": "Tech Leaders Monitor"
+          },
+          "usernames": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "List of monitored Twitter usernames.",
+            "example": ["elonmusk", "sama"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "paused", "suspended"],
+            "description": "Current status of the monitor. Suspended indicates the monitor was auto-paused due to insufficient credits."
+          },
+          "status_reason": {
+            "type": ["string", "null"],
+            "description": "Reason for the current status, if applicable (e.g., \"insufficient_credits\")."
+          },
+          "webhook_url": {
+            "type": ["string", "null"],
+            "description": "HTTPS URL receiving webhook deliveries."
+          },
+          "webhook_secret_set": {
+            "type": "boolean",
+            "description": "Whether a webhook secret is configured. The actual secret is never returned."
+          },
+          "filter_types": {
+            "type": ["array", "null"],
+            "items": {
+              "type": "string",
+              "enum": ["original", "reply", "retweet", "quote"]
+            },
+            "description": "Tweet types being delivered. Null means all types."
+          },
+          "credits_per_account_per_day": {
+            "type": "number",
+            "description": "Credit cost per monitored account per day."
+          },
+          "estimated_credits_per_day": {
+            "type": "number",
+            "description": "Estimated total credit cost per day based on current account count."
+          },
+          "pricing_tier": {
+            "type": "string",
+            "description": "Current pricing tier label.",
+            "example": "Standard"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the monitor was created."
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the monitor was last updated."
+          }
+        }
+      },
+      "FilterRuleResponse": {
+        "type": "object",
+        "description": "Filter rule configuration and status.",
+        "required": ["id", "tag", "query", "interval_seconds", "max_results_per_poll", "status", "created_at", "updated_at"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique filter rule identifier."
+          },
+          "tag": {
+            "type": "string",
+            "description": "Human-readable label for the rule.",
+            "example": "AI news tracker"
+          },
+          "query": {
+            "type": "string",
+            "description": "Twitter Advanced Search query.",
+            "example": "(\"artificial intelligence\" OR \"machine learning\") min_faves:100 lang:en"
+          },
+          "interval_seconds": {
+            "type": "number",
+            "description": "Polling interval in seconds.",
+            "example": 60
+          },
+          "max_results_per_poll": {
+            "type": "integer",
+            "description": "Maximum number of tweets returned per poll cycle.",
+            "example": 20
+          },
+          "status": {
+            "type": "string",
+            "enum": ["active", "paused", "suspended"],
+            "description": "Current status of the rule. Suspended indicates the rule was auto-paused due to insufficient credits."
+          },
+          "status_reason": {
+            "type": ["string", "null"],
+            "description": "Reason for the current status, if applicable."
+          },
+          "webhook_url": {
+            "type": ["string", "null"],
+            "description": "HTTPS URL receiving webhook deliveries."
+          },
+          "webhook_secret_set": {
+            "type": "boolean",
+            "description": "Whether a webhook secret is configured. The actual secret is never returned."
+          },
+          "credits_per_rule_per_day": {
+            "type": "number",
+            "description": "Credit cost per day for this rule at the current interval."
+          },
+          "pricing_tier": {
+            "type": "string",
+            "description": "Current pricing tier label based on interval.",
+            "example": "1-minute"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the rule was created."
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the rule was last updated."
+          }
+        }
+      },
+      "TweetDeliveryLogResponse": {
+        "type": "object",
+        "description": "Log entry for a tweet delivered by a stream monitor.",
+        "required": ["id", "monitor_id", "tweet_id", "delivery_status"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique log entry identifier."
+          },
+          "monitor_id": {
+            "type": "string",
+            "description": "ID of the stream monitor that detected the tweet."
+          },
+          "monitor_name": {
+            "type": "string",
+            "description": "Name of the stream monitor."
+          },
+          "tweet_id": {
+            "type": "string",
+            "description": "ID of the detected tweet."
+          },
+          "author_username": {
+            "type": "string",
+            "description": "Username of the tweet author."
+          },
+          "tweet_text_preview": {
+            "type": ["string", "null"],
+            "description": "Truncated preview of the tweet text."
+          },
+          "tweet_url": {
+            "type": "string",
+            "description": "Full URL to the tweet on Twitter/X."
+          },
+          "tweet_published_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the tweet was originally published."
+          },
+          "detected_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the tweet was detected by the monitor."
+          },
+          "latency_ms": {
+            "type": "integer",
+            "description": "Detection latency in milliseconds (time between tweet publication and detection)."
+          },
+          "latency_badge": {
+            "type": "string",
+            "description": "Human-readable latency badge (e.g., \"fast\", \"normal\", \"slow\")."
+          },
+          "delivery_status": {
+            "type": "string",
+            "description": "Overall delivery status (e.g., \"delivered\", \"failed\", \"pending\")."
+          },
+          "webhook_status_code": {
+            "type": ["integer", "null"],
+            "description": "HTTP status code returned by the webhook endpoint, if applicable."
+          },
+          "webhook_attempts": {
+            "type": "integer",
+            "description": "Number of webhook delivery attempts."
+          }
+        }
+      },
+      "FilterRuleDeliveryLogResponse": {
+        "type": "object",
+        "description": "Log entry for a tweet delivered by a filter rule.",
+        "required": ["id", "rule_id", "tweet_id", "delivery_status"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique log entry identifier."
+          },
+          "rule_id": {
+            "type": "string",
+            "description": "ID of the filter rule that matched the tweet."
+          },
+          "rule_tag": {
+            "type": "string",
+            "description": "Tag label of the filter rule."
+          },
+          "tweet_id": {
+            "type": "string",
+            "description": "ID of the matched tweet."
+          },
+          "author_username": {
+            "type": "string",
+            "description": "Username of the tweet author."
+          },
+          "tweet_text_preview": {
+            "type": ["string", "null"],
+            "description": "Truncated preview of the tweet text."
+          },
+          "tweet_url": {
+            "type": "string",
+            "description": "Full URL to the tweet on Twitter/X."
+          },
+          "tweet_published_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the tweet was originally published."
+          },
+          "detected_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the tweet was detected by the filter rule."
+          },
+          "latency_ms": {
+            "type": "integer",
+            "description": "Detection latency in milliseconds."
+          },
+          "latency_badge": {
+            "type": "string",
+            "description": "Human-readable latency badge (e.g., \"fast\", \"normal\", \"slow\")."
+          },
+          "delivery_status": {
+            "type": "string",
+            "description": "Overall delivery status (e.g., \"delivered\", \"failed\", \"pending\")."
+          },
+          "webhook_status_code": {
+            "type": ["integer", "null"],
+            "description": "HTTP status code returned by the webhook endpoint, if applicable."
+          },
+          "webhook_attempts": {
+            "type": "integer",
+            "description": "Number of webhook delivery attempts."
+          }
+        }
+      },
+      "BillingLogResponse": {
+        "type": "object",
+        "description": "Billing log entry for a stream monitor credit deduction.",
+        "required": ["id", "monitor_id", "billed_at", "credits_deducted"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique billing log identifier."
+          },
+          "monitor_id": {
+            "type": "string",
+            "description": "ID of the stream monitor."
+          },
+          "monitor_name": {
+            "type": "string",
+            "description": "Name of the stream monitor."
+          },
+          "billed_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp of the billing event."
+          },
+          "num_accounts": {
+            "type": "integer",
+            "description": "Number of monitored accounts at the time of billing."
+          },
+          "credits_deducted": {
+            "type": "number",
+            "description": "Total credits deducted in this billing cycle."
+          },
+          "tier_label": {
+            "type": "string",
+            "description": "Pricing tier label applied.",
+            "example": "Standard"
+          },
+          "rate_applied": {
+            "type": "number",
+            "description": "Credit rate per account per day that was applied."
+          }
+        }
+      },
+      "WebhookResponse": {
+        "type": "object",
+        "description": "Webhook endpoint details. Only returned on creation; the secret is included in the response.",
+        "required": ["id", "monitor_id", "url", "created_at"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique webhook identifier."
+          },
+          "monitor_id": {
+            "type": "string",
+            "description": "ID of the associated stream monitor."
+          },
+          "url": {
+            "type": "string",
+            "description": "HTTPS URL of the webhook endpoint."
+          },
+          "secret": {
+            "type": ["string", "null"],
+            "description": "Webhook secret for HMAC-SHA256 signing. Only returned once on creation."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the webhook was created."
+          }
+        }
+      },
+      "WebhookListItem": {
+        "type": "object",
+        "description": "Webhook endpoint summary for list responses.",
+        "required": ["id", "monitor_id", "url", "secret_set", "created_at"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique webhook identifier."
+          },
+          "monitor_id": {
+            "type": "string",
+            "description": "ID of the associated stream monitor."
+          },
+          "monitor_name": {
+            "type": "string",
+            "description": "Name of the associated stream monitor."
+          },
+          "url": {
+            "type": "string",
+            "description": "HTTPS URL of the webhook endpoint."
+          },
+          "secret_set": {
+            "type": "boolean",
+            "description": "Whether a secret is configured for this webhook."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the webhook was created."
           }
         }
       }
