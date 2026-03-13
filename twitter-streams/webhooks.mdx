@@ -1,0 +1,123 @@
+---
+title: "Webhook Delivery"
+description: "Receive HMAC-SHA256 signed HTTP callbacks for detected tweets"
+---
+
+# Webhook Delivery
+
+Configure HTTPS webhook URLs on your stream monitors or filter rules to receive HTTP POST callbacks for each detected tweet. All webhooks are signed with HMAC-SHA256.
+
+## Setup
+
+Set `webhook_url` when creating a monitor or filter rule:
+
+```bash
+curl -X POST "https://scrapebadger.com/v1/twitter/stream/monitors" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "My Monitor",
+    "usernames": ["elonmusk"],
+    "webhook_url": "https://example.com/webhooks/tweets",
+    "webhook_secret": "my-secret-key"
+  }'
+```
+
+If you omit `webhook_secret`, one is auto-generated and returned in the response.
+
+## Webhook payload
+
+```http
+POST https://example.com/webhooks/tweets
+Content-Type: application/json
+X-Signature-256: sha256=a1b2c3d4...
+X-Webhook-Id: wh_abc123
+X-Delivery-Id: del_xyz789
+
+{
+  "event": "tweet.detected",
+  "monitor_id": "abc-123",
+  "monitor_name": "My Monitor",
+  "tweet_id": "1234567890",
+  "author_username": "elonmusk",
+  "tweet_text": "Just announced...",
+  "tweet_url": "https://x.com/elonmusk/status/1234567890",
+  "tweet_published_at": "2026-03-13T12:00:00Z",
+  "detected_at": "2026-03-13T12:00:00.150Z",
+  "latency_ms": 150,
+  "tweet_data": {
+    "id": "1234567890",
+    "text": "Just announced...",
+    "user": { ... },
+    "media": [ ... ]
+  }
+}
+```
+
+## Signature verification
+
+Every webhook includes an `X-Signature-256` header. Verify it to ensure the request is from ScrapeBadger:
+
+### Python
+
+```python
+import hmac
+import hashlib
+
+def verify_signature(payload: bytes, signature: str, secret: str) -> bool:
+    expected = "sha256=" + hmac.new(
+        secret.encode(), payload, hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(expected, signature)
+```
+
+### Node.js
+
+```javascript
+const crypto = require('crypto');
+
+function verifySignature(payload, signature, secret) {
+  const expected = 'sha256=' +
+    crypto.createHmac('sha256', secret).update(payload).digest('hex');
+  return crypto.timingSafeEqual(
+    Buffer.from(expected),
+    Buffer.from(signature)
+  );
+}
+```
+
+## Retry behavior
+
+- ScrapeBadger expects a **2xx response** within **10 seconds**
+- Failed deliveries are retried up to **3 times** with exponential backoff
+- Delivery status is visible in the [delivery logs endpoint](/api-reference/endpoint/streams/list-delivery-logs)
+
+## Testing webhooks
+
+Use the test endpoint to send a sample payload to your webhook URL:
+
+```bash
+curl -X POST "https://scrapebadger.com/v1/twitter/stream/webhooks/test" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"monitor_id": "your-monitor-id"}'
+```
+
+## Managing webhooks
+
+You can also manage webhooks separately from monitors using the dedicated webhook endpoints:
+
+<CardGroup cols={2}>
+  <Card title="Create Webhook" icon="plus" href="/api-reference/endpoint/streams/create-webhook">
+    POST /v1/twitter/stream/webhooks
+  </Card>
+  <Card title="List Webhooks" icon="list" href="/api-reference/endpoint/streams/list-webhooks">
+    GET /v1/twitter/stream/webhooks
+  </Card>
+  <Card title="Delete Webhook" icon="trash" href="/api-reference/endpoint/streams/delete-webhook">
+    DELETE /v1/twitter/stream/webhooks/{webhook_id}
+  </Card>
+  <Card title="Test Webhook" icon="flask" href="/api-reference/endpoint/streams/test-webhook">
+    POST /v1/twitter/stream/webhooks/test
+  </Card>
+</CardGroup>

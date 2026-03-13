@@ -1,0 +1,88 @@
+---
+title: "WebSocket Delivery"
+description: "Connect via WebSocket for real-time tweet streaming"
+---
+
+# WebSocket Delivery
+
+Connect to the ScrapeBadger WebSocket endpoint to receive real-time tweet events from all your active stream monitors and filter rules.
+
+## Connection
+
+```
+wss://scrapebadger.com/v1/twitter/stream?api_key=YOUR_API_KEY
+```
+
+### Using wscat
+
+```bash
+npm install -g wscat
+wscat -c "wss://scrapebadger.com/v1/twitter/stream?api_key=YOUR_API_KEY"
+```
+
+### Using Python
+
+```python
+import asyncio
+import websockets
+import json
+
+async def listen():
+    uri = "wss://scrapebadger.com/v1/twitter/stream?api_key=YOUR_API_KEY"
+    async with websockets.connect(uri) as ws:
+        async for message in ws:
+            event = json.loads(message)
+            print(f"New tweet from @{event['author_username']}: {event['tweet_url']}")
+
+asyncio.run(listen())
+```
+
+### Using Node.js
+
+```javascript
+const WebSocket = require('ws');
+
+const ws = new WebSocket(
+  'wss://scrapebadger.com/v1/twitter/stream?api_key=YOUR_API_KEY'
+);
+
+ws.on('message', (data) => {
+  const event = JSON.parse(data);
+  console.log(`New tweet from @${event.author_username}: ${event.tweet_url}`);
+});
+
+ws.on('error', console.error);
+```
+
+## Event format
+
+Each WebSocket message is a JSON object:
+
+```json
+{
+  "event": "tweet.detected",
+  "monitor_id": "abc-123",
+  "monitor_name": "Tech Leaders",
+  "tweet_id": "1234567890",
+  "author_username": "elonmusk",
+  "tweet_text": "Just announced...",
+  "tweet_url": "https://x.com/elonmusk/status/1234567890",
+  "tweet_published_at": "2026-03-13T12:00:00Z",
+  "detected_at": "2026-03-13T12:00:00.150Z",
+  "latency_ms": 150
+}
+```
+
+## Connection behavior
+
+- **Authentication** is done via the `api_key` query parameter
+- **Heartbeat pings** are sent every 30 seconds to keep the connection alive
+- **Auto-reconnect** is recommended in your client code -- the server may close idle connections
+- **All monitors and filter rules** for the API key deliver to the same WebSocket connection
+- **Multiple connections** are supported per API key
+
+## Best practices
+
+1. **Always implement reconnection logic** with exponential backoff
+2. **Process messages asynchronously** to avoid blocking the WebSocket receive loop
+3. **Use webhooks as a backup** -- WebSocket connections can drop, but webhooks retry delivery

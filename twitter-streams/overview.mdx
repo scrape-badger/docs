@@ -1,0 +1,79 @@
+---
+title: "Twitter Streams Overview"
+description: "Real-time Twitter monitoring with Stream Monitors and Filter Rules"
+---
+
+# Twitter Streams
+
+Monitor Twitter in real-time with two complementary approaches:
+
+- **Stream Monitors** -- Watch specific Twitter accounts and get notified when they tweet, reply, retweet, or quote.
+- **Filter Rules** -- Monitor arbitrary Twitter search queries using Advanced Search syntax.
+
+Both deliver tweets via **WebSocket** and/or **Webhook** with sub-second latency.
+
+## Quick comparison
+
+| Feature | Stream Monitors | Filter Rules |
+|---------|----------------|--------------|
+| **What it watches** | Specific accounts (by username) | Search queries (Advanced Search syntax) |
+| **Billing** | Per-account-per-day (volume tiers) | Per-rule-per-day (interval tiers) |
+| **Max per API key** | 100 accounts per monitor | 50 rules |
+| **Delivery** | WebSocket + Webhook | WebSocket + Webhook |
+| **Polling interval** | Global (100ms default) | Configurable per rule (0.1s -- 86400s) |
+
+## How it works
+
+1. **Create** a monitor or filter rule via the API (or dashboard)
+2. **Configure delivery** -- attach a webhook URL and/or connect via WebSocket
+3. **Receive tweets** in real-time as they are detected
+4. **Credits are billed** automatically every 60 seconds based on your active monitors/rules
+
+## Delivery methods
+
+### WebSocket
+
+Connect to `wss://scrapebadger.com/v1/twitter/stream` with your API key to receive real-time tweet events.
+
+```bash
+wscat -c "wss://scrapebadger.com/v1/twitter/stream?api_key=YOUR_API_KEY"
+```
+
+Each message is a JSON object containing the tweet data, monitor/rule metadata, and timing information.
+
+### Webhooks
+
+Configure an HTTPS webhook URL on your monitor or filter rule. ScrapeBadger sends an HTTP POST for each detected tweet, signed with HMAC-SHA256 so you can verify authenticity.
+
+```
+POST https://your-server.com/webhooks/tweets
+X-Signature-256: sha256=...
+Content-Type: application/json
+
+{
+  "event": "tweet.detected",
+  "monitor_id": "...",
+  "tweet": { ... }
+}
+```
+
+## Auto-pause on low balance
+
+When your credit balance drops below the estimated hourly cost, active monitors and filter rules are automatically paused with `status_reason: "insufficient_credits"`. They resume automatically when you top up.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Stream Monitors" icon="radio" href="/twitter-streams/monitors">
+    Monitor specific Twitter accounts
+  </Card>
+  <Card title="Filter Rules" icon="magnifying-glass" href="/twitter-streams/filter-rules">
+    Monitor search queries
+  </Card>
+  <Card title="WebSocket" icon="bolt" href="/twitter-streams/websocket">
+    Real-time WebSocket delivery
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/twitter-streams/webhooks">
+    HTTP POST delivery with HMAC signing
+  </Card>
+</CardGroup>

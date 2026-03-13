@@ -1,0 +1,77 @@
+---
+title: "Stream Monitors"
+description: "Monitor specific Twitter accounts in real-time"
+---
+
+# Stream Monitors
+
+Stream Monitors watch specific Twitter accounts and notify you when they tweet, reply, retweet, or quote tweet. Monitors poll at a global interval (100ms default) with volume-based pricing.
+
+## Quick start
+
+```bash
+# Create a monitor
+curl -X POST "https://scrapebadger.com/v1/twitter/stream/monitors" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Tech Leaders",
+    "usernames": ["elonmusk", "sataborasu"],
+    "webhook_url": "https://example.com/webhooks/tweets",
+    "filter_types": ["original", "reply"]
+  }'
+```
+
+## Features
+
+- **Up to 100 accounts** per monitor
+- **Tweet type filtering**: original, reply, retweet, quote
+- **Webhook delivery** with HMAC-SHA256 signing
+- **WebSocket delivery** for real-time streaming
+- **Auto-pause** when credits run low
+- **Volume pricing** -- the more accounts you monitor, the lower the per-account cost
+
+## Volume pricing tiers
+
+| Tier | Accounts | Credits / account / day |
+|------|----------|------------------------|
+| Starter | 1--10 | 1,667 |
+| Growth | 11--50 | 1,333 |
+| Scale | 51--100 | 1,000 |
+| Enterprise | 101+ | 833 |
+
+<Note>
+Pricing tiers are applied per-monitor based on the number of usernames. Pricing can be fetched dynamically via the [dashboard stream pricing endpoint](/api-reference/endpoint/streams/get-stream-monitors).
+</Note>
+
+## Monitor lifecycle
+
+1. **Active** -- Monitor is polling and delivering tweets
+2. **Paused** -- Manually paused via API or dashboard
+3. **Suspended** -- Auto-paused due to insufficient credits (`status_reason: "insufficient_credits"`)
+
+## Shadow account warning
+
+Newly registered or long-dormant Twitter accounts may be shadow-banned, causing searches to return no results. Before adding a username to a monitor, verify it is not shadow-banned:
+
+Visit `https://x.com/search?q=from:USERNAME&src=typed_query&f=live` -- if it returns no results for an active poster, the account is likely shadow-banned.
+
+## API endpoints
+
+<CardGroup cols={2}>
+  <Card title="Create Monitor" icon="plus" href="/api-reference/endpoint/streams/create-stream-monitor">
+    POST /v1/twitter/stream/monitors
+  </Card>
+  <Card title="List Monitors" icon="list" href="/api-reference/endpoint/streams/list-stream-monitors">
+    GET /v1/twitter/stream/monitors
+  </Card>
+  <Card title="Get Monitor" icon="eye" href="/api-reference/endpoint/streams/get-stream-monitor">
+    GET /v1/twitter/stream/monitors/{monitor_id}
+  </Card>
+  <Card title="Update Monitor" icon="pen" href="/api-reference/endpoint/streams/update-stream-monitor">
+    PATCH /v1/twitter/stream/monitors/{monitor_id}
+  </Card>
+  <Card title="Delete Monitor" icon="trash" href="/api-reference/endpoint/streams/delete-stream-monitor">
+    DELETE /v1/twitter/stream/monitors/{monitor_id}
+  </Card>
+</CardGroup>

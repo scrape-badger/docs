@@ -32,6 +32,16 @@
               "credits-and-pricing",
               "rate-limits"
             ]
+          },
+          {
+            "group": "Twitter Streams",
+            "pages": [
+              "twitter-streams/overview",
+              "twitter-streams/monitors",
+              "twitter-streams/filter-rules",
+              "twitter-streams/websocket",
+              "twitter-streams/webhooks"
+            ]
           }
         ]
       },
@@ -74,6 +84,35 @@
               "api-reference/endpoint/users/search-users",
               "api-reference/endpoint/users/get-user-mentions",
               "api-reference/endpoint/users/get-user-articles"
+            ]
+          },
+          {
+            "group": "Stream Monitors",
+            "pages": [
+              "api-reference/endpoint/streams/create-stream-monitor",
+              "api-reference/endpoint/streams/list-stream-monitors",
+              "api-reference/endpoint/streams/get-stream-monitor",
+              "api-reference/endpoint/streams/update-stream-monitor",
+              "api-reference/endpoint/streams/delete-stream-monitor",
+              "api-reference/endpoint/streams/create-webhook",
+              "api-reference/endpoint/streams/list-webhooks",
+              "api-reference/endpoint/streams/delete-webhook",
+              "api-reference/endpoint/streams/test-webhook",
+              "api-reference/endpoint/streams/list-delivery-logs",
+              "api-reference/endpoint/streams/list-billing-logs"
+            ]
+          },
+          {
+            "group": "Filter Rules",
+            "pages": [
+              "api-reference/endpoint/filter-rules/create-filter-rule",
+              "api-reference/endpoint/filter-rules/list-filter-rules",
+              "api-reference/endpoint/filter-rules/get-filter-rule",
+              "api-reference/endpoint/filter-rules/update-filter-rule",
+              "api-reference/endpoint/filter-rules/delete-filter-rule",
+              "api-reference/endpoint/filter-rules/validate-filter-rule",
+              "api-reference/endpoint/filter-rules/get-filter-rule-logs",
+              "api-reference/endpoint/filter-rules/get-filter-rule-pricing"
             ]
           },
           {

@@ -1,0 +1,94 @@
+---
+title: "Filter Rules"
+description: "Monitor Twitter search queries in real-time"
+---
+
+# Filter Rules
+
+Filter Rules monitor arbitrary Twitter search queries using Advanced Search syntax. Each rule polls independently at a configurable interval, from sub-second (0.1s) to daily (86,400s).
+
+## Quick start
+
+```bash
+# Create a filter rule
+curl -X POST "https://scrapebadger.com/v1/twitter/stream/filter-rules" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tag": "AI News",
+    "query": "\"artificial intelligence\" OR \"machine learning\" lang:en -is:retweet",
+    "interval_seconds": 5,
+    "webhook_url": "https://example.com/webhooks/tweets"
+  }'
+```
+
+## Features
+
+- **Up to 50 rules** per API key
+- **Advanced Search syntax** -- use `from:`, `to:`, `lang:`, `is:reply`, `has:media`, and more
+- **Configurable polling interval** from 0.1s to 86,400s
+- **Up to 100 results per poll**
+- **Webhook + WebSocket delivery**
+- **Query validation** endpoint to check syntax before creating
+
+## Interval pricing tiers
+
+Faster polling intervals cost more credits per day:
+
+| Tier | Max Interval | Credits / rule / day |
+|------|-------------|---------------------|
+| Turbo | 0.5s | 30,000 |
+| Fast | 5s | 10,000 |
+| Standard | 60s | 1,500 |
+| Relaxed | 600s (10min) | 500 |
+| Daily | 86,400s (24h) | 100 |
+
+<Note>
+Fetch current pricing dynamically via the [pricing tiers endpoint](/api-reference/endpoint/filter-rules/get-filter-rule-pricing).
+</Note>
+
+## Query syntax examples
+
+| Query | Description |
+|-------|-------------|
+| `from:elonmusk` | Tweets from a specific user |
+| `"breaking news" lang:en` | English tweets containing exact phrase |
+| `#bitcoin -is:retweet` | Original tweets with hashtag (no retweets) |
+| `to:OpenAI has:media` | Replies to OpenAI that contain media |
+| `from:elonmusk OR from:sataborasu` | Tweets from either user |
+
+## Rule lifecycle
+
+1. **Active** -- Rule is polling and delivering matched tweets
+2. **Paused** -- Manually paused via API or dashboard
+3. **Suspended** -- Auto-paused due to insufficient credits
+
+## Deduplication
+
+Filter rules automatically deduplicate tweets. If the same tweet matches across multiple polls, it is delivered only once.
+
+## API endpoints
+
+<CardGroup cols={2}>
+  <Card title="Create Rule" icon="plus" href="/api-reference/endpoint/filter-rules/create-filter-rule">
+    POST /v1/twitter/stream/filter-rules
+  </Card>
+  <Card title="List Rules" icon="list" href="/api-reference/endpoint/filter-rules/list-filter-rules">
+    GET /v1/twitter/stream/filter-rules
+  </Card>
+  <Card title="Get Rule" icon="eye" href="/api-reference/endpoint/filter-rules/get-filter-rule">
+    GET /v1/twitter/stream/filter-rules/{rule_id}
+  </Card>
+  <Card title="Update Rule" icon="pen" href="/api-reference/endpoint/filter-rules/update-filter-rule">
+    PATCH /v1/twitter/stream/filter-rules/{rule_id}
+  </Card>
+  <Card title="Delete Rule" icon="trash" href="/api-reference/endpoint/filter-rules/delete-filter-rule">
+    DELETE /v1/twitter/stream/filter-rules/{rule_id}
+  </Card>
+  <Card title="Validate Query" icon="check" href="/api-reference/endpoint/filter-rules/validate-filter-rule">
+    POST /v1/twitter/stream/filter-rules/validate
+  </Card>
+  <Card title="Pricing Tiers" icon="credit-card" href="/api-reference/endpoint/filter-rules/get-filter-rule-pricing">
+    GET /v1/twitter/stream/filter-rules-pricing
+  </Card>
+</CardGroup>
