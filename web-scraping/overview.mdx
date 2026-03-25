@@ -1,0 +1,136 @@
+---
+title: "Web Scraping Overview"
+description: "Scrape any website with automatic anti-bot bypass, JavaScript rendering, and AI-powered data extraction."
+---
+
+# Web Scraping API
+
+Scrape any public webpage and get back clean HTML, Markdown, or plain text. The API handles anti-bot protection, JavaScript rendering, and proxy rotation automatically.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="Smart Engine Selection" icon="gear">
+    Automatically picks the best scraping engine for each site — from fast HTTP requests to full browser rendering.
+  </Card>
+  <Card title="Anti-Bot Bypass" icon="shield-halved">
+    Detects and bypasses Cloudflare, DataDome, Akamai, Kasada, and other protection systems.
+  </Card>
+  <Card title="AI Extraction" icon="brain">
+    Extract structured data from any page using natural language prompts powered by LLMs.
+  </Card>
+</CardGroup>
+
+## How It Works
+
+1. **Send a URL** to the `/v1/web/scrape` endpoint
+2. **ScrapeBadger selects the best engine** — fast HTTP for simple pages, headless browser for JavaScript-heavy sites
+3. **Anti-bot detection runs automatically** — if a block is detected, the request retries with escalated engines
+4. **Get clean content back** in your preferred format (HTML, Markdown, or plain text)
+
+## Scraping Engines
+
+ScrapeBadger uses a tiered engine system. When `engine` is set to `"auto"` (the default), the cheapest engine is tried first and escalation happens automatically if blocking is detected.
+
+| Engine | Description | Cost | Best For |
+|--------|-------------|------|----------|
+| `curl_cffi` | HTTP client with Chrome TLS fingerprint impersonation | 1 credit | Static pages, APIs, most websites |
+| `browser` | Headless browser (Patchright/Camoufox) | 5 credits | JavaScript-rendered pages, SPAs |
+| `windows_chrome` | Real Chrome on a remote Windows VPS via CDP | 10 credits | Heavily protected sites with advanced fingerprinting |
+
+<Info>
+  `rnet` is a backward-compatible alias for `curl_cffi`. `patchright` is a backward-compatible alias for `browser`.
+</Info>
+
+### Auto-Escalation
+
+When `escalate` is enabled (default: `false`), ScrapeBadger automatically tries more powerful engines if the initial one is blocked:
+
+```
+curl_cffi (1 credit) → browser (5 credits) → windows_chrome (10 credits)
+```
+
+You only pay for the engine that succeeds — escalation costs are **not cumulative**.
+
+## Credit Costs
+
+| Component | Cost |
+|-----------|------|
+| `curl_cffi` / `rnet` engine | 1 credit |
+| `browser` / `patchright` engine | 5 credits |
+| `windows_chrome` engine | 10 credits |
+| Anti-bot solver (`anti_bot: true`) | +5 credits |
+| AI extraction (`ai_extract: true`) | +2 credits |
+| Retries | Free |
+| Failed requests | 0 credits |
+
+<Tip>
+  Use the `max_cost` parameter to set a credit budget per request. The request will fail rather than exceed your budget.
+</Tip>
+
+## Quick Example
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://scrapebadger.com/v1/web/scrape" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com",
+    "format": "markdown"
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://scrapebadger.com/v1/web/scrape",
+    headers={"x-api-key": "YOUR_API_KEY"},
+    json={
+        "url": "https://example.com",
+        "format": "markdown"
+    }
+)
+
+data = response.json()
+print(data["content"])
+```
+
+```javascript JavaScript
+const response = await fetch("https://scrapebadger.com/v1/web/scrape", {
+  method: "POST",
+  headers: {
+    "x-api-key": "YOUR_API_KEY",
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    url: "https://example.com",
+    format: "markdown"
+  })
+});
+
+const data = await response.json();
+console.log(data.content);
+```
+
+</CodeGroup>
+
+## Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/web/scrape`](/api-reference/endpoint/web-scraping/scrape) | POST | Scrape a URL and return content |
+| [`/v1/web/detect`](/api-reference/endpoint/web-scraping/detect) | POST | Detect anti-bot and CAPTCHA systems on a URL |
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Scrape Endpoint" icon="globe" href="/api-reference/endpoint/web-scraping/scrape">
+    Full API reference for the scrape endpoint
+  </Card>
+  <Card title="Detect Endpoint" icon="radar" href="/api-reference/endpoint/web-scraping/detect">
+    Analyze a URL for anti-bot protection
+  </Card>
+</CardGroup>

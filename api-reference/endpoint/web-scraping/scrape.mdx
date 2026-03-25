@@ -1,0 +1,468 @@
+---
+title: Scrape URL
+description: Scrape a webpage and return its content as HTML, Markdown, or plain text.
+api: POST /v1/web/scrape
+---
+
+## Request Body
+
+<ParamField body="url" type="string" required>
+  The URL to scrape. Must be a valid HTTP or HTTPS URL. Private IPs and cloud metadata endpoints are blocked for security.
+</ParamField>
+
+<ParamField body="engine" type="string" default="auto">
+  Scraping engine to use.
+
+  | Value | Description | Cost |
+  |-------|-------------|------|
+  | `auto` | Selects `curl_cffi` by default, escalates to `browser` if JS rendering is needed | Varies |
+  | `curl_cffi` | HTTP client with Chrome TLS fingerprint impersonation | 1 credit |
+  | `rnet` | Backward-compatible alias for `curl_cffi` | 1 credit |
+  | `browser` | Headless browser (Patchright/Camoufox) with full JS rendering | 5 credits |
+  | `patchright` | Backward-compatible alias for `browser` | 5 credits |
+  | `windows_chrome` | Real Chrome on a remote Windows VPS via CDP | 10 credits |
+</ParamField>
+
+<ParamField body="format" type="string" default="html">
+  Output format for the scraped content.
+
+  - `html` — Raw HTML of the page
+  - `markdown` — Converted to clean Markdown
+  - `text` — Plain text with HTML tags stripped
+</ParamField>
+
+<ParamField body="render_js" type="boolean" default={false}>
+  Force JavaScript rendering before extracting content. Automatically switches to the `browser` engine. Use this for single-page applications or pages that load content dynamically.
+</ParamField>
+
+<ParamField body="wait_for" type="string">
+  CSS selector or XPath expression to wait for before extracting content. Only works with browser engines (`browser`, `patchright`, `windows_chrome`). If `render_js` is `false` and this is set, JS rendering is forced automatically.
+
+  ```json
+  { "wait_for": "#main-content" }
+  ```
+  ```json
+  { "wait_for": "//div[@class='results']" }
+  ```
+</ParamField>
+
+<ParamField body="wait_timeout" type="integer" default={30000}>
+  Maximum time in milliseconds to wait for the `wait_for` selector to appear. Range: `1000` – `120000`.
+</ParamField>
+
+<ParamField body="wait_after_load" type="integer">
+  Additional milliseconds to wait after the page has finished loading, before extracting content. Useful for pages with animations or delayed rendering. Only works with browser engines. Range: `0` – `30000`.
+</ParamField>
+
+<ParamField body="js_scenario" type="array">
+  A list of browser actions to perform before extracting content. Forces the `browser` engine. Each action is an object with a `type` and action-specific parameters.
+
+  **Supported actions:**
+
+  | Type | Parameters | Description |
+  |------|-----------|-------------|
+  | `click` | `selector` | Click an element |
+  | `fill` | `selector`, `value` | Fill an input field |
+  | `scroll` | `direction`, `amount` | Scroll the page |
+  | `wait` | `milliseconds` | Wait for a duration |
+
+  ```json
+  {
+    "js_scenario": [
+      { "type": "click", "selector": "#load-more" },
+      { "type": "wait", "milliseconds": 2000 },
+      { "type": "scroll", "direction": "down", "amount": 500 }
+    ]
+  }
+  ```
+</ParamField>
+
+<ParamField body="session_id" type="string">
+  A unique identifier to persist cookies, fingerprint, and browser storage across multiple requests. Use the same `session_id` to maintain login state or continue a browsing session.
+
+  ```json
+  { "session_id": "my-shopping-session" }
+  ```
+</ParamField>
+
+<ParamField body="retry_count" type="integer" default={3}>
+  Maximum number of retry attempts when a blocking page is detected. Retries are free — you only pay for the final successful engine. Range: `0` – `10`.
+</ParamField>
+
+<ParamField body="retry_on_block" type="boolean" default={true}>
+  Whether to automatically retry when a blocking page is detected. Set to `false` to get the blocked response immediately.
+</ParamField>
+
+<ParamField body="country" type="string">
+  ISO 3166-1 alpha-2 country code for proxy geo-targeting. Routes the request through a proxy in the specified country.
+
+  ```json
+  { "country": "US" }
+  ```
+
+  Common values: `US`, `GB`, `DE`, `FR`, `JP`, `BR`, `AU`.
+</ParamField>
+
+<ParamField body="custom_headers" type="object">
+  Additional HTTP headers to include in the request to the target URL. Accepts a key-value object.
+
+  ```json
+  {
+    "custom_headers": {
+      "Accept-Language": "en-US",
+      "Referer": "https://google.com"
+    }
+  }
+  ```
+</ParamField>
+
+<ParamField body="screenshot" type="boolean" default={false}>
+  Capture a screenshot of the page. Forces the `browser` engine. The screenshot URL is returned in the `screenshot_url` field of the response.
+</ParamField>
+
+<ParamField body="anti_bot" type="boolean" default={false}>
+  Attempt to bypass detected anti-bot protection using registered solvers. Adds **+5 credits** to the request cost when a solver is invoked. Only triggered when blocking is actually detected.
+</ParamField>
+
+<ParamField body="escalate" type="boolean" default={false}>
+  Allow automatic escalation to more powerful engines when the initial engine is blocked.
+
+  Escalation path: `curl_cffi` → `browser` → `windows_chrome`
+
+  You only pay for the engine that succeeds — costs are **not cumulative**. Without this flag, only the selected engine is tried.
+</ParamField>
+
+<ParamField body="max_cost" type="integer">
+  Maximum credits to spend on this request. The request fails with a `400` error if the estimated cost would exceed this budget. Useful for controlling costs when using `escalate` or `anti_bot`. Minimum: `1`.
+</ParamField>
+
+<ParamField body="ai_extract" type="boolean" default={false}>
+  Run AI-powered extraction on the scraped content using the instruction in `ai_prompt`. Adds **+2 credits** to the request cost. The scrape result is still returned even if AI extraction fails.
+</ParamField>
+
+<ParamField body="ai_prompt" type="string">
+  Natural language instruction for AI data extraction. Required when `ai_extract` is `true`. Maximum 2000 characters.
+
+  ```json
+  {
+    "ai_extract": true,
+    "ai_prompt": "Extract all product names and prices as a JSON array"
+  }
+  ```
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Whether the scrape completed successfully. `false` when all retries are exhausted and the page is still blocked.
+</ResponseField>
+
+<ResponseField name="url" type="string">
+  The final URL after any redirects.
+</ResponseField>
+
+<ResponseField name="status_code" type="integer">
+  HTTP status code from the target URL.
+</ResponseField>
+
+<ResponseField name="content" type="string">
+  The scraped content in the requested format. `null` when `success` is `false`.
+</ResponseField>
+
+<ResponseField name="format" type="string">
+  The output format used: `html`, `markdown`, or `text`.
+</ResponseField>
+
+<ResponseField name="engine_used" type="string">
+  The engine that produced the final result (e.g., `curl_cffi`, `browser`, `windows_chrome`).
+</ResponseField>
+
+<ResponseField name="credits_used" type="integer">
+  Total credits charged for this request, including engine cost, solver, and AI extraction.
+</ResponseField>
+
+<ResponseField name="duration_ms" type="integer">
+  Total request processing time in milliseconds.
+</ResponseField>
+
+<ResponseField name="retries_used" type="integer">
+  Number of retry attempts performed. `0` if the first attempt succeeded.
+</ResponseField>
+
+<ResponseField name="content_length" type="integer">
+  Size of the returned content in bytes.
+</ResponseField>
+
+<ResponseField name="screenshot_url" type="string">
+  URL to the captured screenshot image. Only present when `screenshot: true` was requested.
+</ResponseField>
+
+<ResponseField name="headers" type="object">
+  HTTP response headers from the target URL.
+</ResponseField>
+
+<ResponseField name="blocking_detected" type="boolean">
+  Whether a blocking page was detected during scraping.
+</ResponseField>
+
+<ResponseField name="blocking_details" type="object">
+  Details about the detected blocking page. Only present when `blocking_detected` is `true`.
+
+  <Expandable>
+    <ResponseField name="is_blocked" type="boolean">
+      Whether the page is confirmed as a blocking page.
+    </ResponseField>
+    <ResponseField name="block_type" type="string">
+      Type of block detected (e.g., `cloudflare`, `datadome`, `akamai`, `kasada`).
+    </ResponseField>
+    <ResponseField name="confidence" type="number">
+      Confidence score from `0.0` to `1.0`.
+    </ResponseField>
+    <ResponseField name="details" type="string">
+      Human-readable description of the block.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="antibot_systems" type="array">
+  List of anti-bot systems detected on the page.
+
+  <Expandable>
+    <ResponseField name="system" type="string">
+      System name (e.g., `cloudflare_turnstile`, `datadome`, `akamai`, `kasada`, `amazon_waf`).
+    </ResponseField>
+    <ResponseField name="confidence" type="number">
+      Confidence score from `0.0` to `1.0`.
+    </ResponseField>
+    <ResponseField name="details" type="string">
+      Additional detection details.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="captcha_systems" type="array">
+  List of CAPTCHA systems detected on the page.
+
+  <Expandable>
+    <ResponseField name="system" type="string">
+      System name (e.g., `recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, `geetest`).
+    </ResponseField>
+    <ResponseField name="confidence" type="number">
+      Confidence score from `0.0` to `1.0`.
+    </ResponseField>
+    <ResponseField name="details" type="string">
+      Additional detection details.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="anti_bot_solved" type="boolean">
+  Whether the anti-bot solver successfully bypassed the protection.
+</ResponseField>
+
+<ResponseField name="solver_used" type="string">
+  Name of the solver that successfully bypassed the block. `null` if no solver was used.
+</ResponseField>
+
+<ResponseField name="ai_extraction" type="object | string | array">
+  Structured data extracted by the LLM based on `ai_prompt`. The shape depends on your prompt. `null` when `ai_extract` is `false` or extraction failed.
+</ResponseField>
+
+<ResponseField name="ai_model" type="string">
+  The LLM model used for extraction (e.g., `gpt-4o-mini`). `null` when AI extraction was not used.
+</ResponseField>
+
+<ResponseField name="ai_error" type="string">
+  Error message if AI extraction failed. The scrape result is still returned. `null` on success.
+</ResponseField>
+
+## Examples
+
+### Basic scrape
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://scrapebadger.com/v1/web/scrape" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com", "format": "markdown"}'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://scrapebadger.com/v1/web/scrape",
+    headers={"x-api-key": "YOUR_API_KEY"},
+    json={"url": "https://example.com", "format": "markdown"}
+)
+print(response.json()["content"])
+```
+
+```javascript JavaScript
+const res = await fetch("https://scrapebadger.com/v1/web/scrape", {
+  method: "POST",
+  headers: { "x-api-key": "YOUR_API_KEY", "Content-Type": "application/json" },
+  body: JSON.stringify({ url: "https://example.com", format: "markdown" })
+});
+const data = await res.json();
+console.log(data.content);
+```
+
+</CodeGroup>
+
+### JavaScript rendering with wait
+
+```json
+{
+  "url": "https://example.com/spa-page",
+  "format": "html",
+  "render_js": true,
+  "wait_for": "#dynamic-content",
+  "wait_timeout": 10000
+}
+```
+
+### AI extraction
+
+```json
+{
+  "url": "https://example.com/products",
+  "format": "markdown",
+  "ai_extract": true,
+  "ai_prompt": "Extract all product names, prices, and ratings as a JSON array of objects with keys: name, price, rating"
+}
+```
+
+### Full anti-bot bypass with budget
+
+```json
+{
+  "url": "https://heavily-protected-site.com",
+  "format": "markdown",
+  "escalate": true,
+  "anti_bot": true,
+  "max_cost": 20,
+  "country": "US"
+}
+```
+
+### Browser automation scenario
+
+```json
+{
+  "url": "https://example.com/infinite-scroll",
+  "format": "text",
+  "js_scenario": [
+    { "type": "scroll", "direction": "down", "amount": 1000 },
+    { "type": "wait", "milliseconds": 2000 },
+    { "type": "scroll", "direction": "down", "amount": 1000 },
+    { "type": "wait", "milliseconds": 2000 }
+  ]
+}
+```
+
+## Error Responses
+
+| Status | Description |
+|--------|-------------|
+| `400` | Invalid URL, cost exceeds `max_cost`, or requested engine not available |
+| `402` | Insufficient credits |
+| `422` | Blocking detected after all retries exhausted (`success: false`, `blocking_details` populated) |
+| `429` | Rate limit exceeded |
+| `500` | Unexpected server error |
+
+<ResponseExample>
+
+```json 200 — Success
+{
+  "success": true,
+  "url": "https://example.com",
+  "status_code": 200,
+  "content": "# Example Domain\n\nThis domain is for use in illustrative examples...",
+  "format": "markdown",
+  "engine_used": "curl_cffi",
+  "credits_used": 1,
+  "duration_ms": 342,
+  "retries_used": 0,
+  "content_length": 1256,
+  "screenshot_url": null,
+  "headers": {
+    "content-type": "text/html; charset=UTF-8"
+  },
+  "blocking_detected": false,
+  "blocking_details": null,
+  "antibot_systems": [],
+  "captcha_systems": [],
+  "anti_bot_solved": false,
+  "solver_used": null,
+  "ai_extraction": null,
+  "ai_model": null,
+  "ai_error": null
+}
+```
+
+```json 200 — With AI Extraction
+{
+  "success": true,
+  "url": "https://example.com/products",
+  "status_code": 200,
+  "content": "# Products\n\n...",
+  "format": "markdown",
+  "engine_used": "curl_cffi",
+  "credits_used": 3,
+  "duration_ms": 2150,
+  "retries_used": 0,
+  "content_length": 8432,
+  "screenshot_url": null,
+  "headers": {},
+  "blocking_detected": false,
+  "blocking_details": null,
+  "antibot_systems": [],
+  "captcha_systems": [],
+  "anti_bot_solved": false,
+  "solver_used": null,
+  "ai_extraction": [
+    { "name": "Widget Pro", "price": "$29.99", "rating": 4.5 },
+    { "name": "Widget Basic", "price": "$9.99", "rating": 4.2 }
+  ],
+  "ai_model": "gpt-4o-mini",
+  "ai_error": null
+}
+```
+
+```json 422 — Blocked
+{
+  "success": false,
+  "url": "https://protected-site.com",
+  "status_code": 403,
+  "content": null,
+  "format": "markdown",
+  "engine_used": "curl_cffi",
+  "credits_used": 0,
+  "duration_ms": 5230,
+  "retries_used": 3,
+  "content_length": 0,
+  "screenshot_url": null,
+  "headers": {},
+  "blocking_detected": true,
+  "blocking_details": {
+    "is_blocked": true,
+    "block_type": "cloudflare",
+    "confidence": 0.95,
+    "details": "Cloudflare challenge page detected"
+  },
+  "antibot_systems": [
+    { "system": "cloudflare_turnstile", "confidence": 0.95, "details": null }
+  ],
+  "captcha_systems": [],
+  "anti_bot_solved": false,
+  "solver_used": null,
+  "ai_extraction": null,
+  "ai_model": null,
+  "ai_error": null
+}
+```
+
+</ResponseExample>

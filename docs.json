@@ -34,6 +34,12 @@
             ]
           },
           {
+            "group": "Web Scraping",
+            "pages": [
+              "web-scraping/overview"
+            ]
+          },
+          {
             "group": "Twitter Streams",
             "pages": [
               "twitter-streams/overview",
@@ -52,6 +58,13 @@
             "group": "Overview",
             "pages": [
               "api-reference/introduction"
+            ]
+          },
+          {
+            "group": "Web Scraping",
+            "pages": [
+              "api-reference/endpoint/web-scraping/scrape",
+              "api-reference/endpoint/web-scraping/detect"
             ]
           },
           {

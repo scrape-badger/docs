@@ -1,6 +1,6 @@
 ---
 title: API Reference
-description: Complete Twitter API reference with 50+ endpoints. Auto-generated from our OpenAPI specification.
+description: Complete API reference for web scraping and Twitter data. 50+ endpoints for scraping any website and accessing Twitter data.
 ---
 
 ## Base URL
@@ -9,20 +9,30 @@ description: Complete Twitter API reference with 50+ endpoints. Auto-generated f
 https://scrapebadger.com/v1
 ```
 
-All Twitter API endpoints are prefixed with this base URL. Authentication is required for all requests.
+All API endpoints are prefixed with this base URL. Authentication is required for all requests.
 
 ## Authentication
 
 Include your API key in the `x-api-key` header with every request:
 
 ```bash
-curl -X GET "https://scrapebadger.com/v1/twitter/users/elonmusk/by_username" \
-  -H "x-api-key: YOUR_API_KEY"
+curl -X POST "https://scrapebadger.com/v1/web/scrape" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com", "format": "markdown"}'
 ```
 
 See the [Authentication guide](/authentication) for more details.
 
 ## Endpoint Categories
+
+### Web Scraping
+
+| Category | Endpoints | Description |
+|----------|-----------|-------------|
+| [Web Scraping](/api-reference/endpoint/web-scraping/scrape) | 2 | Scrape any website with anti-bot bypass, JS rendering, and AI extraction |
+
+### Twitter
 
 | Category | Endpoints | Description |
 |----------|-----------|-------------|

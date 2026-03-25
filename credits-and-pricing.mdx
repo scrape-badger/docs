@@ -21,15 +21,33 @@ ScrapeBadger uses a simple credit-based pricing model. Pay only for what you use
 
 ## Credit Costs by Endpoint
 
+### Web Scraping
+
+| Component | Cost |
+|-----------|------|
+| Scrape — `curl_cffi` engine (default) | 1 credit |
+| Scrape — `browser` engine (JS rendering) | 5 credits |
+| Scrape — `windows_chrome` engine | 10 credits |
+| Scrape — Anti-bot solver add-on | +5 credits |
+| Scrape — AI extraction add-on | +2 credits |
+| Detect — Fresh scan | 1 credit |
+| Detect — Cached result (5 min TTL) | 0 credits |
+
+<Tip>
+  Web scraping retries are free — you only pay for the engine that produces the final result. Failed requests cost 0 credits.
+</Tip>
+
+### Twitter
+
 | Category | Endpoints | Cost |
 |----------|-----------|------|
-| Twitter - Tweets | 11 endpoints | 1 credit per request |
-| Twitter - Users | 11 endpoints | 1 credit per request |
-| Twitter - Lists | 3 endpoints | 1 credit per request |
-| Twitter - Communities | 3 endpoints | 1 credit per request |
-| Twitter - Trends | 2 endpoints | 1 credit per request |
-| Twitter - Geo | 2 endpoints | 1 credit per request |
-| Twitter - Spaces | 2 endpoints | 1 credit per request |
+| Tweets | 11 endpoints | 1 credit per request |
+| Users | 11 endpoints | 1 credit per request |
+| Lists | 3 endpoints | 1 credit per request |
+| Communities | 3 endpoints | 1 credit per request |
+| Trends | 2 endpoints | 1 credit per request |
+| Geo | 2 endpoints | 1 credit per request |
+| Spaces | 2 endpoints | 1 credit per request |
 
 <Info>
   Failed requests (4xx/5xx errors) do not consume credits. You are only charged for successful responses.

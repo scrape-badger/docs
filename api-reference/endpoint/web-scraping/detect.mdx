@@ -1,0 +1,196 @@
+---
+title: Detect Protection
+description: Analyze a URL for anti-bot and CAPTCHA systems without performing a full scrape.
+api: POST /v1/web/detect
+---
+
+Quickly scan a URL to identify which anti-bot and CAPTCHA systems are in use. Results are cached per domain for 5 minutes — cached hits cost **0 credits**.
+
+## Request Body
+
+<ParamField body="url" type="string" required>
+  The URL to analyze for anti-bot and CAPTCHA protection systems. Must be a valid HTTP or HTTPS URL.
+</ParamField>
+
+<ParamField body="timeout" type="integer" default={15000}>
+  Request timeout in milliseconds. Range: `1000` – `60000`.
+</ParamField>
+
+<ParamField body="country" type="string">
+  ISO 3166-1 alpha-2 country code for proxy geo-targeting. Some sites show different protection depending on the visitor's location.
+
+  ```json
+  { "country": "US" }
+  ```
+</ParamField>
+
+## Response
+
+<ResponseField name="url" type="string">
+  The analyzed URL.
+</ResponseField>
+
+<ResponseField name="antibot_systems" type="array">
+  List of anti-bot systems detected on the page.
+
+  <Expandable>
+    <ResponseField name="system" type="string">
+      System name. Common values: `cloudflare_turnstile`, `datadome`, `akamai`, `kasada`, `amazon_waf`, `imperva`, `perimeterx`.
+    </ResponseField>
+    <ResponseField name="confidence" type="number">
+      Confidence score from `0.0` to `1.0`.
+    </ResponseField>
+    <ResponseField name="details" type="string">
+      Additional detection details.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="captcha_systems" type="array">
+  List of CAPTCHA systems detected on the page.
+
+  <Expandable>
+    <ResponseField name="system" type="string">
+      System name. Common values: `recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, `geetest`.
+    </ResponseField>
+    <ResponseField name="confidence" type="number">
+      Confidence score from `0.0` to `1.0`.
+    </ResponseField>
+    <ResponseField name="details" type="string">
+      Additional detection details.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="is_blocked" type="boolean">
+  Whether the page is currently showing a blocking/challenge page.
+</ResponseField>
+
+<ResponseField name="blocking_type" type="string">
+  Type of blocking detected (e.g., `cloudflare`, `datadome`). `null` if not blocked.
+</ResponseField>
+
+<ResponseField name="recommendation" type="string">
+  Suggested scraping strategy based on the detected protection. For example: `"Use browser engine with anti_bot enabled"`.
+</ResponseField>
+
+<ResponseField name="credits_used" type="integer">
+  Credits charged for this request. `1` for a fresh scan, `0` for a cached result.
+</ResponseField>
+
+<ResponseField name="duration_ms" type="integer">
+  Response time in milliseconds.
+</ResponseField>
+
+## Examples
+
+### Basic detection
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://scrapebadger.com/v1/web/detect" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com"}'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://scrapebadger.com/v1/web/detect",
+    headers={"x-api-key": "YOUR_API_KEY"},
+    json={"url": "https://example.com"}
+)
+
+detection = response.json()
+for system in detection["antibot_systems"]:
+    print(f"{system['system']}: {system['confidence']}")
+```
+
+```javascript JavaScript
+const res = await fetch("https://scrapebadger.com/v1/web/detect", {
+  method: "POST",
+  headers: { "x-api-key": "YOUR_API_KEY", "Content-Type": "application/json" },
+  body: JSON.stringify({ url: "https://example.com" })
+});
+const detection = await res.json();
+console.log(detection.antibot_systems);
+```
+
+</CodeGroup>
+
+### Detect with geo-targeting
+
+```json
+{
+  "url": "https://region-restricted-site.com",
+  "country": "DE",
+  "timeout": 20000
+}
+```
+
+## Error Responses
+
+| Status | Description |
+|--------|-------------|
+| `400` | Invalid URL |
+| `402` | Insufficient credits |
+| `429` | Rate limit exceeded |
+| `500` | Unexpected server error |
+
+<ResponseExample>
+
+```json 200 — Protection Detected
+{
+  "url": "https://protected-site.com",
+  "antibot_systems": [
+    {
+      "system": "cloudflare_turnstile",
+      "confidence": 0.92,
+      "details": "Turnstile widget detected in page HTML"
+    }
+  ],
+  "captcha_systems": [],
+  "is_blocked": true,
+  "blocking_type": "cloudflare",
+  "recommendation": "Use browser engine with anti_bot enabled",
+  "credits_used": 1,
+  "duration_ms": 1240
+}
+```
+
+```json 200 — No Protection
+{
+  "url": "https://example.com",
+  "antibot_systems": [],
+  "captcha_systems": [],
+  "is_blocked": false,
+  "blocking_type": null,
+  "recommendation": null,
+  "credits_used": 1,
+  "duration_ms": 380
+}
+```
+
+```json 200 — Cached Result
+{
+  "url": "https://protected-site.com",
+  "antibot_systems": [
+    {
+      "system": "cloudflare_turnstile",
+      "confidence": 0.92,
+      "details": "Turnstile widget detected in page HTML"
+    }
+  ],
+  "captcha_systems": [],
+  "is_blocked": true,
+  "blocking_type": "cloudflare",
+  "recommendation": "Use browser engine with anti_bot enabled",
+  "credits_used": 0,
+  "duration_ms": 12
+}
+```
+
+</ResponseExample>

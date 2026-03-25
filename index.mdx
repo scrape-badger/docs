@@ -1,30 +1,41 @@
 ---
 title: Introduction
-description: Access Twitter/X data through a simple REST API. 50+ endpoints for tweets, users, lists, communities, trends, and more.
+description: Scrape any website and access Twitter/X data through a simple REST API. Web scraping with anti-bot bypass, AI extraction, and 50+ Twitter endpoints.
 ---
 
 ## What is ScrapeBadger?
 
-ScrapeBadger is a unified API for accessing Twitter/X data. Instead of managing scraping infrastructure, proxies, and session rotation yourself, make simple REST API calls and get structured JSON data back.
+ScrapeBadger is a unified web scraping and data API. Scrape any website with automatic anti-bot bypass, JavaScript rendering, and AI-powered data extraction — or access Twitter/X data through 50+ structured endpoints. No infrastructure to manage.
 
 **Base URL:** `https://scrapebadger.com/v1`
 
-```bash
+<CodeGroup>
+
+```bash Web Scraping
+curl -X POST "https://scrapebadger.com/v1/web/scrape" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com", "format": "markdown"}'
+```
+
+```bash Twitter API
 curl -X GET "https://scrapebadger.com/v1/twitter/users/elonmusk/by_username" \
   -H "x-api-key: YOUR_API_KEY"
 ```
 
+</CodeGroup>
+
 ## Key Features
 
 <CardGroup cols={3}>
-  <Card title="Simple REST API" icon="bolt">
-    Standard HTTP requests with JSON responses. No complex SDKs or libraries required.
+  <Card title="Web Scraping" icon="globe">
+    Scrape any website with smart engine selection, anti-bot bypass, and AI extraction.
   </Card>
-  <Card title="50+ Endpoints" icon="grid-2">
+  <Card title="50+ Twitter Endpoints" icon="grid-2">
     Tweets, users, lists, communities, trends, geo data, and Twitter Spaces.
   </Card>
   <Card title="Reliable & Scalable" icon="shield-check">
-    Automatic session rotation, retry logic, and rate limit management handled for you.
+    Automatic proxy rotation, retry logic, and rate limit management handled for you.
   </Card>
 </CardGroup>
 
@@ -34,11 +45,11 @@ curl -X GET "https://scrapebadger.com/v1/twitter/users/elonmusk/by_username" \
   <Card title="Quick Start" icon="rocket" href="/quickstart">
     Get up and running in 5 minutes with your first API call.
   </Card>
-  <Card title="Authentication" icon="key" href="/authentication">
-    Learn how to authenticate your API requests.
+  <Card title="Web Scraping Guide" icon="globe" href="/web-scraping/overview">
+    Scrape any website with anti-bot bypass and AI extraction.
   </Card>
   <Card title="API Reference" icon="code" href="/api-reference/introduction">
-    Browse all 50+ endpoints with examples and response schemas.
+    Browse all endpoints with examples and response schemas.
   </Card>
   <Card title="Credits & Pricing" icon="credit-card" href="/credits-and-pricing">
     Understand the credit-based pricing model.
