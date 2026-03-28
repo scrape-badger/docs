@@ -11,7 +11,7 @@ Scrape any public webpage and get back clean HTML, Markdown, or plain text. The 
 
 <CardGroup cols={3}>
   <Card title="Smart Engine Selection" icon="gear">
-    Automatically picks the best scraping engine for each site — from fast HTTP requests to full browser rendering.
+    Automatically picks the best scraping approach for each site — from fast HTTP requests to full browser rendering.
   </Card>
   <Card title="Anti-Bot Bypass" icon="shield-halved">
     Detects and bypasses Cloudflare, DataDome, Akamai, Kasada, and other protection systems.
@@ -19,48 +19,54 @@ Scrape any public webpage and get back clean HTML, Markdown, or plain text. The 
   <Card title="AI Extraction" icon="brain">
     Extract structured data from any page using natural language prompts powered by LLMs.
   </Card>
+  <Card title="Video Recording" icon="video">
+    Record browser sessions as animated GIFs for debugging, visual verification, and monitoring.
+  </Card>
+  <Card title="Screenshots" icon="camera">
+    Capture full-page PNG screenshots of any webpage.
+  </Card>
+  <Card title="Geo-Targeting" icon="globe">
+    Route requests through proxies in 37+ countries to access location-specific content.
+  </Card>
 </CardGroup>
 
 ## How It Works
 
 1. **Send a URL** to the `/v1/web/scrape` endpoint
-2. **ScrapeBadger selects the best engine** — fast HTTP for simple pages, headless browser for JavaScript-heavy sites
-3. **Anti-bot detection runs automatically** — if a block is detected, the request retries with escalated engines
+2. **ScrapeBadger picks the best approach** — fast HTTP for simple pages, headless browser for JavaScript-heavy sites
+3. **Anti-bot detection runs automatically** — if a block is detected, the request retries with more powerful methods
 4. **Get clean content back** in your preferred format (HTML, Markdown, or plain text)
 
-## Scraping Engines
+## Scraping Tiers
 
-ScrapeBadger uses a tiered engine system. When `engine` is set to `"auto"` (the default), the cheapest engine is tried first and escalation happens automatically if blocking is detected.
+ScrapeBadger uses a tiered system. When `engine` is set to `"auto"` (the default), the most cost-effective method is tried first and the system escalates automatically if needed.
 
-| Engine | Description | Cost | Best For |
-|--------|-------------|------|----------|
-| `curl_cffi` | HTTP client with Chrome TLS fingerprint impersonation | 1 credit | Static pages, APIs, most websites |
-| `browser` | Headless browser (Patchright/Camoufox) | 5 credits | JavaScript-rendered pages, SPAs |
-| `windows_chrome` | Real Chrome on a remote Windows VPS via CDP | 10 credits | Heavily protected sites with advanced fingerprinting |
-
-<Info>
-  `rnet` is a backward-compatible alias for `curl_cffi`. `patchright` is a backward-compatible alias for `browser`.
-</Info>
+| Tier | Description | Cost |
+|------|-------------|------|
+| **HTTP** | Fast HTTP request with Chrome TLS fingerprint — works for most websites | 1 credit |
+| **Browser** | Full headless browser with JavaScript rendering — for SPAs and dynamic pages | 5 credits |
+| **Premium Browser** | Real browser with advanced fingerprinting — for heavily protected sites | 10 credits |
 
 ### Auto-Escalation
 
-When `escalate` is enabled (default: `false`), ScrapeBadger automatically tries more powerful engines if the initial one is blocked:
+When `escalate` is enabled, ScrapeBadger automatically tries more powerful methods if the initial one is blocked:
 
 ```
-curl_cffi (1 credit) → browser (5 credits) → windows_chrome (10 credits)
+HTTP (1 credit) → Browser (5 credits) → Premium Browser (10 credits)
 ```
 
-You only pay for the engine that succeeds — escalation costs are **not cumulative**.
+You only pay for the method that succeeds — escalation costs are **not cumulative**.
 
 ## Credit Costs
 
 | Component | Cost |
 |-----------|------|
-| `curl_cffi` / `rnet` engine | 1 credit |
-| `browser` / `patchright` engine | 5 credits |
-| `windows_chrome` engine | 10 credits |
+| Basic HTTP scrape | 1 credit |
+| Browser rendering (`render_js: true`) | 5 credits |
+| Premium browser (via escalation) | 10 credits |
 | Anti-bot solver (`anti_bot: true`) | +5 credits |
 | AI extraction (`ai_extract: true`) | +2 credits |
+| Video recording (`video: true`) | +3 credits |
 | Retries | Free |
 | Failed requests | 0 credits |
 
