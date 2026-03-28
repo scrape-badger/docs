@@ -11,16 +11,14 @@ api: POST /v1/web/scrape
 </ParamField>
 
 <ParamField body="engine" type="string" default="auto">
-  Scraping engine to use.
+  Scraping engine tier to use. ScrapeBadger automatically selects the best approach.
 
   | Value | Description | Cost |
   |-------|-------------|------|
-  | `auto` | Selects `curl_cffi` by default, escalates to `browser` if JS rendering is needed | Varies |
-  | `curl_cffi` | HTTP client with Chrome TLS fingerprint impersonation | 1 credit |
-  | `rnet` | Backward-compatible alias for `curl_cffi` | 1 credit |
-  | `browser` | Headless browser (Patchright/Camoufox) with full JS rendering | 5 credits |
-  | `patchright` | Backward-compatible alias for `browser` | 5 credits |
-  | `windows_chrome` | Real Chrome on a remote Windows VPS via CDP | 10 credits |
+  | `auto` | Automatically picks the best engine for the target site (recommended) | From 1 credit |
+  | `browser` | Force headless browser with full JavaScript rendering | 5 credits |
+
+  In `auto` mode, simple pages use fast HTTP (1 credit) and JavaScript-heavy pages use a browser (5 credits). When `escalate` is enabled, the system can further escalate to premium browsers (10 credits) for heavily protected sites.
 </ParamField>
 
 <ParamField body="format" type="string" default="html">
@@ -117,7 +115,11 @@ api: POST /v1/web/scrape
 </ParamField>
 
 <ParamField body="screenshot" type="boolean" default={false}>
-  Capture a screenshot of the page. Forces the `browser` engine. The screenshot URL is returned in the `screenshot_url` field of the response.
+  Capture a full-page screenshot (PNG). Forces the browser engine. Returned as base64 in the `screenshot_url` response field.
+</ParamField>
+
+<ParamField body="video" type="boolean" default={false}>
+  Record a video of the browser session (animated GIF). Forces the browser engine. Returned as base64 in the `video_url` response field. Adds **+3 credits**. Useful for debugging, visual verification, or monitoring how a page loads.
 </ParamField>
 
 <ParamField body="anti_bot" type="boolean" default={false}>
@@ -174,7 +176,7 @@ api: POST /v1/web/scrape
 </ResponseField>
 
 <ResponseField name="engine_used" type="string">
-  The engine that produced the final result (e.g., `curl_cffi`, `browser`, `windows_chrome`).
+  The engine tier that produced the final result.
 </ResponseField>
 
 <ResponseField name="credits_used" type="integer">
@@ -194,7 +196,11 @@ api: POST /v1/web/scrape
 </ResponseField>
 
 <ResponseField name="screenshot_url" type="string">
-  URL to the captured screenshot image. Only present when `screenshot: true` was requested.
+  Base64-encoded PNG screenshot of the page. Only present when `screenshot: true` was requested.
+</ResponseField>
+
+<ResponseField name="video_url" type="string">
+  Base64-encoded animated GIF of the browser session. Only present when `video: true` was requested.
 </ResponseField>
 
 <ResponseField name="headers" type="object">
@@ -382,12 +388,13 @@ console.log(data.content);
   "status_code": 200,
   "content": "# Example Domain\n\nThis domain is for use in illustrative examples...",
   "format": "markdown",
-  "engine_used": "curl_cffi",
+  "engine_used": "http",
   "credits_used": 1,
   "duration_ms": 342,
   "retries_used": 0,
   "content_length": 1256,
   "screenshot_url": null,
+  "video_url": null,
   "headers": {
     "content-type": "text/html; charset=UTF-8"
   },
@@ -410,12 +417,13 @@ console.log(data.content);
   "status_code": 200,
   "content": "# Products\n\n...",
   "format": "markdown",
-  "engine_used": "curl_cffi",
+  "engine_used": "http",
   "credits_used": 3,
   "duration_ms": 2150,
   "retries_used": 0,
   "content_length": 8432,
   "screenshot_url": null,
+  "video_url": null,
   "headers": {},
   "blocking_detected": false,
   "blocking_details": null,
@@ -439,12 +447,13 @@ console.log(data.content);
   "status_code": 403,
   "content": null,
   "format": "markdown",
-  "engine_used": "curl_cffi",
+  "engine_used": "http",
   "credits_used": 0,
   "duration_ms": 5230,
   "retries_used": 3,
   "content_length": 0,
   "screenshot_url": null,
+  "video_url": null,
   "headers": {},
   "blocking_detected": true,
   "blocking_details": {
