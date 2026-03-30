@@ -20,7 +20,7 @@
       "name": "x-api-key"
     },
     "playground": {
-      "proxy": true
+      "mode": "simple"
     }
   },
   "navigation": {
