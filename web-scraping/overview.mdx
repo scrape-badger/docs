@@ -83,7 +83,7 @@ curl -X POST "https://scrapebadger.com/v1/web/scrape" \
   -H "x-api-key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "url": "https://example.com",
+    "url": "https://scrapebadger.com",
     "format": "markdown"
   }'
 ```
@@ -95,7 +95,7 @@ response = requests.post(
     "https://scrapebadger.com/v1/web/scrape",
     headers={"x-api-key": "YOUR_API_KEY"},
     json={
-        "url": "https://example.com",
+        "url": "https://scrapebadger.com",
         "format": "markdown"
     }
 )
@@ -112,7 +112,7 @@ const response = await fetch("https://scrapebadger.com/v1/web/scrape", {
     "Content-Type": "application/json"
   },
   body: JSON.stringify({
-    url: "https://example.com",
+    url: "https://scrapebadger.com",
     format: "markdown"
   })
 });

@@ -292,7 +292,7 @@ api: POST /v1/web/scrape
 curl -X POST "https://scrapebadger.com/v1/web/scrape" \
   -H "x-api-key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"url": "https://example.com", "format": "markdown"}'
+  -d '{"url": "https://scrapebadger.com", "format": "markdown"}'
 ```
 
 ```python Python
@@ -301,7 +301,7 @@ import requests
 response = requests.post(
     "https://scrapebadger.com/v1/web/scrape",
     headers={"x-api-key": "YOUR_API_KEY"},
-    json={"url": "https://example.com", "format": "markdown"}
+    json={"url": "https://scrapebadger.com", "format": "markdown"}
 )
 print(response.json()["content"])
 ```
@@ -310,7 +310,7 @@ print(response.json()["content"])
 const res = await fetch("https://scrapebadger.com/v1/web/scrape", {
   method: "POST",
   headers: { "x-api-key": "YOUR_API_KEY", "Content-Type": "application/json" },
-  body: JSON.stringify({ url: "https://example.com", format: "markdown" })
+  body: JSON.stringify({ url: "https://scrapebadger.com", format: "markdown" })
 });
 const data = await res.json();
 console.log(data.content);
@@ -322,7 +322,7 @@ console.log(data.content);
 
 ```json
 {
-  "url": "https://example.com/spa-page",
+  "url": "https://scrapebadger.com/spa-page",
   "format": "html",
   "render_js": true,
   "wait_for": "#dynamic-content",
@@ -334,7 +334,7 @@ console.log(data.content);
 
 ```json
 {
-  "url": "https://example.com/products",
+  "url": "https://scrapebadger.com/products",
   "format": "markdown",
   "ai_extract": true,
   "ai_prompt": "Extract all product names, prices, and ratings as a JSON array of objects with keys: name, price, rating"
@@ -358,7 +358,7 @@ console.log(data.content);
 
 ```json
 {
-  "url": "https://example.com/infinite-scroll",
+  "url": "https://scrapebadger.com/infinite-scroll",
   "format": "text",
   "js_scenario": [
     { "type": "scroll", "direction": "down", "amount": 1000 },
@@ -384,7 +384,7 @@ console.log(data.content);
 ```json 200 — Success
 {
   "success": true,
-  "url": "https://example.com",
+  "url": "https://scrapebadger.com",
   "status_code": 200,
   "content": "# Example Domain\n\nThis domain is for use in illustrative examples...",
   "format": "markdown",
@@ -413,7 +413,7 @@ console.log(data.content);
 ```json 200 — With AI Extraction
 {
   "success": true,
-  "url": "https://example.com/products",
+  "url": "https://scrapebadger.com/products",
   "status_code": 200,
   "content": "# Products\n\n...",
   "format": "markdown",

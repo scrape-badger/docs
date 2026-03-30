@@ -92,7 +92,7 @@ Quickly scan a URL to identify which anti-bot and CAPTCHA systems are in use. Re
 curl -X POST "https://scrapebadger.com/v1/web/detect" \
   -H "x-api-key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"url": "https://example.com"}'
+  -d '{"url": "https://scrapebadger.com"}'
 ```
 
 ```python Python
@@ -101,7 +101,7 @@ import requests
 response = requests.post(
     "https://scrapebadger.com/v1/web/detect",
     headers={"x-api-key": "YOUR_API_KEY"},
-    json={"url": "https://example.com"}
+    json={"url": "https://scrapebadger.com"}
 )
 
 detection = response.json()
@@ -113,7 +113,7 @@ for system in detection["antibot_systems"]:
 const res = await fetch("https://scrapebadger.com/v1/web/detect", {
   method: "POST",
   headers: { "x-api-key": "YOUR_API_KEY", "Content-Type": "application/json" },
-  body: JSON.stringify({ url: "https://example.com" })
+  body: JSON.stringify({ url: "https://scrapebadger.com" })
 });
 const detection = await res.json();
 console.log(detection.antibot_systems);
@@ -163,7 +163,7 @@ console.log(detection.antibot_systems);
 
 ```json 200 — No Protection
 {
-  "url": "https://example.com",
+  "url": "https://scrapebadger.com",
   "antibot_systems": [],
   "captcha_systems": [],
   "is_blocked": false,
