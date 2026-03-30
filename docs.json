@@ -12,7 +12,10 @@
     "light": "/logo/light.png",
     "dark": "/logo/dark.png"
   },
-  "openapi": "https://scrapebadger.com/api/twitter-openapi.json",
+  "openapi": [
+    "https://scrapebadger.com/api/twitter-openapi.json",
+    "/openapi-web-scraping.json"
+  ],
   "api": {
     "baseUrl": "https://scrapebadger.com",
     "auth": {

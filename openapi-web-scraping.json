@@ -1,0 +1,237 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ScrapeBadger Web Scraping API",
+    "version": "1.0.0",
+    "description": "Web scraping API with anti-bot bypass, JS rendering, and AI extraction."
+  },
+  "servers": [
+    {
+      "url": "https://scrapebadger.com",
+      "description": "Production"
+    }
+  ],
+  "security": [
+    {
+      "apiKeyAuth": []
+    }
+  ],
+  "paths": {
+    "/v1/web/scrape": {
+      "post": {
+        "operationId": "scrapeUrl",
+        "summary": "Scrape URL",
+        "description": "Scrape a webpage and return its content as HTML, Markdown, or plain text.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["url"],
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "description": "The URL to scrape. Must be a valid HTTP or HTTPS URL."
+                  },
+                  "engine": {
+                    "type": "string",
+                    "default": "auto",
+                    "enum": ["auto", "browser"],
+                    "description": "Scraping engine tier to use."
+                  },
+                  "format": {
+                    "type": "string",
+                    "default": "html",
+                    "enum": ["html", "markdown", "text"],
+                    "description": "Output format for the scraped content."
+                  },
+                  "render_js": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Force JavaScript rendering."
+                  },
+                  "wait_for": {
+                    "type": "string",
+                    "description": "CSS selector or XPath to wait for before extracting."
+                  },
+                  "wait_timeout": {
+                    "type": "integer",
+                    "default": 30000,
+                    "description": "Max wait time in ms for wait_for selector."
+                  },
+                  "wait_after_load": {
+                    "type": "integer",
+                    "description": "Additional ms to wait after page load."
+                  },
+                  "js_scenario": {
+                    "type": "array",
+                    "items": {
+                      "type": "object"
+                    },
+                    "description": "Browser actions to perform before extracting."
+                  },
+                  "session_id": {
+                    "type": "string",
+                    "description": "Persist cookies and state across requests."
+                  },
+                  "retry_count": {
+                    "type": "integer",
+                    "default": 3,
+                    "description": "Max retry attempts on blocking detection."
+                  },
+                  "retry_on_block": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Auto-retry on blocking page detection."
+                  },
+                  "country": {
+                    "type": "string",
+                    "description": "ISO 3166-1 alpha-2 country code for proxy geo-targeting."
+                  },
+                  "custom_headers": {
+                    "type": "object",
+                    "description": "Additional HTTP headers for the target request."
+                  },
+                  "screenshot": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Capture a full-page PNG screenshot."
+                  },
+                  "video": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Record browser session as animated GIF (+3 credits)."
+                  },
+                  "anti_bot": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Attempt anti-bot bypass when blocking detected."
+                  },
+                  "escalate": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Allow auto-escalation to stronger engines."
+                  },
+                  "max_cost": {
+                    "type": "integer",
+                    "description": "Maximum credits budget for this request."
+                  },
+                  "ai_extract": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Run AI extraction on scraped content."
+                  },
+                  "ai_prompt": {
+                    "type": "string",
+                    "description": "Natural language instruction for AI extraction."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful scrape",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "url": { "type": "string" },
+                    "status_code": { "type": "integer" },
+                    "content": { "type": "string" },
+                    "format": { "type": "string" },
+                    "engine_used": { "type": "string" },
+                    "credits_used": { "type": "integer" },
+                    "duration_ms": { "type": "integer" },
+                    "retries_used": { "type": "integer" },
+                    "content_length": { "type": "integer" },
+                    "screenshot_url": { "type": "string", "nullable": true },
+                    "video_url": { "type": "string", "nullable": true },
+                    "headers": { "type": "object" },
+                    "blocking_detected": { "type": "boolean" },
+                    "blocking_details": { "type": "object", "nullable": true },
+                    "antibot_systems": { "type": "array" },
+                    "captcha_systems": { "type": "array" },
+                    "anti_bot_solved": { "type": "boolean" },
+                    "solver_used": { "type": "string", "nullable": true },
+                    "ai_extraction": { "nullable": true },
+                    "ai_model": { "type": "string", "nullable": true },
+                    "ai_error": { "type": "string", "nullable": true }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/web/detect": {
+      "post": {
+        "operationId": "detectProtection",
+        "summary": "Detect Protection",
+        "description": "Analyze a URL for anti-bot and CAPTCHA systems without performing a full scrape.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["url"],
+                "properties": {
+                  "url": {
+                    "type": "string",
+                    "description": "The URL to analyze."
+                  },
+                  "timeout": {
+                    "type": "integer",
+                    "default": 15000,
+                    "description": "Request timeout in milliseconds."
+                  },
+                  "country": {
+                    "type": "string",
+                    "description": "ISO 3166-1 alpha-2 country code for proxy geo-targeting."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Detection result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": { "type": "string" },
+                    "antibot_systems": { "type": "array" },
+                    "captcha_systems": { "type": "array" },
+                    "is_blocked": { "type": "boolean" },
+                    "blocking_type": { "type": "string", "nullable": true },
+                    "recommendation": { "type": "string", "nullable": true },
+                    "credits_used": { "type": "integer" },
+                    "duration_ms": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    }
+  }
+}
