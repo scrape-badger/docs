@@ -1,0 +1,58 @@
+---
+title: "Search Brands"
+api: "GET /v1/vinted/brands"
+description: "Search for Vinted brand IDs by name."
+---
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Brand name to search for. Partial matches are supported.
+
+  Examples: `Nike`, `Adidas`, `Zara`
+</ParamField>
+
+<ParamField query="market" type="string" default="fr">
+  Vinted market to search brands in. Brand availability may vary by market.
+</ParamField>
+
+## Response
+
+<ResponseField name="brands" type="array">
+  Array of matching brands.
+
+  <Expandable title="Brand object">
+    <ResponseField name="id" type="integer">Brand ID. Use this value in the `brand_ids` filter when searching items.</ResponseField>
+    <ResponseField name="title" type="string">Brand name.</ResponseField>
+    <ResponseField name="slug" type="string">URL-friendly brand name.</ResponseField>
+    <ResponseField name="favourite_count" type="integer">Number of users following this brand.</ResponseField>
+    <ResponseField name="item_count" type="integer">Number of items listed under this brand.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "brands": [
+    {
+      "id": 53,
+      "title": "Nike",
+      "slug": "nike",
+      "favourite_count": 245000,
+      "item_count": 1823456
+    },
+    {
+      "id": 2319,
+      "title": "Nike ACG",
+      "slug": "nike-acg",
+      "favourite_count": 8700,
+      "item_count": 12340
+    }
+  ]
+}
+```
+
+<Note>
+  Each brand search request costs **1 credit**. Failed requests are not charged.
+</Note>

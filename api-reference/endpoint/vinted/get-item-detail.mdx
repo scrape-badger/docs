@@ -1,0 +1,80 @@
+---
+title: "Get Item Details"
+api: "GET /v1/vinted/items/{item_id}"
+description: "Get detailed information about a Vinted item."
+---
+
+## Path Parameters
+
+<ParamField path="item_id" type="integer" required>
+  The unique Vinted item ID. You can find this in search results or extract it from a Vinted listing URL.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="fr">
+  Vinted market where the item is listed. Must match the market the item belongs to.
+
+  Examples: `fr`, `de`, `uk`, `it`, `es`, `pl`, `us`
+</ParamField>
+
+## Response
+
+<ResponseField name="id" type="integer">Item ID.</ResponseField>
+<ResponseField name="title" type="string">Item title.</ResponseField>
+<ResponseField name="description" type="string">Full item description text.</ResponseField>
+<ResponseField name="price" type="string">Price in local currency.</ResponseField>
+<ResponseField name="currency" type="string">ISO 4217 currency code.</ResponseField>
+<ResponseField name="brand_title" type="string">Brand name.</ResponseField>
+<ResponseField name="size_title" type="string">Size label.</ResponseField>
+<ResponseField name="status" type="string">Item condition (e.g. `"New with tags"`, `"Good"`).</ResponseField>
+<ResponseField name="color1" type="string">Primary color.</ResponseField>
+<ResponseField name="color2" type="string">Secondary color (nullable).</ResponseField>
+<ResponseField name="photos" type="array">Array of photo objects with `url`, `width`, `height`.</ResponseField>
+<ResponseField name="url" type="string">Full URL to the Vinted listing.</ResponseField>
+<ResponseField name="view_count" type="integer">Number of views.</ResponseField>
+<ResponseField name="favourite_count" type="integer">Number of favourites.</ResponseField>
+<ResponseField name="created_at" type="string">ISO 8601 timestamp when the item was listed.</ResponseField>
+<ResponseField name="updated_at" type="string">ISO 8601 timestamp of the last update.</ResponseField>
+<ResponseField name="user" type="object">Seller information with `id`, `login`, `photo`, `feedback_reputation`.</ResponseField>
+
+### Example Response
+
+```json
+{
+  "id": 4856231890,
+  "title": "Nike Air Force 1 '07 White",
+  "description": "Worn only twice, excellent condition. Size 42 EU. Original box included.",
+  "price": "45.00",
+  "currency": "EUR",
+  "brand_title": "Nike",
+  "size_title": "42",
+  "status": "Very good",
+  "color1": "White",
+  "color2": null,
+  "photos": [
+    {
+      "url": "https://images1.vinted.net/t/...",
+      "width": 1200,
+      "height": 900
+    }
+  ],
+  "url": "https://www.vinted.fr/items/4856231890",
+  "view_count": 234,
+  "favourite_count": 12,
+  "created_at": "2026-03-15T14:30:00Z",
+  "updated_at": "2026-03-20T09:15:00Z",
+  "user": {
+    "id": 12345678,
+    "login": "seller_username",
+    "photo": {
+      "url": "https://images1.vinted.net/t/..."
+    },
+    "feedback_reputation": 0.98
+  }
+}
+```
+
+<Note>
+  Each item detail request costs **1 credit**. Failed requests are not charged.
+</Note>

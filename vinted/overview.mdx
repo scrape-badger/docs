@@ -1,0 +1,132 @@
+---
+title: "Vinted Scraper Overview"
+description: "Scrape Vinted listings, user profiles, and catalog data across 26 European markets with structured JSON responses."
+---
+
+# Vinted Scraper API
+
+Search listings, fetch item details, and retrieve user profiles from Vinted — the largest European second-hand marketplace. The API handles authentication, anti-bot bypass, and market routing automatically.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="26 Markets" icon="earth-europe">
+    Access all Vinted markets including FR, DE, UK, IT, ES, PL, NL, BE, CZ, LT, and more.
+  </Card>
+  <Card title="Anti-Bot Bypass" icon="shield-halved">
+    Automatic session management and fingerprint rotation to avoid blocks.
+  </Card>
+  <Card title="Fast Responses" icon="bolt">
+    Median response time under 2 seconds for search and item detail requests.
+  </Card>
+  <Card title="Structured Data" icon="database">
+    Clean JSON responses with prices, photos, sizes, brands, conditions, and seller info.
+  </Card>
+  <Card title="Country Proxies" icon="globe">
+    Requests are routed through proxies matching the target market for accurate results.
+  </Card>
+  <Card title="SDK Support" icon="code">
+    First-class support via the ScrapeBadger Node.js and Python SDKs.
+  </Card>
+</CardGroup>
+
+## Supported Markets
+
+Vinted operates across 26 country domains. Use the `market` query parameter to target a specific one.
+
+| Market | Domain | Market | Domain |
+|--------|--------|--------|--------|
+| :fr: `fr` | vinted.fr | :de: `de` | vinted.de |
+| :gb: `uk` | vinted.co.uk | :it: `it` | vinted.it |
+| :es: `es` | vinted.es | :pl: `pl` | vinted.pl |
+| :nl: `nl` | vinted.nl | :be: `be` | vinted.be |
+| :czech_republic: `cz` | vinted.cz | :lithuania: `lt` | vinted.lt |
+| :portugal: `pt` | vinted.pt | :at: `at` | vinted.at |
+| :luxembourg: `lu` | vinted.lu | :sk: `sk` | vinted.sk |
+| :denmark: `dk` | vinted.dk | :finland: `fi` | vinted.fi |
+| :sweden: `se` | vinted.se | :romania: `ro` | vinted.ro |
+| :hungary: `hu` | vinted.hu | :croatia: `hr` | vinted.hr |
+| :greece: `gr` | vinted.gr | :us: `us` | vinted.com |
+| :canada: `ca` | vinted.ca | :australia: `au` | vinted.com.au |
+| :latvia: `lv` | vinted.lv | :estonia: `ee` | vinted.ee |
+
+<Tip>
+  If no `market` is specified, it defaults to `fr`. Use the [`/v1/vinted/markets`](/api-reference/endpoint/vinted/list-markets) endpoint to get the full list programmatically.
+</Tip>
+
+## Quick Start
+
+<CodeGroup>
+
+```javascript Node.js
+import ScrapeBadger from "scrapebadger";
+
+const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" });
+
+const results = await client.vinted.search({
+  query: "nike air force 1",
+  market: "fr",
+  per_page: 20,
+});
+
+console.log(results.items);
+```
+
+```python Python
+from scrapebadger import ScrapeBadger
+
+client = ScrapeBadger(api_key="YOUR_API_KEY")
+
+results = client.vinted.search(
+    query="nike air force 1",
+    market="fr",
+    per_page=20,
+)
+
+print(results.items)
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/vinted/search?query=nike+air+force+1&market=fr&per_page=20" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+## Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/vinted/search`](/api-reference/endpoint/vinted/search-items) | GET | Search Vinted catalog items with filters |
+| [`/v1/vinted/items/{item_id}`](/api-reference/endpoint/vinted/get-item-detail) | GET | Get detailed information about a single item |
+| [`/v1/vinted/users/{user_id}`](/api-reference/endpoint/vinted/get-user-profile) | GET | Get a user's profile information |
+| [`/v1/vinted/users/{user_id}/items`](/api-reference/endpoint/vinted/get-user-items) | GET | List items from a specific user |
+| [`/v1/vinted/brands`](/api-reference/endpoint/vinted/search-brands) | GET | Search for brand IDs by name |
+| [`/v1/vinted/colors`](/api-reference/endpoint/vinted/list-colors) | GET | List all available color filters |
+| [`/v1/vinted/statuses`](/api-reference/endpoint/vinted/list-statuses) | GET | List item condition statuses |
+| [`/v1/vinted/markets`](/api-reference/endpoint/vinted/list-markets) | GET | List all supported Vinted markets |
+
+## Credit Costs
+
+| Endpoint | Cost |
+|----------|------|
+| Search items | 1 credit |
+| Get item detail | 1 credit |
+| Get user profile | 1 credit |
+| Get user items | 1 credit |
+| Search brands | 1 credit |
+| List colors | 1 credit |
+| List statuses | 1 credit |
+| List markets | 1 credit |
+| Failed requests | 0 credits |
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Search Items" icon="magnifying-glass" href="/api-reference/endpoint/vinted/search-items">
+    Full API reference for searching the Vinted catalog
+  </Card>
+  <Card title="Get Item Details" icon="shirt" href="/api-reference/endpoint/vinted/get-item-detail">
+    Retrieve full details for a specific listing
+  </Card>
+</CardGroup>

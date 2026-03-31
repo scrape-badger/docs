@@ -1,0 +1,63 @@
+---
+title: "Get User Profile"
+api: "GET /v1/vinted/users/{user_id}"
+description: "Get detailed profile information for a Vinted user."
+---
+
+## Path Parameters
+
+<ParamField path="user_id" type="integer" required>
+  The unique Vinted user ID. You can find this in search results or item detail responses.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="fr">
+  Vinted market where the user is registered.
+
+  Examples: `fr`, `de`, `uk`, `it`, `es`, `pl`, `us`
+</ParamField>
+
+## Response
+
+<ResponseField name="id" type="integer">User ID.</ResponseField>
+<ResponseField name="login" type="string">Username.</ResponseField>
+<ResponseField name="photo" type="object">Profile photo with `url`, `width`, `height`.</ResponseField>
+<ResponseField name="given_item_count" type="integer">Number of items the user has sold.</ResponseField>
+<ResponseField name="item_count" type="integer">Number of items currently listed.</ResponseField>
+<ResponseField name="followers_count" type="integer">Number of followers.</ResponseField>
+<ResponseField name="following_count" type="integer">Number of users followed.</ResponseField>
+<ResponseField name="feedback_reputation" type="number">Reputation score between `0` and `1`.</ResponseField>
+<ResponseField name="feedback_count" type="integer">Total number of feedback ratings received.</ResponseField>
+<ResponseField name="city" type="string">User's city (if public).</ResponseField>
+<ResponseField name="country_title" type="string">User's country.</ResponseField>
+<ResponseField name="last_loged_on" type="string">ISO 8601 timestamp of last login.</ResponseField>
+<ResponseField name="created_at" type="string">ISO 8601 timestamp when the account was created.</ResponseField>
+
+### Example Response
+
+```json
+{
+  "id": 12345678,
+  "login": "seller_username",
+  "photo": {
+    "url": "https://images1.vinted.net/t/...",
+    "width": 400,
+    "height": 400
+  },
+  "given_item_count": 87,
+  "item_count": 23,
+  "followers_count": 156,
+  "following_count": 42,
+  "feedback_reputation": 0.98,
+  "feedback_count": 74,
+  "city": "Paris",
+  "country_title": "France",
+  "last_loged_on": "2026-03-29T18:00:00Z",
+  "created_at": "2022-06-10T12:00:00Z"
+}
+```
+
+<Note>
+  Each user profile request costs **1 credit**. Failed requests are not charged.
+</Note>

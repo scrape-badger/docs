@@ -62,6 +62,45 @@
         ]
       },
       {
+        "tab": "Vinted",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "vinted/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/vinted/search-items"
+            ]
+          },
+          {
+            "group": "Items",
+            "pages": [
+              "api-reference/endpoint/vinted/get-item-detail"
+            ]
+          },
+          {
+            "group": "Users",
+            "pages": [
+              "api-reference/endpoint/vinted/get-user-profile",
+              "api-reference/endpoint/vinted/get-user-items"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api-reference/endpoint/vinted/search-brands",
+              "api-reference/endpoint/vinted/list-colors",
+              "api-reference/endpoint/vinted/list-statuses",
+              "api-reference/endpoint/vinted/list-markets"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Twitter",
         "groups": [
           {

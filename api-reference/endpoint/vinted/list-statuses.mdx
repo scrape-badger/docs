@@ -1,0 +1,55 @@
+---
+title: "List Conditions"
+api: "GET /v1/vinted/statuses"
+description: "List all available item condition statuses for Vinted search."
+---
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="fr">
+  Vinted market. Status names are localized to the market language.
+</ParamField>
+
+## Response
+
+<ResponseField name="statuses" type="array">
+  Array of available item conditions.
+
+  <Expandable title="Status object">
+    <ResponseField name="id" type="integer">Status ID. Use this value in the `status_ids` filter when searching items.</ResponseField>
+    <ResponseField name="title" type="string">Localized condition label.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "statuses": [
+    {
+      "id": 6,
+      "title": "New with tags"
+    },
+    {
+      "id": 1,
+      "title": "New without tags"
+    },
+    {
+      "id": 2,
+      "title": "Very good"
+    },
+    {
+      "id": 3,
+      "title": "Good"
+    },
+    {
+      "id": 4,
+      "title": "Satisfactory"
+    }
+  ]
+}
+```
+
+<Note>
+  Each status list request costs **1 credit**. Failed requests are not charged.
+</Note>

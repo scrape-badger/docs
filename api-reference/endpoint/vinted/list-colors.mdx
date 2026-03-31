@@ -1,0 +1,61 @@
+---
+title: "List Colors"
+api: "GET /v1/vinted/colors"
+description: "List all available color filters for Vinted search."
+---
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="fr">
+  Vinted market. Color names are localized to the market language.
+</ParamField>
+
+## Response
+
+<ResponseField name="colors" type="array">
+  Array of available colors.
+
+  <Expandable title="Color object">
+    <ResponseField name="id" type="integer">Color ID. Use this value in the `color_ids` filter when searching items.</ResponseField>
+    <ResponseField name="title" type="string">Localized color name.</ResponseField>
+    <ResponseField name="hex" type="string">Hex color code (e.g. `"#000000"`).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "colors": [
+    {
+      "id": 1,
+      "title": "Black",
+      "hex": "#000000"
+    },
+    {
+      "id": 3,
+      "title": "Grey",
+      "hex": "#808080"
+    },
+    {
+      "id": 4,
+      "title": "White",
+      "hex": "#FFFFFF"
+    },
+    {
+      "id": 7,
+      "title": "Blue",
+      "hex": "#0000FF"
+    },
+    {
+      "id": 12,
+      "title": "Red",
+      "hex": "#FF0000"
+    }
+  ]
+}
+```
+
+<Note>
+  Each color list request costs **1 credit**. Failed requests are not charged.
+</Note>

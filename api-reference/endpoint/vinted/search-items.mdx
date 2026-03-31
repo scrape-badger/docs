@@ -1,0 +1,131 @@
+---
+title: "Search Items"
+api: "GET /v1/vinted/search"
+description: "Search Vinted catalog items with filters."
+---
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search query string. Matches against item titles and descriptions.
+</ParamField>
+
+<ParamField query="market" type="string" default="fr">
+  Vinted market to search. See [`/v1/vinted/markets`](/api-reference/endpoint/vinted/list-markets) for all supported values.
+
+  Examples: `fr`, `de`, `uk`, `it`, `es`, `pl`, `us`
+</ParamField>
+
+<ParamField query="page" type="integer" default={1}>
+  Page number for paginated results. Starts at `1`.
+</ParamField>
+
+<ParamField query="per_page" type="integer" default={24}>
+  Number of items per page. Range: `1` - `96`.
+</ParamField>
+
+<ParamField query="price_from" type="number">
+  Minimum price filter in the market's local currency.
+</ParamField>
+
+<ParamField query="price_to" type="number">
+  Maximum price filter in the market's local currency.
+</ParamField>
+
+<ParamField query="brand_ids" type="string">
+  Comma-separated list of brand IDs to filter by. Use [`/v1/vinted/brands`](/api-reference/endpoint/vinted/search-brands) to look up IDs.
+
+  Example: `53`, `14,53,221`
+</ParamField>
+
+<ParamField query="color_ids" type="string">
+  Comma-separated list of color IDs to filter by. Use [`/v1/vinted/colors`](/api-reference/endpoint/vinted/list-colors) to look up IDs.
+
+  Example: `1`, `1,4,12`
+</ParamField>
+
+<ParamField query="status_ids" type="string">
+  Comma-separated list of condition status IDs to filter by. Use [`/v1/vinted/statuses`](/api-reference/endpoint/vinted/list-statuses) to look up IDs.
+
+  Example: `6` (New with tags), `1,2` (New without tags, Very good)
+</ParamField>
+
+<ParamField query="order" type="string" default="relevance">
+  Sort order for results.
+
+  | Value | Description |
+  |-------|-------------|
+  | `relevance` | Best match (default) |
+  | `price_low_to_high` | Cheapest first |
+  | `price_high_to_low` | Most expensive first |
+  | `newest_first` | Most recently listed |
+</ParamField>
+
+## Response
+
+<ResponseField name="items" type="array">
+  Array of matching items.
+
+  <Expandable title="Item object">
+    <ResponseField name="id" type="integer">Item ID.</ResponseField>
+    <ResponseField name="title" type="string">Item title.</ResponseField>
+    <ResponseField name="price" type="string">Price in local currency (e.g. `"15.00"`).</ResponseField>
+    <ResponseField name="currency" type="string">ISO 4217 currency code (e.g. `"EUR"`).</ResponseField>
+    <ResponseField name="brand_title" type="string">Brand name.</ResponseField>
+    <ResponseField name="size_title" type="string">Size label.</ResponseField>
+    <ResponseField name="photo" type="object">Primary photo with `url`, `width`, `height`.</ResponseField>
+    <ResponseField name="url" type="string">Full URL to the Vinted listing.</ResponseField>
+    <ResponseField name="user" type="object">Seller summary with `id`, `login`, `photo`.</ResponseField>
+    <ResponseField name="favourite_count" type="integer">Number of users who favourited this item.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="total_entries" type="integer">
+  Total number of matching items across all pages.
+</ResponseField>
+
+<ResponseField name="current_page" type="integer">
+  Current page number.
+</ResponseField>
+
+<ResponseField name="per_page" type="integer">
+  Number of items per page.
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "items": [
+    {
+      "id": 4856231890,
+      "title": "Nike Air Force 1 '07 White",
+      "price": "45.00",
+      "currency": "EUR",
+      "brand_title": "Nike",
+      "size_title": "42",
+      "photo": {
+        "url": "https://images1.vinted.net/t/...",
+        "width": 800,
+        "height": 600
+      },
+      "url": "https://www.vinted.fr/items/4856231890",
+      "user": {
+        "id": 12345678,
+        "login": "seller_username",
+        "photo": {
+          "url": "https://images1.vinted.net/t/..."
+        }
+      },
+      "favourite_count": 12
+    }
+  ],
+  "total_entries": 2847,
+  "current_page": 1,
+  "per_page": 24
+}
+```
+
+<Note>
+  Each search request costs **1 credit**. Failed requests are not charged.
+</Note>

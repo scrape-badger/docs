@@ -1,0 +1,88 @@
+---
+title: "Get User Items"
+api: "GET /v1/vinted/users/{user_id}/items"
+description: "List all active items from a specific Vinted user."
+---
+
+## Path Parameters
+
+<ParamField path="user_id" type="integer" required>
+  The unique Vinted user ID.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="fr">
+  Vinted market where the user is registered.
+
+  Examples: `fr`, `de`, `uk`, `it`, `es`, `pl`, `us`
+</ParamField>
+
+<ParamField query="page" type="integer" default={1}>
+  Page number for paginated results. Starts at `1`.
+</ParamField>
+
+<ParamField query="per_page" type="integer" default={24}>
+  Number of items per page. Range: `1` - `96`.
+</ParamField>
+
+## Response
+
+<ResponseField name="items" type="array">
+  Array of items listed by the user.
+
+  <Expandable title="Item object">
+    <ResponseField name="id" type="integer">Item ID.</ResponseField>
+    <ResponseField name="title" type="string">Item title.</ResponseField>
+    <ResponseField name="price" type="string">Price in local currency.</ResponseField>
+    <ResponseField name="currency" type="string">ISO 4217 currency code.</ResponseField>
+    <ResponseField name="brand_title" type="string">Brand name.</ResponseField>
+    <ResponseField name="size_title" type="string">Size label.</ResponseField>
+    <ResponseField name="photo" type="object">Primary photo with `url`, `width`, `height`.</ResponseField>
+    <ResponseField name="url" type="string">Full URL to the Vinted listing.</ResponseField>
+    <ResponseField name="favourite_count" type="integer">Number of favourites.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="total_entries" type="integer">
+  Total number of items listed by this user.
+</ResponseField>
+
+<ResponseField name="current_page" type="integer">
+  Current page number.
+</ResponseField>
+
+<ResponseField name="per_page" type="integer">
+  Number of items per page.
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "items": [
+    {
+      "id": 4856231890,
+      "title": "Nike Air Force 1 '07 White",
+      "price": "45.00",
+      "currency": "EUR",
+      "brand_title": "Nike",
+      "size_title": "42",
+      "photo": {
+        "url": "https://images1.vinted.net/t/...",
+        "width": 800,
+        "height": 600
+      },
+      "url": "https://www.vinted.fr/items/4856231890",
+      "favourite_count": 12
+    }
+  ],
+  "total_entries": 23,
+  "current_page": 1,
+  "per_page": 24
+}
+```
+
+<Note>
+  Each user items request costs **1 credit**. Failed requests are not charged.
+</Note>

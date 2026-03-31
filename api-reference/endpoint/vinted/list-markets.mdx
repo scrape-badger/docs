@@ -1,0 +1,55 @@
+---
+title: "List Markets"
+api: "GET /v1/vinted/markets"
+description: "List all supported Vinted markets with their domains and country codes."
+---
+
+## Response
+
+<ResponseField name="markets" type="array">
+  Array of supported Vinted markets.
+
+  <Expandable title="Market object">
+    <ResponseField name="code" type="string">Market code to use in the `market` query parameter (e.g. `"fr"`, `"de"`).</ResponseField>
+    <ResponseField name="title" type="string">Country name.</ResponseField>
+    <ResponseField name="domain" type="string">Vinted domain for this market (e.g. `"vinted.fr"`).</ResponseField>
+    <ResponseField name="currency" type="string">ISO 4217 currency code used in this market.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "markets": [
+    {
+      "code": "fr",
+      "title": "France",
+      "domain": "vinted.fr",
+      "currency": "EUR"
+    },
+    {
+      "code": "de",
+      "title": "Germany",
+      "domain": "vinted.de",
+      "currency": "EUR"
+    },
+    {
+      "code": "uk",
+      "title": "United Kingdom",
+      "domain": "vinted.co.uk",
+      "currency": "GBP"
+    },
+    {
+      "code": "us",
+      "title": "United States",
+      "domain": "vinted.com",
+      "currency": "USD"
+    }
+  ]
+}
+```
+
+<Note>
+  Each markets list request costs **1 credit**. Failed requests are not charged.
+</Note>
