@@ -14,7 +14,8 @@
   },
   "openapi": [
     "https://scrapebadger.com/api/twitter-openapi.json",
-    "/openapi-web-scraping.json"
+    "/openapi-web-scraping.json",
+    "/openapi-vinted.json"
   ],
   "api": {
     "baseUrl": "https://scrapebadger.com",

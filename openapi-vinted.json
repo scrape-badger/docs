@@ -1,0 +1,497 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ScrapeBadger Vinted API",
+    "version": "1.0.0",
+    "description": "Vinted marketplace scraping API for searching items, fetching details, user profiles, and reference data."
+  },
+  "servers": [
+    {
+      "url": "https://scrapebadger.com",
+      "description": "Production"
+    }
+  ],
+  "security": [
+    {
+      "apiKeyAuth": []
+    }
+  ],
+  "paths": {
+    "/v1/vinted/search": {
+      "get": {
+        "operationId": "searchVintedItems",
+        "summary": "Search Items",
+        "description": "Search Vinted catalog items with filters.",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Search query string. Matches against item titles and descriptions."
+          },
+          {
+            "name": "market",
+            "in": "query",
+            "schema": { "type": "string", "default": "fr" },
+            "description": "Vinted market to search (e.g. fr, de, uk, it, es, pl, us)."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1, "minimum": 1 },
+            "description": "Page number for paginated results."
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 24, "minimum": 1, "maximum": 96 },
+            "description": "Number of items per page."
+          },
+          {
+            "name": "price_from",
+            "in": "query",
+            "schema": { "type": "number" },
+            "description": "Minimum price filter in the market's local currency."
+          },
+          {
+            "name": "price_to",
+            "in": "query",
+            "schema": { "type": "number" },
+            "description": "Maximum price filter in the market's local currency."
+          },
+          {
+            "name": "brand_ids",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Comma-separated list of brand IDs to filter by."
+          },
+          {
+            "name": "color_ids",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Comma-separated list of color IDs to filter by."
+          },
+          {
+            "name": "status_ids",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Comma-separated list of condition status IDs to filter by."
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "relevance",
+              "enum": ["relevance", "price_low_to_high", "price_high_to_low", "newest_first"]
+            },
+            "description": "Sort order for results."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful search",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/VintedItemSummary" }
+                    },
+                    "total_entries": { "type": "integer", "description": "Total number of matching items across all pages." },
+                    "current_page": { "type": "integer", "description": "Current page number." },
+                    "per_page": { "type": "integer", "description": "Number of items per page." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vinted/items/{item_id}": {
+      "get": {
+        "operationId": "getVintedItemDetail",
+        "summary": "Get Item Details",
+        "description": "Get detailed information about a Vinted item.",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "The unique Vinted item ID."
+          },
+          {
+            "name": "market",
+            "in": "query",
+            "schema": { "type": "string", "default": "fr" },
+            "description": "Vinted market where the item is listed (e.g. fr, de, uk)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Item details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "integer", "description": "Item ID." },
+                    "title": { "type": "string", "description": "Item title." },
+                    "description": { "type": "string", "nullable": true, "description": "Full item description text." },
+                    "price": { "type": "string", "description": "Price in local currency." },
+                    "currency": { "type": "string", "description": "ISO 4217 currency code." },
+                    "brand_title": { "type": "string", "nullable": true, "description": "Brand name." },
+                    "size_title": { "type": "string", "nullable": true, "description": "Size label." },
+                    "status": { "type": "string", "nullable": true, "description": "Item condition (e.g. \"New with tags\", \"Good\")." },
+                    "color1": { "type": "string", "nullable": true, "description": "Primary color." },
+                    "color2": { "type": "string", "nullable": true, "description": "Secondary color." },
+                    "photos": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/VintedPhoto" },
+                      "description": "Array of photo objects."
+                    },
+                    "url": { "type": "string", "description": "Full URL to the Vinted listing." },
+                    "view_count": { "type": "integer", "description": "Number of views." },
+                    "favourite_count": { "type": "integer", "description": "Number of favourites." },
+                    "created_at": { "type": "string", "nullable": true, "description": "ISO 8601 timestamp when the item was listed." },
+                    "updated_at": { "type": "string", "nullable": true, "description": "ISO 8601 timestamp of the last update." },
+                    "user": { "$ref": "#/components/schemas/VintedUserSummary", "description": "Seller information." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vinted/users/{user_id}": {
+      "get": {
+        "operationId": "getVintedUserProfile",
+        "summary": "Get User Profile",
+        "description": "Get detailed profile information for a Vinted user.",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "The unique Vinted user ID."
+          },
+          {
+            "name": "market",
+            "in": "query",
+            "schema": { "type": "string", "default": "fr" },
+            "description": "Vinted market where the user is registered (e.g. fr, de, uk)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "integer", "description": "User ID." },
+                    "login": { "type": "string", "description": "Username." },
+                    "photo": {
+                      "type": "object",
+                      "nullable": true,
+                      "properties": {
+                        "url": { "type": "string" },
+                        "width": { "type": "integer" },
+                        "height": { "type": "integer" }
+                      },
+                      "description": "Profile photo."
+                    },
+                    "given_item_count": { "type": "integer", "description": "Number of items the user has sold." },
+                    "item_count": { "type": "integer", "description": "Number of items currently listed." },
+                    "followers_count": { "type": "integer", "description": "Number of followers." },
+                    "following_count": { "type": "integer", "description": "Number of users followed." },
+                    "feedback_reputation": { "type": "number", "description": "Reputation score between 0 and 1." },
+                    "feedback_count": { "type": "integer", "description": "Total number of feedback ratings received." },
+                    "city": { "type": "string", "nullable": true, "description": "User's city (if public)." },
+                    "country_title": { "type": "string", "nullable": true, "description": "User's country." },
+                    "last_loged_on": { "type": "string", "nullable": true, "description": "ISO 8601 timestamp of last login." },
+                    "created_at": { "type": "string", "nullable": true, "description": "ISO 8601 timestamp when the account was created." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vinted/users/{user_id}/items": {
+      "get": {
+        "operationId": "getVintedUserItems",
+        "summary": "Get User Items",
+        "description": "List all active items from a specific Vinted user.",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" },
+            "description": "The unique Vinted user ID."
+          },
+          {
+            "name": "market",
+            "in": "query",
+            "schema": { "type": "string", "default": "fr" },
+            "description": "Vinted market where the user is registered (e.g. fr, de, uk)."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1, "minimum": 1 },
+            "description": "Page number for paginated results."
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 24, "minimum": 1, "maximum": 96 },
+            "description": "Number of items per page."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User items list",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/VintedItemSummary" }
+                    },
+                    "total_entries": { "type": "integer", "description": "Total number of items listed by this user." },
+                    "current_page": { "type": "integer", "description": "Current page number." },
+                    "per_page": { "type": "integer", "description": "Number of items per page." }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vinted/brands": {
+      "get": {
+        "operationId": "searchVintedBrands",
+        "summary": "Search Brands",
+        "description": "Search for Vinted brand IDs by name.",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Brand name to search for. Partial matches are supported."
+          },
+          {
+            "name": "market",
+            "in": "query",
+            "schema": { "type": "string", "default": "fr" },
+            "description": "Vinted market to search brands in."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Brand search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "brands": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "integer", "description": "Brand ID." },
+                          "title": { "type": "string", "description": "Brand name." },
+                          "slug": { "type": "string", "description": "URL-friendly brand name." },
+                          "favourite_count": { "type": "integer", "description": "Number of users following this brand." },
+                          "item_count": { "type": "integer", "description": "Number of items listed under this brand." }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vinted/colors": {
+      "get": {
+        "operationId": "listVintedColors",
+        "summary": "List Colors",
+        "description": "List all available color filters for Vinted search.",
+        "parameters": [
+          {
+            "name": "market",
+            "in": "query",
+            "schema": { "type": "string", "default": "fr" },
+            "description": "Vinted market. Color names are localized to the market language."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Available colors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "colors": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "integer", "description": "Color ID." },
+                          "title": { "type": "string", "description": "Localized color name." },
+                          "hex": { "type": "string", "description": "Hex color code (e.g. \"#000000\")." }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vinted/statuses": {
+      "get": {
+        "operationId": "listVintedStatuses",
+        "summary": "List Conditions",
+        "description": "List all available item condition statuses for Vinted search.",
+        "parameters": [
+          {
+            "name": "market",
+            "in": "query",
+            "schema": { "type": "string", "default": "fr" },
+            "description": "Vinted market. Status names are localized to the market language."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Available item conditions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "statuses": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": { "type": "integer", "description": "Status ID." },
+                          "title": { "type": "string", "description": "Localized condition label." }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/vinted/markets": {
+      "get": {
+        "operationId": "listVintedMarkets",
+        "summary": "List Markets",
+        "description": "List all supported Vinted markets with their domains and country codes.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Supported markets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "markets": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "code": { "type": "string", "description": "Market code (e.g. \"fr\", \"de\")." },
+                          "title": { "type": "string", "description": "Country name." },
+                          "domain": { "type": "string", "description": "Vinted domain for this market." },
+                          "currency": { "type": "string", "description": "ISO 4217 currency code." }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    },
+    "schemas": {
+      "VintedItemSummary": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "description": "Item ID." },
+          "title": { "type": "string", "description": "Item title." },
+          "price": { "type": "string", "description": "Price in local currency (e.g. \"15.00\")." },
+          "currency": { "type": "string", "description": "ISO 4217 currency code (e.g. \"EUR\")." },
+          "brand_title": { "type": "string", "nullable": true, "description": "Brand name." },
+          "size_title": { "type": "string", "nullable": true, "description": "Size label." },
+          "photo": { "$ref": "#/components/schemas/VintedPhoto" },
+          "url": { "type": "string", "description": "Full URL to the Vinted listing." },
+          "user": { "$ref": "#/components/schemas/VintedUserSummary" },
+          "favourite_count": { "type": "integer", "description": "Number of users who favourited this item." }
+        }
+      },
+      "VintedPhoto": {
+        "type": "object",
+        "properties": {
+          "url": { "type": "string", "description": "Photo URL." },
+          "width": { "type": "integer", "nullable": true, "description": "Width in pixels." },
+          "height": { "type": "integer", "nullable": true, "description": "Height in pixels." }
+        }
+      },
+      "VintedUserSummary": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "description": "User ID." },
+          "login": { "type": "string", "description": "Username." },
+          "photo": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "url": { "type": "string" }
+            }
+          },
+          "feedback_reputation": { "type": "number", "nullable": true, "description": "Reputation score between 0 and 1." }
+        }
+      }
+    }
+  }
+}
