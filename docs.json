@@ -221,6 +221,45 @@
         ]
       }
     ],
+      {
+        "tab": "MCP Server",
+        "groups": [
+          {
+            "group": "MCP Server",
+            "pages": [
+              "mcp/overview"
+            ]
+          },
+          {
+            "group": "Integrations",
+            "pages": [
+              "mcp/integrations/claude-desktop",
+              "mcp/integrations/claude-code",
+              "mcp/integrations/cursor",
+              "mcp/integrations/windsurf",
+              "mcp/integrations/vscode-copilot",
+              "mcp/integrations/gemini",
+              "mcp/integrations/chatgpt",
+              "mcp/integrations/openclaw",
+              "mcp/integrations/cline",
+              "mcp/integrations/continue"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "CLI",
+        "groups": [
+          {
+            "group": "CLI",
+            "pages": [
+              "cli/overview",
+              "cli/commands"
+            ]
+          }
+        ]
+      }
+    ],
     "global": {
       "anchors": [
         {

@@ -1,0 +1,39 @@
+---
+title: "Continue.dev"
+description: "Connect ScrapeBadger to Continue.dev via MCP."
+---
+
+# Continue.dev
+
+## Setup
+
+Add to `.continue/config.yaml` in your project:
+
+```yaml
+mcpServers:
+  - name: scrapebadger
+    type: streamable-http
+    url: https://mcp.scrapebadger.com/mcp
+    env:
+      SCRAPEBADGER_API_KEY: YOUR_API_KEY
+```
+
+Or drop a JSON config into `.continue/mcpServers/scrapebadger.json`:
+
+```json
+{
+  "mcpServers": {
+    "scrapebadger": {
+      "type": "streamable-http",
+      "url": "https://mcp.scrapebadger.com/mcp",
+      "env": {
+        "SCRAPEBADGER_API_KEY": "YOUR_API_KEY"
+      }
+    }
+  }
+}
+```
+
+<Note>
+Continue.dev can import JSON configs from Claude Desktop, Cursor, or Cline directly into `.continue/mcpServers/`. MCP tools only work in **Agent mode**.
+</Note>

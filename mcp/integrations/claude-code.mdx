@@ -1,0 +1,48 @@
+---
+title: "Claude Code"
+description: "Connect ScrapeBadger to Claude Code (CLI) via MCP."
+---
+
+# Claude Code
+
+Claude Code has native HTTP transport support — no bridge needed.
+
+## Setup
+
+Run this command in your terminal:
+
+```bash
+claude mcp add --transport http scrapebadger \
+  https://mcp.scrapebadger.com/mcp \
+  --header "Authorization: Bearer YOUR_API_KEY"
+```
+
+Or add to `.mcp.json` in your project root:
+
+```json
+{
+  "mcpServers": {
+    "scrapebadger": {
+      "type": "http",
+      "url": "https://mcp.scrapebadger.com/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_KEY"
+      }
+    }
+  }
+}
+```
+
+## Verify
+
+Inside a Claude Code session, type `/mcp` to see connected servers. ScrapeBadger should show 63 tools.
+
+## Scopes
+
+| Scope | Config Location | Use Case |
+|-------|----------------|----------|
+| Local (default) | `~/.claude.json` per project | Project-specific |
+| Project | `.mcp.json` in project root | Shared with team via git |
+| User | `~/.claude.json` globally | Available everywhere |
+
+Add `--scope user` to the `claude mcp add` command for global access.

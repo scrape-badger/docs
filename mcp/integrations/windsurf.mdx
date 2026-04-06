@@ -1,0 +1,39 @@
+---
+title: "Windsurf"
+description: "Connect ScrapeBadger to Windsurf IDE via MCP."
+---
+
+# Windsurf
+
+## Setup
+
+Edit the MCP config file at:
+- **macOS/Linux**: `~/.codeium/windsurf/mcp_config.json`
+- **Windows**: `%USERPROFILE%\.codeium\windsurf\mcp_config.json`
+
+Or open via: Windsurf Settings > Cascade > MCP Servers
+
+```json
+{
+  "mcpServers": {
+    "scrapebadger": {
+      "serverUrl": "https://mcp.scrapebadger.com/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_KEY"
+      }
+    }
+  }
+}
+```
+
+<Warning>
+Windsurf uses `serverUrl` — not `url`. This is different from Cursor and other tools.
+</Warning>
+
+## Verify
+
+Go to Windsurf Settings > Cascade > MCP Servers. ScrapeBadger should appear as connected.
+
+<Note>
+Windsurf has a maximum of 100 tools across all MCP servers. ScrapeBadger uses 63, leaving room for 37 more from other servers.
+</Note>

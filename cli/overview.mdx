@@ -1,0 +1,98 @@
+---
+title: "CLI Overview"
+description: "Command-line interface for ScrapeBadger — Twitter, Vinted, and Web Scraping from the terminal."
+---
+
+# ScrapeBadger CLI
+
+A command-line tool for accessing ScrapeBadger APIs directly from your terminal. Supports multiple output formats, pipe-friendly design, and field selection.
+
+## Install
+
+<CodeGroup>
+```bash pip
+pip install scrapebadger-cli
+```
+
+```bash uv
+uv tool install scrapebadger-cli
+```
+</CodeGroup>
+
+## Quick Start
+
+```bash
+# Set up your API key
+scrapebadger auth --api-key sb_live_...
+
+# Get a Twitter user profile
+scrapebadger twitter user elonmusk
+
+# Search tweets as a table
+scrapebadger twitter search "AI agents" --output table
+
+# Search Vinted in Germany
+scrapebadger vinted search "nike shoes" --market de
+
+# Scrape a URL with JS rendering
+scrapebadger web scrape https://example.com --js
+
+# Check your credits
+scrapebadger credits
+```
+
+## Authentication
+
+The CLI resolves your API key in this order:
+
+1. `SCRAPEBADGER_API_KEY` environment variable
+2. `.env` file in the current directory
+3. `~/.config/scrapebadger/config.json` (saved via `scrapebadger auth`)
+
+## Output Formats
+
+Every command supports `--output` (`-o`) to choose the format:
+
+| Format | Flag | Best For |
+|--------|------|----------|
+| JSON | `-o json` (default) | Piping to `jq`, programmatic use |
+| CSV | `-o csv` | Spreadsheets, data analysis |
+| Table | `-o table` | Human-readable terminal output |
+| Markdown | `-o markdown` | Documentation, reports |
+
+### Field Selection
+
+Use `--fields` (`-f`) to include only specific columns:
+
+```bash
+scrapebadger twitter trends -o csv -f name,domain_context
+```
+
+## Commands
+
+| Group | Commands |
+|-------|----------|
+| **Account** | `auth`, `credits`, `logout` |
+| **Twitter** | `user`, `tweets`, `tweet`, `search`, `followers`, `following`, `mentions`, `trends`, `replies`, `quotes`, `retweeters`, `community`, `list`, `space` + more |
+| **Vinted** | `search`, `item`, `user`, `user-items`, `brands`, `markets` |
+| **Web** | `scrape`, `detect`, `screenshot`, `extract`, `batch`, `batch-status` |
+
+## Pipeline Examples
+
+```bash
+# Export trending topics to CSV
+scrapebadger twitter trends -o csv > trends.csv
+
+# Get followers and pipe to jq
+scrapebadger twitter followers elonmusk | jq '.[].username'
+
+# Scrape a page and extract text
+scrapebadger web scrape https://example.com --format markdown
+```
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `SCRAPEBADGER_API_KEY` | Your API key |
+| `SCRAPEBADGER_API_URL` | Override the API base URL (default: `https://scrapebadger.com`) |

@@ -1,0 +1,39 @@
+---
+title: "OpenClaw"
+description: "Connect ScrapeBadger to OpenClaw personal AI assistant."
+---
+
+# OpenClaw
+
+[OpenClaw](https://openclaw.ai/) supports three integration methods. Choose the one that fits your needs:
+
+## Option 1: Skill (Recommended)
+
+The simplest approach — install from ClawHub:
+
+```bash
+openclaw skills install scrapebadger
+```
+
+This teaches the OpenClaw agent how to use the ScrapeBadger API via natural language instructions.
+
+## Option 2: Plugin
+
+For richer integration with typed tools:
+
+```bash
+openclaw plugins install @scrapebadger/openclaw-plugin
+```
+
+## Option 3: MCP
+
+OpenClaw has a built-in MCP Registry. Connect to our hosted server at `https://mcp.scrapebadger.com/mcp`.
+
+## Authentication
+
+Set the `SCRAPEBADGER_API_KEY` environment variable before starting OpenClaw:
+
+```bash
+export SCRAPEBADGER_API_KEY=sb_live_...
+openclaw
+```

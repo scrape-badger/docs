@@ -1,0 +1,37 @@
+---
+title: "Cursor"
+description: "Connect ScrapeBadger to Cursor IDE via MCP."
+---
+
+# Cursor
+
+## Setup
+
+Create or edit `.cursor/mcp.json` (project-level) or `~/.cursor/mcp.json` (global):
+
+```json
+{
+  "mcpServers": {
+    "scrapebadger": {
+      "type": "streamableHttp",
+      "url": "https://mcp.scrapebadger.com/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_KEY"
+      }
+    }
+  }
+}
+```
+
+## Verify
+
+Open Cursor Settings > MCP. ScrapeBadger should appear as connected with 63 tools.
+
+<Warning>
+MCP tools only work in **Agent mode** (not Ask or Edit mode). Make sure to select Agent mode when using ScrapeBadger tools.
+</Warning>
+
+## Troubleshooting
+
+- **Tools not showing?** Restart Cursor after adding the config.
+- **"streamableHttp" not recognized?** Update Cursor to the latest version.

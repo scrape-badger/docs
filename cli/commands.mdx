@@ -1,0 +1,133 @@
+---
+title: "Command Reference"
+description: "Full reference for all ScrapeBadger CLI commands."
+---
+
+# Command Reference
+
+## Account Commands
+
+### `scrapebadger auth`
+
+Set up or view your API key.
+
+```bash
+scrapebadger auth --api-key sb_live_...   # Set key directly
+scrapebadger auth                          # Interactive prompt
+scrapebadger auth --show                   # Show saved key
+```
+
+### `scrapebadger credits`
+
+Check your credit balance.
+
+### `scrapebadger logout`
+
+Remove saved API key from config.
+
+---
+
+## Twitter Commands
+
+All Twitter commands are under `scrapebadger twitter`.
+
+### Users
+
+```bash
+scrapebadger twitter user <username>           # Profile by username
+scrapebadger twitter user-id <user_id>         # Profile by numeric ID
+scrapebadger twitter followers <username>      # Followers list
+scrapebadger twitter following <username>      # Following list
+scrapebadger twitter mentions <username>       # Tweets mentioning user
+```
+
+### Tweets
+
+```bash
+scrapebadger twitter tweet <tweet_id>          # Single tweet
+scrapebadger twitter tweets <username>         # User's latest tweets
+scrapebadger twitter search <query>            # Advanced search
+scrapebadger twitter replies <tweet_id>        # Tweet replies
+scrapebadger twitter quotes <tweet_id>         # Quote tweets
+scrapebadger twitter retweeters <tweet_id>     # Who retweeted
+```
+
+### Discovery
+
+```bash
+scrapebadger twitter trends                    # Global trends
+scrapebadger twitter trends --place <woeid>    # Location trends
+scrapebadger twitter community <id>            # Community details
+scrapebadger twitter community-tweets <id>     # Community tweets
+scrapebadger twitter search-communities <query> # Search communities
+scrapebadger twitter list <id>                 # List details
+scrapebadger twitter list-tweets <id>          # List tweets
+scrapebadger twitter space <id>                # Space details
+```
+
+### Common Options
+
+| Option | Short | Description |
+|--------|-------|-------------|
+| `--output` | `-o` | Output format: json, csv, table, markdown |
+| `--fields` | `-f` | Comma-separated fields to include |
+| `--cursor` | `-c` | Pagination cursor |
+| `--count` | `-n` | Maximum results (where applicable) |
+
+---
+
+## Vinted Commands
+
+All Vinted commands are under `scrapebadger vinted`.
+
+```bash
+scrapebadger vinted search <query>             # Search items
+scrapebadger vinted item <item_id>             # Item details
+scrapebadger vinted user <user_id>             # Seller profile
+scrapebadger vinted user-items <user_id>       # User's listed items
+scrapebadger vinted brands <keyword>           # Search brands
+scrapebadger vinted markets                    # List all markets
+```
+
+### Vinted Options
+
+| Option | Short | Description |
+|--------|-------|-------------|
+| `--market` | `-m` | Market code: fr, de, uk, us, etc. (default: fr) |
+| `--page` | `-p` | Page number |
+| `--per-page` | | Results per page (max 96) |
+| `--price-from` | | Min price filter |
+| `--price-to` | | Max price filter |
+
+---
+
+## Web Scraping Commands
+
+All web commands are under `scrapebadger web`.
+
+```bash
+scrapebadger web scrape <url>                  # Scrape a URL
+scrapebadger web detect <url>                  # Detect anti-bot protection
+scrapebadger web screenshot <url>              # Take screenshot
+scrapebadger web extract <url>                 # Extract structured data
+scrapebadger web batch <url1> <url2> ...       # Batch scraping
+scrapebadger web batch-status <job_id>         # Check batch status
+```
+
+### Web Scrape Options
+
+| Option | Description |
+|--------|-------------|
+| `--js` | Enable JavaScript rendering |
+| `--wait-for` | CSS selector to wait for |
+| `--timeout` | Timeout in milliseconds |
+| `--proxy` | Proxy country code |
+| `--format` | Response format: html, markdown, text |
+
+### Web Extract Options
+
+| Option | Description |
+|--------|-------------|
+| `--rules` | CSS/XPath extraction rules as JSON |
+| `--ai-rules` | AI extraction rules as JSON |
+| `--ai-query` | Freeform AI query about the page |

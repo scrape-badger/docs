@@ -1,0 +1,35 @@
+---
+title: "Gemini CLI"
+description: "Connect ScrapeBadger to Google Gemini CLI via MCP."
+---
+
+# Gemini CLI
+
+## Setup
+
+Edit `~/.gemini/settings.json` (or `.gemini/settings.json` in your project):
+
+```json
+{
+  "mcpServers": {
+    "scrapebadger": {
+      "httpUrl": "https://mcp.scrapebadger.com/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_KEY"
+      }
+    }
+  }
+}
+```
+
+<Warning>
+Gemini CLI uses `httpUrl` — not `url`. This is different from Cursor and other tools.
+</Warning>
+
+## Verify
+
+Run `gemini` and ask it to use a ScrapeBadger tool. The tools will be discovered automatically.
+
+<Note>
+The Gemini web app (gemini.google.com) does **not** support custom MCP servers. MCP is available through the Gemini CLI only.
+</Note>

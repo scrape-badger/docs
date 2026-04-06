@@ -1,0 +1,48 @@
+---
+title: "VS Code + Copilot"
+description: "Connect ScrapeBadger to VS Code with GitHub Copilot via MCP."
+---
+
+# VS Code + GitHub Copilot
+
+## Setup
+
+Create `.vscode/mcp.json` in your project root:
+
+```json
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "scrapebadger-api-key",
+      "description": "ScrapeBadger API Key",
+      "password": true
+    }
+  ],
+  "servers": {
+    "scrapebadger": {
+      "type": "http",
+      "url": "https://mcp.scrapebadger.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${input:scrapebadger-api-key}"
+      }
+    }
+  }
+}
+```
+
+<Warning>
+VS Code uses `"servers"` — not `"mcpServers"`. This is different from every other tool.
+</Warning>
+
+## How It Works
+
+The `inputs` array creates a secure prompt for your API key. VS Code will ask for it on first use and store it securely — no hardcoded keys in your config.
+
+## Verify
+
+Open the Command Palette (`Cmd+Shift+P`) > "MCP: List Servers". ScrapeBadger should appear.
+
+<Note>
+MCP tools only work in Copilot **Agent mode**, not Ask or Edit mode.
+</Note>

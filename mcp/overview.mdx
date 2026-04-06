@@ -1,0 +1,79 @@
+---
+title: "MCP Server"
+description: "Connect AI agents to ScrapeBadger via Model Context Protocol. 63 tools for Twitter, Vinted, and web scraping."
+---
+
+# MCP Server
+
+ScrapeBadger provides a hosted MCP (Model Context Protocol) server at `mcp.scrapebadger.com` that lets AI agents access all ScrapeBadger APIs through structured, typed tools.
+
+## What is MCP?
+
+[Model Context Protocol](https://spec.modelcontextprotocol.io/) is an open standard by Anthropic for connecting AI models to external tools and data sources. Instead of writing code, your AI agent discovers and calls ScrapeBadger tools naturally during a conversation.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="63 Tools" icon="wrench">
+    Every ScrapeBadger API endpoint is available as a typed MCP tool with structured parameters.
+  </Card>
+  <Card title="Zero Setup" icon="bolt">
+    Hosted at mcp.scrapebadger.com — just add one config snippet to your AI tool.
+  </Card>
+  <Card title="10 Platforms" icon="plug">
+    Works with Claude, Cursor, Windsurf, VS Code, Gemini, ChatGPT, OpenClaw, Cline, and more.
+  </Card>
+  <Card title="Same Pricing" icon="credit-card">
+    No extra cost — MCP uses the same credit-based pricing as the REST API.
+  </Card>
+  <Card title="3 Products" icon="layer-group">
+    Twitter/X data, Vinted marketplace, and general web scraping — all in one server.
+  </Card>
+  <Card title="Bearer Auth" icon="key">
+    Secure API key authentication via Authorization header or query parameter.
+  </Card>
+</CardGroup>
+
+## Available Tools
+
+| Category | Tools | Description |
+|----------|-------|-------------|
+| **Twitter Users** | 11 | Profiles, search, followers, following, mentions, subscriptions |
+| **Twitter Tweets** | 11 | Get tweets, advanced search, replies, quotes, retweeters, edit history |
+| **Twitter Discovery** | 12 | Trends, communities, lists, places, spaces, broadcasts |
+| **Twitter Streams** | 8 | Real-time stream monitors, webhooks, delivery logs |
+| **Twitter Filter Rules** | 8 | Query-based monitoring, pricing tiers, delivery logs |
+| **Vinted** | 8 | Item search, details, seller profiles, brands, markets |
+| **Web Scraping** | 6 | Scrape URLs, screenshots, AI extraction, batch jobs |
+
+## Quick Start
+
+<Steps>
+  <Step title="Get an API Key">
+    Sign up at [scrapebadger.com](https://scrapebadger.com) and create an API key from the dashboard.
+  </Step>
+  <Step title="Choose Your AI Tool">
+    See the [integration guides](/mcp/integrations/claude-desktop) for copy-paste config snippets for each platform.
+  </Step>
+  <Step title="Start Using Tools">
+    Ask your AI agent to search tweets, scrape websites, or look up Vinted items — it will discover and call the right tools automatically.
+  </Step>
+</Steps>
+
+## Authentication
+
+Pass your API key using one of these methods:
+
+| Method | Example | Best For |
+|--------|---------|----------|
+| **Bearer header** | `Authorization: Bearer sb_live_...` | Cursor, Windsurf, VS Code, Cline |
+| **Query parameter** | `?api_key=sb_live_...` | Claude Desktop (via mcp-remote) |
+| **Environment variable** | `SCRAPEBADGER_API_KEY=sb_live_...` | Local/stdio installations |
+
+## MCP Endpoint
+
+```
+https://mcp.scrapebadger.com/mcp
+```
+
+Health check: `https://mcp.scrapebadger.com/health`
