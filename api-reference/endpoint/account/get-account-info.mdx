@@ -1,0 +1,54 @@
+---
+title: Get Account Info
+api: GET /v1/account/me
+description: Check your credit balance, plan tier, and rate limits.
+---
+
+Returns account details for the authenticated API key. **No credits are deducted** for this call.
+
+<Note>
+  This endpoint is useful for monitoring your credit balance programmatically — e.g., before running a batch job or in a CI pipeline.
+</Note>
+
+## Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `credits_balance` | `number` | Current credit balance for the account |
+| `tier` | `string` | Plan tier (e.g., `free`, `pro`, `enterprise`) |
+| `rate_limit_per_minute` | `integer` | Maximum API requests allowed per minute |
+
+<RequestExample>
+```bash cURL
+curl -X GET "https://scrapebadger.com/v1/account/me" \
+  -H "x-api-key: sb_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    "https://scrapebadger.com/v1/account/me",
+    headers={"x-api-key": "sb_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}
+)
+print(response.json())
+```
+
+```javascript Node.js
+const response = await fetch("https://scrapebadger.com/v1/account/me", {
+  headers: { "x-api-key": "sb_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" }
+});
+const data = await response.json();
+console.log(data);
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "credits_balance": 99171,
+  "tier": "pro",
+  "rate_limit_per_minute": 100
+}
+```
+</ResponseExample>

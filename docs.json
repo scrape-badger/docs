@@ -41,6 +41,12 @@
               "credits-and-pricing",
               "rate-limits"
             ]
+          },
+          {
+            "group": "Account",
+            "pages": [
+              "api-reference/endpoint/account/get-account-info"
+            ]
           }
         ]
       },
