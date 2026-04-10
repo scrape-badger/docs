@@ -81,131 +81,112 @@
           },
           {
             "group": "Search",
-            "openapi": {
-              "source": "/openapi-google.json",
-              "directory": "api-reference/google"
-            },
-            "tag": "Google Search"
+            "pages": [
+              "api-reference/google/google-search/google-web-search"
+            ]
           },
           {
             "group": "Maps",
-            "openapi": {
-              "source": "/openapi-google.json",
-              "directory": "api-reference/google"
-            },
-            "tag": "Google Maps"
+            "pages": [
+              "api-reference/google/google-maps/search-google-maps-places",
+              "api-reference/google/google-maps/get-place-details",
+              "api-reference/google/google-maps/get-place-reviews",
+              "api-reference/google/google-maps/get-place-photos",
+              "api-reference/google/google-maps/get-business-posts"
+            ]
           },
           {
             "group": "News",
-            "openapi": {
-              "source": "/openapi-google.json",
-              "directory": "api-reference/google"
-            },
-            "tag": "Google News"
+            "pages": [
+              "api-reference/google/google-news/search-google-news",
+              "api-reference/google/google-news/news-by-topic",
+              "api-reference/google/google-news/trending-news"
+            ]
           },
           {
             "group": "Hotels",
-            "openapi": {
-              "source": "/openapi-google.json",
-              "directory": "api-reference/google"
-            },
-            "tag": "Google Hotels"
+            "pages": [
+              "api-reference/google/google-hotels/search-hotels",
+              "api-reference/google/google-hotels/hotel-details"
+            ]
           },
           {
             "group": "Trends",
-            "openapi": {
-              "source": "/openapi-google.json",
-              "directory": "api-reference/google"
-            },
-            "tag": "Google Trends"
+            "pages": [
+              "api-reference/google/google-trends/interest-over-time",
+              "api-reference/google/google-trends/interest-by-region",
+              "api-reference/google/google-trends/related-topics-&-queries",
+              "api-reference/google/google-trends/trending-searches"
+            ]
           },
           {
             "group": "Jobs",
-            "openapi": {
-              "source": "/openapi-google.json",
-              "directory": "api-reference/google"
-            },
-            "tag": "Google Jobs"
+            "pages": [
+              "api-reference/google/google-jobs/search-google-jobs"
+            ]
           },
           {
             "group": "Shopping",
-            "openapi": {
-              "source": "/openapi-google.json",
-              "directory": "api-reference/google"
-            },
-            "tag": "Google Shopping"
+            "pages": [
+              "api-reference/google/google-shopping/search-products",
+              "api-reference/google/google-shopping/product-details",
+              "api-reference/google/google-shopping/resolve-merchant-url-for-a-product"
+            ]
           },
           {
             "group": "Patents",
-            "openapi": {
-              "source": "/openapi-google.json",
-              "directory": "api-reference/google"
-            },
-            "tag": "Google Patents"
+            "pages": [
+              "api-reference/google/google-patents/search-patents",
+              "api-reference/google/google-patents/patent-details"
+            ]
           },
           {
             "group": "Scholar",
-            "openapi": {
-              "source": "/openapi-google.json",
-              "directory": "api-reference/google"
-            },
-            "tag": "Google Scholar"
+            "pages": [
+              "api-reference/google/google-scholar/search-google-scholar"
+            ]
           },
           {
             "group": "Images",
-            "openapi": {
-              "source": "/openapi-google.json",
-              "directory": "api-reference/google"
-            },
-            "tag": "Google Images"
+            "pages": [
+              "api-reference/google/google-images/search-google-images"
+            ]
           },
           {
             "group": "Videos",
-            "openapi": {
-              "source": "/openapi-google.json",
-              "directory": "api-reference/google"
-            },
-            "tag": "Google Videos"
+            "pages": [
+              "api-reference/google/google-videos/search-google-videos"
+            ]
           },
           {
             "group": "Finance",
-            "openapi": {
-              "source": "/openapi-google.json",
-              "directory": "api-reference/google"
-            },
-            "tag": "Google Finance"
+            "pages": [
+              "api-reference/google/google-finance/get-stockindex-quote"
+            ]
           },
           {
             "group": "AI Mode",
-            "openapi": {
-              "source": "/openapi-google.json",
-              "directory": "api-reference/google"
-            },
-            "tag": "Google AI Mode"
+            "pages": [
+              "api-reference/google/google-ai-mode/google-ai-mode-search"
+            ]
           },
           {
             "group": "Lens",
-            "openapi": {
-              "source": "/openapi-google.json",
-              "directory": "api-reference/google"
-            },
-            "tag": "Google Lens"
+            "pages": [
+              "api-reference/google/google-lens/google-lens-visual-search"
+            ]
           },
           {
             "group": "Products",
-            "openapi": {
-              "source": "/openapi-google.json",
-              "directory": "api-reference/google"
-            },
-            "tag": "Google Products"
+            "pages": [
+              "api-reference/google/google-products/immersive-product-detail"
+            ]
           },
           {
             "group": "Autocomplete",
-            "openapi": {
-              "source": "/openapi-google.json",
-              "directory": "api-reference/google"
-            },
-            "tag": "Google Autocomplete"
+            "pages": [
+              "api-reference/google/google-autocomplete/google-search-suggestions"
+            ]
           }
         ]
       },
