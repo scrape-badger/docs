@@ -161,7 +161,7 @@
           {
             "group": "Finance",
             "pages": [
-              "api-reference/google/google-finance/get-stock-index-quote"
+              "api-reference/google/google-finance/get-stockindex-quote"
             ]
           },
           {
