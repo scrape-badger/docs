@@ -14,7 +14,6 @@
     "/v1/google/search": {
       "get": {
         "tags": [
-          "Google",
           "Google Search"
         ],
         "summary": "Google web search",
@@ -369,7 +368,6 @@
     "/v1/google/maps/search": {
       "get": {
         "tags": [
-          "Google",
           "Google Maps"
         ],
         "summary": "Search Google Maps places",
@@ -461,7 +459,6 @@
     "/v1/google/maps/place": {
       "get": {
         "tags": [
-          "Google",
           "Google Maps"
         ],
         "summary": "Get place details",
@@ -547,7 +544,6 @@
     "/v1/google/maps/reviews": {
       "get": {
         "tags": [
-          "Google",
           "Google Maps"
         ],
         "summary": "Get place reviews",
@@ -640,7 +636,6 @@
     "/v1/google/maps/photos": {
       "get": {
         "tags": [
-          "Google",
           "Google Maps"
         ],
         "summary": "Get place photos",
@@ -711,7 +706,6 @@
     "/v1/google/maps/posts": {
       "get": {
         "tags": [
-          "Google",
           "Google Maps"
         ],
         "summary": "Get business posts",
@@ -772,7 +766,6 @@
     "/v1/google/news/search": {
       "get": {
         "tags": [
-          "Google",
           "Google News"
         ],
         "summary": "Search Google News",
@@ -849,7 +842,6 @@
     "/v1/google/news/topics": {
       "get": {
         "tags": [
-          "Google",
           "Google News"
         ],
         "summary": "News by topic",
@@ -926,7 +918,6 @@
     "/v1/google/news/trending": {
       "get": {
         "tags": [
-          "Google",
           "Google News"
         ],
         "summary": "Trending news",
@@ -992,7 +983,6 @@
     "/v1/google/hotels/search": {
       "get": {
         "tags": [
-          "Google",
           "Google Hotels"
         ],
         "summary": "Search hotels",
@@ -1089,7 +1079,6 @@
     "/v1/google/hotels/details": {
       "get": {
         "tags": [
-          "Google",
           "Google Hotels"
         ],
         "summary": "Hotel details",
@@ -1156,7 +1145,6 @@
     "/v1/google/trends/interest": {
       "get": {
         "tags": [
-          "Google",
           "Google Trends"
         ],
         "summary": "Interest over time",
@@ -1221,7 +1209,6 @@
     "/v1/google/trends/regions": {
       "get": {
         "tags": [
-          "Google",
           "Google Trends"
         ],
         "summary": "Interest by region",
@@ -1276,7 +1263,6 @@
     "/v1/google/trends/related": {
       "get": {
         "tags": [
-          "Google",
           "Google Trends"
         ],
         "summary": "Related topics & queries",
@@ -1331,7 +1317,6 @@
     "/v1/google/trends/trending": {
       "get": {
         "tags": [
-          "Google",
           "Google Trends"
         ],
         "summary": "Trending searches",
@@ -1375,7 +1360,6 @@
     "/v1/google/jobs/search": {
       "get": {
         "tags": [
-          "Google",
           "Google Jobs"
         ],
         "summary": "Search Google Jobs",
@@ -1478,7 +1462,6 @@
     "/v1/google/shopping/search": {
       "get": {
         "tags": [
-          "Google",
           "Google Shopping"
         ],
         "summary": "Search products",
@@ -1581,7 +1564,6 @@
     "/v1/google/shopping/product": {
       "get": {
         "tags": [
-          "Google",
           "Google Shopping"
         ],
         "summary": "Product details",
@@ -1636,7 +1618,6 @@
     "/v1/google/shopping/product/click": {
       "get": {
         "tags": [
-          "Google",
           "Google Shopping"
         ],
         "summary": "Resolve merchant URL for a product",
@@ -1760,7 +1741,6 @@
     "/v1/google/patents/search": {
       "get": {
         "tags": [
-          "Google",
           "Google Patents"
         ],
         "summary": "Search patents",
@@ -1876,7 +1856,6 @@
     "/v1/google/patents/detail": {
       "get": {
         "tags": [
-          "Google",
           "Google Patents"
         ],
         "summary": "Patent details",
@@ -1921,7 +1900,6 @@
     "/v1/google/scholar/search": {
       "get": {
         "tags": [
-          "Google",
           "Google Scholar"
         ],
         "summary": "Search Google Scholar",
@@ -2054,7 +2032,6 @@
     "/v1/google/autocomplete": {
       "get": {
         "tags": [
-          "Google",
           "Google Autocomplete"
         ],
         "summary": "Google search suggestions",
@@ -2124,7 +2101,6 @@
     "/v1/google/images/search": {
       "get": {
         "tags": [
-          "Google",
           "Google Images"
         ],
         "summary": "Search Google Images",
@@ -2291,7 +2267,6 @@
     "/v1/google/videos/search": {
       "get": {
         "tags": [
-          "Google",
           "Google Videos"
         ],
         "summary": "Search Google Videos",
@@ -2404,7 +2379,6 @@
     "/v1/google/finance/quote": {
       "get": {
         "tags": [
-          "Google",
           "Google Finance"
         ],
         "summary": "Get stock/index quote",
@@ -2462,7 +2436,6 @@
     "/v1/google/ai-mode/search": {
       "get": {
         "tags": [
-          "Google",
           "Google AI Mode"
         ],
         "summary": "Google AI Mode search",
@@ -2532,7 +2505,6 @@
     "/v1/google/lens/search": {
       "get": {
         "tags": [
-          "Google",
           "Google Lens"
         ],
         "summary": "Google Lens visual search",
@@ -2602,7 +2574,6 @@
     "/v1/google/products/detail": {
       "get": {
         "tags": [
-          "Google",
           "Google Products"
         ],
         "summary": "Immersive product detail",
@@ -2672,7 +2643,6 @@
     "/v1/google/health": {
       "get": {
         "tags": [
-          "Google",
           "Google Health"
         ],
         "summary": "Google scraper health check",
