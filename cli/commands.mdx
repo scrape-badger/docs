@@ -76,6 +76,122 @@ scrapebadger twitter space <id>                # Space details
 
 ---
 
+## Google Commands
+
+All Google commands are under `scrapebadger google`. **29 subcommands** cover all 16 Google product APIs.
+
+### Search
+
+```bash
+scrapebadger google search <query>             # Google web search (SERP)
+scrapebadger google images <query>             # Image search
+scrapebadger google videos <query>             # Video search
+scrapebadger google autocomplete <query>       # Search suggestions
+scrapebadger google ai-mode <query>            # AI-generated answer (udm=50)
+scrapebadger google lens <image_url>           # Visual search by image URL
+```
+
+### Search Options
+
+| Option | Description |
+|---|---|
+| `--gl` | Country code (e.g. `us`, `gb`) |
+| `--hl` | Language code (e.g. `en`, `fr`) |
+| `--num` / `-n` | Number of results |
+| `--start` | Page offset (0, 10, 20, ...) |
+| `--domain` | Google domain (e.g. `google.co.uk`) |
+| `--device` | `desktop` or `mobile` |
+| `--location` | City-level geo-targeting |
+| `--tbs` | Time filter (e.g. `qdr:d` past day) |
+| `--safe` | `off`, `medium`, `high` |
+
+### Maps
+
+```bash
+scrapebadger google maps-search <query>        # Place search
+scrapebadger google maps-place --data-id <id>  # Place detail (or --place-id)
+scrapebadger google maps-reviews <data_id>     # Paginated reviews
+scrapebadger google maps-photos <data_id>      # Place photos
+scrapebadger google maps-posts <data_id>       # Business posts
+```
+
+### News
+
+```bash
+scrapebadger google news <query>               # News article search
+scrapebadger google news-topics <topic>        # WORLD, BUSINESS, TECHNOLOGY, ...
+scrapebadger google news-trending              # Real-time trending stories
+```
+
+### Hotels
+
+```bash
+scrapebadger google hotels <query> \
+    --check-in 2026-05-01 --check-out 2026-05-05 --adults 2
+scrapebadger google hotels-details <property_token> \
+    --check-in 2026-05-01 --check-out 2026-05-05
+```
+
+### Trends
+
+```bash
+scrapebadger google trends <query>             # Interest over time (up to 5 terms)
+scrapebadger google trends-regions <query>     # Interest by region
+scrapebadger google trends-related <query>     # Related topics + queries
+scrapebadger google trends-trending            # Real-time trending searches
+```
+
+### Jobs
+
+```bash
+scrapebadger google jobs "software engineer" \
+    --location "San Francisco, CA" --job-type FULLTIME --date-posted week
+```
+
+### Shopping
+
+```bash
+scrapebadger google shopping <query>                      # Product search
+scrapebadger google shopping --min-price 500 --max-price 2000 --sort-by price_low
+scrapebadger google shopping-product <product_id>         # Product detail + sellers
+scrapebadger google shopping-click "<product title>" --source <merchant>
+```
+
+<Tip>
+  The `shopping-click` command resolves the real merchant URL for a product by title. Google has removed direct merchant links from organic Shopping HTML; this command uses an "I'm Feeling Lucky" redirect scoped to the source merchant (via `site:` operator) to materialize the product page URL. Mirrors ScrapingDog's `scrapingdog_immersive_product_link` pattern and costs **1 credit per call**.
+</Tip>
+
+### Patents, Scholar, Finance, Products
+
+```bash
+scrapebadger google patents <query> --inventor Smith --assignee Google
+scrapebadger google patent US10123456B2                   # Full patent detail
+scrapebadger google scholar <query> --as-ylo 2020 --as-yhi 2024
+scrapebadger google finance AAPL:NASDAQ                   # Stock quote
+scrapebadger google product-detail <product_id>           # Immersive product
+```
+
+### Common Options
+
+Every google command supports `--output/-o` (`json`, `csv`, `table`, `markdown`) and `--fields/-f` (comma-separated field list).
+
+```bash
+# Export top 20 SERP results as CSV
+scrapebadger google search "python 3.13" --num 20 -o csv > results.csv
+
+# Pipe to jq
+scrapebadger google shopping "laptop" | jq '.results[].title'
+
+# Full shopping search → click enrichment workflow
+scrapebadger google shopping "laptop" | \
+  jq -r '.results[0] | [.title, .source] | @tsv' | \
+  while IFS=$'\t' read -r title source; do
+    scrapebadger google shopping-click "$title" --source "$source"
+  done
+```
+
+---
+
 ## Vinted Commands
 
 All Vinted commands are under `scrapebadger vinted`.

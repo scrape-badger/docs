@@ -1,0 +1,223 @@
+---
+title: "Google Scraper Overview"
+description: "Structured JSON APIs for 16 Google product APIs — Search, Maps, News, Hotels, Trends, Jobs, Shopping, Patents, Scholar, Images, Videos, Finance, AI Mode, Lens, and Products."
+---
+
+# Google Scraper API
+
+Programmatic access to **16 Google product APIs** with structured JSON responses. The ScrapeBadger Google Scraper handles SearchGuard, proxy rotation, cookie warmup, and IP rotation on 429 automatically — you just call the endpoint.
+
+## Products
+
+<CardGroup cols={3}>
+  <Card title="Search (SERP)" icon="magnifying-glass">
+    Organic results, ads, knowledge graph, People Also Ask, related searches, AI overview, and pagination.
+  </Card>
+  <Card title="Maps" icon="map-location-dot">
+    Place search, business details, reviews, photos, and posts from Google Maps.
+  </Card>
+  <Card title="News" icon="newspaper">
+    Article search, topic feeds, and trending stories from Google News.
+  </Card>
+  <Card title="Hotels" icon="hotel">
+    Property search and detailed listings with prices, ratings, and amenities.
+  </Card>
+  <Card title="Trends" icon="chart-line">
+    Interest over time, regional breakdowns, related queries, and real-time trending.
+  </Card>
+  <Card title="Jobs" icon="briefcase">
+    Job listings aggregated across the web with filters for type, date, and location.
+  </Card>
+  <Card title="Shopping" icon="cart-shopping">
+    Product listings with prices, ratings, filters — plus per-product merchant URL enrichment.
+  </Card>
+  <Card title="Patents" icon="file-signature">
+    Patent document search and full-detail retrieval by patent number.
+  </Card>
+  <Card title="Scholar" icon="graduation-cap">
+    Academic paper search with year-range and citation filters.
+  </Card>
+  <Card title="Autocomplete" icon="keyboard">
+    Google search suggestion lookup for query prefixes.
+  </Card>
+  <Card title="Images" icon="image">
+    Image search with size, color, and type filters.
+  </Card>
+  <Card title="Videos" icon="video">
+    Video search across Google's video index.
+  </Card>
+  <Card title="Finance" icon="money-bill">
+    Stock, index, crypto, and currency quotes with change data.
+  </Card>
+  <Card title="AI Mode" icon="robot">
+    Google's generative AI answers (udm=50) with text blocks and source references.
+  </Card>
+  <Card title="Lens" icon="camera-retro">
+    Visual image search — find similar products and images from a URL.
+  </Card>
+</CardGroup>
+
+## Anti-Bot Handling
+
+Google deployed **SearchGuard** in January 2025 — a JS challenge that blocks raw HTTP. The ScrapeBadger Google Scraper bypasses it with a cookie-warmup pattern:
+
+1. First request attempts **curl_cffi** with cached cookies (~0.2s fast path)
+2. If a SearchGuard challenge is detected, a **patchright browser warmup** solves it
+3. Subsequent requests reuse the warm cookies via curl_cffi for speed
+4. On **429 or CAPTCHA**, the cached residential proxy session is invalidated to rotate the exit IP, then the retry loop continues (up to 3 IP rotations per request)
+
+## 185 Google Domains
+
+The SERP endpoint accepts any of Google's 185 country domains via the `domain` parameter:
+
+```bash
+curl "https://scrapebadger.com/v1/google/search?q=laptop&domain=google.co.uk&gl=gb&hl=en" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+## Quick Start
+
+<CodeGroup>
+
+```javascript Node.js
+import { ScrapeBadger } from "scrapebadger";
+
+const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" });
+
+// Web search
+const serp = await client.google.search.search({ q: "python 3.13" });
+for (const r of serp.organic_results) {
+  console.log(r.title, r.link);
+}
+
+// Shopping search + per-product merchant URL enrichment
+const products = await client.google.shopping.search({ q: "laptop" });
+const first = products.results[0];
+const enriched = await client.google.shopping.click({
+  title: first.title,
+  source: first.source,
+});
+console.log("Merchant URL:", enriched.merchant_url);
+```
+
+```python Python
+from scrapebadger import ScrapeBadger
+
+async with ScrapeBadger(api_key="YOUR_API_KEY") as client:
+    # Web search
+    serp = await client.google.search.search("python 3.13")
+    for r in serp["organic_results"]:
+        print(r["title"], r["link"])
+
+    # Maps search
+    places = await client.google.maps.search("coffee shops in san francisco")
+
+    # Shopping search + click enrichment
+    products = await client.google.shopping.search("laptop")
+    first = products["results"][0]
+    enriched = await client.google.shopping.click(
+        title=first["title"],
+        source=first["source"],
+    )
+    print("Merchant URL:", enriched["merchant_url"])
+```
+
+```bash cURL
+# Web search
+curl "https://scrapebadger.com/v1/google/search?q=python+3.13&gl=us&hl=en" \
+  -H "x-api-key: YOUR_API_KEY"
+
+# Shopping search
+curl "https://scrapebadger.com/v1/google/shopping/search?q=laptop" \
+  -H "x-api-key: YOUR_API_KEY"
+
+# Per-product merchant URL enrichment
+curl "https://scrapebadger.com/v1/google/shopping/product/click?title=Lenovo+IdeaPad+5&source=Walmart" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+## Endpoint Index
+
+<Tabs>
+  <Tab title="Search">
+    | Endpoint | Credits | Description |
+    |---|---|---|
+    | `GET /v1/google/search` | 2 | Web search with 21 parameters |
+    | `GET /v1/google/images/search` | 2 | Image search with size/color filters |
+    | `GET /v1/google/videos/search` | 2 | Video search |
+    | `GET /v1/google/autocomplete` | 1 | Query suggestions |
+    | `GET /v1/google/ai-mode/search` | 3 | AI-generated answers |
+    | `GET /v1/google/lens/search` | 3 | Visual image search |
+  </Tab>
+  <Tab title="Maps">
+    | Endpoint | Credits | Description |
+    |---|---|---|
+    | `GET /v1/google/maps/search` | 2 | Search places by query |
+    | `GET /v1/google/maps/place` | 3 | Place details by `place_id` / `data_id` |
+    | `GET /v1/google/maps/reviews` | 3 | Paginated reviews for a place |
+    | `GET /v1/google/maps/photos` | 2 | Place photos |
+    | `GET /v1/google/maps/posts` | 2 | Business posts |
+  </Tab>
+  <Tab title="Shopping">
+    | Endpoint | Credits | Description |
+    |---|---|---|
+    | `GET /v1/google/shopping/search` | 2 | Product search with filters + ads |
+    | `GET /v1/google/shopping/product` | 5 | Product detail with seller list |
+    | `GET /v1/google/shopping/product/click` | 1 | Resolve merchant URL per product |
+  </Tab>
+  <Tab title="News & Content">
+    | Endpoint | Credits | Description |
+    |---|---|---|
+    | `GET /v1/google/news/search` | 1 | News article search |
+    | `GET /v1/google/news/topics` | 1 | News by predefined topic |
+    | `GET /v1/google/news/trending` | 1 | Trending stories |
+    | `GET /v1/google/scholar/search` | 2 | Academic paper search |
+    | `GET /v1/google/patents/search` | 2 | Patent document search |
+    | `GET /v1/google/patents/detail` | 3 | Full patent detail |
+  </Tab>
+  <Tab title="Other">
+    | Endpoint | Credits | Description |
+    |---|---|---|
+    | `GET /v1/google/hotels/search` | 3 | Hotel search with dates |
+    | `GET /v1/google/hotels/details` | 5 | Detailed property info |
+    | `GET /v1/google/trends/interest` | 2 | Interest over time |
+    | `GET /v1/google/trends/regions` | 2 | Interest by region |
+    | `GET /v1/google/trends/related` | 2 | Related topics and queries |
+    | `GET /v1/google/trends/trending` | 1 | Real-time trending searches |
+    | `GET /v1/google/jobs/search` | 2 | Job listings search |
+    | `GET /v1/google/finance/quote` | 2 | Stock / index / crypto quote |
+    | `GET /v1/google/products/detail` | 3 | Immersive product detail |
+  </Tab>
+</Tabs>
+
+## Credit Costs Summary
+
+Total of **22 distinct endpoint patterns** priced from **1 to 5 credits**. See [Credits & Pricing](/credits-and-pricing) for full details.
+
+<Tip>
+  The `shopping/product/click` endpoint costs only **1 credit** per call because it uses a lightweight curl_cffi "I'm Feeling Lucky" redirect lookup — so bulk-enriching 50 products with merchant URLs adds just 50 credits on top of the original shopping search.
+</Tip>
+
+## Legal & Compliance
+
+<Warning>
+**SearchGuard litigation is active.** Google sued SerpAPI in **December 2025** under the DMCA for circumventing the SearchGuard JavaScript challenge it deployed in January 2025. Reddit also sued SerpAPI, Perplexity, and several other scraping providers in October 2025 over crawling its content. Both cases are still being litigated as of 2026 and the legal landscape around SERP scraping is evolving quickly.
+
+Before deploying ScrapeBadger Google endpoints in production, you are responsible for:
+
+- Reviewing **Google's Terms of Service** and any applicable local laws (DMCA, CFAA in the US; copyright directives in the EU)
+- Ensuring your use case has a **legitimate business purpose** (research, SEO monitoring, price comparison, accessibility tooling, etc.) and isn't redistributing Google content in a way that competes with Google itself
+- Following **robots.txt** spirit where applicable and rate-limiting your requests to avoid disrupting Google's services
+- Consulting your own legal counsel — ScrapeBadger does not provide legal advice and cannot warrant the lawfulness of your specific use case
+
+ScrapeBadger reserves the right to suspend access to the Google Scraper endpoints at any time in response to changes in the legal landscape or platform terms.
+</Warning>
+
+### Reference cases
+
+- *Google LLC v. SerpAPI* (Dec 2025) — DMCA §1201 claim alleging circumvention of SearchGuard
+- *Reddit v. Perplexity, SerpAPI et al.* (Oct 2025) — breach of access terms and unauthorized data ingestion
+
+ScrapeBadger continues to operate under the position that scraping publicly accessible search results for legitimate business research is permitted, but this position may need to evolve as litigation progresses.

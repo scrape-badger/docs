@@ -42,4 +42,12 @@ To skip confirmation prompts for specific tools, add `alwaysAllow`:
 
 ## Verify
 
-After saving, Cline automatically detects the available tools. You should see 63 ScrapeBadger tools in the MCP Servers panel.
+After saving, Cline automatically detects the available tools. You should see 92 ScrapeBadger tools in the MCP Servers panel.
+
+## Example tool call
+
+Try asking Cline to use a Google tool:
+
+> "Search Google Shopping for laptops under $1500 and resolve the merchant URL for the top result"
+
+Cline will call `google_shopping_search` followed by `google_shopping_product_click` automatically.

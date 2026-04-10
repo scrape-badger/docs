@@ -15,7 +15,8 @@
   "openapi": [
     "https://scrapebadger.com/api/twitter-openapi.json",
     "/openapi-web-scraping.json",
-    "/openapi-vinted.json"
+    "/openapi-vinted.json",
+    "/openapi-google.json"
   ],
   "api": {
     "baseUrl": "https://scrapebadger.com",
@@ -65,6 +66,146 @@
               "api-reference/endpoint/web-scraping/scrape",
               "api-reference/endpoint/web-scraping/detect"
             ]
+          }
+        ]
+      },
+      {
+        "tab": "Google",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "google/overview",
+              "google/shopping-click-enrichment"
+            ]
+          },
+          {
+            "group": "Search",
+            "openapi": {
+              "source": "/openapi-google.json",
+              "directory": "api-reference/google"
+            },
+            "tag": "Google Search"
+          },
+          {
+            "group": "Maps",
+            "openapi": {
+              "source": "/openapi-google.json",
+              "directory": "api-reference/google"
+            },
+            "tag": "Google Maps"
+          },
+          {
+            "group": "News",
+            "openapi": {
+              "source": "/openapi-google.json",
+              "directory": "api-reference/google"
+            },
+            "tag": "Google News"
+          },
+          {
+            "group": "Hotels",
+            "openapi": {
+              "source": "/openapi-google.json",
+              "directory": "api-reference/google"
+            },
+            "tag": "Google Hotels"
+          },
+          {
+            "group": "Trends",
+            "openapi": {
+              "source": "/openapi-google.json",
+              "directory": "api-reference/google"
+            },
+            "tag": "Google Trends"
+          },
+          {
+            "group": "Jobs",
+            "openapi": {
+              "source": "/openapi-google.json",
+              "directory": "api-reference/google"
+            },
+            "tag": "Google Jobs"
+          },
+          {
+            "group": "Shopping",
+            "openapi": {
+              "source": "/openapi-google.json",
+              "directory": "api-reference/google"
+            },
+            "tag": "Google Shopping"
+          },
+          {
+            "group": "Patents",
+            "openapi": {
+              "source": "/openapi-google.json",
+              "directory": "api-reference/google"
+            },
+            "tag": "Google Patents"
+          },
+          {
+            "group": "Scholar",
+            "openapi": {
+              "source": "/openapi-google.json",
+              "directory": "api-reference/google"
+            },
+            "tag": "Google Scholar"
+          },
+          {
+            "group": "Images",
+            "openapi": {
+              "source": "/openapi-google.json",
+              "directory": "api-reference/google"
+            },
+            "tag": "Google Images"
+          },
+          {
+            "group": "Videos",
+            "openapi": {
+              "source": "/openapi-google.json",
+              "directory": "api-reference/google"
+            },
+            "tag": "Google Videos"
+          },
+          {
+            "group": "Finance",
+            "openapi": {
+              "source": "/openapi-google.json",
+              "directory": "api-reference/google"
+            },
+            "tag": "Google Finance"
+          },
+          {
+            "group": "AI Mode",
+            "openapi": {
+              "source": "/openapi-google.json",
+              "directory": "api-reference/google"
+            },
+            "tag": "Google AI Mode"
+          },
+          {
+            "group": "Lens",
+            "openapi": {
+              "source": "/openapi-google.json",
+              "directory": "api-reference/google"
+            },
+            "tag": "Google Lens"
+          },
+          {
+            "group": "Products",
+            "openapi": {
+              "source": "/openapi-google.json",
+              "directory": "api-reference/google"
+            },
+            "tag": "Google Products"
+          },
+          {
+            "group": "Autocomplete",
+            "openapi": {
+              "source": "/openapi-google.json",
+              "directory": "api-reference/google"
+            },
+            "tag": "Google Autocomplete"
           }
         ]
       },
@@ -247,7 +388,7 @@
               "mcp/integrations/chatgpt",
               "mcp/integrations/openclaw",
               "mcp/integrations/cline",
-              "mcp/integrations/continue"
+              "mcp/integrations/continue-dev"
             ]
           }
         ]

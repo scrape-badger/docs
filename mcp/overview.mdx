@@ -1,6 +1,6 @@
 ---
 title: "MCP Server"
-description: "Connect AI agents to ScrapeBadger via Model Context Protocol. 63 tools for Twitter, Vinted, and web scraping."
+description: "Connect AI agents to ScrapeBadger via Model Context Protocol. 92 tools for Twitter, Google, Vinted, and web scraping."
 ---
 
 # MCP Server
@@ -14,7 +14,7 @@ ScrapeBadger provides a hosted MCP (Model Context Protocol) server at `mcp.scrap
 ## Key Features
 
 <CardGroup cols={3}>
-  <Card title="63 Tools" icon="wrench">
+  <Card title="92 Tools" icon="wrench">
     Every ScrapeBadger API endpoint is available as a typed MCP tool with structured parameters.
   </Card>
   <Card title="Zero Setup" icon="bolt">
@@ -26,8 +26,8 @@ ScrapeBadger provides a hosted MCP (Model Context Protocol) server at `mcp.scrap
   <Card title="Same Pricing" icon="credit-card">
     No extra cost — MCP uses the same credit-based pricing as the REST API.
   </Card>
-  <Card title="3 Products" icon="layer-group">
-    Twitter/X data, Vinted marketplace, and general web scraping — all in one server.
+  <Card title="4 Products" icon="layer-group">
+    Twitter/X data, Google (16 products), Vinted marketplace, and general web scraping — all in one server.
   </Card>
   <Card title="Bearer Auth" icon="key">
     Secure API key authentication via Authorization header or query parameter.
@@ -43,8 +43,69 @@ ScrapeBadger provides a hosted MCP (Model Context Protocol) server at `mcp.scrap
 | **Twitter Discovery** | 12 | Trends, communities, lists, places, spaces, broadcasts |
 | **Twitter Streams** | 8 | Real-time stream monitors, webhooks, delivery logs |
 | **Twitter Filter Rules** | 8 | Query-based monitoring, pricing tiers, delivery logs |
+| **Google Search** | 6 | Web search (SERP), Images, Videos, Autocomplete, AI Mode, Lens |
+| **Google Maps** | 5 | Place search, details, reviews, photos, business posts |
+| **Google News & Content** | 8 | News search/topics/trending, Scholar, Patents search + detail, Finance, Products |
+| **Google Shopping** | 3 | Product search, product detail, merchant URL enrichment |
+| **Google Specialized** | 7 | Hotels (search + details), Trends (4 endpoints), Jobs |
 | **Vinted** | 8 | Item search, details, seller profiles, brands, markets |
 | **Web Scraping** | 6 | Scrape URLs, screenshots, AI extraction, batch jobs |
+
+## Google Tools
+
+All 29 Google MCP tools are prefixed with `google_`:
+
+<Tabs>
+  <Tab title="Search & Discovery">
+    | Tool | Description |
+    |---|---|
+    | `google_search` | Web search (SERP) with 21 parameters + knowledge graph, PAA, AI overview |
+    | `google_images_search` | Image search with size/color/type filters |
+    | `google_videos_search` | Video search |
+    | `google_autocomplete` | Search suggestions for a query prefix |
+    | `google_ai_mode_search` | Generative AI answers (udm=50) with references |
+    | `google_lens_search` | Visual image search by URL |
+  </Tab>
+  <Tab title="Maps">
+    | Tool | Description |
+    |---|---|
+    | `google_maps_search` | Search places by text query |
+    | `google_maps_place` | Place detail by place_id or data_id |
+    | `google_maps_reviews` | Paginated reviews (sortable) |
+    | `google_maps_photos` | Place photos |
+    | `google_maps_posts` | Business posts |
+  </Tab>
+  <Tab title="Shopping">
+    | Tool | Description |
+    |---|---|
+    | `google_shopping_search` | Product search with filters + quick_filters + ads |
+    | `google_shopping_product` | Product detail with seller list |
+    | `google_shopping_product_click` | Resolve merchant URL per product (mirrors ScrapingDog's immersive link) |
+  </Tab>
+  <Tab title="News, Trends, Jobs">
+    | Tool | Description |
+    |---|---|
+    | `google_news_search` | News article search |
+    | `google_news_topics` | News by predefined topic |
+    | `google_news_trending` | Trending stories |
+    | `google_trends_interest` | Interest over time (up to 5 terms) |
+    | `google_trends_regions` | Interest by region |
+    | `google_trends_related` | Related topics + queries |
+    | `google_trends_trending` | Real-time trending searches |
+    | `google_jobs_search` | Job listings with filters |
+  </Tab>
+  <Tab title="Specialized">
+    | Tool | Description |
+    |---|---|
+    | `google_hotels_search` | Hotel search with dates |
+    | `google_hotels_details` | Property details by property_token |
+    | `google_patents_search` | Patent document search |
+    | `google_patents_detail` | Full patent by publication number |
+    | `google_scholar_search` | Academic paper search with year filters |
+    | `google_finance_quote` | Stock / index / crypto quotes |
+    | `google_products_detail` | Immersive product detail |
+  </Tab>
+</Tabs>
 
 ## Quick Start
 

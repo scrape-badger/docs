@@ -37,3 +37,11 @@ Or drop a JSON config into `.continue/mcpServers/scrapebadger.json`:
 <Note>
 Continue.dev can import JSON configs from Claude Desktop, Cursor, or Cline directly into `.continue/mcpServers/`. MCP tools only work in **Agent mode**.
 </Note>
+
+## Tools available
+
+ScrapeBadger exposes 92 tools to Continue.dev across Twitter, Google (16 products), Vinted, and Web Scraping. In Agent mode, ask things like:
+
+> "Search Google Shopping for the cheapest 16-inch laptop and resolve the merchant URL"
+
+Continue.dev will call `google_shopping_search` followed by `google_shopping_product_click`.

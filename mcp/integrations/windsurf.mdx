@@ -35,5 +35,13 @@ Windsurf uses `serverUrl` — not `url`. This is different from Cursor and other
 Go to Windsurf Settings > Cascade > MCP Servers. ScrapeBadger should appear as connected.
 
 <Note>
-Windsurf has a maximum of 100 tools across all MCP servers. ScrapeBadger uses 63, leaving room for 37 more from other servers.
+Windsurf has a maximum of 100 tools across all MCP servers. ScrapeBadger uses 92 (Twitter, Google, Vinted, Web Scraping), leaving room for 8 more from other servers.
 </Note>
+
+## Example
+
+Ask Cascade in Agent mode:
+
+> "Search Google Shopping for a gaming headset under $200 and return the merchant URL of the top result"
+
+Cascade will call `google_shopping_search` then `google_shopping_product_click`.

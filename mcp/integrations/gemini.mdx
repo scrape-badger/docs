@@ -33,3 +33,17 @@ Run `gemini` and ask it to use a ScrapeBadger tool. The tools will be discovered
 <Note>
 The Gemini web app (gemini.google.com) does **not** support custom MCP servers. MCP is available through the Gemini CLI only.
 </Note>
+
+## Examples
+
+ScrapeBadger gives Gemini CLI 92 tools across Twitter, Google, Vinted, and Web Scraping. Try:
+
+```bash
+gemini "Search Google for 'best react state management 2026' and list the top 5 results"
+```
+
+```bash
+gemini "Find a Razer gaming headset on Google Shopping and resolve the merchant URL"
+```
+
+Gemini will discover and call the appropriate `google_search` / `google_shopping_*` tools.

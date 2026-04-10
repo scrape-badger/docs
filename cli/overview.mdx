@@ -1,6 +1,6 @@
 ---
 title: "CLI Overview"
-description: "Command-line interface for ScrapeBadger — Twitter, Vinted, and Web Scraping from the terminal."
+description: "Command-line interface for ScrapeBadger — Twitter, Google, Vinted, and Web Scraping from the terminal."
 ---
 
 # ScrapeBadger CLI
@@ -30,6 +30,13 @@ scrapebadger twitter user elonmusk
 
 # Search tweets as a table
 scrapebadger twitter search "AI agents" --output table
+
+# Google web search
+scrapebadger google search "python 3.13" --gl us --num 20
+
+# Google shopping + per-product merchant URL enrichment
+scrapebadger google shopping "laptop" --max-price 2000
+scrapebadger google shopping-click "Lenovo IdeaPad 5" --source "Walmart"
 
 # Search Vinted in Germany
 scrapebadger vinted search "nike shoes" --market de
@@ -74,6 +81,7 @@ scrapebadger twitter trends -o csv -f name,domain_context
 |-------|----------|
 | **Account** | `auth`, `credits`, `logout` |
 | **Twitter** | `user`, `tweets`, `tweet`, `search`, `followers`, `following`, `mentions`, `trends`, `replies`, `quotes`, `retweeters`, `community`, `list`, `space` + more |
+| **Google** | `search`, `maps-search`, `maps-place`, `maps-reviews`, `maps-photos`, `maps-posts`, `news`, `news-topics`, `news-trending`, `hotels`, `hotels-details`, `trends`, `trends-regions`, `trends-related`, `trends-trending`, `jobs`, `shopping`, `shopping-product`, `shopping-click`, `patents`, `patent`, `scholar`, `autocomplete`, `images`, `videos`, `finance`, `ai-mode`, `lens`, `product-detail` (29 commands covering 16 Google products) |
 | **Vinted** | `search`, `item`, `user`, `user-items`, `brands`, `markets` |
 | **Web** | `scrape`, `detect`, `screenshot`, `extract`, `batch`, `batch-status` |
 

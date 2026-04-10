@@ -35,7 +35,7 @@ Or add to `.mcp.json` in your project root:
 
 ## Verify
 
-Inside a Claude Code session, type `/mcp` to see connected servers. ScrapeBadger should show 63 tools.
+Inside a Claude Code session, type `/mcp` to see connected servers. ScrapeBadger should show 92 tools.
 
 ## Scopes
 
@@ -46,3 +46,15 @@ Inside a Claude Code session, type `/mcp` to see connected servers. ScrapeBadger
 | User | `~/.claude.json` globally | Available everywhere |
 
 Add `--scope user` to the `claude mcp add` command for global access.
+
+## Examples
+
+Once connected, ask Claude Code natural-language questions and it will pick the right tool:
+
+> "Show me the top 5 results on Google for 'rust async runtime' and summarize them"
+
+Claude Code calls `google_search`.
+
+> "Find me a laptop under $1500 on Google Shopping and give me the merchant URL for the cheapest one"
+
+Claude Code chains `google_shopping_search` → `google_shopping_product_click`.

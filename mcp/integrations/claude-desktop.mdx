@@ -47,12 +47,16 @@ Claude Desktop uses stdio transport only. The `npx mcp-remote` package bridges b
 
 ## Verify
 
-After restarting, click the tools icon (hammer) in Claude Desktop. You should see 63 ScrapeBadger tools listed.
+After restarting, click the tools icon (hammer) in Claude Desktop. You should see 92 ScrapeBadger tools listed (Twitter, Google, Vinted, and Web Scraping).
 
-## Example
+## Examples
 
 Try asking Claude:
 
 > "Search Twitter for recent posts about AI agents"
 
 Claude will call the `twitter_advanced_search` tool automatically.
+
+> "Find the top 3 laptops on Google Shopping under $1500 and resolve the merchant URL for each"
+
+Claude will chain `google_shopping_search` with `google_shopping_product_click` for each result.
