@@ -116,7 +116,8 @@
               "api-reference/google/google-trends/interest-over-time",
               "api-reference/google/google-trends/interest-by-region",
               "api-reference/google/google-trends/related-topics-&-queries",
-              "api-reference/google/google-trends/trending-searches"
+              "api-reference/google/google-trends/trending-searches",
+              "api-reference/google/google-trends/topic-autocomplete"
             ]
           },
           {
@@ -143,7 +144,11 @@
           {
             "group": "Scholar",
             "pages": [
-              "api-reference/google/google-scholar/search-google-scholar"
+              "api-reference/google/google-scholar/search-google-scholar",
+              "api-reference/google/google-scholar/search-scholar-profiles",
+              "api-reference/google/google-scholar/get-scholar-author",
+              "api-reference/google/google-scholar/get-scholar-author-citation",
+              "api-reference/google/google-scholar/get-scholar-cite"
             ]
           },
           {
@@ -174,6 +179,24 @@
             "group": "Lens",
             "pages": [
               "api-reference/google/google-lens/google-lens-visual-search"
+            ]
+          },
+          {
+            "group": "Local",
+            "pages": [
+              "api-reference/google/google-local/local-pack-search"
+            ]
+          },
+          {
+            "group": "Shorts",
+            "pages": [
+              "api-reference/google/google-shorts/shorts-search"
+            ]
+          },
+          {
+            "group": "Flights",
+            "pages": [
+              "api-reference/google/google-flights/flights-search"
             ]
           },
           {
