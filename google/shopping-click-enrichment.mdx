@@ -1,105 +1,31 @@
 ---
 title: "Shopping Merchant URL Enrichment"
-description: "Resolve the real merchant URL for a Google Shopping product on demand. Mirrors ScrapingDog's per-product immersive link pattern."
----
-
-# Shopping Merchant URL Enrichment
-
-Google has removed direct merchant links from organic Shopping HTML — every click in the real Shopping UI now routes through a JavaScript handler. The `/v1/google/shopping/product/click` endpoint materializes the direct merchant URL for any product title on demand.
-
-## How It Works
-
-1. Call `/v1/google/shopping/search?q=laptop` — you get product listings with title, price, source merchant, rating, thumbnail, and a per-product `click_link`.
-2. Call the product's `click_link` (or construct `/v1/google/shopping/product/click?title=...&source=...`) — the endpoint uses Google's "I'm Feeling Lucky" redirect (`btnI=1`), scoped to the card's `source` merchant via a `site:` operator, to return the direct product page URL.
-
-The `source`-scoped `site:` query guarantees the resolved URL matches the exact merchant whose price was shown in the card, not a generic top organic match.
-
-## Two-Step Example
-
-<CodeGroup>
-
-```javascript Node.js
-import { ScrapeBadger } from "scrapebadger";
-
-const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" });
-
-// Step 1: search shopping
+description: "Resolve the real merchant URL for a Google Shopping product on demand."
+--- # Shopping Merchant URL Enrichment Google has removed direct merchant links from organic Shopping HTML — every click in the real Shopping UI now routes through a JavaScript handler. The `/v1/google/shopping/product/click` endpoint materializes the direct merchant URL for any product title on demand. ## How It Works 1. Call `/v1/google/shopping/search?q=laptop` — you get product listings with title, price, source merchant, rating, thumbnail, and a per-product `click_link`.
+2. Call the product's `click_link` (or construct `/v1/google/shopping/product/click?title=...&source=...`) — the endpoint uses Google's "I'm Feeling Lucky" redirect (`btnI=1`), scoped to the card's `source` merchant via a `site:` operator, to return the direct product page URL. The `source`-scoped `site:` query guarantees the resolved URL matches the exact merchant whose price was shown in the card, not a generic top organic match. ## Two-Step Example <CodeGroup> ```javascript Node.js
+import { ScrapeBadger } from "scrapebadger"; const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" }); // Step 1: search shopping
 const products = await client.google.shopping.search({ q: "laptop" });
 const first = products.results[0];
 console.log(first.title, first.price.extracted, first.source);
-// "Lenovo IdeaPad 5 16IRU9 16\" 2-in-1 Laptop" "$599.00" "Walmart"
-
-// Step 2: resolve the merchant URL
-const enriched = await client.google.shopping.click({
-  title: first.title,
-  source: first.source,
+// "Lenovo IdeaPad 5 16IRU9 16\" 2-in-1 Laptop" "$599.00" "Walmart" // Step 2: resolve the merchant URL
+const enriched = await client.google.shopping.click({ title: first.title, source: first.source,
 });
 console.log(enriched.merchant_url);
 // "https://www.walmart.com/ip/Lenovo-IdeaPad-5-..."
-```
-
-```python Python
-from scrapebadger import ScrapeBadger
-
-async with ScrapeBadger(api_key="YOUR_API_KEY") as client:
-    # Step 1: search shopping
-    products = await client.google.shopping.search("laptop")
-    first = products["results"][0]
-    print(first["title"], first["price"]["extracted"], first["source"])
-
-    # Step 2: resolve the merchant URL
-    enriched = await client.google.shopping.click(
-        title=first["title"],
-        source=first["source"],
-    )
-    print(enriched["merchant_url"])
-```
-
-```bash cURL
+``` ```python Python
+from scrapebadger import ScrapeBadger async with ScrapeBadger(api_key="YOUR_API_KEY") as client: # Step 1: search shopping products = await client.google.shopping.search("laptop") first = products["results"][0] print(first["title"], first["price"]["extracted"], first["source"]) # Step 2: resolve the merchant URL enriched = await client.google.shopping.click( title=first["title"], source=first["source"], ) print(enriched["merchant_url"])
+``` ```bash cURL
 # Step 1
-curl "https://scrapebadger.com/v1/google/shopping/search?q=laptop" \
-  -H "x-api-key: YOUR_API_KEY"
-
-# Step 2 — use the click_link returned in the first response
-curl "https://scrapebadger.com/v1/google/shopping/product/click?title=Lenovo+IdeaPad+5+16IRU9+16%22+2-in-1+Laptop&source=Walmart&gl=us&hl=en" \
-  -H "x-api-key: YOUR_API_KEY"
-```
-
-</CodeGroup>
-
-## Response Shape
-
-```json
-{
-  "product_id": "60c2e6fdb6b3",
-  "title": "Lenovo IdeaPad 5 16IRU9 16\" 2-in-1 Laptop Computer",
-  "merchant_url": "https://www.walmart.com/ip/Lenovo-IdeaPad-5-16IRU9-16-2-in-1-Laptop/12345",
-  "merchant_domain": "www.walmart.com",
-  "source_query": "Lenovo IdeaPad 5 16IRU9 16\" 2-in-1 Laptop Computer site:walmart.com"
+curl "https://scrapebadger.com/v1/google/shopping/search?q=laptop" \ -H "x-api-key: YOUR_API_KEY" # Step 2 — use the click_link returned in the first response
+curl "https://scrapebadger.com/v1/google/shopping/product/click?title=Lenovo+IdeaPad+5+16IRU9+16%22+2-in-1+Laptop&source=Walmart&gl=us&hl=en" \ -H "x-api-key: YOUR_API_KEY"
+``` </CodeGroup> ## Response Shape ```json
+{ "product_id": "60c2e6fdb6b3", "title": "Lenovo IdeaPad 5 16IRU9 16\" 2-in-1 Laptop Computer", "merchant_url": "https://www.walmart.com/ip/Lenovo-IdeaPad-5-16IRU9-16-2-in-1-Laptop/12345", "merchant_domain": "www.walmart.com", "source_query": "Lenovo IdeaPad 5 16IRU9 16\" 2-in-1 Laptop Computer site:walmart.com"
 }
-```
-
-| Field | Description |
+``` | Field | Description |
 |---|---|
 | `product_id` | Stable MD5 hash of `(title, source, price)` — echoed back so you can correlate with the original search result. |
 | `title` | The product title you passed in. |
 | `merchant_url` | The direct merchant product page URL, or `null` if no redirect was produced. |
 | `merchant_domain` | The host portion of `merchant_url`. |
-| `source_query` | The query that was passed to Google's "I'm Feeling Lucky" redirect — useful for debugging. |
-
-## Supported Merchants
-
-The endpoint maps common source names to canonical domains for accurate `site:` scoping. Supported out of the box:
-
-- **Marketplaces**: Walmart, Best Buy, Amazon (incl. "Amazon.com - Seller"), Target, eBay, Newegg, Costco, Home Depot, Lowe's, Staples, Office Depot, Micro Center, Adorama, B&H Photo-Video-Pro Audio
-- **Brand stores**: HP, Dell, Lenovo, Apple, Razer, Asus, Acer, HyperX, MSI, Samsung
-
-For sources not in the map, the endpoint falls back to a bare-title query (no `site:` scope) which still resolves a valid merchant URL — just not necessarily the one whose price was shown.
-
-## Pricing
-
-**1 credit per call** — the endpoint uses a lightweight curl_cffi request, not a browser. Enriching 50 products from a Shopping search adds just 50 credits on top of the original 2-credit search.
-
-## Why This Exists
-
-Google's organic Shopping HTML doesn't contain merchant URLs at all — clicking a product card opens a JavaScript modal that fetches merchant info only when you actually click "Visit site". Attempting to capture that flow in a single synchronous scrape is impractical (~60-90s per query for 50 products). Instead, the ScrapeBadger Shopping click endpoint exposes merchant URL resolution as a **per-product on-demand call**, mirroring the `scrapingdog_immersive_product_link` pattern — you only pay for enrichment when you actually need the link.
+| `source_query` | The query that was passed to Google's "I'm Feeling Lucky" redirect — useful for debugging. | ## Supported Merchants The endpoint maps common source names to canonical domains for accurate `site:` scoping. Supported out of the box: - **Marketplaces**: Walmart, Best Buy, Amazon (incl. "Amazon.com - Seller"), Target, eBay, Newegg, Costco, Home Depot, Lowe's, Staples, Office Depot, Micro Center, Adorama, B&H Photo-Video-Pro Audio
+- **Brand stores**: HP, Dell, Lenovo, Apple, Razer, Asus, Acer, HyperX, MSI, Samsung For sources not in the map, the endpoint falls back to a bare-title query (no `site:` scope) which still resolves a valid merchant URL — just not necessarily the one whose price was shown. ## Pricing The endpoint uses a lightweight curl_cffi request, not a browser. Per-call credit cost is configured in the admin panel and returned live from `GET /public/pricing` — query that endpoint for the authoritative current rate. ## Why This Exists Google's organic Shopping HTML doesn't contain merchant URLs at all — clicking a product card opens a JavaScript modal that fetches merchant info only when you actually click "Visit site". Attempting to capture that flow in a single synchronous scrape is impractical (~60-90s per query for 50 products). Instead, the ScrapeBadger Shopping click endpoint exposes merchant URL resolution as a **per-product on-demand call** — you only pay for enrichment when you actually need the link.

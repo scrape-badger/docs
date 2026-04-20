@@ -142,62 +142,61 @@ curl "https://scrapebadger.com/v1/google/shopping/product/click?title=Lenovo+Ide
 
 <Tabs>
   <Tab title="Search">
-    | Endpoint | Credits | Description |
-    |---|---|---|
-    | `GET /v1/google/search` | 2 | Web search with 21 parameters |
-    | `GET /v1/google/images/search` | 2 | Image search with size/color filters |
-    | `GET /v1/google/videos/search` | 2 | Video search |
-    | `GET /v1/google/autocomplete` | 1 | Query suggestions |
-    | `GET /v1/google/ai-mode/search` | 3 | AI-generated answers |
-    | `GET /v1/google/lens/search` | 3 | Visual image search |
+    | Endpoint | Description |
+    |---|---|
+    | `GET /v1/google/search` | Web search with 21 parameters |
+    | `GET /v1/google/images/search` | Image search with size/color filters |
+    | `GET /v1/google/videos/search` | Video search |
+    | `GET /v1/google/autocomplete` | Query suggestions |
+    | `GET /v1/google/ai-mode/search` | AI-generated answers |
+    | `GET /v1/google/lens/search` | Visual image search |
   </Tab>
   <Tab title="Maps">
-    | Endpoint | Credits | Description |
-    |---|---|---|
-    | `GET /v1/google/maps/search` | 2 | Search places by query |
-    | `GET /v1/google/maps/place` | 3 | Place details by `place_id` / `data_id` |
-    | `GET /v1/google/maps/reviews` | 3 | Paginated reviews for a place |
-    | `GET /v1/google/maps/photos` | 2 | Place photos |
-    | `GET /v1/google/maps/posts` | 2 | Business posts |
+    | Endpoint | Description |
+    |---|---|
+    | `GET /v1/google/maps/search` | Search places by query |
+    | `GET /v1/google/maps/place` | Place details by `place_id` / `data_id` |
+    | `GET /v1/google/maps/reviews` | Paginated reviews for a place |
+    | `GET /v1/google/maps/photos` | Place photos |
+    | `GET /v1/google/maps/posts` | Business posts |
   </Tab>
   <Tab title="Shopping">
-    | Endpoint | Credits | Description |
-    |---|---|---|
-    | `GET /v1/google/shopping/search` | 2 | Product search with filters + ads |
-    | `GET /v1/google/shopping/product` | 5 | Product detail with seller list |
-    | `GET /v1/google/shopping/product/click` | 1 | Resolve merchant URL per product |
+    | Endpoint | Description |
+    |---|---|
+    | `GET /v1/google/shopping/search` | Product search with filters + ads |
+    | `GET /v1/google/shopping/product` | Product detail with seller list |
+    | `GET /v1/google/shopping/product/click` | Resolve merchant URL per product (lightweight curl_cffi lookup) |
   </Tab>
   <Tab title="News & Content">
-    | Endpoint | Credits | Description |
-    |---|---|---|
-    | `GET /v1/google/news/search` | 1 | News article search |
-    | `GET /v1/google/news/topics` | 1 | News by predefined topic |
-    | `GET /v1/google/news/trending` | 1 | Trending stories |
-    | `GET /v1/google/scholar/search` | 2 | Academic paper search |
-    | `GET /v1/google/patents/search` | 2 | Patent document search |
-    | `GET /v1/google/patents/detail` | 3 | Full patent detail |
+    | Endpoint | Description |
+    |---|---|
+    | `GET /v1/google/news/search` | News article search |
+    | `GET /v1/google/news/topics` | News by predefined topic |
+    | `GET /v1/google/news/trending` | Trending stories |
+    | `GET /v1/google/scholar/search` | Academic paper search |
+    | `GET /v1/google/patents/search` | Patent document search |
+    | `GET /v1/google/patents/detail` | Full patent detail |
   </Tab>
   <Tab title="Other">
-    | Endpoint | Credits | Description |
-    |---|---|---|
-    | `GET /v1/google/hotels/search` | 3 | Hotel search with dates |
-    | `GET /v1/google/hotels/details` | 5 | Detailed property info |
-    | `GET /v1/google/trends/interest` | 2 | Interest over time |
-    | `GET /v1/google/trends/regions` | 2 | Interest by region |
-    | `GET /v1/google/trends/related` | 2 | Related topics and queries |
-    | `GET /v1/google/trends/trending` | 1 | Real-time trending searches |
-    | `GET /v1/google/jobs/search` | 2 | Job listings search |
-    | `GET /v1/google/finance/quote` | 2 | Stock / index / crypto quote |
-    | `GET /v1/google/products/detail` | 3 | Immersive product detail |
+    | Endpoint | Description |
+    |---|---|
+    | `GET /v1/google/hotels/search` | Hotel search w/ dates (modes: `ds0` default richest, `rpc`, `fast`, `render` fallback) |
+    | `GET /v1/google/hotels/details` | Detailed property info |
+    | `GET /v1/google/trends/search` | Unified Trends — `data_type` picks TIMESERIES, GEO_MAP, GEO_MAP_0, RELATED_TOPICS, or RELATED_QUERIES |
+    | `GET /v1/google/trends/trending-now` | Current trending searches (search_volume + deltas) |
+    | `GET /v1/google/trends/autocomplete` | Knowledge Graph topic autocomplete |
+    | `GET /v1/google/jobs/search` | Job listings search |
+    | `GET /v1/google/finance/quote` | Stock / index / crypto quote |
+    | `GET /v1/google/products/detail` | Immersive product detail |
   </Tab>
 </Tabs>
 
-## Credit Costs Summary
+## Credit Costs
 
-Total of **22 distinct endpoint patterns** priced from **1 to 5 credits**. See [Credits & Pricing](/credits-and-pricing) for full details.
+Per-endpoint credit pricing is configured by ScrapeBadger admins and returned live from `GET https://api.scrapebadger.com/public/pricing` (uncached, updates immediately). The public pricing page and each product landing page at [scrapebadger.com](https://scrapebadger.com) show the authoritative current rate. See [Credits & Pricing](/credits-and-pricing) for plan-level rates.
 
 <Tip>
-  The `shopping/product/click` endpoint costs only **1 credit** per call because it uses a lightweight curl_cffi "I'm Feeling Lucky" redirect lookup — so bulk-enriching 50 products with merchant URLs adds just 50 credits on top of the original shopping search.
+  Query `GET /public/pricing` in your integration to cache the current per-endpoint cost — don't hardcode credit numbers, they can be adjusted.
 </Tip>
 
 ## Legal & Compliance
