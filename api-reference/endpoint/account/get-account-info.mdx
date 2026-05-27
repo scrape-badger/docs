@@ -1,22 +1,44 @@
 ---
 title: Get Account Info
 api: GET /v1/account/me
-description: Check your credit balance, plan tier, and rate limits.
+description: Check your credit balances, subscription details, plan tier, and rate limits.
 ---
 
 Returns account details for the authenticated API key. **No credits are deducted** for this call.
 
 <Note>
-  This endpoint is useful for monitoring your credit balance programmatically — e.g., before running a batch job or in a CI pipeline.
+  This endpoint is useful for monitoring your credit balance programmatically — e.g., before running a batch job or in a CI pipeline. It returns both PAYG and subscription credit balances, plus full subscription details if you're on a plan.
 </Note>
 
 ## Response Fields
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `credits_balance` | `number` | Current credit balance for the account |
-| `tier` | `string` | Plan tier (e.g., `free`, `pro`, `enterprise`) |
+| `credits_balance` | `integer` | PAYG (pay-as-you-go) credit balance — never expires |
+| `subscription_credits_balance` | `integer` | Subscription wallet — current period's monthly allowance (0 if no subscription) |
+| `total_credits_balance` | `integer` | Sum of PAYG + subscription credits |
+| `tier` | `string` | Account tier (`free`, `basic`, `pro`, `enterprise`) |
 | `rate_limit_per_minute` | `integer` | Maximum API requests allowed per minute |
+| `subscription` | `object \| null` | Active subscription details, or `null` if PAYG-only |
+
+### Subscription Object
+
+When the user has an active subscription, `subscription` contains:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `plan_code` | `string` | Plan identifier (e.g., `starter`, `growth`, `pro`) |
+| `plan_title` | `string` | Display name of the plan |
+| `billing_cadence` | `string` | `monthly` or `annual` |
+| `status` | `string` | Subscription status (`active`, `past_due`) |
+| `current_period_start` | `string` | ISO 8601 start of current billing period |
+| `current_period_end` | `string` | ISO 8601 end of current billing period (next renewal date) |
+| `cancel_at_period_end` | `boolean` | Whether the subscription is set to cancel at period end |
+| `cancel_effective_at` | `string \| null` | When the cancellation takes effect (if cancelled) |
+| `monthly_credits` | `integer` | Credits included per month in this plan |
+| `pending_plan_code` | `string \| null` | Scheduled downgrade plan code (if pending change) |
+| `pending_plan_title` | `string \| null` | Scheduled downgrade plan title |
+| `pending_change_effective_at` | `string \| null` | When the pending plan change takes effect |
 
 <RequestExample>
 ```bash cURL
@@ -31,7 +53,10 @@ response = requests.get(
     "https://scrapebadger.com/v1/account/me",
     headers={"x-api-key": "sb_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"}
 )
-print(response.json())
+data = response.json()
+print(f"PAYG: {data['credits_balance']}")
+print(f"Sub:  {data['subscription_credits_balance']}")
+print(f"Plan: {data['subscription']['plan_title'] if data['subscription'] else 'PAYG'}")
 ```
 
 ```javascript Node.js
@@ -44,11 +69,38 @@ console.log(data);
 </RequestExample>
 
 <ResponseExample>
-```json 200
+```json 200 — Subscription user
+{
+  "credits_balance": 50000,
+  "subscription_credits_balance": 250000,
+  "total_credits_balance": 300000,
+  "tier": "pro",
+  "rate_limit_per_minute": 1000,
+  "subscription": {
+    "plan_code": "growth",
+    "plan_title": "Growth",
+    "billing_cadence": "monthly",
+    "status": "active",
+    "current_period_start": "2026-05-01T00:00:00Z",
+    "current_period_end": "2026-06-01T00:00:00Z",
+    "cancel_at_period_end": false,
+    "cancel_effective_at": null,
+    "monthly_credits": 500000,
+    "pending_plan_code": null,
+    "pending_plan_title": null,
+    "pending_change_effective_at": null
+  }
+}
+```
+
+```json 200 — PAYG user
 {
   "credits_balance": 99171,
+  "subscription_credits_balance": 0,
+  "total_credits_balance": 99171,
   "tier": "pro",
-  "rate_limit_per_minute": 100
+  "rate_limit_per_minute": 100,
+  "subscription": null
 }
 ```
 </ResponseExample>
