@@ -1,0 +1,181 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ScrapeBadger Account API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://scrapebadger.com"
+    }
+  ],
+  "security": [
+    {
+      "apiKey": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "apiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key",
+        "description": "Your ScrapeBadger API key. You can find this in your dashboard at https://scrapebadger.com/dashboard/api-keys"
+      }
+    }
+  },
+  "paths": {
+    "/v1/account/me": {
+      "get": {
+        "operationId": "get-account-info",
+        "summary": "Get Account Info",
+        "description": "Check your credit balances, subscription details, plan tier, and rate limits. No credits are deducted for this call.",
+        "tags": ["Account"],
+        "security": [
+          {
+            "apiKey": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account info retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "credits_balance": {
+                      "type": "integer",
+                      "description": "PAYG (pay-as-you-go) credit balance — never expires"
+                    },
+                    "subscription_credits_balance": {
+                      "type": "integer",
+                      "description": "Subscription wallet — current period's monthly allowance (0 if no subscription)"
+                    },
+                    "total_credits_balance": {
+                      "type": "integer",
+                      "description": "Sum of PAYG + subscription credits"
+                    },
+                    "tier": {
+                      "type": "string",
+                      "description": "Account tier (free, basic, pro, enterprise)",
+                      "enum": ["free", "basic", "pro", "enterprise"]
+                    },
+                    "rate_limit_per_minute": {
+                      "type": "integer",
+                      "description": "Maximum API requests allowed per minute"
+                    },
+                    "subscription": {
+                      "type": "object",
+                      "nullable": true,
+                      "description": "Active subscription details, or null if PAYG-only",
+                      "properties": {
+                        "plan_code": {
+                          "type": "string",
+                          "description": "Plan identifier (e.g., starter, growth, pro)"
+                        },
+                        "plan_title": {
+                          "type": "string",
+                          "description": "Display name of the plan"
+                        },
+                        "billing_cadence": {
+                          "type": "string",
+                          "enum": ["monthly", "annual"]
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": ["active", "past_due"]
+                        },
+                        "current_period_start": {
+                          "type": "string",
+                          "format": "date-time",
+                          "nullable": true
+                        },
+                        "current_period_end": {
+                          "type": "string",
+                          "format": "date-time",
+                          "nullable": true,
+                          "description": "Next renewal date"
+                        },
+                        "cancel_at_period_end": {
+                          "type": "boolean",
+                          "description": "Whether the subscription is set to cancel at period end"
+                        },
+                        "cancel_effective_at": {
+                          "type": "string",
+                          "format": "date-time",
+                          "nullable": true,
+                          "description": "When the cancellation takes effect"
+                        },
+                        "monthly_credits": {
+                          "type": "integer",
+                          "description": "Credits included per month in this plan"
+                        },
+                        "pending_plan_code": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Scheduled downgrade plan code"
+                        },
+                        "pending_plan_title": {
+                          "type": "string",
+                          "nullable": true,
+                          "description": "Scheduled downgrade plan title"
+                        },
+                        "pending_change_effective_at": {
+                          "type": "string",
+                          "format": "date-time",
+                          "nullable": true,
+                          "description": "When the pending plan change takes effect"
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "subscription_user": {
+                    "summary": "Subscription user",
+                    "value": {
+                      "credits_balance": 50000,
+                      "subscription_credits_balance": 250000,
+                      "total_credits_balance": 300000,
+                      "tier": "pro",
+                      "rate_limit_per_minute": 1000,
+                      "subscription": {
+                        "plan_code": "growth",
+                        "plan_title": "Growth",
+                        "billing_cadence": "monthly",
+                        "status": "active",
+                        "current_period_start": "2026-05-01T00:00:00Z",
+                        "current_period_end": "2026-06-01T00:00:00Z",
+                        "cancel_at_period_end": false,
+                        "cancel_effective_at": null,
+                        "monthly_credits": 500000,
+                        "pending_plan_code": null,
+                        "pending_plan_title": null,
+                        "pending_change_effective_at": null
+                      }
+                    }
+                  },
+                  "payg_user": {
+                    "summary": "PAYG user",
+                    "value": {
+                      "credits_balance": 99171,
+                      "subscription_credits_balance": 0,
+                      "total_credits_balance": 99171,
+                      "tier": "pro",
+                      "rate_limit_per_minute": 100,
+                      "subscription": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid or missing API key"
+          }
+        }
+      }
+    }
+  }
+}

@@ -16,7 +16,8 @@
     "https://scrapebadger.com/api/twitter-openapi.json",
     "/openapi-web-scraping.json",
     "/openapi-vinted.json",
-    "/openapi-google.json"
+    "/openapi-google.json",
+    "/openapi-account.json"
   ],
   "api": {
     "baseUrl": "https://scrapebadger.com",
@@ -113,11 +114,13 @@
           {
             "group": "Trends",
             "pages": [
-              "api-reference/google/google-trends/interest-over-time",
-              "api-reference/google/google-trends/interest-by-region",
-              "api-reference/google/google-trends/related-topics-&-queries",
-              "api-reference/google/google-trends/trending-searches",
-              "api-reference/google/google-trends/topic-autocomplete"
+              "api-reference/google/google-trends/search",
+              "api-reference/google/google-trends/trending-now",
+              "api-reference/google/google-trends/topic-autocomplete",
+              "api-reference/google/google-trends/interest",
+              "api-reference/google/google-trends/regions",
+              "api-reference/google/google-trends/related",
+              "api-reference/google/google-trends/trending"
             ]
           },
           {
