@@ -10,6 +10,12 @@ Returns account details for the authenticated API key. **No credits are deducted
   This endpoint is useful for monitoring your credit balance programmatically — e.g., before running a batch job or in a CI pipeline. It returns both PAYG and subscription credit balances, plus full subscription details if you're on a plan.
 </Note>
 
+## Authorization
+
+<ParamField header="x-api-key" type="string" required>
+  Your ScrapeBadger API key. You can find this in your dashboard at [https://scrapebadger.com/dashboard/api-keys](https://scrapebadger.com/dashboard/api-keys).
+</ParamField>
+
 ## Response Fields
 
 | Field | Type | Description |
