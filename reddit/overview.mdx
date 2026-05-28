@@ -1,6 +1,6 @@
 ---
 title: "Reddit Scraper Overview"
-description: "Extract posts, comments, subreddits, and user data from Reddit with structured JSON responses. 22 endpoints covering search, listings, comment trees, and wiki content."
+description: "Extract posts, comments, subreddits, and user data from Reddit with structured JSON responses. 21 endpoints covering search, listings, comment trees, and wiki content."
 ---
 
 # Reddit Scraper API
@@ -100,7 +100,6 @@ curl -X GET "https://api.scrapebadger.com/v1/reddit/search/posts?q=artificial+in
 | `GET /v1/reddit/subreddits/{subreddit}` | 2 | Subreddit metadata |
 | `GET /v1/reddit/subreddits/{subreddit}/posts` | 2 | Subreddit posts (hot/new/top/rising) |
 | `GET /v1/reddit/subreddits/{subreddit}/rules` | 1 | Subreddit rules |
-| `GET /v1/reddit/subreddits/{subreddit}/moderators` | 2 | Moderator team (currently unsupported — Reddit auth required) |
 | `GET /v1/reddit/subreddits/{subreddit}/wiki` | 1 | List wiki pages |
 | `GET /v1/reddit/subreddits/{subreddit}/wiki/{page}` | 3 | Wiki page content |
 | `GET /v1/reddit/subreddits/popular` | 1 | Popular subreddits |

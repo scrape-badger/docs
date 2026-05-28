@@ -714,46 +714,6 @@
         }
       }
     },
-    "/v1/reddit/subreddits/{subreddit}/moderators": {
-      "get": {
-        "summary": "Get subreddit moderators",
-        "description": "Get the moderator team of a subreddit.",
-        "operationId": "get_subreddit_moderators_v1_reddit_subreddits__subreddit__moderators_get",
-        "parameters": [
-          {
-            "name": "subreddit",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Subreddit"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "title": "Response Get Subreddit Moderators V1 Reddit Subreddits  Subreddit  Moderators Get"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/v1/reddit/subreddits/{subreddit}/wiki": {
       "get": {
         "summary": "List wiki pages",

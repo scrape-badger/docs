@@ -250,7 +250,6 @@
               "api-reference/endpoint/reddit/get-subreddit",
               "api-reference/endpoint/reddit/get-subreddit-posts",
               "api-reference/endpoint/reddit/get-subreddit-rules",
-              "api-reference/endpoint/reddit/get-subreddit-moderators",
               "api-reference/endpoint/reddit/get-subreddit-wiki",
               "api-reference/endpoint/reddit/get-subreddit-wiki-page",
               "api-reference/endpoint/reddit/get-popular-subreddits",

@@ -1,248 +1,118 @@
 ---
 title: "Command Reference"
 description: "Full reference for all ScrapeBadger CLI commands."
----
-
-# Command Reference
-
-## Account Commands
-
-### `scrapebadger auth`
-
-Set up or view your API key.
-
-```bash
-scrapebadger auth --api-key sb_live_...   # Set key directly
-scrapebadger auth                          # Interactive prompt
-scrapebadger auth --show                   # Show saved key
-```
-
-### `scrapebadger credits`
-
-Check your credit balance.
-
-### `scrapebadger logout`
-
-Remove saved API key from config.
-
----
-
-## Twitter Commands
-
-All Twitter commands are under `scrapebadger twitter`.
-
-### Users
-
-```bash
-scrapebadger twitter user <username>           # Profile by username
-scrapebadger twitter user-id <user_id>         # Profile by numeric ID
-scrapebadger twitter followers <username>      # Followers list
-scrapebadger twitter following <username>      # Following list
-scrapebadger twitter mentions <username>       # Tweets mentioning user
-```
-
-### Tweets
-
-```bash
-scrapebadger twitter tweet <tweet_id>          # Single tweet
-scrapebadger twitter tweets <username>         # User's latest tweets
-scrapebadger twitter search <query>            # Advanced search
-scrapebadger twitter replies <tweet_id>        # Tweet replies
-scrapebadger twitter quotes <tweet_id>         # Quote tweets
-scrapebadger twitter retweeters <tweet_id>     # Who retweeted
-```
-
-### Discovery
-
-```bash
-scrapebadger twitter trends                    # Global trends
-scrapebadger twitter trends --place <woeid>    # Location trends
-scrapebadger twitter community <id>            # Community details
-scrapebadger twitter community-tweets <id>     # Community tweets
+--- # Command Reference ## Account Commands ### `scrapebadger auth` Set up or view your API key. ```bash
+scrapebadger auth --api-key sb_live_... # Set key directly
+scrapebadger auth # Interactive prompt
+scrapebadger auth --show # Show saved key
+``` ### `scrapebadger credits` Check your credit balance. ### `scrapebadger logout` Remove saved API key from config. --- ## Twitter Commands All Twitter commands are under `scrapebadger twitter`. ### Users ```bash
+scrapebadger twitter user <username> # Profile by username
+scrapebadger twitter user-id <user_id> # Profile by numeric ID
+scrapebadger twitter followers <username> # Followers list
+scrapebadger twitter following <username> # Following list
+scrapebadger twitter mentions <username> # Tweets mentioning user
+``` ### Tweets ```bash
+scrapebadger twitter tweet <tweet_id> # Single tweet
+scrapebadger twitter tweets <username> # User's latest tweets
+scrapebadger twitter search <query> # Advanced search
+scrapebadger twitter replies <tweet_id> # Tweet replies
+scrapebadger twitter quotes <tweet_id> # Quote tweets
+scrapebadger twitter retweeters <tweet_id> # Who retweeted
+``` ### Discovery ```bash
+scrapebadger twitter trends # Global trends
+scrapebadger twitter trends --place <woeid> # Location trends
+scrapebadger twitter community <id> # Community details
+scrapebadger twitter community-tweets <id> # Community tweets
 scrapebadger twitter search-communities <query> # Search communities
-scrapebadger twitter list <id>                 # List details
-scrapebadger twitter list-tweets <id>          # List tweets
-scrapebadger twitter space <id>                # Space details
-```
-
-### Common Options
-
-| Option | Short | Description |
+scrapebadger twitter list <id> # List details
+scrapebadger twitter list-tweets <id> # List tweets
+scrapebadger twitter space <id> # Space details
+``` ### Common Options | Option | Short | Description |
 |--------|-------|-------------|
 | `--output` | `-o` | Output format: json, csv, table, markdown |
 | `--fields` | `-f` | Comma-separated fields to include |
 | `--cursor` | `-c` | Pagination cursor |
-| `--count` | `-n` | Maximum results (where applicable) |
-
----
-
-## Google Commands
-
-All Google commands are under `scrapebadger google`. **29 subcommands** cover all 16 Google product APIs.
-
-### Search
-
-```bash
-scrapebadger google search <query>             # Google web search (SERP)
-scrapebadger google images <query>             # Image search
-scrapebadger google videos <query>             # Video search
-scrapebadger google autocomplete <query>       # Search suggestions
-scrapebadger google ai-mode <query>            # AI-generated answer (udm=50)
-scrapebadger google lens <image_url>           # Visual search by image URL
-```
-
-### Search Options
-
-| Option | Description |
+| `--count` | `-n` | Maximum results (where applicable) | --- ## Google Commands All Google commands are under `scrapebadger google`. **29 subcommands** cover all 16 Google product APIs. ### Search ```bash
+scrapebadger google search <query> # Google web search (SERP)
+scrapebadger google images <query> # Image search
+scrapebadger google videos <query> # Video search
+scrapebadger google autocomplete <query> # Search suggestions
+scrapebadger google ai-mode <query> # AI-generated answer (udm=50)
+scrapebadger google lens <image_url> # Visual search by image URL
+``` ### Search Options | Option | Description |
 |---|---|
 | `--gl` | Country code (e.g. `us`, `gb`) |
 | `--hl` | Language code (e.g. `en`, `fr`) |
 | `--num` / `-n` | Number of results |
-| `--start` | Page offset (0, 10, 20, ...) |
+| `--start` | Page offset (0, 10, 20,...) |
 | `--domain` | Google domain (e.g. `google.co.uk`) |
 | `--device` | `desktop` or `mobile` |
 | `--location` | City-level geo-targeting |
 | `--tbs` | Time filter (e.g. `qdr:d` past day) |
-| `--safe` | `off`, `medium`, `high` |
-
-### Maps
-
-```bash
-scrapebadger google maps-search <query>        # Place search
-scrapebadger google maps-place --data-id <id>  # Place detail (or --place-id)
-scrapebadger google maps-reviews <data_id>     # Paginated reviews
-scrapebadger google maps-photos <data_id>      # Place photos
-scrapebadger google maps-posts <data_id>       # Business posts
-```
-
-### News
-
-```bash
-scrapebadger google news <query>               # News article search
-scrapebadger google news-topics <topic>        # WORLD, BUSINESS, TECHNOLOGY, ...
-scrapebadger google news-trending              # Real-time trending stories
-```
-
-### Hotels
-
-```bash
-scrapebadger google hotels <query> \
-    --check-in 2026-05-01 --check-out 2026-05-05 --adults 2
-scrapebadger google hotels-details <property_token> \
-    --check-in 2026-05-01 --check-out 2026-05-05
-```
-
-### Trends
-
-```bash
-scrapebadger google trends <query>             # Interest over time (up to 5 terms)
-scrapebadger google trends-regions <query>     # Interest by region
-scrapebadger google trends-related <query>     # Related topics + queries
-scrapebadger google trends-trending            # Real-time trending searches
-```
-
-### Jobs
-
-```bash
-scrapebadger google jobs "software engineer" \
-    --location "San Francisco, CA" --job-type FULLTIME --date-posted week
-```
-
-### Shopping
-
-```bash
-scrapebadger google shopping <query>                      # Product search
+| `--safe` | `off`, `medium`, `high` | ### Maps ```bash
+scrapebadger google maps-search <query> # Place search
+scrapebadger google maps-place --data-id <id> # Place detail (or --place-id)
+scrapebadger google maps-reviews <data_id> # Paginated reviews
+scrapebadger google maps-photos <data_id> # Place photos
+scrapebadger google maps-posts <data_id> # Business posts
+``` ### News ```bash
+scrapebadger google news <query> # News article search
+scrapebadger google news-topics <topic> # WORLD, BUSINESS, TECHNOLOGY,...
+scrapebadger google news-trending # Real-time trending stories
+``` ### Hotels ```bash
+scrapebadger google hotels <query> \ --check-in 2026-05-01 --check-out 2026-05-05 --adults 2
+scrapebadger google hotels-details <property_token> \ --check-in 2026-05-01 --check-out 2026-05-05
+``` ### Trends ```bash
+scrapebadger google trends <query> # Interest over time (up to 5 terms)
+scrapebadger google trends-regions <query> # Interest by region
+scrapebadger google trends-related <query> # Related topics + queries
+scrapebadger google trends-trending # Real-time trending searches
+``` ### Jobs ```bash
+scrapebadger google jobs "software engineer" \ --location "San Francisco, CA" --job-type FULLTIME --date-posted week
+``` ### Shopping ```bash
+scrapebadger google shopping <query> # Product search
 scrapebadger google shopping --min-price 500 --max-price 2000 --sort-by price_low
-scrapebadger google shopping-product <product_id>         # Product detail + sellers
+scrapebadger google shopping-product <product_id> # Product detail + sellers
 scrapebadger google shopping-click "<product title>" --source <merchant>
-```
-
-<Tip>
-  The `shopping-click` command resolves the real merchant URL for a product by title. Google has removed direct merchant links from organic Shopping HTML; this command uses an "I'm Feeling Lucky" redirect scoped to the source merchant (via `site:` operator) to materialize the product page URL. Mirrors ScrapingDog's `scrapingdog_immersive_product_link` pattern and costs **1 credit per call**.
-</Tip>
-
-### Patents, Scholar, Finance, Products
-
-```bash
+``` <Tip> The `shopping-click` command resolves the real merchant URL for a product by title. Google has removed direct merchant links from organic Shopping HTML; this command uses an "I'm Feeling Lucky" redirect scoped to the source merchant (via `site:` operator) to materialize the product page URL. Costs **1 credit per call**.
+</Tip> ### Patents, Scholar, Finance, Products ```bash
 scrapebadger google patents <query> --inventor Smith --assignee Google
-scrapebadger google patent US10123456B2                   # Full patent detail
+scrapebadger google patent US10123456B2 # Full patent detail
 scrapebadger google scholar <query> --as-ylo 2020 --as-yhi 2024
-scrapebadger google finance AAPL:NASDAQ                   # Stock quote
-scrapebadger google product-detail <product_id>           # Immersive product
-```
-
-### Common Options
-
-Every google command supports `--output/-o` (`json`, `csv`, `table`, `markdown`) and `--fields/-f` (comma-separated field list).
-
-```bash
+scrapebadger google finance AAPL:NASDAQ # Stock quote
+scrapebadger google product-detail <product_id> # Immersive product
+``` ### Common Options Every google command supports `--output/-o` (`json`, `csv`, `table`, `markdown`) and `--fields/-f` (comma-separated field list). ```bash
 # Export top 20 SERP results as CSV
-scrapebadger google search "python 3.13" --num 20 -o csv > results.csv
-
-# Pipe to jq
-scrapebadger google shopping "laptop" | jq '.results[].title'
-
-# Full shopping search → click enrichment workflow
-scrapebadger google shopping "laptop" | \
-  jq -r '.results[0] | [.title, .source] | @tsv' | \
-  while IFS=$'\t' read -r title source; do
-    scrapebadger google shopping-click "$title" --source "$source"
-  done
-```
-
----
-
-## Vinted Commands
-
-All Vinted commands are under `scrapebadger vinted`.
-
-```bash
-scrapebadger vinted search <query>             # Search items
-scrapebadger vinted item <item_id>             # Item details
-scrapebadger vinted user <user_id>             # Seller profile
-scrapebadger vinted user-items <user_id>       # User's listed items
-scrapebadger vinted brands <keyword>           # Search brands
-scrapebadger vinted markets                    # List all markets
-```
-
-### Vinted Options
-
-| Option | Short | Description |
+scrapebadger google search "python 3.13" --num 20 -o csv > results.csv # Pipe to jq
+scrapebadger google shopping "laptop" | jq '.results[].title' # Full shopping search → click enrichment workflow
+scrapebadger google shopping "laptop" | \ jq -r '.results[0] | [.title,.source] | @tsv' | \ while IFS=$'\t' read -r title source; do scrapebadger google shopping-click "$title" --source "$source" done
+``` --- ## Vinted Commands All Vinted commands are under `scrapebadger vinted`. ```bash
+scrapebadger vinted search <query> # Search items
+scrapebadger vinted item <item_id> # Item details
+scrapebadger vinted user <user_id> # Seller profile
+scrapebadger vinted user-items <user_id> # User's listed items
+scrapebadger vinted brands <keyword> # Search brands
+scrapebadger vinted markets # List all markets
+``` ### Vinted Options | Option | Short | Description |
 |--------|-------|-------------|
 | `--market` | `-m` | Market code: fr, de, uk, us, etc. (default: fr) |
 | `--page` | `-p` | Page number |
 | `--per-page` | | Results per page (max 96) |
 | `--price-from` | | Min price filter |
-| `--price-to` | | Max price filter |
-
----
-
-## Web Scraping Commands
-
-All web commands are under `scrapebadger web`.
-
-```bash
-scrapebadger web scrape <url>                  # Scrape a URL
-scrapebadger web detect <url>                  # Detect anti-bot protection
-scrapebadger web screenshot <url>              # Take screenshot
-scrapebadger web extract <url>                 # Extract structured data
-scrapebadger web batch <url1> <url2> ...       # Batch scraping
-scrapebadger web batch-status <job_id>         # Check batch status
-```
-
-### Web Scrape Options
-
-| Option | Description |
+| `--price-to` | | Max price filter | --- ## Web Scraping Commands All web commands are under `scrapebadger web`. ```bash
+scrapebadger web scrape <url> # Scrape a URL
+scrapebadger web detect <url> # Detect anti-bot protection
+scrapebadger web screenshot <url> # Take screenshot
+scrapebadger web extract <url> # Extract structured data
+scrapebadger web batch <url1> <url2>... # Batch scraping
+scrapebadger web batch-status <job_id> # Check batch status
+``` ### Web Scrape Options | Option | Description |
 |--------|-------------|
 | `--js` | Enable JavaScript rendering |
 | `--wait-for` | CSS selector to wait for |
 | `--timeout` | Timeout in milliseconds |
 | `--proxy` | Proxy country code |
-| `--format` | Response format: html, markdown, text |
-
-### Web Extract Options
-
-| Option | Description |
+| `--format` | Response format: html, markdown, text | ### Web Extract Options | Option | Description |
 |--------|-------------|
 | `--rules` | CSS/XPath extraction rules as JSON |
 | `--ai-rules` | AI extraction rules as JSON |
