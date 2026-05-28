@@ -16,6 +16,7 @@
     "https://scrapebadger.com/api/twitter-openapi.json",
     "/openapi-web-scraping.json",
     "/openapi-vinted.json",
+    "/openapi-reddit.json",
     "/openapi-google.json",
     "/openapi-account.json"
   ],
@@ -223,6 +224,47 @@
             "group": "Overview",
             "pages": [
               "reddit/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/reddit/search-posts",
+              "api-reference/endpoint/reddit/search-subreddits",
+              "api-reference/endpoint/reddit/search-users",
+              "api-reference/endpoint/reddit/get-domain-posts"
+            ]
+          },
+          {
+            "group": "Posts",
+            "pages": [
+              "api-reference/endpoint/reddit/get-trending-posts",
+              "api-reference/endpoint/reddit/get-post",
+              "api-reference/endpoint/reddit/get-post-comments",
+              "api-reference/endpoint/reddit/get-post-duplicates"
+            ]
+          },
+          {
+            "group": "Subreddits",
+            "pages": [
+              "api-reference/endpoint/reddit/get-subreddit",
+              "api-reference/endpoint/reddit/get-subreddit-posts",
+              "api-reference/endpoint/reddit/get-subreddit-rules",
+              "api-reference/endpoint/reddit/get-subreddit-moderators",
+              "api-reference/endpoint/reddit/get-subreddit-wiki",
+              "api-reference/endpoint/reddit/get-subreddit-wiki-page",
+              "api-reference/endpoint/reddit/get-popular-subreddits",
+              "api-reference/endpoint/reddit/get-new-subreddits"
+            ]
+          },
+          {
+            "group": "Users",
+            "pages": [
+              "api-reference/endpoint/reddit/get-user",
+              "api-reference/endpoint/reddit/get-user-posts",
+              "api-reference/endpoint/reddit/get-user-comments",
+              "api-reference/endpoint/reddit/get-user-moderated",
+              "api-reference/endpoint/reddit/get-user-trophies"
             ]
           }
         ]
