@@ -19,10 +19,6 @@
   "paths": {
     "/v1/reddit/search/posts": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Search"
-        ],
         "summary": "Search Reddit posts",
         "description": "Search Reddit posts globally or within a subreddit.",
         "operationId": "search_posts_v1_reddit_search_posts_get",
@@ -135,10 +131,6 @@
     },
     "/v1/reddit/search/subreddits": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Search"
-        ],
         "summary": "Search subreddits",
         "description": "Search for subreddits by keyword.",
         "operationId": "search_subreddits_v1_reddit_search_subreddits_get",
@@ -209,10 +201,6 @@
     },
     "/v1/reddit/search/users": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Search"
-        ],
         "summary": "Search users",
         "description": "Search for Reddit users.",
         "operationId": "search_users_v1_reddit_search_users_get",
@@ -283,10 +271,6 @@
     },
     "/v1/reddit/posts/trending": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Posts"
-        ],
         "summary": "Get trending posts",
         "description": "Get trending posts from Reddit's front page.",
         "operationId": "get_trending_posts_v1_reddit_posts_trending_get",
@@ -370,10 +354,6 @@
     },
     "/v1/reddit/posts/{post_id}": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Posts"
-        ],
         "summary": "Get post detail",
         "description": "Get detailed information about a Reddit post.",
         "operationId": "get_post_v1_reddit_posts__post_id__get",
@@ -414,10 +394,6 @@
     },
     "/v1/reddit/posts/{post_id}/comments": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Posts"
-        ],
         "summary": "Get post comments",
         "description": "Get comment tree for a Reddit post.",
         "operationId": "get_post_comments_v1_reddit_posts__post_id__comments_get",
@@ -500,10 +476,6 @@
     },
     "/v1/reddit/posts/{post_id}/duplicates": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Posts"
-        ],
         "summary": "Get cross-posts",
         "description": "Get cross-posts and duplicates of a Reddit post.",
         "operationId": "get_post_duplicates_v1_reddit_posts__post_id__duplicates_get",
@@ -572,10 +544,6 @@
     },
     "/v1/reddit/subreddits/{subreddit}": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Subreddits"
-        ],
         "summary": "Get subreddit info",
         "description": "Get detailed information about a subreddit.",
         "operationId": "get_subreddit_v1_reddit_subreddits__subreddit__get",
@@ -616,10 +584,6 @@
     },
     "/v1/reddit/subreddits/{subreddit}/posts": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Subreddits"
-        ],
         "summary": "Get subreddit posts",
         "description": "Get posts from a subreddit with sorting options.",
         "operationId": "get_subreddit_posts_v1_reddit_subreddits__subreddit__posts_get",
@@ -712,10 +676,6 @@
     },
     "/v1/reddit/subreddits/{subreddit}/rules": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Subreddits"
-        ],
         "summary": "Get subreddit rules",
         "description": "Get the rules of a subreddit.",
         "operationId": "get_subreddit_rules_v1_reddit_subreddits__subreddit__rules_get",
@@ -756,10 +716,6 @@
     },
     "/v1/reddit/subreddits/{subreddit}/moderators": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Subreddits"
-        ],
         "summary": "Get subreddit moderators",
         "description": "Get the moderator team of a subreddit.",
         "operationId": "get_subreddit_moderators_v1_reddit_subreddits__subreddit__moderators_get",
@@ -800,10 +756,6 @@
     },
     "/v1/reddit/subreddits/{subreddit}/wiki": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Wiki"
-        ],
         "summary": "List wiki pages",
         "description": "List all wiki pages in a subreddit.",
         "operationId": "get_wiki_pages_v1_reddit_subreddits__subreddit__wiki_get",
@@ -844,10 +796,6 @@
     },
     "/v1/reddit/subreddits/{subreddit}/wiki/{page}": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Wiki"
-        ],
         "summary": "Get wiki page content",
         "description": "Get the content of a specific wiki page.",
         "operationId": "get_wiki_page_v1_reddit_subreddits__subreddit__wiki__page__get",
@@ -897,10 +845,6 @@
     },
     "/v1/reddit/subreddits/popular": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Subreddits"
-        ],
         "summary": "Popular subreddits",
         "description": "Get popular subreddits by subscriber count.",
         "operationId": "get_popular_subreddits_v1_reddit_subreddits_popular_get",
@@ -960,10 +904,6 @@
     },
     "/v1/reddit/subreddits/new": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Subreddits"
-        ],
         "summary": "New subreddits",
         "description": "Get recently created subreddits.",
         "operationId": "get_new_subreddits_v1_reddit_subreddits_new_get",
@@ -1023,10 +963,6 @@
     },
     "/v1/reddit/users/{username}": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Users"
-        ],
         "summary": "Get user profile",
         "description": "Get a Reddit user's profile.",
         "operationId": "get_user_v1_reddit_users__username__get",
@@ -1067,10 +1003,6 @@
     },
     "/v1/reddit/users/{username}/posts": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Users"
-        ],
         "summary": "Get user's posts",
         "description": "Get posts submitted by a Reddit user.",
         "operationId": "get_user_posts_v1_reddit_users__username__posts_get",
@@ -1159,10 +1091,6 @@
     },
     "/v1/reddit/users/{username}/comments": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Users"
-        ],
         "summary": "Get user's comments",
         "description": "Get comments by a Reddit user.",
         "operationId": "get_user_comments_v1_reddit_users__username__comments_get",
@@ -1251,10 +1179,6 @@
     },
     "/v1/reddit/users/{username}/moderated": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Users"
-        ],
         "summary": "Get user's moderated subreddits",
         "description": "Get subreddits moderated by a user.",
         "operationId": "get_user_moderated_v1_reddit_users__username__moderated_get",
@@ -1295,10 +1219,6 @@
     },
     "/v1/reddit/users/{username}/trophies": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Users"
-        ],
         "summary": "Get user's trophies",
         "description": "Get a user's trophy case.",
         "operationId": "get_user_trophies_v1_reddit_users__username__trophies_get",
@@ -1339,10 +1259,6 @@
     },
     "/v1/reddit/domains/{domain}/posts": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Search"
-        ],
         "summary": "Get posts by domain",
         "description": "Get Reddit posts linking to a specific domain.",
         "operationId": "get_domain_posts_v1_reddit_domains__domain__posts_get",
@@ -1431,10 +1347,6 @@
     },
     "/v1/reddit/health": {
       "get": {
-        "tags": [
-          "Reddit",
-          "Reddit Health"
-        ],
         "summary": "Reddit scraper health check",
         "operationId": "reddit_health_v1_reddit_health_head",
         "responses": {
@@ -1451,10 +1363,6 @@
         }
       },
       "head": {
-        "tags": [
-          "Reddit",
-          "Reddit Health"
-        ],
         "summary": "Reddit scraper health check",
         "operationId": "reddit_health_v1_reddit_health_head",
         "responses": {
@@ -1479,6 +1387,61 @@
         "in": "header",
         "name": "X-API-Key",
         "description": "ScrapeBadger API key"
+      }
+    },
+    "schemas": {
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
       }
     }
   }
