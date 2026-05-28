@@ -217,6 +217,17 @@
         ]
       },
       {
+        "tab": "Reddit",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "reddit/overview"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Vinted",
         "groups": [
           {

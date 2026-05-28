@@ -1,0 +1,267 @@
+---
+title: "Reddit Scraper Overview"
+description: "Extract posts, comments, subreddits, and user data from Reddit with structured JSON responses. 22 endpoints covering search, listings, comment trees, and wiki content."
+---
+
+# Reddit Scraper API
+
+Search posts, fetch comment trees, explore subreddits, and retrieve user profiles from Reddit. The API handles TLS fingerprinting, proxy rotation, and anti-bot bypass automatically — no Reddit API key or OAuth setup needed.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="22 Endpoints" icon="grid-2">
+    Search, posts, comments, subreddits, users, wiki, trending, and cross-post detection.
+  </Card>
+  <Card title="No Reddit API Key" icon="key">
+    We handle all authentication and rate limiting. Just use your ScrapeBadger API key.
+  </Card>
+  <Card title="Comment Trees" icon="message">
+    Full nested comment threads with configurable depth control (0-10 levels).
+  </Card>
+  <Card title="Search Syntax" icon="magnifying-glass">
+    Full Reddit search operators: title:, author:, subreddit:, flair:, AND/OR/NOT.
+  </Card>
+  <Card title="Anti-Bot Bypass" icon="shield-halved">
+    Automatic TLS fingerprint rotation and residential proxy routing.
+  </Card>
+  <Card title="SDK Support" icon="code">
+    First-class support via the ScrapeBadger Node.js and Python SDKs.
+  </Card>
+</CardGroup>
+
+## Quick Start
+
+<CodeGroup>
+
+```javascript Node.js
+import ScrapeBadger from 'scrapebadger';
+
+const client = new ScrapeBadger({ apiKey: 'YOUR_API_KEY' });
+
+// Search posts
+const results = await client.reddit.search.posts({
+  q: 'artificial intelligence',
+  sort: 'top',
+  t: 'week',
+  limit: 10,
+});
+
+console.log(results.posts);
+```
+
+```python Python
+from scrapebadger import ScrapeBadger
+
+client = ScrapeBadger(api_key="YOUR_API_KEY")
+
+# Search posts
+results = client.reddit.search.posts(
+    q="artificial intelligence",
+    sort="top",
+    t="week",
+    limit=10,
+)
+
+print(results.posts)
+```
+
+```bash cURL
+curl -X GET "https://api.scrapebadger.com/v1/reddit/search/posts?q=artificial+intelligence&sort=top&t=week&limit=10" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+## Endpoints
+
+### Search
+
+| Endpoint | Credits | Description |
+|----------|---------|-------------|
+| `GET /v1/reddit/search/posts` | 2 | Search posts globally or within a subreddit |
+| `GET /v1/reddit/search/subreddits` | 2 | Search for subreddits by keyword |
+| `GET /v1/reddit/search/users` | 2 | Search for Reddit users |
+| `GET /v1/reddit/domains/{domain}/posts` | 2 | Get posts linking to a specific domain |
+
+### Posts
+
+| Endpoint | Credits | Description |
+|----------|---------|-------------|
+| `GET /v1/reddit/posts/trending` | 1 | Trending posts from Reddit's front page |
+| `GET /v1/reddit/posts/{post_id}` | 2 | Get post details by ID |
+| `GET /v1/reddit/posts/{post_id}/comments` | 3 | Comment tree with depth control |
+| `GET /v1/reddit/posts/{post_id}/duplicates` | 3 | Cross-posts and duplicates |
+
+### Subreddits
+
+| Endpoint | Credits | Description |
+|----------|---------|-------------|
+| `GET /v1/reddit/subreddits/{subreddit}` | 2 | Subreddit metadata |
+| `GET /v1/reddit/subreddits/{subreddit}/posts` | 2 | Subreddit posts (hot/new/top/rising) |
+| `GET /v1/reddit/subreddits/{subreddit}/rules` | 1 | Subreddit rules |
+| `GET /v1/reddit/subreddits/{subreddit}/moderators` | 2 | Moderator team |
+| `GET /v1/reddit/subreddits/{subreddit}/wiki` | 1 | List wiki pages |
+| `GET /v1/reddit/subreddits/{subreddit}/wiki/{page}` | 3 | Wiki page content |
+| `GET /v1/reddit/subreddits/popular` | 1 | Popular subreddits |
+| `GET /v1/reddit/subreddits/new` | 1 | New subreddits |
+
+### Users
+
+| Endpoint | Credits | Description |
+|----------|---------|-------------|
+| `GET /v1/reddit/users/{username}` | 2 | User profile and karma |
+| `GET /v1/reddit/users/{username}/posts` | 2 | User's submitted posts |
+| `GET /v1/reddit/users/{username}/comments` | 2 | User's comment history |
+| `GET /v1/reddit/users/{username}/moderated` | 3 | Subreddits user moderates |
+| `GET /v1/reddit/users/{username}/trophies` | 1 | User's trophy case |
+
+## Pagination
+
+All listing endpoints use cursor-based pagination with `after` and `before` parameters.
+
+```json
+{
+  "posts": [...],
+  "pagination": {
+    "after": "t3_abc123",
+    "before": null,
+    "count": 25,
+    "limit": 25
+  }
+}
+```
+
+Pass the `after` value as a query parameter to get the next page of results. The maximum `limit` per request is 100.
+
+## Search Syntax
+
+The search endpoints support Reddit's full query syntax:
+
+| Operator | Example | Description |
+|----------|---------|-------------|
+| `title:` | `title:python` | Search in post titles |
+| `author:` | `author:spez` | Filter by author |
+| `subreddit:` | `subreddit:programming` | Filter by subreddit |
+| `flair:` | `flair:Discussion` | Filter by flair |
+| `site:` | `site:github.com` | Filter by link domain |
+| `nsfw:yes` | `nsfw:yes` | Include NSFW posts |
+| `self:yes` | `self:yes` | Only text posts |
+| `AND` / `OR` / `NOT` | `python AND tutorial` | Boolean operators |
+
+## Response Fields
+
+### Post Object
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Reddit post ID (e.g. `1obwkbb`) |
+| `fullname` | string | Reddit fullname with `t3_` prefix |
+| `title` | string | Post title |
+| `selftext` | string | Plain-text body (empty for link posts) |
+| `selftext_html` | string \| null | HTML-rendered body |
+| `url` | string | Final URL (link target or self-post URL) |
+| `permalink` | string | Full Reddit permalink |
+| `domain` | string | Link domain (e.g. `github.com`, `self.python`) |
+| `author` | string | Author username |
+| `author_fullname` | string \| null | Author fullname (`t2_...`) |
+| `author_flair_text` | string \| null | Author's flair on this subreddit |
+| `subreddit` | string | Subreddit name (no prefix) |
+| `subreddit_name_prefixed` | string | Subreddit with prefix (e.g. `r/python`) |
+| `subreddit_id` | string | Subreddit fullname (`t5_...`) |
+| `subreddit_subscribers` | number | Subscriber count at time of fetch |
+| `score` | number | Net score (ups − downs) |
+| `ups` | number | Upvote count |
+| `upvote_ratio` | number | Ratio of upvotes (0.0–1.0) |
+| `num_comments` | number | Total comment count |
+| `num_crossposts` | number | Number of cross-posts |
+| `created_utc` | number | Unix timestamp |
+| `created_at` | string | ISO 8601 UTC timestamp (e.g. `2025-10-20T22:56:45Z`) |
+| `edited` | number \| boolean | False or edit Unix timestamp |
+| `edited_at` | string \| null | ISO 8601 UTC if edited |
+| `is_self` | boolean | True for text posts |
+| `is_video` | boolean | True for native Reddit video |
+| `is_gallery` | boolean | True for image galleries |
+| `is_nsfw` | boolean | NSFW flag |
+| `is_spoiler` | boolean | Spoiler flag |
+| `is_locked` | boolean | Locked from new comments |
+| `is_stickied` | boolean | Pinned to top of subreddit |
+| `is_archived` | boolean | Older than 6 months (no new comments) |
+| `is_original_content` | boolean | OC tag |
+| `is_robot_indexable` | boolean | Whether search engines can index |
+| `is_crosspostable` | boolean | Allowed to be cross-posted |
+| `send_replies` | boolean | Author receives inbox replies |
+| `link_flair_text` | string \| null | Post flair text |
+| `link_flair_background_color` | string \| null | Flair background hex |
+| `link_flair_text_color` | string \| null | `light` or `dark` |
+| `link_flair_template_id` | string \| null | Reddit's flair template UUID |
+| `distinguished` | string \| null | `moderator`, `admin`, or null |
+| `thumbnail` | string \| null | Thumbnail URL |
+| `preview_images` | array | Preview images with `url`, `width`, `height` |
+| `media` | object \| null | Embedded media (video, oEmbed) |
+| `gallery_data` | array \| null | Gallery item metadata |
+| `total_awards` | number | Total awards received |
+| `awards` | array | Award objects (id, name, count, icon_url) |
+| `gilded` | number | Number of times gilded |
+| `removed_by_category` | string \| null | Removal reason category |
+
+### Comment Object
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id`, `fullname` | string | Comment ID and `t1_*` fullname |
+| `body`, `body_html` | string | Comment text (plain & rendered) |
+| `author`, `author_fullname` | string | Author info |
+| `subreddit`, `subreddit_name_prefixed` | string | Subreddit context |
+| `post_id`, `post_title` | string | Parent post |
+| `parent_id` | string | Parent thing fullname |
+| `score`, `ups`, `controversiality` | number | Engagement |
+| `depth` | number | Nesting level (0 = top-level) |
+| `created_utc`, `created_at` | number, string | Unix + ISO 8601 |
+| `edited`, `edited_at` | number/bool, string | Edit timestamps |
+| `is_submitter` | boolean | True if author is post author (OP) |
+| `is_stickied`, `is_locked` | boolean | Moderation state |
+| `distinguished` | string \| null | Mod/admin badge |
+| `replies` | array | Nested comments (recursive) |
+
+### Subreddit Object
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id`, `fullname`, `name` | string | Identifiers |
+| `display_name_prefixed` | string | E.g. `r/python` |
+| `title`, `header_title` | string | Display names |
+| `description`, `description_html` | string | Long description (sidebar) |
+| `public_description`, `public_description_html` | string | Short description |
+| `subscribers`, `active_users` | number | Member counts |
+| `created_utc`, `created_at` | number, string | When created |
+| `type` | string | `public`, `private`, `restricted` |
+| `submission_type` | string | `any`, `link`, `self` |
+| `advertiser_category` | string \| null | Ad category |
+| `is_nsfw`, `is_quarantined` | boolean | Content flags |
+| `icon_url`, `banner_url`, `header_url` | string | Images |
+| `primary_color`, `key_color`, `banner_background_color` | string | Theme |
+| `wiki_enabled`, `allow_images`, `allow_videos`, `allow_galleries`, `allow_polls` | boolean | Content permissions |
+| `spoilers_enabled`, `emojis_enabled`, `free_form_reports` | boolean | Features |
+| `comment_score_hide_mins` | number | Minutes before scores show |
+| `should_archive_posts` | boolean | Auto-archive after 6mo |
+| `allowed_media_in_comments` | array | E.g. `["video"]` |
+
+### User Object
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id`, `fullname`, `name` | string | Identifiers |
+| `display_name_prefixed` | string | E.g. `u/spez` |
+| `description`, `profile_title` | string | Bio |
+| `icon_url`, `snoovatar_url`, `banner_url` | string | Images |
+| `profile_url` | string | Profile page URL |
+| `link_karma`, `comment_karma`, `awardee_karma`, `awarder_karma`, `total_karma` | number | Karma breakdown |
+| `created_utc`, `created_at` | number, string | Account age |
+| `verified`, `has_verified_email`, `is_employee`, `is_mod`, `is_gold`, `is_suspended` | boolean | Account flags |
+| `accepts_followers`, `has_subscribed` | boolean | Settings |
+| `is_nsfw` | boolean | NSFW profile |
+
+## Rate Limits
+
+Reddit Scraper API requests are subject to the same rate limits as all ScrapeBadger endpoints. See [Rate Limits](/rate-limits) for details.
