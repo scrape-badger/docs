@@ -1,0 +1,44 @@
+---
+title: "List Categories"
+openapi: "GET /v1/amazon/categories"
+description: "List common Amazon department/category aliases and bestseller nodes."
+---
+
+## Query Parameters
+
+<ParamField query="domain" type="string" default="com">
+  Amazon marketplace TLD or code. Category aliases are scoped per marketplace.
+
+  Examples: `com`, `co.uk`, `de`
+</ParamField>
+
+## Response
+
+<ResponseField name="domain" type="string">Marketplace the aliases apply to.</ResponseField>
+<ResponseField name="categories" type="array">
+  Array of category aliases.
+
+  <Expandable title="Category object">
+    <ResponseField name="alias" type="string">Category alias usable in the [search](/api-reference/endpoint/amazon/search-products) `category` parameter (the `i=` value).</ResponseField>
+    <ResponseField name="name" type="string">Human-readable department name.</ResponseField>
+    <ResponseField name="bestsellers_node" type="string">Browse-node slug usable with [bestsellers](/api-reference/endpoint/amazon/bestsellers) and [new releases](/api-reference/endpoint/amazon/new-releases) (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "domain": "com",
+  "categories": [
+    { "alias": "electronics", "name": "Electronics", "bestsellers_node": "electronics" },
+    { "alias": "stripbooks", "name": "Books", "bestsellers_node": "books" },
+    { "alias": "fashion", "name": "Clothing, Shoes & Jewelry", "bestsellers_node": "fashion" },
+    { "alias": "toys-and-games", "name": "Toys & Games", "bestsellers_node": "toys-and-games" }
+  ]
+}
+```
+
+<Note>
+  The categories list is **free** (0 credits).
+</Note>

@@ -1,0 +1,65 @@
+---
+title: "Seller Feedback"
+openapi: "GET /v1/amazon/sellers/{seller_id}/feedback"
+description: "Buyer feedback entries for a seller."
+---
+
+## Path Parameters
+
+<ParamField path="seller_id" type="string" required>
+  The Amazon seller ID whose feedback to list.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="domain" type="string" default="com">
+  Amazon marketplace TLD or code where the seller operates.
+
+  Examples: `com`, `co.uk`, `de`
+</ParamField>
+
+<ParamField query="page" type="integer" default={1}>
+  Page number for paginated feedback entries. Starts at `1`.
+</ParamField>
+
+## Response
+
+<ResponseField name="seller_id" type="string">The seller ID whose feedback was listed.</ResponseField>
+<ResponseField name="domain" type="string">Marketplace domain.</ResponseField>
+<ResponseField name="feedback" type="array">
+  Array of buyer feedback entries.
+
+  <Expandable title="Feedback object">
+    <ResponseField name="rating" type="integer">Star rating left by the buyer (1-5).</ResponseField>
+    <ResponseField name="body" type="string">Feedback comment text.</ResponseField>
+    <ResponseField name="date_raw" type="string">Raw date string as shown on Amazon.</ResponseField>
+    <ResponseField name="date_at" type="string">ISO 8601 timestamp of the feedback (nullable).</ResponseField>
+    <ResponseField name="rater" type="string">Buyer display name, if shown (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="pagination" type="object">
+  Pagination metadata with `current_page`, `total_pages`, `total_results`.
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "seller_id": "A1B2C3D4E5F6G7",
+  "domain": "com",
+  "feedback": [
+    {
+      "rating": 5,
+      "body": "Fast shipping and item exactly as described. Would buy again.",
+      "date_raw": "Reviewed on May 30, 2026",
+      "date_at": "2026-05-30T00:00:00Z",
+      "rater": "M. K."
+    }
+  ],
+  "pagination": { "current_page": 1, "total_pages": 50, "total_results": 500 }
+}
+```
+
+<Note>
+  Each seller feedback request costs **3 credits**. Failed requests are not charged.
+</Note>

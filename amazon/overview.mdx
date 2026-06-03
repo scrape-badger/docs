@@ -1,0 +1,158 @@
+---
+title: "Amazon Scraper Overview"
+description: "Scrape Amazon products, offers, reviews, listings, and seller data across 20 marketplaces with structured JSON responses."
+---
+
+# Amazon Scraper API
+
+Search products, fetch full product detail, list offers and reviews, pull bestsellers, new releases, and deals, and retrieve seller storefronts from Amazon — the world's largest online marketplace. The API handles authentication, anti-bot bypass, and marketplace routing automatically.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="20 Marketplaces" icon="earth-americas">
+    Access all major Amazon marketplaces including US, UK, DE, FR, IT, ES, JP, CA, IN, AU, and more.
+  </Card>
+  <Card title="Anti-Bot Bypass" icon="shield-halved">
+    Automatic AWS WAF bypass via Chrome TLS impersonation, fresh residential sessions, and origin warmup.
+  </Card>
+  <Card title="Rich Product Data" icon="box">
+    Variants, badges, buybox, best-seller ranks, A+ content, specs, and frequently-bought-together.
+  </Card>
+  <Card title="Structured Data" icon="database">
+    Clean JSON responses with normalized prices, ratings, reviews, offers, and seller feedback.
+  </Card>
+  <Card title="Country Proxies" icon="globe">
+    Requests are routed through residential proxies matching the target marketplace for accurate pricing.
+  </Card>
+  <Card title="SDK Support" icon="code">
+    First-class support via the ScrapeBadger Node.js and Python SDKs.
+  </Card>
+</CardGroup>
+
+## Supported Marketplaces
+
+Amazon operates across 20 country domains. Use the `domain` query parameter to target a specific one.
+
+| Market | Domain | Market | Domain |
+|--------|--------|--------|--------|
+| :us: `com` | amazon.com | :gb: `co.uk` | amazon.co.uk |
+| :de: `de` | amazon.de | :fr: `fr` | amazon.fr |
+| :it: `it` | amazon.it | :es: `es` | amazon.es |
+| :netherlands: `nl` | amazon.nl | :sweden: `se` | amazon.se |
+| :poland: `pl` | amazon.pl | :canada: `ca` | amazon.ca |
+| :mexico: `com.mx` | amazon.com.mx | :brazil: `com.br` | amazon.com.br |
+| :japan: `co.jp` | amazon.co.jp | :india: `in` | amazon.in |
+| :australia: `com.au` | amazon.com.au | :singapore: `sg` | amazon.sg |
+| :united_arab_emirates: `ae` | amazon.ae | :saudi_arabia: `sa` | amazon.sa |
+| :tr: `com.tr` | amazon.com.tr | :egypt: `eg` | amazon.eg |
+
+<Tip>
+  If no `domain` is specified, it defaults to `com`. Use the [`/v1/amazon/markets`](/api-reference/endpoint/amazon/list-markets) endpoint to get the full list (with currency and locale) programmatically.
+</Tip>
+
+## Quick Start
+
+<CodeGroup>
+
+```javascript Node.js
+import ScrapeBadger from "scrapebadger";
+
+const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" });
+
+const results = await client.amazon.search({
+  query: "wireless earbuds",
+  domain: "com",
+  page: 1,
+});
+
+console.log(results.results);
+```
+
+```python Python
+from scrapebadger import ScrapeBadger
+
+client = ScrapeBadger(api_key="YOUR_API_KEY")
+
+results = client.amazon.search(
+    query="wireless earbuds",
+    domain="com",
+    page=1,
+)
+
+print(results.results)
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/amazon/search?query=wireless+earbuds&domain=com&page=1" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+## Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/amazon/search`](/api-reference/endpoint/amazon/search-products) | GET | Search the Amazon catalog with filters and sorting |
+| [`/v1/amazon/autocomplete`](/api-reference/endpoint/amazon/autocomplete) | GET | Keyword autocomplete suggestions |
+| [`/v1/amazon/products/{asin}`](/api-reference/endpoint/amazon/get-product) | GET | Full product detail by ASIN |
+| [`/v1/amazon/products/{asin}/offers`](/api-reference/endpoint/amazon/get-offers) | GET | All seller offers, including the Buy Box winner |
+| [`/v1/amazon/products/{asin}/reviews`](/api-reference/endpoint/amazon/get-reviews) | GET | Customer reviews with filters |
+| [`/v1/amazon/bestsellers`](/api-reference/endpoint/amazon/bestsellers) | GET | Top-selling products by category |
+| [`/v1/amazon/new-releases`](/api-reference/endpoint/amazon/new-releases) | GET | Newly released products by category |
+| [`/v1/amazon/deals`](/api-reference/endpoint/amazon/deals) | GET | Current deals and lightning deals |
+| [`/v1/amazon/category`](/api-reference/endpoint/amazon/browse-category) | GET | List products within a browse-node category |
+| [`/v1/amazon/sellers/{seller_id}`](/api-reference/endpoint/amazon/get-seller) | GET | Seller profile and feedback summary |
+| [`/v1/amazon/sellers/{seller_id}/products`](/api-reference/endpoint/amazon/seller-products) | GET | Seller storefront listings |
+| [`/v1/amazon/sellers/{seller_id}/feedback`](/api-reference/endpoint/amazon/seller-feedback) | GET | Buyer feedback entries for a seller |
+| [`/v1/amazon/markets`](/api-reference/endpoint/amazon/list-markets) | GET | List all supported marketplaces |
+| [`/v1/amazon/categories`](/api-reference/endpoint/amazon/list-categories) | GET | List department/category aliases |
+
+## Credit Costs
+
+| Endpoint | Cost |
+|----------|------|
+| Search products | 5 credits |
+| Get product detail | 10 credits |
+| Get offers | 8 credits |
+| Get reviews | 10 credits |
+| Bestsellers | 5 credits |
+| New releases | 5 credits |
+| Deals | 5 credits |
+| Browse category | 5 credits |
+| Get seller | 3 credits |
+| Seller products | 5 credits |
+| Seller feedback | 3 credits |
+| Autocomplete | 1 credit |
+| List markets | 0 credits |
+| List categories | 0 credits |
+| Failed requests | 0 credits |
+
+## Authentication
+
+All requests require your API key in the `X-API-Key` header:
+
+```bash
+curl "https://scrapebadger.com/v1/amazon/search?query=laptop" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+## Anti-Bot Handling
+
+Amazon protects its catalog with AWS WAF, IP-reputation scoring, and TLS/HTTP-2 fingerprinting. ScrapeBadger clears these automatically using Chrome TLS impersonation on fresh **residential** sessions matched to the target marketplace, plus an origin-warmup step that seeds a clean WAF-passing session before guarded endpoints (offers, autocomplete) are fetched. You never need to manage proxies, sessions, or CAPTCHAs.
+
+<Note>
+  For accurate pricing and availability, requests are routed through residential proxies in the marketplace's country. This is handled automatically based on the `domain` parameter.
+</Note>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Search Products" icon="magnifying-glass" href="/api-reference/endpoint/amazon/search-products">
+    Full API reference for searching the Amazon catalog
+  </Card>
+  <Card title="Get Product Detail" icon="box" href="/api-reference/endpoint/amazon/get-product">
+    Retrieve full product detail for a specific ASIN
+  </Card>
+</CardGroup>

@@ -1,0 +1,37 @@
+---
+title: "List Markets"
+openapi: "GET /v1/amazon/markets"
+description: "List all supported Amazon marketplaces."
+---
+
+## Response
+
+<ResponseField name="markets" type="array">
+  Array of supported Amazon marketplaces.
+
+  <Expandable title="Market object">
+    <ResponseField name="code" type="string">Market code (e.g. `"US"`, `"UK"`, `"DE"`).</ResponseField>
+    <ResponseField name="domain" type="string">Amazon domain TLD to use in the `domain` query parameter (e.g. `"com"`, `"co.uk"`).</ResponseField>
+    <ResponseField name="name" type="string">Marketplace country name.</ResponseField>
+    <ResponseField name="currency" type="string">ISO 4217 currency code used in this market.</ResponseField>
+    <ResponseField name="language" type="string">Default locale for this market.</ResponseField>
+    <ResponseField name="country_code" type="string">ISO country code used for proxy geo-targeting.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "markets": [
+    { "code": "US", "domain": "com", "name": "United States", "currency": "USD", "language": "en-US", "country_code": "US" },
+    { "code": "UK", "domain": "co.uk", "name": "United Kingdom", "currency": "GBP", "language": "en-GB", "country_code": "GB" },
+    { "code": "DE", "domain": "de", "name": "Germany", "currency": "EUR", "language": "de-DE", "country_code": "DE" },
+    { "code": "JP", "domain": "co.jp", "name": "Japan", "currency": "JPY", "language": "ja-JP", "country_code": "JP" }
+  ]
+}
+```
+
+<Note>
+  The markets list is **free** (0 credits).
+</Note>

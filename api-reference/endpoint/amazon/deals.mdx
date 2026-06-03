@@ -1,0 +1,73 @@
+---
+title: "Today's Deals"
+openapi: "GET /v1/amazon/deals"
+description: "Current Amazon deals (lightning deals, best deals)."
+---
+
+## Query Parameters
+
+<ParamField query="domain" type="string" default="com">
+  Amazon marketplace TLD or code.
+
+  Examples: `com`, `co.uk`, `de`
+</ParamField>
+
+<ParamField query="category" type="string">
+  Category alias to scope the deals feed. Use [`/v1/amazon/categories`](/api-reference/endpoint/amazon/list-categories) to look up aliases.
+</ParamField>
+
+<ParamField query="page" type="integer" default={1}>
+  Page number for paginated deals. Starts at `1`.
+</ParamField>
+
+## Response
+
+<ResponseField name="domain" type="string">Marketplace domain.</ResponseField>
+<ResponseField name="category" type="string">Category the deals were scoped to (nullable).</ResponseField>
+<ResponseField name="results" type="array">
+  Array of current deals.
+
+  <Expandable title="Deal object">
+    <ResponseField name="position" type="integer">Position in the deals feed.</ResponseField>
+    <ResponseField name="asin" type="string">Product ASIN.</ResponseField>
+    <ResponseField name="title" type="string">Product title.</ResponseField>
+    <ResponseField name="link" type="string">Full URL to the product page.</ResponseField>
+    <ResponseField name="image" type="string">Primary product image URL.</ResponseField>
+    <ResponseField name="deal_price" type="object">Discounted deal price with `value`, `currency`, `symbol`, `raw`.</ResponseField>
+    <ResponseField name="list_price" type="object">Original list price.</ResponseField>
+    <ResponseField name="discount_percent" type="integer">Discount percentage (nullable).</ResponseField>
+    <ResponseField name="deal_type" type="string">Deal type label (e.g. `Best Deal`, `Lightning Deal`).</ResponseField>
+    <ResponseField name="is_lightning_deal" type="boolean">Whether this is a time-limited lightning deal.</ResponseField>
+    <ResponseField name="badge" type="string">Promotional badge text (nullable).</ResponseField>
+    <ResponseField name="ends_at" type="string">ISO 8601 timestamp when the deal ends, if available (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "domain": "com",
+  "category": null,
+  "results": [
+    {
+      "position": 1,
+      "asin": "B0C7KMR3T5",
+      "title": "Sony WH-1000XM5 Wireless Headphones",
+      "link": "https://www.amazon.com/dp/B0C7KMR3T5",
+      "image": "https://m.media-amazon.com/images/I/61deal.jpg",
+      "deal_price": { "value": 298.0, "currency": "USD", "symbol": "$", "raw": "$298.00" },
+      "list_price": { "value": 399.99, "currency": "USD", "symbol": "$", "raw": "$399.99" },
+      "discount_percent": 25,
+      "deal_type": "Best Deal",
+      "is_lightning_deal": false,
+      "badge": "Limited time deal",
+      "ends_at": null
+    }
+  ]
+}
+```
+
+<Note>
+  Each deals request costs **5 credits**. Failed requests are not charged.
+</Note>

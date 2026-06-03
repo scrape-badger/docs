@@ -16,6 +16,7 @@
     "https://scrapebadger.com/api/twitter-openapi.json",
     "/openapi-web-scraping.json",
     "/openapi-vinted.json",
+    "/openapi-amazon.json",
     "/openapi-reddit.json",
     "/openapi-google.json",
     "/openapi-account.json"
@@ -303,6 +304,56 @@
               "api-reference/endpoint/vinted/list-colors",
               "api-reference/endpoint/vinted/list-statuses",
               "api-reference/endpoint/vinted/list-markets"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Amazon",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "amazon/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/amazon/search-products",
+              "api-reference/endpoint/amazon/autocomplete"
+            ]
+          },
+          {
+            "group": "Products",
+            "pages": [
+              "api-reference/endpoint/amazon/get-product",
+              "api-reference/endpoint/amazon/get-offers",
+              "api-reference/endpoint/amazon/get-reviews"
+            ]
+          },
+          {
+            "group": "Listings",
+            "pages": [
+              "api-reference/endpoint/amazon/bestsellers",
+              "api-reference/endpoint/amazon/new-releases",
+              "api-reference/endpoint/amazon/deals",
+              "api-reference/endpoint/amazon/browse-category"
+            ]
+          },
+          {
+            "group": "Sellers",
+            "pages": [
+              "api-reference/endpoint/amazon/get-seller",
+              "api-reference/endpoint/amazon/seller-products",
+              "api-reference/endpoint/amazon/seller-feedback"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api-reference/endpoint/amazon/list-markets",
+              "api-reference/endpoint/amazon/list-categories"
             ]
           }
         ]

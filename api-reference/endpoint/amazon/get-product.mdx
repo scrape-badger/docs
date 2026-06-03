@@ -1,0 +1,97 @@
+---
+title: "Get Product Detail"
+openapi: "GET /v1/amazon/products/{asin}"
+description: "Full product detail by ASIN (price, variants, badges, buybox, ranks, ...)."
+---
+
+## Path Parameters
+
+<ParamField path="asin" type="string" required>
+  The Amazon Standard Identification Number (ASIN) of the product. You can find this in search results or extract it from a product URL (`/dp/{ASIN}`).
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="domain" type="string" default="com">
+  Amazon marketplace TLD or code where the product is listed.
+
+  Examples: `com`, `co.uk`, `de`, `fr`
+</ParamField>
+
+<ParamField query="zip" type="string">
+  Delivery postal/zip code for a localized buybox and delivery estimate.
+</ParamField>
+
+<ParamField query="language" type="string">
+  Locale for the product page, e.g. `en_US`, `de_DE`.
+</ParamField>
+
+## Response
+
+<ResponseField name="domain" type="string">Marketplace domain the product was fetched from.</ResponseField>
+<ResponseField name="product" type="object">
+  Full product object.
+
+  <Expandable title="Product object">
+    <ResponseField name="asin" type="string">Product ASIN.</ResponseField>
+    <ResponseField name="parent_asin" type="string">Parent ASIN if the product is a variation child (nullable).</ResponseField>
+    <ResponseField name="title" type="string">Product title.</ResponseField>
+    <ResponseField name="brand" type="string">Brand name.</ResponseField>
+    <ResponseField name="price" type="object">Current price with `value`, `currency`, `symbol`, `raw`.</ResponseField>
+    <ResponseField name="list_price" type="object">Strikethrough list price.</ResponseField>
+    <ResponseField name="discount_percent" type="integer">Discount percentage off list price.</ResponseField>
+    <ResponseField name="rating" type="number">Average star rating (0-5).</ResponseField>
+    <ResponseField name="ratings_total" type="integer">Total number of ratings.</ResponseField>
+    <ResponseField name="rating_breakdown" type="object">Percentage of ratings per star bucket (`five_star` ... `one_star`).</ResponseField>
+    <ResponseField name="feature_bullets" type="array">Bullet-point feature highlights.</ResponseField>
+    <ResponseField name="images" type="array">All product image URLs.</ResponseField>
+    <ResponseField name="variants" type="array">Variation children with `asin`, `attributes`, `price`, `is_current`.</ResponseField>
+    <ResponseField name="bestsellers_rank" type="array">Best-seller ranks with `rank`, `category`, `link`.</ResponseField>
+    <ResponseField name="specifications" type="object">Technical specifications map.</ResponseField>
+    <ResponseField name="buybox" type="object">Buy Box winner with `seller_name`, `seller_id`, `price`, `fulfillment`.</ResponseField>
+    <ResponseField name="badges" type="object">Badge flags: `amazons_choice`, `best_seller`, `prime`, `climate_pledge_friendly`.</ResponseField>
+    <ResponseField name="also_bought" type="array">ASINs frequently bought by the same customers.</ResponseField>
+    <ResponseField name="top_reviews" type="array">A handful of featured reviews.</ResponseField>
+    <ResponseField name="scraped_at" type="string">ISO 8601 timestamp when the product was scraped.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "domain": "com",
+  "product": {
+    "asin": "B08N5WRWNW",
+    "title": "Echo Dot (4th Gen) Smart speaker with Alexa",
+    "brand": "Amazon",
+    "price": { "value": 49.99, "currency": "USD", "symbol": "$", "raw": "$49.99" },
+    "list_price": { "value": 59.99, "currency": "USD", "symbol": "$", "raw": "$59.99" },
+    "discount_percent": 17,
+    "rating": 4.7,
+    "ratings_total": 184231,
+    "rating_breakdown": { "five_star": 78, "four_star": 13, "three_star": 4, "two_star": 2, "one_star": 3 },
+    "feature_bullets": ["Meet the Echo Dot - Our most popular smart speaker."],
+    "images": ["https://m.media-amazon.com/images/I/714Rdc+abc.jpg"],
+    "variants": [
+      { "asin": "B08N5WRWNW", "attributes": { "Color": "Charcoal" }, "is_current": true }
+    ],
+    "bestsellers_rank": [
+      { "rank": 334, "category": "Electronics", "link": "https://www.amazon.com/gp/bestsellers/electronics" },
+      { "rank": 1, "category": "Smart Speakers", "link": "https://www.amazon.com/gp/bestsellers/electronics/smart-speakers" }
+    ],
+    "specifications": { "Item Weight": "12 ounces" },
+    "buybox": { "seller_name": "Amazon.com", "seller_id": "ATVPDKIKX0DER", "fulfillment": "Amazon" },
+    "badges": { "amazons_choice": true, "best_seller": false, "prime": true, "climate_pledge_friendly": true },
+    "also_bought": ["B07FZ8S74R", "B08C1W5N87"],
+    "top_reviews": [
+      { "id": "R1ABCDEF123456", "title": "Great little speaker", "rating": 5, "verified_purchase": true }
+    ],
+    "scraped_at": "2026-06-03T12:00:00Z"
+  }
+}
+```
+
+<Note>
+  Each product detail request costs **10 credits**. Failed requests are not charged.
+</Note>

@@ -1,0 +1,114 @@
+---
+title: "Get Reviews"
+openapi: "GET /v1/amazon/products/{asin}/reviews"
+description: "Customer reviews for an ASIN (featured + paginated, with filters)."
+---
+
+## Path Parameters
+
+<ParamField path="asin" type="string" required>
+  The ASIN of the product to fetch reviews for.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="domain" type="string" default="com">
+  Amazon marketplace TLD or code where the product is listed.
+
+  Examples: `com`, `co.uk`, `de`
+</ParamField>
+
+<ParamField query="page" type="integer" default={1}>
+  Page number for paginated reviews. Starts at `1`.
+</ParamField>
+
+<ParamField query="sort_by" type="string" default="helpful">
+  Sort order for reviews.
+
+  | Value | Description |
+  |-------|-------------|
+  | `helpful` | Most helpful first (default) |
+  | `recent` | Most recent first |
+</ParamField>
+
+<ParamField query="star" type="string">
+  Filter reviews by star rating or sentiment.
+
+  | Value | Description |
+  |-------|-------------|
+  | `one_star` ... `five_star` | Reviews with that exact star rating |
+  | `positive` | Positive reviews (4-5 stars) |
+  | `critical` | Critical reviews (1-3 stars) |
+</ParamField>
+
+<ParamField query="verified_only" type="boolean" default={false}>
+  Only return reviews from verified purchases.
+</ParamField>
+
+<ParamField query="media_only" type="boolean" default={false}>
+  Only return reviews that include images or video.
+</ParamField>
+
+## Response
+
+<ResponseField name="asin" type="string">The ASIN the reviews belong to.</ResponseField>
+<ResponseField name="domain" type="string">Marketplace domain.</ResponseField>
+<ResponseField name="rating" type="number">Overall average product rating.</ResponseField>
+<ResponseField name="ratings_total" type="integer">Total number of ratings for the product.</ResponseField>
+<ResponseField name="rating_breakdown" type="object">Percentage of ratings per star bucket (`five_star` ... `one_star`).</ResponseField>
+<ResponseField name="reviews" type="array">
+  Array of reviews.
+
+  <Expandable title="Review object">
+    <ResponseField name="id" type="string">Review ID.</ResponseField>
+    <ResponseField name="title" type="string">Review title.</ResponseField>
+    <ResponseField name="body" type="string">Full review text.</ResponseField>
+    <ResponseField name="rating" type="integer">Star rating left by the reviewer (1-5).</ResponseField>
+    <ResponseField name="date_raw" type="string">Raw date string as shown on Amazon.</ResponseField>
+    <ResponseField name="date_at" type="string">ISO 8601 timestamp of the review.</ResponseField>
+    <ResponseField name="review_country" type="string">Country the review was written in.</ResponseField>
+    <ResponseField name="profile" type="object">Reviewer profile: `name`, `link`, `id`, `image`.</ResponseField>
+    <ResponseField name="verified_purchase" type="boolean">Whether the review is from a verified purchase.</ResponseField>
+    <ResponseField name="vine_program" type="boolean">Whether the review is part of the Vine program.</ResponseField>
+    <ResponseField name="helpful_votes" type="integer">Number of helpful votes.</ResponseField>
+    <ResponseField name="variant" type="string">Variant the review applies to (nullable).</ResponseField>
+    <ResponseField name="images" type="array">Review image URLs.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="pagination" type="object">
+  Pagination metadata with `current_page`, `total_pages`, `total_results`.
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "asin": "B08N5WRWNW",
+  "domain": "com",
+  "rating": 4.7,
+  "ratings_total": 184231,
+  "rating_breakdown": { "five_star": 78, "four_star": 13, "three_star": 4, "two_star": 2, "one_star": 3 },
+  "reviews": [
+    {
+      "id": "R1ABCDEF123456",
+      "title": "Great little speaker",
+      "body": "Sound quality is excellent for the size. Setup was quick and Alexa is responsive.",
+      "rating": 5,
+      "date_raw": "Reviewed in the United States on May 28, 2026",
+      "date_at": "2026-05-28T00:00:00Z",
+      "review_country": "United States",
+      "profile": { "name": "Jane D.", "link": "https://www.amazon.com/gp/profile/amzn1.account.ABC", "id": "amzn1.account.ABC", "image": "https://m.media-amazon.com/images/S/amazon-avatars/abc.png" },
+      "verified_purchase": true,
+      "vine_program": false,
+      "helpful_votes": 42,
+      "variant": "Color: Charcoal",
+      "images": ["https://m.media-amazon.com/images/I/71review1.jpg"]
+    }
+  ],
+  "pagination": { "current_page": 1, "total_pages": 100, "total_results": 1000 }
+}
+```
+
+<Note>
+  Each reviews request costs **10 credits**. Amazon exposes a public *featured* subset of reviews; full review history is login-gated. Failed requests are not charged.
+</Note>

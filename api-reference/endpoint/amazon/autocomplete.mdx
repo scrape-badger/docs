@@ -1,0 +1,50 @@
+---
+title: "Keyword Suggestions"
+openapi: "GET /v1/amazon/autocomplete"
+description: "Get Amazon search autocomplete suggestions for keyword research."
+---
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Partial search term to expand into suggestions.
+
+  Example: `wireless ear`
+</ParamField>
+
+<ParamField query="domain" type="string" default="com">
+  Amazon marketplace TLD or code. Suggestions are localized per marketplace.
+
+  Examples: `com`, `co.uk`, `de`
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">The partial term that was expanded.</ResponseField>
+<ResponseField name="domain" type="string">Marketplace the suggestions came from.</ResponseField>
+<ResponseField name="suggestions" type="array">
+  Array of suggested search phrases.
+
+  <Expandable title="Suggestion object">
+    <ResponseField name="value" type="string">Suggested search phrase.</ResponseField>
+    <ResponseField name="alias" type="string">Department alias the suggestion is scoped to, if any (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "query": "wireless ear",
+  "domain": "com",
+  "suggestions": [
+    { "value": "wireless earbuds", "alias": "aps" },
+    { "value": "wireless earbuds bluetooth", "alias": "aps" },
+    { "value": "wireless earphones", "alias": "electronics" }
+  ]
+}
+```
+
+<Note>
+  Each autocomplete request costs **1 credit**. Failed requests are not charged.
+</Note>

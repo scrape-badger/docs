@@ -1,0 +1,68 @@
+---
+title: "Get Seller"
+openapi: "GET /v1/amazon/sellers/{seller_id}"
+description: "Seller profile, ratings and feedback summary."
+---
+
+## Path Parameters
+
+<ParamField path="seller_id" type="string" required>
+  The Amazon seller ID (the value of the `seller=` URL parameter, e.g. from a `/sp?seller=...` link).
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="domain" type="string" default="com">
+  Amazon marketplace TLD or code where the seller operates.
+
+  Examples: `com`, `co.uk`, `de`
+</ParamField>
+
+## Response
+
+<ResponseField name="domain" type="string">Marketplace domain.</ResponseField>
+<ResponseField name="seller" type="object">
+  Seller profile object.
+
+  <Expandable title="Seller object">
+    <ResponseField name="seller_id" type="string">Seller ID.</ResponseField>
+    <ResponseField name="name" type="string">Seller display name.</ResponseField>
+    <ResponseField name="link" type="string">Full URL to the seller storefront.</ResponseField>
+    <ResponseField name="rating" type="number">Average seller rating (0-5, nullable).</ResponseField>
+    <ResponseField name="ratings_total" type="integer">Total number of seller ratings (nullable).</ResponseField>
+    <ResponseField name="ratings_percentage_positive" type="integer">Percentage of positive ratings (nullable).</ResponseField>
+    <ResponseField name="feedback" type="object">Feedback windows (`lifetime`, `12mo`, `90d`, `30d`), each with `positive`, `neutral`, `negative`, `count`.</ResponseField>
+    <ResponseField name="business_name" type="string">Registered business name (nullable).</ResponseField>
+    <ResponseField name="business_address" type="string">Registered business address (nullable).</ResponseField>
+    <ResponseField name="member_since" type="string">Year the seller joined (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "domain": "com",
+  "seller": {
+    "seller_id": "A1B2C3D4E5F6G7",
+    "name": "TechDeals Store",
+    "link": "https://www.amazon.com/sp?seller=A1B2C3D4E5F6G7",
+    "rating": 4.6,
+    "ratings_total": 8421,
+    "ratings_percentage_positive": 94,
+    "feedback": {
+      "lifetime": { "positive": 94, "neutral": 2, "negative": 4, "count": 8421 },
+      "12mo": { "positive": 95, "neutral": 2, "negative": 3, "count": 2103 },
+      "90d": { "positive": 96, "neutral": 1, "negative": 3, "count": 540 },
+      "30d": { "positive": 97, "neutral": 1, "negative": 2, "count": 182 }
+    },
+    "business_name": "TechDeals LLC",
+    "business_address": "123 Commerce St, Seattle, WA 98101, US",
+    "member_since": "2017"
+  }
+}
+```
+
+<Note>
+  Each seller request costs **3 credits**. Failed requests are not charged.
+</Note>

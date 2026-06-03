@@ -1,0 +1,80 @@
+---
+title: "Get Offers"
+openapi: "GET /v1/amazon/products/{asin}/offers"
+description: "All third-party offers for an ASIN, including the Buy Box winner."
+---
+
+## Path Parameters
+
+<ParamField path="asin" type="string" required>
+  The ASIN of the product to list offers for.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="domain" type="string" default="com">
+  Amazon marketplace TLD or code where the product is listed.
+
+  Examples: `com`, `co.uk`, `de`
+</ParamField>
+
+<ParamField query="zip" type="string">
+  Delivery postal/zip code for localized offers and delivery estimates.
+</ParamField>
+
+## Response
+
+<ResponseField name="asin" type="string">The ASIN the offers belong to.</ResponseField>
+<ResponseField name="domain" type="string">Marketplace domain.</ResponseField>
+<ResponseField name="offers" type="array">
+  Array of seller offers, ordered with the Buy Box winner first.
+
+  <Expandable title="Offer object">
+    <ResponseField name="position" type="integer">Position in the offer list.</ResponseField>
+    <ResponseField name="seller" type="object">Seller summary: `name`, `id`, `link`, `rating`, `ratings_total`, `ratings_percentage_positive`.</ResponseField>
+    <ResponseField name="price" type="object">Offer price with `value`, `currency`, `symbol`, `raw`.</ResponseField>
+    <ResponseField name="condition" type="object">Condition with `is_new`, `title`, `comments`.</ResponseField>
+    <ResponseField name="delivery" type="object">Delivery info: `is_free`, `fulfilled_by_amazon`, `date`, `price`.</ResponseField>
+    <ResponseField name="buybox_winner" type="boolean">Whether this offer currently wins the Buy Box.</ResponseField>
+    <ResponseField name="is_prime" type="boolean">Whether the offer is Prime-eligible.</ResponseField>
+    <ResponseField name="minimum_order_quantity" type="integer">Minimum order quantity (nullable).</ResponseField>
+    <ResponseField name="maximum_order_quantity" type="integer">Maximum order quantity (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "asin": "B08N5WRWNW",
+  "domain": "com",
+  "offers": [
+    {
+      "position": 1,
+      "seller": { "name": "Amazon.com", "id": "ATVPDKIKX0DER", "rating": 4.7, "ratings_total": 1284000, "ratings_percentage_positive": 96 },
+      "price": { "value": 49.99, "currency": "USD", "symbol": "$", "raw": "$49.99" },
+      "condition": { "is_new": true, "title": "New", "comments": null },
+      "delivery": { "is_free": true, "fulfilled_by_amazon": true, "date": "2026-06-04", "price": null },
+      "buybox_winner": true,
+      "is_prime": true,
+      "minimum_order_quantity": 1,
+      "maximum_order_quantity": 30
+    },
+    {
+      "position": 2,
+      "seller": { "name": "TechDeals Store", "id": "A1B2C3D4E5F6G7", "rating": 4.6, "ratings_total": 8421, "ratings_percentage_positive": 94 },
+      "price": { "value": 47.5, "currency": "USD", "symbol": "$", "raw": "$47.50" },
+      "condition": { "is_new": true, "title": "New", "comments": null },
+      "delivery": { "is_free": false, "fulfilled_by_amazon": false, "date": "2026-06-08", "price": { "value": 4.99, "currency": "USD", "symbol": "$", "raw": "$4.99" } },
+      "buybox_winner": false,
+      "is_prime": false,
+      "minimum_order_quantity": 1,
+      "maximum_order_quantity": 10
+    }
+  ]
+}
+```
+
+<Note>
+  Each offers request costs **8 credits**. Single-seller products return an empty `offers` array. Failed requests are not charged.
+</Note>

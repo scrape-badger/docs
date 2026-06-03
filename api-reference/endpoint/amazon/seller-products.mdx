@@ -1,0 +1,75 @@
+---
+title: "Seller Products"
+openapi: "GET /v1/amazon/sellers/{seller_id}/products"
+description: "Products listed in a seller's storefront."
+---
+
+## Path Parameters
+
+<ParamField path="seller_id" type="string" required>
+  The Amazon seller ID whose storefront to list.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="domain" type="string" default="com">
+  Amazon marketplace TLD or code where the seller operates.
+
+  Examples: `com`, `co.uk`, `de`
+</ParamField>
+
+<ParamField query="page" type="integer" default={1}>
+  Page number for paginated storefront results. Starts at `1`.
+</ParamField>
+
+## Response
+
+<ResponseField name="seller_id" type="string">The seller ID whose storefront was listed.</ResponseField>
+<ResponseField name="domain" type="string">Marketplace domain.</ResponseField>
+<ResponseField name="results" type="array">
+  Array of products in the seller storefront.
+
+  <Expandable title="SearchResult object">
+    <ResponseField name="position" type="integer">Position on the page (1-based).</ResponseField>
+    <ResponseField name="asin" type="string">Product ASIN.</ResponseField>
+    <ResponseField name="title" type="string">Product title.</ResponseField>
+    <ResponseField name="link" type="string">Full URL to the product page.</ResponseField>
+    <ResponseField name="image" type="string">Primary product image URL.</ResponseField>
+    <ResponseField name="price" type="object">Price object with `value`, `currency`, `symbol`, `raw`.</ResponseField>
+    <ResponseField name="rating" type="number">Average star rating (nullable).</ResponseField>
+    <ResponseField name="ratings_total" type="integer">Total number of ratings (nullable).</ResponseField>
+    <ResponseField name="is_prime" type="boolean">Whether the item is Prime-eligible.</ResponseField>
+    <ResponseField name="availability" type="string">Availability/stock message.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="pagination" type="object">
+  Pagination metadata with `current_page`, `total_pages`, `total_results`.
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "seller_id": "A1B2C3D4E5F6G7",
+  "domain": "com",
+  "results": [
+    {
+      "position": 1,
+      "asin": "B0CX23V2ZK",
+      "title": "Anker Prime Power Bank (2026)",
+      "link": "https://www.amazon.com/dp/B0CX23V2ZK",
+      "image": "https://m.media-amazon.com/images/I/61new.jpg",
+      "price": { "value": 129.99, "currency": "USD", "symbol": "$", "raw": "$129.99" },
+      "rating": 4.6,
+      "ratings_total": 842,
+      "is_prime": true,
+      "availability": "In Stock"
+    }
+  ],
+  "pagination": { "current_page": 1, "total_pages": 4, "total_results": 96 }
+}
+```
+
+<Note>
+  Each seller products request costs **5 credits**. Failed requests are not charged.
+</Note>

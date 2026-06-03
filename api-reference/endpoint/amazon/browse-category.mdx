@@ -1,0 +1,87 @@
+---
+title: "Browse Category"
+openapi: "GET /v1/amazon/category"
+description: "List products within an Amazon browse-node category."
+---
+
+## Query Parameters
+
+<ParamField query="node" type="string" required>
+  Amazon browse-node id to list products from. You can find browse-node ids in product `bestsellers_rank` links or category URLs (`node=...`).
+</ParamField>
+
+<ParamField query="domain" type="string" default="com">
+  Amazon marketplace TLD or code.
+
+  Examples: `com`, `co.uk`, `de`
+</ParamField>
+
+<ParamField query="page" type="integer" default={1}>
+  Page number for paginated results. Range: `1` - `20`.
+</ParamField>
+
+<ParamField query="sort_by" type="string">
+  Sort order for results.
+
+  | Value | Description |
+  |-------|-------------|
+  | `relevance` | Best match (default) |
+  | `price_low_to_high` | Cheapest first |
+  | `price_high_to_low` | Most expensive first |
+  | `avg_review` | Highest customer rating first |
+  | `newest` | Most recently added |
+</ParamField>
+
+## Response
+
+<ResponseField name="node" type="string">The browse-node id that was listed.</ResponseField>
+<ResponseField name="domain" type="string">Marketplace domain.</ResponseField>
+<ResponseField name="results" type="array">
+  Array of products in the category.
+
+  <Expandable title="SearchResult object">
+    <ResponseField name="position" type="integer">Position on the page (1-based).</ResponseField>
+    <ResponseField name="asin" type="string">Product ASIN.</ResponseField>
+    <ResponseField name="title" type="string">Product title.</ResponseField>
+    <ResponseField name="link" type="string">Full URL to the product page.</ResponseField>
+    <ResponseField name="image" type="string">Primary product image URL.</ResponseField>
+    <ResponseField name="price" type="object">Price object with `value`, `currency`, `symbol`, `raw`.</ResponseField>
+    <ResponseField name="rating" type="number">Average star rating (nullable).</ResponseField>
+    <ResponseField name="ratings_total" type="integer">Total number of ratings (nullable).</ResponseField>
+    <ResponseField name="is_prime" type="boolean">Whether the item is Prime-eligible.</ResponseField>
+    <ResponseField name="is_best_seller" type="boolean">Best Seller badge present.</ResponseField>
+    <ResponseField name="availability" type="string">Availability/stock message.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="pagination" type="object">
+  Pagination metadata with `current_page`, `total_pages`, `total_results`.
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "node": "172282",
+  "domain": "com",
+  "results": [
+    {
+      "position": 1,
+      "asin": "B0CHWRXH8B",
+      "title": "Bose QuietComfort Ultra Wireless Earbuds",
+      "link": "https://www.amazon.com/dp/B0CHWRXH8B",
+      "image": "https://m.media-amazon.com/images/I/61abc123.jpg",
+      "price": { "value": 249.0, "currency": "USD", "symbol": "$", "raw": "$249.00" },
+      "rating": 4.4,
+      "ratings_total": 12480,
+      "is_prime": true,
+      "is_best_seller": true,
+      "availability": "In Stock"
+    }
+  ],
+  "pagination": { "current_page": 1, "total_pages": 20, "total_results": 660 }
+}
+```
+
+<Note>
+  Each category request costs **5 credits**. Failed requests are not charged.
+</Note>

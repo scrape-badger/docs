@@ -1,0 +1,117 @@
+---
+title: "Search Products"
+openapi: "GET /v1/amazon/search"
+description: "Search the Amazon catalog with filters and sorting."
+---
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords. Matches against product titles, brands, and descriptions.
+</ParamField>
+
+<ParamField query="domain" type="string" default="com">
+  Amazon marketplace TLD or code. See [`/v1/amazon/markets`](/api-reference/endpoint/amazon/list-markets) for all supported values.
+
+  Examples: `com`, `co.uk`, `de`, `fr`, `co.jp`
+</ParamField>
+
+<ParamField query="page" type="integer" default={1}>
+  Page number for paginated results. Range: `1` - `20`.
+</ParamField>
+
+<ParamField query="sort_by" type="string">
+  Sort order for results.
+
+  | Value | Description |
+  |-------|-------------|
+  | `relevance` | Best match (default) |
+  | `price_low_to_high` | Cheapest first |
+  | `price_high_to_low` | Most expensive first |
+  | `avg_review` | Highest customer rating first |
+  | `newest` | Most recently added |
+</ParamField>
+
+<ParamField query="category" type="string">
+  Department/category alias to scope the search (the `i=` parameter). Use [`/v1/amazon/categories`](/api-reference/endpoint/amazon/list-categories) to look up aliases.
+
+  Example: `electronics`, `stripbooks`
+</ParamField>
+
+<ParamField query="min_price" type="number">
+  Minimum price filter in the marketplace's local currency.
+</ParamField>
+
+<ParamField query="max_price" type="number">
+  Maximum price filter in the marketplace's local currency.
+</ParamField>
+
+<ParamField query="zip" type="string">
+  Delivery postal/zip code for localized pricing and availability.
+</ParamField>
+
+<ParamField query="language" type="string">
+  Locale for results, e.g. `en_US`, `fr_FR`.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">The search query that was executed.</ResponseField>
+<ResponseField name="domain" type="string">Marketplace domain that was searched.</ResponseField>
+<ResponseField name="results" type="array">
+  Array of matching products.
+
+  <Expandable title="SearchResult object">
+    <ResponseField name="position" type="integer">Position on the page (1-based).</ResponseField>
+    <ResponseField name="asin" type="string">Amazon Standard Identification Number.</ResponseField>
+    <ResponseField name="title" type="string">Product title.</ResponseField>
+    <ResponseField name="link" type="string">Full URL to the product page.</ResponseField>
+    <ResponseField name="image" type="string">Primary product image URL.</ResponseField>
+    <ResponseField name="price" type="object">Price object with `value`, `currency`, `symbol`, `raw`.</ResponseField>
+    <ResponseField name="list_price" type="object">Strikethrough list price (nullable).</ResponseField>
+    <ResponseField name="rating" type="number">Average star rating (0-5).</ResponseField>
+    <ResponseField name="ratings_total" type="integer">Total number of ratings.</ResponseField>
+    <ResponseField name="is_prime" type="boolean">Whether the item is Prime-eligible.</ResponseField>
+    <ResponseField name="is_sponsored" type="boolean">Whether the result is a sponsored placement.</ResponseField>
+    <ResponseField name="is_amazons_choice" type="boolean">Amazon's Choice badge present.</ResponseField>
+    <ResponseField name="is_best_seller" type="boolean">Best Seller badge present.</ResponseField>
+    <ResponseField name="bought_past_month" type="string">Purchase-volume hint (nullable).</ResponseField>
+    <ResponseField name="availability" type="string">Availability/stock message.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="pagination" type="object">
+  Pagination metadata with `current_page`, `total_pages`, `total_results`.
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "query": "wireless earbuds",
+  "domain": "com",
+  "results": [
+    {
+      "position": 1,
+      "asin": "B0CHWRXH8B",
+      "title": "Bose QuietComfort Ultra Wireless Earbuds",
+      "link": "https://www.amazon.com/dp/B0CHWRXH8B",
+      "image": "https://m.media-amazon.com/images/I/61abc123.jpg",
+      "price": { "value": 249.0, "currency": "USD", "symbol": "$", "raw": "$249.00" },
+      "list_price": { "value": 299.0, "currency": "USD", "symbol": "$", "raw": "$299.00" },
+      "rating": 4.4,
+      "ratings_total": 12480,
+      "is_prime": true,
+      "is_sponsored": false,
+      "is_amazons_choice": true,
+      "is_best_seller": false,
+      "bought_past_month": "5K+ bought in past month",
+      "availability": "In Stock"
+    }
+  ],
+  "pagination": { "current_page": 1, "total_pages": 20, "total_results": 480 }
+}
+```
+
+<Note>
+  Each search request costs **5 credits**. Failed requests are not charged.
+</Note>

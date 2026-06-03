@@ -1,0 +1,69 @@
+---
+title: "Bestsellers"
+openapi: "GET /v1/amazon/bestsellers"
+description: "Top-selling products for a category (browse node)."
+---
+
+## Query Parameters
+
+<ParamField query="domain" type="string" default="com">
+  Amazon marketplace TLD or code.
+
+  Examples: `com`, `co.uk`, `de`
+</ParamField>
+
+<ParamField query="category" type="string">
+  Bestsellers node id or category slug. Use [`/v1/amazon/categories`](/api-reference/endpoint/amazon/list-categories) to look up nodes. Defaults to the marketplace's electronics grid on `.com`.
+
+  Example: `electronics`, `books`
+</ParamField>
+
+<ParamField query="page" type="integer" default={1}>
+  Page number. Each page covers 50 ranks. Range: `1` - `2`.
+</ParamField>
+
+## Response
+
+<ResponseField name="domain" type="string">Marketplace domain.</ResponseField>
+<ResponseField name="category" type="string">Category/node the list was pulled from (nullable).</ResponseField>
+<ResponseField name="results" type="array">
+  Array of ranked bestseller products.
+
+  <Expandable title="Bestseller object">
+    <ResponseField name="rank" type="integer">Best-seller rank.</ResponseField>
+    <ResponseField name="position" type="integer">Position on the page.</ResponseField>
+    <ResponseField name="asin" type="string">Product ASIN.</ResponseField>
+    <ResponseField name="title" type="string">Product title.</ResponseField>
+    <ResponseField name="link" type="string">Full URL to the product page.</ResponseField>
+    <ResponseField name="image" type="string">Primary product image URL.</ResponseField>
+    <ResponseField name="rating" type="number">Average star rating (nullable).</ResponseField>
+    <ResponseField name="ratings_total" type="integer">Total number of ratings (nullable).</ResponseField>
+    <ResponseField name="price" type="object">Price object with `value`, `currency`, `symbol`, `raw`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "domain": "com",
+  "category": "electronics",
+  "results": [
+    {
+      "rank": 1,
+      "position": 1,
+      "asin": "B09B8V1LZ3",
+      "title": "Apple AirTag",
+      "link": "https://www.amazon.com/dp/B09B8V1LZ3",
+      "image": "https://m.media-amazon.com/images/I/71abc.jpg",
+      "rating": 4.7,
+      "ratings_total": 412300,
+      "price": { "value": 24.0, "currency": "USD", "symbol": "$", "raw": "$24.00" }
+    }
+  ]
+}
+```
+
+<Note>
+  Each bestsellers request costs **5 credits**. Failed requests are not charged.
+</Note>
