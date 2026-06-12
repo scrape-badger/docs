@@ -1,0 +1,3725 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ScrapeBadger TikTok API",
+    "version": "1.0.0",
+    "description": "TikTok scraping API for user profiles, videos, comments, transcripts, hashtags, music/sounds, search, trending, and the EU Commercial Content (ad transparency) library. Returns clean structured JSON; handles signing, anti-bot bypass, and regional proxy routing automatically."
+  },
+  "servers": [
+    {
+      "url": "https://scrapebadger.com",
+      "description": "Production"
+    }
+  ],
+  "security": [
+    {
+      "apiKeyAuth": []
+    }
+  ],
+  "paths": {
+    "/v1/tiktok/users/{username}": {
+      "get": {
+        "operationId": "getTikTokUser",
+        "summary": "Get User Profile",
+        "description": "Full TikTok user profile by @handle (stats, verification, links, avatars).",
+        "tags": [
+          "TikTok Users"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The user's @handle (unique_id), without the leading '@'."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileResponse"
+                },
+                "example": {
+                  "user": {
+                    "id": "6784129854561813509",
+                    "sec_uid": "MS4wLjABAAAA...",
+                    "unique_id": "charlidamelio",
+                    "nickname": "charli d'amelio",
+                    "signature": "no bio yet",
+                    "bio_link": null,
+                    "verified": true,
+                    "verify_reason": null,
+                    "private_account": false,
+                    "is_commerce_account": false,
+                    "region": "US",
+                    "language": "en",
+                    "avatar_thumb": "https://p16-sign.tiktokcdn-us.com/avatar.jpeg",
+                    "avatar_larger": "https://p16-sign.tiktokcdn-us.com/avatar_larger.jpeg",
+                    "stats": {
+                      "follower_count": 155600000,
+                      "following_count": 1300,
+                      "heart_count": 11800000000,
+                      "video_count": 2700,
+                      "digg_count": 12000,
+                      "friend_count": 1200
+                    },
+                    "is_live": false,
+                    "create_time_utc": 1531234567,
+                    "create_time_at": "2018-07-10T12:16:07Z",
+                    "profile_url": "https://www.tiktok.com/@charlidamelio"
+                  },
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/users/{username}/videos": {
+      "get": {
+        "operationId": "getTikTokUserVideos",
+        "summary": "Get User Videos",
+        "description": "A user's posted videos, newest first, with cursor pagination.",
+        "tags": [
+          "TikTok Users"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The user's @handle (unique_id), without the leading '@'."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 30,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Maximum number of items to return (1-50)."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Opaque pagination cursor from a prior page's `pagination.cursor`."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User videos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoListResponse"
+                },
+                "example": {
+                  "videos": [
+                    {
+                      "id": "7234567890123456789",
+                      "description": "new dance #fyp #dance",
+                      "create_time_utc": 1700000000,
+                      "create_time_at": "2023-11-14T22:13:20Z",
+                      "region": "US",
+                      "url": "https://www.tiktok.com/@charlidamelio/video/7234567890123456789",
+                      "share_url": "https://www.tiktok.com/@charlidamelio/video/7234567890123456789",
+                      "aweme_type": 0,
+                      "author": {
+                        "id": "6784129854561813509",
+                        "sec_uid": "MS4wLjABAAAA...",
+                        "unique_id": "charlidamelio",
+                        "nickname": "charli d'amelio",
+                        "avatar_thumb": "https://p16-sign.tiktokcdn-us.com/avatar.jpeg",
+                        "signature": "no bio yet",
+                        "verified": true,
+                        "follower_count": 155600000,
+                        "following_count": 1300,
+                        "heart_count": 11800000000,
+                        "video_count": 2700,
+                        "region": "US"
+                      },
+                      "music": {
+                        "id": "7011111111111111111",
+                        "title": "original sound",
+                        "author_name": "charli d'amelio",
+                        "duration": 15,
+                        "play_url": "https://sf16-sg.tiktokcdn.com/music.mp3",
+                        "original": true
+                      },
+                      "stats": {
+                        "play_count": 24000000,
+                        "digg_count": 3100000,
+                        "comment_count": 18000,
+                        "share_count": 42000,
+                        "collect_count": 99000
+                      },
+                      "video": {
+                        "height": 1024,
+                        "width": 576,
+                        "duration": 15,
+                        "ratio": "540p",
+                        "format": "mp4",
+                        "cover": "https://p16-sign.tiktokcdn-us.com/cover.jpeg",
+                        "play_addr": "https://v16-webapp.tiktok.com/video.mp4",
+                        "download_addr": "https://v16-webapp.tiktok.com/download.mp4",
+                        "has_watermark": true
+                      },
+                      "hashtags": [
+                        "fyp",
+                        "dance"
+                      ],
+                      "mentions": [],
+                      "challenges": [
+                        {
+                          "id": "229207",
+                          "title": "fyp",
+                          "desc": "",
+                          "is_commerce": false
+                        }
+                      ],
+                      "is_slideshow": false,
+                      "image_urls": [],
+                      "is_ad": false,
+                      "is_pinned": false
+                    }
+                  ],
+                  "pagination": {
+                    "has_more": true,
+                    "cursor": "30",
+                    "count": 30,
+                    "search_id": null
+                  },
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/users/{username}/followers": {
+      "get": {
+        "operationId": "getTikTokUserFollowers",
+        "summary": "Get Followers (Deprecated)",
+        "deprecated": true,
+        "description": "**Deprecated (HTTP 410 Gone).** TikTok followers/following/liked-video lists require an authenticated account session, which the ScrapeBadger TikTok API does not provide. This route is retained for contract discoverability but always returns 410. All other TikTok endpoints remain fully supported.",
+        "tags": [
+          "TikTok Users"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The user's @handle (unique_id), without the leading '@'."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 30,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Maximum number of items to return (1-50)."
+          }
+        ],
+        "responses": {
+          "410": {
+            "description": "Gone \u2014 endpoint deprecated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeprecatedError"
+                },
+                "example": {
+                  "error": "endpoint_deprecated",
+                  "endpoint": "users/charlidamelio/followers",
+                  "deprecated": true,
+                  "message": "This endpoint is deprecated and no longer available. TikTok followers, following, and liked-video lists require an authenticated account session, which the ScrapeBadger TikTok API does not provide."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/users/{username}/following": {
+      "get": {
+        "operationId": "getTikTokUserFollowing",
+        "summary": "Get Following (Deprecated)",
+        "deprecated": true,
+        "description": "**Deprecated (HTTP 410 Gone).** TikTok followers/following/liked-video lists require an authenticated account session, which the ScrapeBadger TikTok API does not provide. This route is retained for contract discoverability but always returns 410. All other TikTok endpoints remain fully supported.",
+        "tags": [
+          "TikTok Users"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The user's @handle (unique_id), without the leading '@'."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 30,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Maximum number of items to return (1-50)."
+          }
+        ],
+        "responses": {
+          "410": {
+            "description": "Gone \u2014 endpoint deprecated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeprecatedError"
+                },
+                "example": {
+                  "error": "endpoint_deprecated",
+                  "endpoint": "users/charlidamelio/followers",
+                  "deprecated": true,
+                  "message": "This endpoint is deprecated and no longer available. TikTok followers, following, and liked-video lists require an authenticated account session, which the ScrapeBadger TikTok API does not provide."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/users/{username}/liked": {
+      "get": {
+        "operationId": "getTikTokUserLiked",
+        "summary": "Get Liked Videos (Deprecated)",
+        "deprecated": true,
+        "description": "**Deprecated (HTTP 410 Gone).** TikTok followers/following/liked-video lists require an authenticated account session, which the ScrapeBadger TikTok API does not provide. This route is retained for contract discoverability but always returns 410. All other TikTok endpoints remain fully supported.",
+        "tags": [
+          "TikTok Users"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The user's @handle (unique_id), without the leading '@'."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 30,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Maximum number of items to return (1-50)."
+          }
+        ],
+        "responses": {
+          "410": {
+            "description": "Gone \u2014 endpoint deprecated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeprecatedError"
+                },
+                "example": {
+                  "error": "endpoint_deprecated",
+                  "endpoint": "users/charlidamelio/followers",
+                  "deprecated": true,
+                  "message": "This endpoint is deprecated and no longer available. TikTok followers, following, and liked-video lists require an authenticated account session, which the ScrapeBadger TikTok API does not provide."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/users/{username}/reposts": {
+      "get": {
+        "operationId": "getTikTokUserReposts",
+        "summary": "Get User Reposts",
+        "description": "Videos a user has reposted to their profile.",
+        "tags": [
+          "TikTok Users"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The user's @handle (unique_id), without the leading '@'."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 30,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Maximum number of items to return (1-50)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reposted videos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoListResponse"
+                },
+                "example": {
+                  "videos": [
+                    {
+                      "id": "7234567890123456789",
+                      "description": "new dance #fyp #dance",
+                      "create_time_utc": 1700000000,
+                      "create_time_at": "2023-11-14T22:13:20Z",
+                      "region": "US",
+                      "url": "https://www.tiktok.com/@charlidamelio/video/7234567890123456789",
+                      "share_url": "https://www.tiktok.com/@charlidamelio/video/7234567890123456789",
+                      "aweme_type": 0,
+                      "author": {
+                        "id": "6784129854561813509",
+                        "sec_uid": "MS4wLjABAAAA...",
+                        "unique_id": "charlidamelio",
+                        "nickname": "charli d'amelio",
+                        "avatar_thumb": "https://p16-sign.tiktokcdn-us.com/avatar.jpeg",
+                        "signature": "no bio yet",
+                        "verified": true,
+                        "follower_count": 155600000,
+                        "following_count": 1300,
+                        "heart_count": 11800000000,
+                        "video_count": 2700,
+                        "region": "US"
+                      },
+                      "music": {
+                        "id": "7011111111111111111",
+                        "title": "original sound",
+                        "author_name": "charli d'amelio",
+                        "duration": 15,
+                        "play_url": "https://sf16-sg.tiktokcdn.com/music.mp3",
+                        "original": true
+                      },
+                      "stats": {
+                        "play_count": 24000000,
+                        "digg_count": 3100000,
+                        "comment_count": 18000,
+                        "share_count": 42000,
+                        "collect_count": 99000
+                      },
+                      "video": {
+                        "height": 1024,
+                        "width": 576,
+                        "duration": 15,
+                        "ratio": "540p",
+                        "format": "mp4",
+                        "cover": "https://p16-sign.tiktokcdn-us.com/cover.jpeg",
+                        "play_addr": "https://v16-webapp.tiktok.com/video.mp4",
+                        "download_addr": "https://v16-webapp.tiktok.com/download.mp4",
+                        "has_watermark": true
+                      },
+                      "hashtags": [
+                        "fyp",
+                        "dance"
+                      ],
+                      "mentions": [],
+                      "challenges": [
+                        {
+                          "id": "229207",
+                          "title": "fyp",
+                          "desc": "",
+                          "is_commerce": false
+                        }
+                      ],
+                      "is_slideshow": false,
+                      "image_urls": [],
+                      "is_ad": false,
+                      "is_pinned": false
+                    }
+                  ],
+                  "pagination": {
+                    "has_more": true,
+                    "cursor": "30",
+                    "count": 30,
+                    "search_id": null
+                  },
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/videos/{video_id}": {
+      "get": {
+        "operationId": "getTikTokVideo",
+        "summary": "Get Video Detail",
+        "description": "Full metadata for a single TikTok video or photo slideshow.",
+        "tags": [
+          "TikTok Videos"
+        ],
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The numeric TikTok video/aweme id."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          },
+          {
+            "name": "username",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Author @handle. When supplied, skips the oEmbed author lookup for a faster, cheaper fetch."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Video detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoResponse"
+                },
+                "example": {
+                  "video": {
+                    "id": "7234567890123456789",
+                    "description": "new dance #fyp #dance",
+                    "create_time_utc": 1700000000,
+                    "create_time_at": "2023-11-14T22:13:20Z",
+                    "region": "US",
+                    "url": "https://www.tiktok.com/@charlidamelio/video/7234567890123456789",
+                    "share_url": "https://www.tiktok.com/@charlidamelio/video/7234567890123456789",
+                    "aweme_type": 0,
+                    "author": {
+                      "id": "6784129854561813509",
+                      "sec_uid": "MS4wLjABAAAA...",
+                      "unique_id": "charlidamelio",
+                      "nickname": "charli d'amelio",
+                      "avatar_thumb": "https://p16-sign.tiktokcdn-us.com/avatar.jpeg",
+                      "signature": "no bio yet",
+                      "verified": true,
+                      "follower_count": 155600000,
+                      "following_count": 1300,
+                      "heart_count": 11800000000,
+                      "video_count": 2700,
+                      "region": "US"
+                    },
+                    "music": {
+                      "id": "7011111111111111111",
+                      "title": "original sound",
+                      "author_name": "charli d'amelio",
+                      "duration": 15,
+                      "play_url": "https://sf16-sg.tiktokcdn.com/music.mp3",
+                      "original": true
+                    },
+                    "stats": {
+                      "play_count": 24000000,
+                      "digg_count": 3100000,
+                      "comment_count": 18000,
+                      "share_count": 42000,
+                      "collect_count": 99000
+                    },
+                    "video": {
+                      "height": 1024,
+                      "width": 576,
+                      "duration": 15,
+                      "ratio": "540p",
+                      "format": "mp4",
+                      "cover": "https://p16-sign.tiktokcdn-us.com/cover.jpeg",
+                      "play_addr": "https://v16-webapp.tiktok.com/video.mp4",
+                      "download_addr": "https://v16-webapp.tiktok.com/download.mp4",
+                      "has_watermark": true
+                    },
+                    "hashtags": [
+                      "fyp",
+                      "dance"
+                    ],
+                    "mentions": [],
+                    "challenges": [
+                      {
+                        "id": "229207",
+                        "title": "fyp",
+                        "desc": "",
+                        "is_commerce": false
+                      }
+                    ],
+                    "is_slideshow": false,
+                    "image_urls": [],
+                    "is_ad": false,
+                    "is_pinned": false
+                  },
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/videos/{video_id}/comments": {
+      "get": {
+        "operationId": "getTikTokVideoComments",
+        "summary": "Get Comments",
+        "description": "Top-level comments on a video, with cursor pagination.",
+        "tags": [
+          "TikTok Videos"
+        ],
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The numeric TikTok video/aweme id."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Maximum number of items to return (1-50)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentListResponse"
+                },
+                "example": {
+                  "comments": [
+                    {
+                      "id": "7234999999999999999",
+                      "text": "this is iconic",
+                      "aweme_id": "7234567890123456789",
+                      "parent_comment_id": null,
+                      "digg_count": 12000,
+                      "reply_count": 34,
+                      "create_time_utc": 1700000500,
+                      "create_time_at": "2023-11-14T22:21:40Z",
+                      "liked_by_author": true,
+                      "pinned_by_author": false,
+                      "comment_language": "en",
+                      "mentions": [],
+                      "image_urls": [],
+                      "author": {
+                        "id": "6784129854561813509",
+                        "sec_uid": "MS4wLjABAAAA...",
+                        "unique_id": "charlidamelio",
+                        "nickname": "charli d'amelio",
+                        "avatar_thumb": "https://p16-sign.tiktokcdn-us.com/avatar.jpeg",
+                        "signature": "no bio yet",
+                        "verified": true,
+                        "follower_count": 155600000,
+                        "following_count": 1300,
+                        "heart_count": 11800000000,
+                        "video_count": 2700,
+                        "region": "US"
+                      },
+                      "replies": []
+                    }
+                  ],
+                  "pagination": {
+                    "has_more": true,
+                    "cursor": "30",
+                    "count": 30,
+                    "search_id": null
+                  },
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/videos/{video_id}/related": {
+      "get": {
+        "operationId": "getTikTokRelatedVideos",
+        "summary": "Get Related Videos",
+        "description": "TikTok's recommended/related videos for a given video.",
+        "tags": [
+          "TikTok Videos"
+        ],
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The numeric TikTok video/aweme id."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 16,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Maximum number of items to return (1-50)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Related videos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoListResponse"
+                },
+                "example": {
+                  "videos": [
+                    {
+                      "id": "7234567890123456789",
+                      "description": "new dance #fyp #dance",
+                      "create_time_utc": 1700000000,
+                      "create_time_at": "2023-11-14T22:13:20Z",
+                      "region": "US",
+                      "url": "https://www.tiktok.com/@charlidamelio/video/7234567890123456789",
+                      "share_url": "https://www.tiktok.com/@charlidamelio/video/7234567890123456789",
+                      "aweme_type": 0,
+                      "author": {
+                        "id": "6784129854561813509",
+                        "sec_uid": "MS4wLjABAAAA...",
+                        "unique_id": "charlidamelio",
+                        "nickname": "charli d'amelio",
+                        "avatar_thumb": "https://p16-sign.tiktokcdn-us.com/avatar.jpeg",
+                        "signature": "no bio yet",
+                        "verified": true,
+                        "follower_count": 155600000,
+                        "following_count": 1300,
+                        "heart_count": 11800000000,
+                        "video_count": 2700,
+                        "region": "US"
+                      },
+                      "music": {
+                        "id": "7011111111111111111",
+                        "title": "original sound",
+                        "author_name": "charli d'amelio",
+                        "duration": 15,
+                        "play_url": "https://sf16-sg.tiktokcdn.com/music.mp3",
+                        "original": true
+                      },
+                      "stats": {
+                        "play_count": 24000000,
+                        "digg_count": 3100000,
+                        "comment_count": 18000,
+                        "share_count": 42000,
+                        "collect_count": 99000
+                      },
+                      "video": {
+                        "height": 1024,
+                        "width": 576,
+                        "duration": 15,
+                        "ratio": "540p",
+                        "format": "mp4",
+                        "cover": "https://p16-sign.tiktokcdn-us.com/cover.jpeg",
+                        "play_addr": "https://v16-webapp.tiktok.com/video.mp4",
+                        "download_addr": "https://v16-webapp.tiktok.com/download.mp4",
+                        "has_watermark": true
+                      },
+                      "hashtags": [
+                        "fyp",
+                        "dance"
+                      ],
+                      "mentions": [],
+                      "challenges": [
+                        {
+                          "id": "229207",
+                          "title": "fyp",
+                          "desc": "",
+                          "is_commerce": false
+                        }
+                      ],
+                      "is_slideshow": false,
+                      "image_urls": [],
+                      "is_ad": false,
+                      "is_pinned": false
+                    }
+                  ],
+                  "pagination": {
+                    "has_more": true,
+                    "cursor": "30",
+                    "count": 30,
+                    "search_id": null
+                  },
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/videos/{video_id}/transcript": {
+      "get": {
+        "operationId": "getTikTokTranscript",
+        "summary": "Get Transcript",
+        "description": "Subtitle/caption tracks and the ASR voice-to-text transcript for a video.",
+        "tags": [
+          "TikTok Videos"
+        ],
+        "parameters": [
+          {
+            "name": "video_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The numeric TikTok video/aweme id."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transcript",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranscriptResponse"
+                },
+                "example": {
+                  "video_id": "7234567890123456789",
+                  "subtitles": [
+                    {
+                      "language": "English",
+                      "language_code": "eng-US",
+                      "source": "ASR",
+                      "url": "https://v16-webapp.tiktok.com/subtitle.webvtt",
+                      "format": "webvtt"
+                    }
+                  ],
+                  "voice_to_text": "hey guys welcome back to my channel",
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/comments/{comment_id}/replies": {
+      "get": {
+        "operationId": "getTikTokCommentReplies",
+        "summary": "Get Comment Replies",
+        "description": "Replies to a specific comment on a video.",
+        "tags": [
+          "TikTok Videos"
+        ],
+        "parameters": [
+          {
+            "name": "comment_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The comment id (cid) whose replies you want."
+          },
+          {
+            "name": "video_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The parent video/aweme id the comment belongs to."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Maximum number of items to return (1-50)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comment replies",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentListResponse"
+                },
+                "example": {
+                  "comments": [
+                    {
+                      "id": "7234999999999999999",
+                      "text": "this is iconic",
+                      "aweme_id": "7234567890123456789",
+                      "parent_comment_id": null,
+                      "digg_count": 12000,
+                      "reply_count": 34,
+                      "create_time_utc": 1700000500,
+                      "create_time_at": "2023-11-14T22:21:40Z",
+                      "liked_by_author": true,
+                      "pinned_by_author": false,
+                      "comment_language": "en",
+                      "mentions": [],
+                      "image_urls": [],
+                      "author": {
+                        "id": "6784129854561813509",
+                        "sec_uid": "MS4wLjABAAAA...",
+                        "unique_id": "charlidamelio",
+                        "nickname": "charli d'amelio",
+                        "avatar_thumb": "https://p16-sign.tiktokcdn-us.com/avatar.jpeg",
+                        "signature": "no bio yet",
+                        "verified": true,
+                        "follower_count": 155600000,
+                        "following_count": 1300,
+                        "heart_count": 11800000000,
+                        "video_count": 2700,
+                        "region": "US"
+                      },
+                      "replies": []
+                    }
+                  ],
+                  "pagination": {
+                    "has_more": true,
+                    "cursor": "30",
+                    "count": 30,
+                    "search_id": null
+                  },
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/oembed": {
+      "get": {
+        "operationId": "getTikTokOEmbed",
+        "summary": "Get oEmbed Metadata",
+        "description": "Cheap, unauthenticated oEmbed metadata for a TikTok video or profile URL.",
+        "tags": [
+          "TikTok Videos"
+        ],
+        "parameters": [
+          {
+            "name": "url",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Full TikTok video or profile URL."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "oEmbed metadata",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TikTokOEmbed"
+                },
+                "example": {
+                  "version": "1.0",
+                  "type": "video",
+                  "title": "new dance #fyp #dance",
+                  "author_name": "charli d'amelio",
+                  "author_url": "https://www.tiktok.com/@charlidamelio",
+                  "provider_name": "TikTok",
+                  "provider_url": "https://www.tiktok.com",
+                  "html": "<blockquote class=\"tiktok-embed\" ...></blockquote>",
+                  "thumbnail_url": "https://p16-sign.tiktokcdn-us.com/oembed.jpeg",
+                  "thumbnail_width": 576,
+                  "thumbnail_height": 1024,
+                  "embed_product_id": "7234567890123456789",
+                  "embed_type": "video"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/hashtags/{name}": {
+      "get": {
+        "operationId": "getTikTokHashtag",
+        "summary": "Get Hashtag Detail",
+        "description": "Hashtag/challenge detail (video count, view count, cover).",
+        "tags": [
+          "TikTok Hashtags"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The hashtag text, without the leading '#'."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Hashtag detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HashtagResponse"
+                },
+                "example": {
+                  "hashtag": {
+                    "id": "229207",
+                    "title": "fyp",
+                    "description": "Videos on the For You feed.",
+                    "cover": "https://p16-sign.tiktokcdn-us.com/hashtag.jpeg",
+                    "video_count": 12000000,
+                    "view_count": 55000000000000,
+                    "is_commerce": false,
+                    "url": "https://www.tiktok.com/tag/fyp"
+                  },
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/hashtags/{name}/videos": {
+      "get": {
+        "operationId": "getTikTokHashtagVideos",
+        "summary": "Get Hashtag Videos",
+        "description": "Videos tagged with a given hashtag, with cursor pagination.",
+        "tags": [
+          "TikTok Hashtags"
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The hashtag text, without the leading '#'."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 30,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Maximum number of items to return (1-50)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Hashtag videos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoListResponse"
+                },
+                "example": {
+                  "videos": [
+                    {
+                      "id": "7234567890123456789",
+                      "description": "new dance #fyp #dance",
+                      "create_time_utc": 1700000000,
+                      "create_time_at": "2023-11-14T22:13:20Z",
+                      "region": "US",
+                      "url": "https://www.tiktok.com/@charlidamelio/video/7234567890123456789",
+                      "share_url": "https://www.tiktok.com/@charlidamelio/video/7234567890123456789",
+                      "aweme_type": 0,
+                      "author": {
+                        "id": "6784129854561813509",
+                        "sec_uid": "MS4wLjABAAAA...",
+                        "unique_id": "charlidamelio",
+                        "nickname": "charli d'amelio",
+                        "avatar_thumb": "https://p16-sign.tiktokcdn-us.com/avatar.jpeg",
+                        "signature": "no bio yet",
+                        "verified": true,
+                        "follower_count": 155600000,
+                        "following_count": 1300,
+                        "heart_count": 11800000000,
+                        "video_count": 2700,
+                        "region": "US"
+                      },
+                      "music": {
+                        "id": "7011111111111111111",
+                        "title": "original sound",
+                        "author_name": "charli d'amelio",
+                        "duration": 15,
+                        "play_url": "https://sf16-sg.tiktokcdn.com/music.mp3",
+                        "original": true
+                      },
+                      "stats": {
+                        "play_count": 24000000,
+                        "digg_count": 3100000,
+                        "comment_count": 18000,
+                        "share_count": 42000,
+                        "collect_count": 99000
+                      },
+                      "video": {
+                        "height": 1024,
+                        "width": 576,
+                        "duration": 15,
+                        "ratio": "540p",
+                        "format": "mp4",
+                        "cover": "https://p16-sign.tiktokcdn-us.com/cover.jpeg",
+                        "play_addr": "https://v16-webapp.tiktok.com/video.mp4",
+                        "download_addr": "https://v16-webapp.tiktok.com/download.mp4",
+                        "has_watermark": true
+                      },
+                      "hashtags": [
+                        "fyp",
+                        "dance"
+                      ],
+                      "mentions": [],
+                      "challenges": [
+                        {
+                          "id": "229207",
+                          "title": "fyp",
+                          "desc": "",
+                          "is_commerce": false
+                        }
+                      ],
+                      "is_slideshow": false,
+                      "image_urls": [],
+                      "is_ad": false,
+                      "is_pinned": false
+                    }
+                  ],
+                  "pagination": {
+                    "has_more": true,
+                    "cursor": "30",
+                    "count": 30,
+                    "search_id": null
+                  },
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/music/{music_id}": {
+      "get": {
+        "operationId": "getTikTokMusic",
+        "summary": "Get Music/Sound Detail",
+        "description": "Detail for a TikTok sound/music entity (title, author, usage counts).",
+        "tags": [
+          "TikTok Music"
+        ],
+        "parameters": [
+          {
+            "name": "music_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The numeric TikTok music/sound id."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Music detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MusicResponse"
+                },
+                "example": {
+                  "music": {
+                    "id": "7011111111111111111",
+                    "title": "original sound",
+                    "author_name": "charli d'amelio",
+                    "album": null,
+                    "duration": 15,
+                    "play_url": "https://sf16-sg.tiktokcdn.com/music.mp3",
+                    "cover_thumb": "https://p16-sign.tiktokcdn-us.com/music_cover.jpeg",
+                    "original": true,
+                    "is_copyrighted": false,
+                    "video_count": 480000,
+                    "user_count": 460000
+                  },
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/music/{music_id}/videos": {
+      "get": {
+        "operationId": "getTikTokMusicVideos",
+        "summary": "Get Music Videos",
+        "description": "Videos that use a given TikTok sound, with cursor pagination.",
+        "tags": [
+          "TikTok Music"
+        ],
+        "parameters": [
+          {
+            "name": "music_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The numeric TikTok music/sound id."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 30,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Maximum number of items to return (1-50)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Music videos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoListResponse"
+                },
+                "example": {
+                  "videos": [
+                    {
+                      "id": "7234567890123456789",
+                      "description": "new dance #fyp #dance",
+                      "create_time_utc": 1700000000,
+                      "create_time_at": "2023-11-14T22:13:20Z",
+                      "region": "US",
+                      "url": "https://www.tiktok.com/@charlidamelio/video/7234567890123456789",
+                      "share_url": "https://www.tiktok.com/@charlidamelio/video/7234567890123456789",
+                      "aweme_type": 0,
+                      "author": {
+                        "id": "6784129854561813509",
+                        "sec_uid": "MS4wLjABAAAA...",
+                        "unique_id": "charlidamelio",
+                        "nickname": "charli d'amelio",
+                        "avatar_thumb": "https://p16-sign.tiktokcdn-us.com/avatar.jpeg",
+                        "signature": "no bio yet",
+                        "verified": true,
+                        "follower_count": 155600000,
+                        "following_count": 1300,
+                        "heart_count": 11800000000,
+                        "video_count": 2700,
+                        "region": "US"
+                      },
+                      "music": {
+                        "id": "7011111111111111111",
+                        "title": "original sound",
+                        "author_name": "charli d'amelio",
+                        "duration": 15,
+                        "play_url": "https://sf16-sg.tiktokcdn.com/music.mp3",
+                        "original": true
+                      },
+                      "stats": {
+                        "play_count": 24000000,
+                        "digg_count": 3100000,
+                        "comment_count": 18000,
+                        "share_count": 42000,
+                        "collect_count": 99000
+                      },
+                      "video": {
+                        "height": 1024,
+                        "width": 576,
+                        "duration": 15,
+                        "ratio": "540p",
+                        "format": "mp4",
+                        "cover": "https://p16-sign.tiktokcdn-us.com/cover.jpeg",
+                        "play_addr": "https://v16-webapp.tiktok.com/video.mp4",
+                        "download_addr": "https://v16-webapp.tiktok.com/download.mp4",
+                        "has_watermark": true
+                      },
+                      "hashtags": [
+                        "fyp",
+                        "dance"
+                      ],
+                      "mentions": [],
+                      "challenges": [
+                        {
+                          "id": "229207",
+                          "title": "fyp",
+                          "desc": "",
+                          "is_commerce": false
+                        }
+                      ],
+                      "is_slideshow": false,
+                      "image_urls": [],
+                      "is_ad": false,
+                      "is_pinned": false
+                    }
+                  ],
+                  "pagination": {
+                    "has_more": true,
+                    "cursor": "30",
+                    "count": 30,
+                    "search_id": null
+                  },
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/search": {
+      "get": {
+        "operationId": "searchTikTok",
+        "summary": "General Search",
+        "description": "General TikTok search \u2014 video results from the Top feed.",
+        "tags": [
+          "TikTok Search"
+        ],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search keyword."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Maximum number of items to return (1-50)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoListResponse"
+                },
+                "example": {
+                  "videos": [
+                    {
+                      "id": "7234567890123456789",
+                      "description": "new dance #fyp #dance",
+                      "create_time_utc": 1700000000,
+                      "create_time_at": "2023-11-14T22:13:20Z",
+                      "region": "US",
+                      "url": "https://www.tiktok.com/@charlidamelio/video/7234567890123456789",
+                      "share_url": "https://www.tiktok.com/@charlidamelio/video/7234567890123456789",
+                      "aweme_type": 0,
+                      "author": {
+                        "id": "6784129854561813509",
+                        "sec_uid": "MS4wLjABAAAA...",
+                        "unique_id": "charlidamelio",
+                        "nickname": "charli d'amelio",
+                        "avatar_thumb": "https://p16-sign.tiktokcdn-us.com/avatar.jpeg",
+                        "signature": "no bio yet",
+                        "verified": true,
+                        "follower_count": 155600000,
+                        "following_count": 1300,
+                        "heart_count": 11800000000,
+                        "video_count": 2700,
+                        "region": "US"
+                      },
+                      "music": {
+                        "id": "7011111111111111111",
+                        "title": "original sound",
+                        "author_name": "charli d'amelio",
+                        "duration": 15,
+                        "play_url": "https://sf16-sg.tiktokcdn.com/music.mp3",
+                        "original": true
+                      },
+                      "stats": {
+                        "play_count": 24000000,
+                        "digg_count": 3100000,
+                        "comment_count": 18000,
+                        "share_count": 42000,
+                        "collect_count": 99000
+                      },
+                      "video": {
+                        "height": 1024,
+                        "width": 576,
+                        "duration": 15,
+                        "ratio": "540p",
+                        "format": "mp4",
+                        "cover": "https://p16-sign.tiktokcdn-us.com/cover.jpeg",
+                        "play_addr": "https://v16-webapp.tiktok.com/video.mp4",
+                        "download_addr": "https://v16-webapp.tiktok.com/download.mp4",
+                        "has_watermark": true
+                      },
+                      "hashtags": [
+                        "fyp",
+                        "dance"
+                      ],
+                      "mentions": [],
+                      "challenges": [
+                        {
+                          "id": "229207",
+                          "title": "fyp",
+                          "desc": "",
+                          "is_commerce": false
+                        }
+                      ],
+                      "is_slideshow": false,
+                      "image_urls": [],
+                      "is_ad": false,
+                      "is_pinned": false
+                    }
+                  ],
+                  "pagination": {
+                    "has_more": true,
+                    "cursor": "30",
+                    "count": 30,
+                    "search_id": null
+                  },
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/search/users": {
+      "get": {
+        "operationId": "searchTikTokUsers",
+        "summary": "Search Users",
+        "description": "Search TikTok users by keyword.",
+        "tags": [
+          "TikTok Search"
+        ],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search keyword."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Maximum number of items to return (1-50)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSearchResponse"
+                },
+                "example": {
+                  "users": [
+                    {
+                      "id": "6784129854561813509",
+                      "sec_uid": "MS4wLjABAAAA...",
+                      "unique_id": "charlidamelio",
+                      "nickname": "charli d'amelio",
+                      "avatar_thumb": "https://p16-sign.tiktokcdn-us.com/avatar.jpeg",
+                      "signature": "no bio yet",
+                      "verified": true,
+                      "follower_count": 155600000,
+                      "following_count": 1300,
+                      "heart_count": 11800000000,
+                      "video_count": 2700,
+                      "region": "US"
+                    }
+                  ],
+                  "pagination": {
+                    "has_more": true,
+                    "cursor": "30",
+                    "count": 30,
+                    "search_id": null
+                  },
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/search/videos": {
+      "get": {
+        "operationId": "searchTikTokVideos",
+        "summary": "Search Videos",
+        "description": "Search TikTok videos by keyword.",
+        "tags": [
+          "TikTok Search"
+        ],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search keyword."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Maximum number of items to return (1-50)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Video search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoListResponse"
+                },
+                "example": {
+                  "videos": [
+                    {
+                      "id": "7234567890123456789",
+                      "description": "new dance #fyp #dance",
+                      "create_time_utc": 1700000000,
+                      "create_time_at": "2023-11-14T22:13:20Z",
+                      "region": "US",
+                      "url": "https://www.tiktok.com/@charlidamelio/video/7234567890123456789",
+                      "share_url": "https://www.tiktok.com/@charlidamelio/video/7234567890123456789",
+                      "aweme_type": 0,
+                      "author": {
+                        "id": "6784129854561813509",
+                        "sec_uid": "MS4wLjABAAAA...",
+                        "unique_id": "charlidamelio",
+                        "nickname": "charli d'amelio",
+                        "avatar_thumb": "https://p16-sign.tiktokcdn-us.com/avatar.jpeg",
+                        "signature": "no bio yet",
+                        "verified": true,
+                        "follower_count": 155600000,
+                        "following_count": 1300,
+                        "heart_count": 11800000000,
+                        "video_count": 2700,
+                        "region": "US"
+                      },
+                      "music": {
+                        "id": "7011111111111111111",
+                        "title": "original sound",
+                        "author_name": "charli d'amelio",
+                        "duration": 15,
+                        "play_url": "https://sf16-sg.tiktokcdn.com/music.mp3",
+                        "original": true
+                      },
+                      "stats": {
+                        "play_count": 24000000,
+                        "digg_count": 3100000,
+                        "comment_count": 18000,
+                        "share_count": 42000,
+                        "collect_count": 99000
+                      },
+                      "video": {
+                        "height": 1024,
+                        "width": 576,
+                        "duration": 15,
+                        "ratio": "540p",
+                        "format": "mp4",
+                        "cover": "https://p16-sign.tiktokcdn-us.com/cover.jpeg",
+                        "play_addr": "https://v16-webapp.tiktok.com/video.mp4",
+                        "download_addr": "https://v16-webapp.tiktok.com/download.mp4",
+                        "has_watermark": true
+                      },
+                      "hashtags": [
+                        "fyp",
+                        "dance"
+                      ],
+                      "mentions": [],
+                      "challenges": [
+                        {
+                          "id": "229207",
+                          "title": "fyp",
+                          "desc": "",
+                          "is_commerce": false
+                        }
+                      ],
+                      "is_slideshow": false,
+                      "image_urls": [],
+                      "is_ad": false,
+                      "is_pinned": false
+                    }
+                  ],
+                  "pagination": {
+                    "has_more": true,
+                    "cursor": "30",
+                    "count": 30,
+                    "search_id": null
+                  },
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/search/hashtags": {
+      "get": {
+        "operationId": "searchTikTokHashtags",
+        "summary": "Search Hashtags",
+        "description": "Search TikTok hashtags by keyword.",
+        "tags": [
+          "TikTok Search"
+        ],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search keyword."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Maximum number of items to return (1-50)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Hashtag search results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HashtagSearchResponse"
+                },
+                "example": {
+                  "hashtags": [
+                    {
+                      "id": "229207",
+                      "title": "fyp",
+                      "description": "Videos on the For You feed.",
+                      "cover": "https://p16-sign.tiktokcdn-us.com/hashtag.jpeg",
+                      "video_count": 12000000,
+                      "view_count": 55000000000000,
+                      "is_commerce": false,
+                      "url": "https://www.tiktok.com/tag/fyp"
+                    }
+                  ],
+                  "pagination": {
+                    "has_more": true,
+                    "cursor": "30",
+                    "count": 30,
+                    "search_id": null
+                  },
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/trending/videos": {
+      "get": {
+        "operationId": "getTikTokTrendingVideos",
+        "summary": "Trending Videos",
+        "description": "Trending videos from the TikTok Explore feed.",
+        "tags": [
+          "TikTok Trending"
+        ],
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Maximum number of items to return (1-50)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Trending videos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VideoListResponse"
+                },
+                "example": {
+                  "videos": [
+                    {
+                      "id": "7234567890123456789",
+                      "description": "new dance #fyp #dance",
+                      "create_time_utc": 1700000000,
+                      "create_time_at": "2023-11-14T22:13:20Z",
+                      "region": "US",
+                      "url": "https://www.tiktok.com/@charlidamelio/video/7234567890123456789",
+                      "share_url": "https://www.tiktok.com/@charlidamelio/video/7234567890123456789",
+                      "aweme_type": 0,
+                      "author": {
+                        "id": "6784129854561813509",
+                        "sec_uid": "MS4wLjABAAAA...",
+                        "unique_id": "charlidamelio",
+                        "nickname": "charli d'amelio",
+                        "avatar_thumb": "https://p16-sign.tiktokcdn-us.com/avatar.jpeg",
+                        "signature": "no bio yet",
+                        "verified": true,
+                        "follower_count": 155600000,
+                        "following_count": 1300,
+                        "heart_count": 11800000000,
+                        "video_count": 2700,
+                        "region": "US"
+                      },
+                      "music": {
+                        "id": "7011111111111111111",
+                        "title": "original sound",
+                        "author_name": "charli d'amelio",
+                        "duration": 15,
+                        "play_url": "https://sf16-sg.tiktokcdn.com/music.mp3",
+                        "original": true
+                      },
+                      "stats": {
+                        "play_count": 24000000,
+                        "digg_count": 3100000,
+                        "comment_count": 18000,
+                        "share_count": 42000,
+                        "collect_count": 99000
+                      },
+                      "video": {
+                        "height": 1024,
+                        "width": 576,
+                        "duration": 15,
+                        "ratio": "540p",
+                        "format": "mp4",
+                        "cover": "https://p16-sign.tiktokcdn-us.com/cover.jpeg",
+                        "play_addr": "https://v16-webapp.tiktok.com/video.mp4",
+                        "download_addr": "https://v16-webapp.tiktok.com/download.mp4",
+                        "has_watermark": true
+                      },
+                      "hashtags": [
+                        "fyp",
+                        "dance"
+                      ],
+                      "mentions": [],
+                      "challenges": [
+                        {
+                          "id": "229207",
+                          "title": "fyp",
+                          "desc": "",
+                          "is_commerce": false
+                        }
+                      ],
+                      "is_slideshow": false,
+                      "image_urls": [],
+                      "is_ad": false,
+                      "is_pinned": false
+                    }
+                  ],
+                  "pagination": {
+                    "has_more": true,
+                    "cursor": "30",
+                    "count": 30,
+                    "search_id": null
+                  },
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/trending/hashtags": {
+      "get": {
+        "operationId": "getTikTokTrendingHashtags",
+        "summary": "Trending Hashtags",
+        "description": "Trending hashtags ranked by usage (served via the on-device signer path \u2014 view counts and distinct-creator counts).",
+        "tags": [
+          "TikTok Trending"
+        ],
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 7
+            },
+            "description": "Look-back window in days for the trend ranking (e.g. 7, 30, 120)."
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Maximum number of items to return (1-50)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Trending hashtags",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrendingHashtagsResponse"
+                },
+                "example": {
+                  "hashtags": [
+                    {
+                      "name": "fyp",
+                      "id": "229207",
+                      "rank": 1,
+                      "rank_diff": 0,
+                      "country_code": "US",
+                      "industry": "Entertainment",
+                      "publish_count": 120000,
+                      "view_count": 55000000000,
+                      "user_count": 98000,
+                      "is_promoted": false,
+                      "is_new": false,
+                      "url": "https://www.tiktok.com/tag/fyp"
+                    }
+                  ],
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/trending/songs": {
+      "get": {
+        "operationId": "getTikTokTrendingSongs",
+        "summary": "Trending Songs",
+        "description": "Trending songs/sounds ranked by usage (served via the on-device signer path \u2014 hot-music feed).",
+        "tags": [
+          "TikTok Trending"
+        ],
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "US"
+            },
+            "description": "Content region (ISO 3166-1 alpha-2). Routes the request through a proxy and signer for that locale."
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 7
+            },
+            "description": "Look-back window in days for the trend ranking (e.g. 7, 30, 120)."
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Maximum number of items to return (1-50)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Trending songs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrendingSongsResponse"
+                },
+                "example": {
+                  "songs": [
+                    {
+                      "title": "Espresso",
+                      "id": "7011111111111111111",
+                      "author": "Sabrina Carpenter",
+                      "rank": 1,
+                      "rank_diff": 2,
+                      "country_code": "US",
+                      "duration": 175,
+                      "user_count": 1800000,
+                      "cover": "https://p16-sign.tiktokcdn-us.com/song.jpeg",
+                      "play_url": "https://sf16-sg.tiktokcdn.com/song.mp3",
+                      "is_new": false,
+                      "link": "https://www.tiktok.com/music/Espresso-7011111111111111111"
+                    }
+                  ],
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/ads/search": {
+      "get": {
+        "operationId": "searchTikTokAds",
+        "summary": "Search the TikTok Ad Library",
+        "description": "Search TikTok's Commercial Content Library (EU Digital Services Act ad transparency) by keyword or advertiser id. EU regions only.",
+        "tags": [
+          "TikTok Ads"
+        ],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": ""
+            },
+            "description": "Keyword to search ads by. Ignored when advertiser_id is set."
+          },
+          {
+            "name": "advertiser_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": ""
+            },
+            "description": "Advertiser business id(s) to scope the search to a specific advertiser."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "DE"
+            },
+            "description": "EU region code \u2014 the Ad Library is EU-only (e.g. DE, FR, IE, NL)."
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 30,
+              "minimum": 1,
+              "maximum": 365
+            },
+            "description": "Look-back window in days for ads shown."
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "last_shown_date,desc"
+            },
+            "description": "Sort order, '<field>,<direction>' (e.g. last_shown_date,desc)."
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            },
+            "description": "Result offset for pagination."
+          },
+          {
+            "name": "search_id",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": ""
+            },
+            "description": "Opaque search id from a prior page's `pagination.search_id`, to chain pages."
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Maximum number of items to return (1-50)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ad Library results",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdLibrarySearchResponse"
+                },
+                "example": {
+                  "ads": [
+                    {
+                      "id": "172000000000000",
+                      "name": "Acme GmbH",
+                      "audit_status": "approved",
+                      "type": "video",
+                      "first_shown_date": 1699999999000,
+                      "last_shown_date": 1700999999000,
+                      "videos": [
+                        {
+                          "video_url": "https://library.tiktok.com/ad-video.mp4",
+                          "cover_img": "https://library.tiktok.com/ad-cover.jpeg"
+                        }
+                      ]
+                    }
+                  ],
+                  "pagination": {
+                    "has_more": true,
+                    "total": 240,
+                    "search_id": "20231114...",
+                    "offset": 0
+                  },
+                  "region": "DE"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/regions": {
+      "get": {
+        "operationId": "listTikTokRegions",
+        "summary": "List Regions",
+        "description": "List supported TikTok content regions.",
+        "tags": [
+          "TikTok Reference"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Supported regions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegionsResponse"
+                },
+                "example": {
+                  "regions": [
+                    {
+                      "code": "US",
+                      "country_code": "US",
+                      "locale": "en",
+                      "name": "United States"
+                    },
+                    {
+                      "code": "GB",
+                      "country_code": "GB",
+                      "locale": "en",
+                      "name": "United Kingdom"
+                    },
+                    {
+                      "code": "DE",
+                      "country_code": "DE",
+                      "locale": "de",
+                      "name": "Germany"
+                    },
+                    {
+                      "code": "JP",
+                      "country_code": "JP",
+                      "locale": "ja",
+                      "name": "Japan"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    },
+    "schemas": {
+      "TikTokAuthor": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Numeric user id."
+          },
+          "sec_uid": {
+            "type": "string",
+            "description": "Secure user id (sec_uid) used for downstream list calls."
+          },
+          "unique_id": {
+            "type": "string",
+            "description": "The @handle."
+          },
+          "nickname": {
+            "type": "string",
+            "description": "Display name."
+          },
+          "avatar_thumb": {
+            "type": "string"
+          },
+          "avatar_medium": {
+            "type": "string"
+          },
+          "avatar_larger": {
+            "type": "string"
+          },
+          "signature": {
+            "type": "string",
+            "description": "Bio text."
+          },
+          "verified": {
+            "type": "boolean"
+          },
+          "private_account": {
+            "type": "boolean"
+          },
+          "follower_count": {
+            "type": "integer"
+          },
+          "following_count": {
+            "type": "integer"
+          },
+          "heart_count": {
+            "type": "integer",
+            "description": "Total likes received."
+          },
+          "video_count": {
+            "type": "integer"
+          },
+          "digg_count": {
+            "type": "integer",
+            "description": "Likes given."
+          },
+          "region": {
+            "type": "string"
+          },
+          "verify_reason": {
+            "type": "string"
+          },
+          "verification_type": {
+            "type": "integer"
+          },
+          "account_region": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "original_musician": {
+            "type": "boolean"
+          },
+          "is_star": {
+            "type": "boolean"
+          },
+          "ins_id": {
+            "type": "string",
+            "description": "Linked Instagram handle."
+          },
+          "twitter_name": {
+            "type": "string"
+          },
+          "youtube_channel_title": {
+            "type": "string"
+          },
+          "room_id": {
+            "type": "string",
+            "description": "Non-empty while the user is live."
+          },
+          "commerce_user_level": {
+            "type": "integer"
+          },
+          "with_shop_entry": {
+            "type": "boolean"
+          }
+        },
+        "description": "Author summary embedded in a video, comment, or search result."
+      },
+      "TikTokUserStats": {
+        "type": "object",
+        "properties": {
+          "follower_count": {
+            "type": "integer"
+          },
+          "following_count": {
+            "type": "integer"
+          },
+          "heart_count": {
+            "type": "integer",
+            "description": "Total likes received."
+          },
+          "video_count": {
+            "type": "integer"
+          },
+          "digg_count": {
+            "type": "integer",
+            "description": "Likes given."
+          },
+          "friend_count": {
+            "type": "integer"
+          }
+        },
+        "description": "Aggregate counts for a user profile."
+      },
+      "TikTokUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "sec_uid": {
+            "type": "string",
+            "description": "Secure user id \u2014 needed to call list endpoints."
+          },
+          "unique_id": {
+            "type": "string",
+            "description": "The @handle."
+          },
+          "nickname": {
+            "type": "string"
+          },
+          "signature": {
+            "type": "string",
+            "description": "Bio text."
+          },
+          "bio_link": {
+            "type": "string",
+            "description": "External link in bio."
+          },
+          "verified": {
+            "type": "boolean"
+          },
+          "verify_reason": {
+            "type": "string"
+          },
+          "verification_type": {
+            "type": "integer"
+          },
+          "private_account": {
+            "type": "boolean"
+          },
+          "is_commerce_account": {
+            "type": "boolean"
+          },
+          "is_seller": {
+            "type": "boolean",
+            "description": "TikTok Shop seller."
+          },
+          "is_organization": {
+            "type": "boolean"
+          },
+          "original_musician": {
+            "type": "boolean"
+          },
+          "is_star": {
+            "type": "boolean"
+          },
+          "region": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "ins_id": {
+            "type": "string"
+          },
+          "twitter_name": {
+            "type": "string"
+          },
+          "youtube_channel_title": {
+            "type": "string"
+          },
+          "avatar_thumb": {
+            "type": "string"
+          },
+          "avatar_medium": {
+            "type": "string"
+          },
+          "avatar_larger": {
+            "type": "string"
+          },
+          "stats": {
+            "$ref": "#/components/schemas/TikTokUserStats"
+          },
+          "open_favorite": {
+            "type": "boolean"
+          },
+          "comment_setting": {
+            "type": "integer"
+          },
+          "duet_setting": {
+            "type": "integer"
+          },
+          "stitch_setting": {
+            "type": "integer"
+          },
+          "download_setting": {
+            "type": "integer"
+          },
+          "following_visibility": {
+            "type": "integer"
+          },
+          "is_live": {
+            "type": "boolean"
+          },
+          "room_id": {
+            "type": "string"
+          },
+          "commerce_category": {
+            "type": "string"
+          },
+          "commerce_user_level": {
+            "type": "integer"
+          },
+          "with_shop_entry": {
+            "type": "boolean"
+          },
+          "create_time_utc": {
+            "type": "integer",
+            "description": "Account creation Unix timestamp."
+          },
+          "create_time_at": {
+            "type": "string",
+            "description": "Account creation ISO 8601 UTC."
+          },
+          "profile_url": {
+            "type": "string"
+          }
+        },
+        "description": "A full TikTok user profile."
+      },
+      "TikTokStats": {
+        "type": "object",
+        "properties": {
+          "play_count": {
+            "type": "integer",
+            "description": "Views."
+          },
+          "digg_count": {
+            "type": "integer",
+            "description": "Likes."
+          },
+          "comment_count": {
+            "type": "integer"
+          },
+          "share_count": {
+            "type": "integer"
+          },
+          "collect_count": {
+            "type": "integer",
+            "description": "Saves/bookmarks."
+          },
+          "download_count": {
+            "type": "integer"
+          },
+          "forward_count": {
+            "type": "integer"
+          },
+          "whatsapp_share_count": {
+            "type": "integer"
+          },
+          "repost_count": {
+            "type": "integer"
+          }
+        },
+        "description": "Engagement statistics for a video."
+      },
+      "TikTokVideoMeta": {
+        "type": "object",
+        "properties": {
+          "height": {
+            "type": "integer"
+          },
+          "width": {
+            "type": "integer"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Seconds."
+          },
+          "ratio": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          },
+          "definition": {
+            "type": "string"
+          },
+          "codec_type": {
+            "type": "string"
+          },
+          "encoded_type": {
+            "type": "string"
+          },
+          "bitrate": {
+            "type": "integer"
+          },
+          "cover": {
+            "type": "string"
+          },
+          "origin_cover": {
+            "type": "string"
+          },
+          "dynamic_cover": {
+            "type": "string"
+          },
+          "animated_cover": {
+            "type": "string"
+          },
+          "ai_dynamic_cover": {
+            "type": "string"
+          },
+          "share_cover": {
+            "type": "string"
+          },
+          "play_addr": {
+            "type": "string",
+            "description": "Direct play URL."
+          },
+          "download_addr": {
+            "type": "string",
+            "description": "Watermarked download URL."
+          },
+          "download_no_watermark_addr": {
+            "type": "string",
+            "description": "Clean MP4 (mobile)."
+          },
+          "has_watermark": {
+            "type": "boolean"
+          },
+          "volume_loudness": {
+            "type": "number"
+          },
+          "volume_peak": {
+            "type": "number"
+          }
+        },
+        "description": "Playable-media metadata for a video."
+      },
+      "TikTokMusic": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "author_name": {
+            "type": "string"
+          },
+          "album": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Seconds."
+          },
+          "play_url": {
+            "type": "string"
+          },
+          "cover_thumb": {
+            "type": "string"
+          },
+          "cover_medium": {
+            "type": "string"
+          },
+          "cover_large": {
+            "type": "string"
+          },
+          "original": {
+            "type": "boolean"
+          },
+          "is_copyrighted": {
+            "type": "boolean"
+          },
+          "mid": {
+            "type": "string"
+          },
+          "owner_id": {
+            "type": "string"
+          },
+          "owner_nickname": {
+            "type": "string"
+          },
+          "is_commerce_music": {
+            "type": "boolean"
+          },
+          "is_original_sound": {
+            "type": "boolean"
+          },
+          "video_count": {
+            "type": "integer",
+            "description": "Videos using this sound (standalone music endpoints only)."
+          },
+          "user_count": {
+            "type": "integer",
+            "description": "Distinct creators using this sound (standalone music endpoints only)."
+          }
+        },
+        "description": "Sound/music attached to a video, or a standalone music entity."
+      },
+      "TikTokChallenge": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string",
+            "description": "Hashtag text, no '#'."
+          },
+          "desc": {
+            "type": "string"
+          },
+          "cover": {
+            "type": "string"
+          },
+          "is_commerce": {
+            "type": "boolean"
+          }
+        },
+        "description": "A hashtag/challenge referenced from a video."
+      },
+      "TikTokEffectSticker": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "photo_url": {
+            "type": "string"
+          }
+        },
+        "description": "An effect/sticker applied to a video."
+      },
+      "TikTokTextExtra": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "'hashtag' or 'mention'."
+          },
+          "hashtag_name": {
+            "type": "string"
+          },
+          "user_unique_id": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string"
+          },
+          "start": {
+            "type": "integer"
+          },
+          "end": {
+            "type": "integer"
+          }
+        },
+        "description": "An entity (hashtag or @mention) inside the caption."
+      },
+      "TikTokSubtitle": {
+        "type": "object",
+        "properties": {
+          "language": {
+            "type": "string"
+          },
+          "language_code": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string",
+            "description": "ASR vs creator."
+          },
+          "version": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string"
+          }
+        },
+        "description": "A subtitle/caption track for a video."
+      },
+      "TikTokVideoStatus": {
+        "type": "object",
+        "properties": {
+          "is_delete": {
+            "type": "boolean"
+          },
+          "allow_share": {
+            "type": "boolean"
+          },
+          "allow_comment": {
+            "type": "boolean"
+          },
+          "private_status": {
+            "type": "integer",
+            "description": "0 public, 1 friends, 2 private."
+          },
+          "in_reviewing": {
+            "type": "boolean"
+          },
+          "reviewed": {
+            "type": "boolean"
+          },
+          "is_prohibited": {
+            "type": "boolean"
+          },
+          "download_status": {
+            "type": "integer"
+          },
+          "self_see": {
+            "type": "boolean"
+          }
+        },
+        "description": "Moderation/availability state of a post."
+      },
+      "TikTokVideoControl": {
+        "type": "object",
+        "properties": {
+          "allow_download": {
+            "type": "boolean"
+          },
+          "allow_duet": {
+            "type": "boolean"
+          },
+          "allow_stitch": {
+            "type": "boolean"
+          },
+          "allow_react": {
+            "type": "boolean"
+          },
+          "allow_comment": {
+            "type": "boolean"
+          },
+          "share_type": {
+            "type": "integer"
+          },
+          "prevent_download": {
+            "type": "boolean"
+          }
+        },
+        "description": "Per-post interaction permissions."
+      },
+      "TikTokAnchor": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "integer"
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          }
+        },
+        "description": "A link/shopping/POI anchor attached to a post."
+      },
+      "TikTokVideo": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "description": "Caption text."
+          },
+          "text_language": {
+            "type": "string"
+          },
+          "create_time_utc": {
+            "type": "integer",
+            "description": "Post Unix timestamp."
+          },
+          "create_time_at": {
+            "type": "string",
+            "description": "Post ISO 8601 UTC."
+          },
+          "region": {
+            "type": "string",
+            "description": "Location created."
+          },
+          "url": {
+            "type": "string",
+            "description": "Web video URL."
+          },
+          "share_url": {
+            "type": "string",
+            "description": "Canonical share link."
+          },
+          "group_id": {
+            "type": "string"
+          },
+          "aweme_type": {
+            "type": "integer",
+            "description": "0 video, 150 photo/slideshow, ..."
+          },
+          "content_type": {
+            "type": "string"
+          },
+          "author": {
+            "$ref": "#/components/schemas/TikTokAuthor"
+          },
+          "music": {
+            "$ref": "#/components/schemas/TikTokMusic"
+          },
+          "stats": {
+            "$ref": "#/components/schemas/TikTokStats"
+          },
+          "video": {
+            "$ref": "#/components/schemas/TikTokVideoMeta"
+          },
+          "status": {
+            "$ref": "#/components/schemas/TikTokVideoStatus"
+          },
+          "video_control": {
+            "$ref": "#/components/schemas/TikTokVideoControl"
+          },
+          "anchors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TikTokAnchor"
+            }
+          },
+          "hashtags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mentions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "text_extra": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TikTokTextExtra"
+            }
+          },
+          "challenges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TikTokChallenge"
+            }
+          },
+          "effect_stickers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TikTokEffectSticker"
+            }
+          },
+          "is_slideshow": {
+            "type": "boolean"
+          },
+          "image_urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Image URLs for photo/slideshow posts."
+          },
+          "is_ad": {
+            "type": "boolean"
+          },
+          "is_aigc": {
+            "type": "boolean"
+          },
+          "aigc_description": {
+            "type": "string"
+          },
+          "is_pinned": {
+            "type": "boolean"
+          },
+          "is_muted": {
+            "type": "boolean"
+          },
+          "secret": {
+            "type": "boolean"
+          },
+          "private_item": {
+            "type": "boolean"
+          },
+          "duet_enabled": {
+            "type": "boolean"
+          },
+          "stitch_enabled": {
+            "type": "boolean"
+          },
+          "share_enabled": {
+            "type": "boolean"
+          },
+          "comment_status": {
+            "type": "string"
+          },
+          "can_repost": {
+            "type": "boolean"
+          },
+          "is_paid_content": {
+            "type": "boolean"
+          },
+          "is_on_this_day": {
+            "type": "boolean"
+          },
+          "support_danmaku": {
+            "type": "boolean",
+            "description": "Supports bullet comments."
+          },
+          "subtitles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TikTokSubtitle"
+            },
+            "description": "Populated only on the transcript endpoint."
+          },
+          "voice_to_text": {
+            "type": "string",
+            "description": "ASR transcript (transcript endpoint only)."
+          },
+          "diversification_labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "suggested_words": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "description": "A TikTok post (video or photo slideshow) with full metadata."
+      },
+      "TikTokComment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Comment id (cid)."
+          },
+          "text": {
+            "type": "string"
+          },
+          "aweme_id": {
+            "type": "string",
+            "description": "Parent video id."
+          },
+          "parent_comment_id": {
+            "type": "string"
+          },
+          "digg_count": {
+            "type": "integer"
+          },
+          "reply_count": {
+            "type": "integer"
+          },
+          "create_time_utc": {
+            "type": "integer"
+          },
+          "create_time_at": {
+            "type": "string"
+          },
+          "liked_by_author": {
+            "type": "boolean"
+          },
+          "pinned_by_author": {
+            "type": "boolean"
+          },
+          "comment_language": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "mentions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "text_extra": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TikTokTextExtra"
+            }
+          },
+          "image_urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Comment sticker/image URLs."
+          },
+          "author": {
+            "$ref": "#/components/schemas/TikTokAuthor"
+          },
+          "replies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TikTokComment"
+            },
+            "description": "Nested replies (when included)."
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "description": "A comment or reply on a video."
+      },
+      "TikTokHashtag": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string",
+            "description": "Name without '#'."
+          },
+          "description": {
+            "type": "string"
+          },
+          "cover": {
+            "type": "string"
+          },
+          "profile_larger": {
+            "type": "string"
+          },
+          "video_count": {
+            "type": "integer"
+          },
+          "view_count": {
+            "type": "integer"
+          },
+          "is_commerce": {
+            "type": "boolean"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "description": "A hashtag/challenge detail."
+      },
+      "TikTokTrendingHashtag": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "rank": {
+            "type": "integer"
+          },
+          "rank_diff": {
+            "type": "integer",
+            "description": "Change in rank vs prior period."
+          },
+          "country_code": {
+            "type": "string"
+          },
+          "industry": {
+            "type": "string"
+          },
+          "publish_count": {
+            "type": "integer",
+            "description": "Videos using it."
+          },
+          "view_count": {
+            "type": "integer"
+          },
+          "user_count": {
+            "type": "integer",
+            "description": "Distinct creators using it."
+          },
+          "is_promoted": {
+            "type": "boolean"
+          },
+          "is_new": {
+            "type": "boolean"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "description": "A trending hashtag entry."
+      },
+      "TikTokTrendingSong": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "rank": {
+            "type": "integer"
+          },
+          "rank_diff": {
+            "type": "integer"
+          },
+          "country_code": {
+            "type": "string"
+          },
+          "duration": {
+            "type": "integer"
+          },
+          "user_count": {
+            "type": "integer",
+            "description": "Videos using this sound."
+          },
+          "cover": {
+            "type": "string"
+          },
+          "play_url": {
+            "type": "string"
+          },
+          "is_new": {
+            "type": "boolean"
+          },
+          "link": {
+            "type": "string"
+          }
+        },
+        "description": "A trending song/sound entry."
+      },
+      "TikTokOEmbed": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "author_name": {
+            "type": "string"
+          },
+          "author_url": {
+            "type": "string"
+          },
+          "provider_name": {
+            "type": "string"
+          },
+          "provider_url": {
+            "type": "string"
+          },
+          "html": {
+            "type": "string",
+            "description": "Embed HTML snippet."
+          },
+          "thumbnail_url": {
+            "type": "string"
+          },
+          "thumbnail_width": {
+            "type": "integer"
+          },
+          "thumbnail_height": {
+            "type": "integer"
+          },
+          "embed_product_id": {
+            "type": "string"
+          },
+          "embed_type": {
+            "type": "string"
+          }
+        },
+        "description": "oEmbed metadata for a TikTok URL."
+      },
+      "TikTokCursorPage": {
+        "type": "object",
+        "properties": {
+          "has_more": {
+            "type": "boolean",
+            "description": "True when more pages are available."
+          },
+          "cursor": {
+            "type": "string",
+            "description": "Opaque cursor; pass back as ?cursor= for the next page."
+          },
+          "count": {
+            "type": "integer",
+            "description": "Number of items in this page."
+          },
+          "search_id": {
+            "type": "string",
+            "description": "Search endpoints chain rid \u2192 search_id across pages."
+          }
+        },
+        "description": "Cursor pagination metadata shared by all list endpoints."
+      },
+      "TikTokAdVideo": {
+        "type": "object",
+        "properties": {
+          "video_url": {
+            "type": "string"
+          },
+          "cover_img": {
+            "type": "string"
+          }
+        },
+        "description": "A creative asset attached to an ad."
+      },
+      "TikTokAd": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "Advertiser name."
+          },
+          "audit_status": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "first_shown_date": {
+            "type": "integer",
+            "description": "Epoch milliseconds."
+          },
+          "last_shown_date": {
+            "type": "integer",
+            "description": "Epoch milliseconds."
+          },
+          "videos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TikTokAdVideo"
+            }
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "description": "An ad from the Commercial Content Library."
+      },
+      "AdLibraryPage": {
+        "type": "object",
+        "properties": {
+          "has_more": {
+            "type": "boolean"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "search_id": {
+            "type": "string",
+            "description": "Pass to the next page request."
+          },
+          "offset": {
+            "type": "integer"
+          }
+        },
+        "description": "Pagination metadata for Ad Library search."
+      },
+      "RegionInfo": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "country_code": {
+            "type": "string"
+          },
+          "locale": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "description": "A supported TikTok content region."
+      },
+      "ProfileResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/TikTokUser"
+          },
+          "region": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "user",
+          "region"
+        ]
+      },
+      "VideoResponse": {
+        "type": "object",
+        "properties": {
+          "video": {
+            "$ref": "#/components/schemas/TikTokVideo"
+          },
+          "region": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "video",
+          "region"
+        ]
+      },
+      "VideoListResponse": {
+        "type": "object",
+        "properties": {
+          "videos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TikTokVideo"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/TikTokCursorPage"
+          },
+          "region": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "region"
+        ]
+      },
+      "CommentListResponse": {
+        "type": "object",
+        "properties": {
+          "comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TikTokComment"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/TikTokCursorPage"
+          },
+          "region": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "region"
+        ]
+      },
+      "HashtagResponse": {
+        "type": "object",
+        "properties": {
+          "hashtag": {
+            "$ref": "#/components/schemas/TikTokHashtag"
+          },
+          "region": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "hashtag",
+          "region"
+        ]
+      },
+      "MusicResponse": {
+        "type": "object",
+        "properties": {
+          "music": {
+            "$ref": "#/components/schemas/TikTokMusic"
+          },
+          "region": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "music",
+          "region"
+        ]
+      },
+      "UserSearchResponse": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TikTokAuthor"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/TikTokCursorPage"
+          },
+          "region": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "region"
+        ]
+      },
+      "HashtagSearchResponse": {
+        "type": "object",
+        "properties": {
+          "hashtags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TikTokHashtag"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/TikTokCursorPage"
+          },
+          "region": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "region"
+        ]
+      },
+      "TranscriptResponse": {
+        "type": "object",
+        "properties": {
+          "video_id": {
+            "type": "string"
+          },
+          "subtitles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TikTokSubtitle"
+            }
+          },
+          "voice_to_text": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "video_id",
+          "region"
+        ]
+      },
+      "TrendingHashtagsResponse": {
+        "type": "object",
+        "properties": {
+          "hashtags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TikTokTrendingHashtag"
+            }
+          },
+          "region": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "region"
+        ]
+      },
+      "TrendingSongsResponse": {
+        "type": "object",
+        "properties": {
+          "songs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TikTokTrendingSong"
+            }
+          },
+          "region": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "region"
+        ]
+      },
+      "AdLibrarySearchResponse": {
+        "type": "object",
+        "properties": {
+          "ads": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TikTokAd"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/AdLibraryPage"
+          },
+          "region": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "pagination",
+          "region"
+        ]
+      },
+      "RegionsResponse": {
+        "type": "object",
+        "properties": {
+          "regions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RegionInfo"
+            }
+          }
+        },
+        "required": [
+          "regions"
+        ]
+      },
+      "DeprecatedError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "endpoint": {
+            "type": "string"
+          },
+          "deprecated": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "description": "Error body returned by deprecated (410 Gone) endpoints."
+      }
+    }
+  }
+}

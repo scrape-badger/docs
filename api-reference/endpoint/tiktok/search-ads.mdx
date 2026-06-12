@@ -1,0 +1,13 @@
+---
+title: "Search the Ad Library"
+openapi: "GET /v1/tiktok/ads/search"
+description: "Search TikTok's EU Commercial Content (ad transparency) Library by keyword or advertiser id."
+---
+
+<Note>
+  The TikTok Ad Library is **EU-only** (EU Digital Services Act ad transparency). Use an EU `region` such as `DE`, `FR`, `IE`, or `NL`. Pass `advertiser_id` to scope to a single advertiser, or `query` for a keyword search.
+</Note>
+
+<Note>
+  Each request costs **5 credits**. Failed requests are not charged.
+</Note>

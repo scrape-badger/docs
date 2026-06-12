@@ -1,0 +1,163 @@
+---
+title: "TikTok Scraper Overview"
+description: "Scrape TikTok user profiles, videos, comments, transcripts, hashtags, music, search, trending, and the EU ad library with structured JSON responses."
+---
+
+# TikTok Scraper API
+
+Fetch full user profiles, posted videos, comments and replies, video transcripts, hashtag and music detail, run keyword search across videos/users/hashtags, pull trending videos/hashtags/songs, and query TikTok's EU Commercial Content (ad transparency) library. The API handles request signing, anti-bot bypass, and regional proxy routing automatically.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="Profiles & Videos" icon="user">
+    Full user profiles with stats and verification, plus posted videos and reposts with cursor pagination.
+  </Card>
+  <Card title="Comments & Transcripts" icon="comments">
+    Top-level comments, threaded replies, and ASR voice-to-text transcripts with subtitle tracks.
+  </Card>
+  <Card title="Search" icon="magnifying-glass">
+    Keyword search across videos, users, and hashtags, plus a general Top-feed search.
+  </Card>
+  <Card title="Trending" icon="arrow-trend-up">
+    Trending videos, hashtags, and songs ranked by usage, with rank-change deltas.
+  </Card>
+  <Card title="Ad Transparency" icon="bullhorn">
+    Search TikTok's EU Commercial Content Library by keyword or advertiser id.
+  </Card>
+  <Card title="SDK Support" icon="code">
+    First-class support via the ScrapeBadger Node.js and Python SDKs.
+  </Card>
+</CardGroup>
+
+## Supported Regions
+
+TikTok content is region-aware. Use the `region` query parameter (ISO 3166-1 alpha-2) on any endpoint to route the request through a proxy and signer for that locale. It defaults to `US`.
+
+<Tip>
+  Use the [`/v1/tiktok/regions`](/api-reference/endpoint/tiktok/list-regions) endpoint to get the full list of supported regions (with locale and country code) programmatically.
+</Tip>
+
+## Quick Start
+
+<CodeGroup>
+
+```javascript Node.js
+import ScrapeBadger from "scrapebadger";
+
+const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" });
+
+const profile = await client.tiktok.getUser({
+  username: "charlidamelio",
+  region: "US",
+});
+
+console.log(profile.user.stats.follower_count);
+```
+
+```python Python
+from scrapebadger import ScrapeBadger
+
+client = ScrapeBadger(api_key="YOUR_API_KEY")
+
+profile = client.tiktok.get_user(
+    username="charlidamelio",
+    region="US",
+)
+
+print(profile.user.stats.follower_count)
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/tiktok/users/charlidamelio?region=US" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+## Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/tiktok/users/{username}`](/api-reference/endpoint/tiktok/get-user-profile) | GET | Full user profile by @handle |
+| [`/v1/tiktok/users/{username}/videos`](/api-reference/endpoint/tiktok/get-user-videos) | GET | A user's posted videos |
+| [`/v1/tiktok/users/{username}/reposts`](/api-reference/endpoint/tiktok/get-user-reposts) | GET | Videos a user has reposted |
+| [`/v1/tiktok/videos/{video_id}`](/api-reference/endpoint/tiktok/get-video-detail) | GET | Full metadata for a single video |
+| [`/v1/tiktok/videos/{video_id}/comments`](/api-reference/endpoint/tiktok/get-comments) | GET | Top-level comments on a video |
+| [`/v1/tiktok/videos/{video_id}/related`](/api-reference/endpoint/tiktok/get-related-videos) | GET | Related/recommended videos |
+| [`/v1/tiktok/videos/{video_id}/transcript`](/api-reference/endpoint/tiktok/get-transcript) | GET | Subtitle tracks + voice-to-text |
+| [`/v1/tiktok/comments/{comment_id}/replies`](/api-reference/endpoint/tiktok/get-comment-replies) | GET | Replies to a comment |
+| [`/v1/tiktok/oembed`](/api-reference/endpoint/tiktok/get-oembed) | GET | Cheap unauthenticated oEmbed metadata |
+| [`/v1/tiktok/hashtags/{name}`](/api-reference/endpoint/tiktok/get-hashtag) | GET | Hashtag/challenge detail |
+| [`/v1/tiktok/hashtags/{name}/videos`](/api-reference/endpoint/tiktok/get-hashtag-videos) | GET | Videos tagged with a hashtag |
+| [`/v1/tiktok/music/{music_id}`](/api-reference/endpoint/tiktok/get-music) | GET | Sound/music detail |
+| [`/v1/tiktok/music/{music_id}/videos`](/api-reference/endpoint/tiktok/get-music-videos) | GET | Videos using a sound |
+| [`/v1/tiktok/search`](/api-reference/endpoint/tiktok/search) | GET | General Top-feed search |
+| [`/v1/tiktok/search/users`](/api-reference/endpoint/tiktok/search-users) | GET | Search users by keyword |
+| [`/v1/tiktok/search/videos`](/api-reference/endpoint/tiktok/search-videos) | GET | Search videos by keyword |
+| [`/v1/tiktok/search/hashtags`](/api-reference/endpoint/tiktok/search-hashtags) | GET | Search hashtags by keyword |
+| [`/v1/tiktok/trending/videos`](/api-reference/endpoint/tiktok/trending-videos) | GET | Trending Explore-feed videos |
+| [`/v1/tiktok/trending/hashtags`](/api-reference/endpoint/tiktok/trending-hashtags) | GET | Trending hashtags by usage |
+| [`/v1/tiktok/trending/songs`](/api-reference/endpoint/tiktok/trending-songs) | GET | Trending songs/sounds by usage |
+| [`/v1/tiktok/ads/search`](/api-reference/endpoint/tiktok/search-ads) | GET | Search the EU ad library |
+| [`/v1/tiktok/regions`](/api-reference/endpoint/tiktok/list-regions) | GET | List supported regions |
+
+## Credit Costs
+
+| Endpoint | Cost |
+|----------|------|
+| Get user profile | 5 credits |
+| Get user videos | 8 credits |
+| Get user reposts | 8 credits |
+| Get video detail | 5 credits |
+| Get comments | 8 credits |
+| Get related videos | 8 credits |
+| Get transcript | 10 credits |
+| Get comment replies | 8 credits |
+| oEmbed | 2 credits |
+| Get hashtag detail | 5 credits |
+| Get hashtag videos | 8 credits |
+| Get music detail | 5 credits |
+| Get music videos | 8 credits |
+| Search (general) | 5 credits |
+| Search users | 5 credits |
+| Search videos | 5 credits |
+| Search hashtags | 5 credits |
+| Trending videos | 5 credits |
+| Trending hashtags | 5 credits |
+| Trending songs | 5 credits |
+| Ad library search | 5 credits |
+| List regions | 0 credits |
+| Failed requests | 0 credits |
+
+## Authentication
+
+All requests require your API key in the `x-api-key` header:
+
+```bash
+curl "https://scrapebadger.com/v1/tiktok/users/charlidamelio" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+## Anti-Bot Handling & Notes
+
+TikTok protects its mobile and web APIs with request signing (X-Argus / X-Ladon / X-Gorgon / X-Khronos), device trust, and per-IP reputation scoring. ScrapeBadger clears these automatically — you never need to manage signatures, device registration, proxies, or sessions. Requests are routed through proxies matched to the `region` you request.
+
+<Note>
+  **Trending hashtags and trending songs** (`/v1/tiktok/trending/hashtags`, `/v1/tiktok/trending/songs`) are served via an **on-device signer path**. They are ranked by real usage (view counts, distinct-creator counts) rather than the deprecated Creative Center trend lists.
+</Note>
+
+<Warning>
+  **Followers, following, and liked-video lists are deprecated.** These endpoints (`/v1/tiktok/users/{username}/followers`, `/following`, `/liked`) require an authenticated account session, which this API intentionally does not provide. They return **HTTP 410 Gone** with a deprecation notice and are not charged. All other TikTok endpoints (videos, profile, search, comments, hashtags, trending, music) remain fully supported.
+</Warning>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Get User Profile" icon="user" href="/api-reference/endpoint/tiktok/get-user-profile">
+    Full API reference for fetching a TikTok user profile
+  </Card>
+  <Card title="Get Video Detail" icon="video" href="/api-reference/endpoint/tiktok/get-video-detail">
+    Retrieve full metadata for a specific TikTok video
+  </Card>
+</CardGroup>

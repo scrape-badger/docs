@@ -1,0 +1,13 @@
+---
+title: "Trending Hashtags"
+openapi: "GET /v1/tiktok/trending/hashtags"
+description: "Trending hashtags ranked by usage (served via the on-device signer path)."
+---
+
+<Note>
+  Trending hashtags are served via an on-device signer path and ranked by real usage (view counts and distinct-creator counts), not the deprecated Creative Center trend lists.
+</Note>
+
+<Note>
+  Each request costs **5 credits**. Failed requests are not charged.
+</Note>

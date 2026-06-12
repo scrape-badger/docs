@@ -17,6 +17,7 @@
     "/openapi-web-scraping.json",
     "/openapi-vinted.json",
     "/openapi-amazon.json",
+    "/openapi-tiktok.json",
     "/openapi-reddit.json",
     "/openapi-google.json",
     "/openapi-account.json"
@@ -354,6 +355,79 @@
             "pages": [
               "api-reference/endpoint/amazon/list-markets",
               "api-reference/endpoint/amazon/list-categories"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "TikTok",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "tiktok/overview"
+            ]
+          },
+          {
+            "group": "Users",
+            "pages": [
+              "api-reference/endpoint/tiktok/get-user-profile",
+              "api-reference/endpoint/tiktok/get-user-videos",
+              "api-reference/endpoint/tiktok/get-user-reposts"
+            ]
+          },
+          {
+            "group": "Videos",
+            "pages": [
+              "api-reference/endpoint/tiktok/get-video-detail",
+              "api-reference/endpoint/tiktok/get-comments",
+              "api-reference/endpoint/tiktok/get-related-videos",
+              "api-reference/endpoint/tiktok/get-transcript",
+              "api-reference/endpoint/tiktok/get-comment-replies",
+              "api-reference/endpoint/tiktok/get-oembed"
+            ]
+          },
+          {
+            "group": "Hashtags",
+            "pages": [
+              "api-reference/endpoint/tiktok/get-hashtag",
+              "api-reference/endpoint/tiktok/get-hashtag-videos"
+            ]
+          },
+          {
+            "group": "Music",
+            "pages": [
+              "api-reference/endpoint/tiktok/get-music",
+              "api-reference/endpoint/tiktok/get-music-videos"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/tiktok/search",
+              "api-reference/endpoint/tiktok/search-users",
+              "api-reference/endpoint/tiktok/search-videos",
+              "api-reference/endpoint/tiktok/search-hashtags"
+            ]
+          },
+          {
+            "group": "Trending",
+            "pages": [
+              "api-reference/endpoint/tiktok/trending-videos",
+              "api-reference/endpoint/tiktok/trending-hashtags",
+              "api-reference/endpoint/tiktok/trending-songs"
+            ]
+          },
+          {
+            "group": "Ads",
+            "pages": [
+              "api-reference/endpoint/tiktok/search-ads"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api-reference/endpoint/tiktok/list-regions"
             ]
           }
         ]
