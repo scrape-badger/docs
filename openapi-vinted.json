@@ -87,6 +87,12 @@
               "enum": ["relevance", "price_low_to_high", "price_high_to_low", "newest_first"]
             },
             "description": "Sort order for results."
+          },
+          {
+            "name": "seller_country",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Comma-separated ISO 3166-1 alpha-2 country codes (case-insensitive) to keep only items whose seller is physically located in one of those countries (e.g. \"fr\" or \"fr,be\"). Vinted markets federate cross-border listings; this filters on the seller's real location, which is a different axis from `market`. Note: pagination totals stay unfiltered, so a page may return fewer than `per_page` items after filtering. Billing: 1 base credit + 1 credit per uncached seller looked up (seller country cached 7 days; cache hits are free)."
           }
         ],
         "responses": {
@@ -101,9 +107,10 @@
                       "type": "array",
                       "items": { "$ref": "#/components/schemas/VintedItemSummary" }
                     },
-                    "total_entries": { "type": "integer", "description": "Total number of matching items across all pages." },
+                    "total_entries": { "type": "integer", "description": "Total number of matching items across all pages. Reflects Vinted's unfiltered totals even when seller_country filtering is applied." },
                     "current_page": { "type": "integer", "description": "Current page number." },
-                    "per_page": { "type": "integer", "description": "Number of items per page." }
+                    "per_page": { "type": "integer", "description": "Number of items per page." },
+                    "seller_country": { "type": "string", "nullable": true, "description": "Echo of the normalized seller_country filter that was applied (uppercase, comma-separated ISO-2 codes, e.g. \"FR,BE\"), or null when no filter was requested." }
                   }
                 }
               }
@@ -466,7 +473,8 @@
           "photo": { "$ref": "#/components/schemas/VintedPhoto" },
           "url": { "type": "string", "description": "Full URL to the Vinted listing." },
           "user": { "$ref": "#/components/schemas/VintedUserSummary" },
-          "favourite_count": { "type": "integer", "description": "Number of users who favourited this item." }
+          "favourite_count": { "type": "integer", "description": "Number of users who favourited this item." },
+          "seller_country_code": { "type": "string", "nullable": true, "description": "ISO 3166-1 alpha-2 code of the seller's physical country (e.g. \"IT\"), or null if it could not be resolved." }
         }
       },
       "VintedPhoto": {

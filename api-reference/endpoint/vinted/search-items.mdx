@@ -61,6 +61,22 @@ description: "Search Vinted catalog items with filters."
   | `newest_first` | Most recently listed |
 </ParamField>
 
+<ParamField query="seller_country" type="string">
+  Comma-separated list of ISO 3166-1 alpha-2 country codes (case-insensitive) to keep only items whose **seller is physically located** in one of those countries.
+
+  Vinted markets federate listings across borders — a search on `vinted.fr` returns items from sellers in IT, DE, NL, ES, and elsewhere (prices and labels are localized, but the seller is abroad). Vinted exposes no native country facet, so ScrapeBadger resolves each result item's seller country and drops items outside the requested set.
+
+  Examples: `fr`, `fr,be`, `IT,ES`
+
+  <Note>
+    `market` and `seller_country` are **different axes**. `market` selects which Vinted domain you search (which catalog and currency you see); `seller_country` filters on where the seller actually is. For example, `market=fr&seller_country=it` searches the French catalog but returns only items shipped by sellers in Italy.
+  </Note>
+
+  <Warning>
+    Pagination totals (`total_entries` / `total_pages`) reflect Vinted's **unfiltered** result set. After seller-country filtering, a page may contain fewer than `per_page` items (or none), even though more matching items exist on later pages. Iterate through pages until you have collected enough matching items.
+  </Warning>
+</ParamField>
+
 ## Response
 
 <ResponseField name="items" type="array">
@@ -77,6 +93,9 @@ description: "Search Vinted catalog items with filters."
     <ResponseField name="url" type="string">Full URL to the Vinted listing.</ResponseField>
     <ResponseField name="user" type="object">Seller summary with `id`, `login`, `photo`.</ResponseField>
     <ResponseField name="favourite_count" type="integer">Number of users who favourited this item.</ResponseField>
+    <ResponseField name="seller_country_code" type="string">
+      ISO 3166-1 alpha-2 code of the seller's physical country (e.g. `"IT"`), or `null` if it could not be resolved. Always present on each item; populated whether or not `seller_country` filtering was requested.
+    </ResponseField>
   </Expandable>
 </ResponseField>
 
@@ -90,6 +109,10 @@ description: "Search Vinted catalog items with filters."
 
 <ResponseField name="per_page" type="integer">
   Number of items per page.
+</ResponseField>
+
+<ResponseField name="seller_country" type="string">
+  Echo of the normalized `seller_country` filter that was applied (uppercase, comma-separated ISO-2 codes, e.g. `"FR,BE"`), or `null` when no filter was requested.
 </ResponseField>
 
 ### Example Response
@@ -117,15 +140,48 @@ description: "Search Vinted catalog items with filters."
           "url": "https://images1.vinted.net/t/..."
         }
       },
-      "favourite_count": 12
+      "favourite_count": 12,
+      "seller_country_code": "FR"
     }
   ],
   "total_entries": 2847,
   "current_page": 1,
-  "per_page": 24
+  "per_page": 24,
+  "seller_country": "FR"
 }
 ```
 
+### Example Request — filter by seller country
+
+Return only listings from sellers physically located in France:
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/vinted/search?query=nike+air+force+1&market=fr&seller_country=fr&per_page=20" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const results = await client.vinted.search({
+  query: "nike air force 1",
+  market: "fr",
+  seller_country: "fr",
+  per_page: 20,
+});
+```
+
+```python Python
+results = client.vinted.search(
+    query="nike air force 1",
+    market="fr",
+    seller_country="fr",
+    per_page=20,
+)
+```
+
+</CodeGroup>
+
 <Note>
-  Each search request costs **1 credit**. Failed requests are not charged.
+  A search costs **1 base credit + 1 credit per uncached seller** looked up to resolve seller country. Seller countries are cached for 7 days, so cache hits are free: a fresh page of 20 distinct sellers costs ≈ 21 credits, while repeated or overlapping searches are far cheaper. When `seller_country` is omitted, no seller lookups are performed and the request costs **1 credit**. Failed requests are not charged.
 </Note>

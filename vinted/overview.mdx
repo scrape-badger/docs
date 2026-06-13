@@ -54,6 +54,33 @@ Vinted operates across 26 country domains. Use the `market` query parameter to t
   If no `market` is specified, it defaults to `fr`. Use the [`/v1/vinted/markets`](/api-reference/endpoint/vinted/list-markets) endpoint to get the full list programmatically.
 </Tip>
 
+## Filtering by seller country (cross-border listings)
+
+Vinted markets **federate listings across borders**. A search on `vinted.fr` does not only return items from French sellers — it surfaces items from sellers physically located in IT, DE, NL, ES, and elsewhere. Vinted localizes the rendering (EUR prices, French labels), but the seller may be abroad.
+
+Vinted exposes **no native country facet** — its catalog filters cover only size, brand, status, color, price, and material, and the undocumented `country_ids` parameter is ignored. To solve this, [`/v1/vinted/search`](/api-reference/endpoint/vinted/search-items) accepts an optional `seller_country` parameter:
+
+```bash
+curl "https://scrapebadger.com/v1/vinted/search?query=nike+air+force+1&market=fr&seller_country=fr,be" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+- **Value:** comma-separated ISO 3166-1 alpha-2 codes, case-insensitive (e.g. `fr` or `fr,be`).
+- **Behavior:** ScrapeBadger resolves each result item's seller country and drops items whose seller isn't in the requested set.
+- **Response additions:** each item gains a `seller_country_code` field (ISO-2 string or `null`), and the response gains a top-level `seller_country` echoing the normalized filter.
+
+<Note>
+  `market` and `seller_country` are **different axes**. `market` chooses which Vinted domain (catalog + currency) you search; `seller_country` filters on where the seller physically is. `market=fr&seller_country=it` searches the French catalog but returns only items shipped from Italy.
+</Note>
+
+<Warning>
+  Pagination (`total_entries` / `total_pages`) still reflects Vinted's **unfiltered** totals, so a filtered page may return fewer than `per_page` items. Keep requesting pages until you have collected enough matching items.
+</Warning>
+
+<Note>
+  Filtering adds **1 credit per uncached seller** looked up, on top of the 1 base credit. Seller countries are cached for 7 days, so cache hits are free — a fresh page of 20 distinct sellers costs ≈ 21 credits, while repeated or overlapping searches are far cheaper. Omitting `seller_country` keeps the search at 1 credit.
+</Note>
+
 ## Quick Start
 
 <CodeGroup>
