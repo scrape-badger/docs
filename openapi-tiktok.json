@@ -134,7 +134,8 @@
             "schema": {
               "type": "string"
             },
-            "description": "Opaque pagination cursor from a prior page's `pagination.cursor`."
+            "description": "Pagination cursor — pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page.",
+            "required": false
           }
         ],
         "responses": {
@@ -271,7 +272,7 @@
         ],
         "responses": {
           "410": {
-            "description": "Gone \u2014 endpoint deprecated",
+            "description": "Gone — endpoint deprecated",
             "content": {
               "application/json": {
                 "schema": {
@@ -331,7 +332,7 @@
         ],
         "responses": {
           "410": {
-            "description": "Gone \u2014 endpoint deprecated",
+            "description": "Gone — endpoint deprecated",
             "content": {
               "application/json": {
                 "schema": {
@@ -391,7 +392,7 @@
         ],
         "responses": {
           "410": {
-            "description": "Gone \u2014 endpoint deprecated",
+            "description": "Gone — endpoint deprecated",
             "content": {
               "application/json": {
                 "schema": {
@@ -697,6 +698,15 @@
               "maximum": 50
             },
             "description": "Maximum number of items to return (1-50)."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pagination cursor — pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page."
           }
         ],
         "responses": {
@@ -987,6 +997,15 @@
               "maximum": 50
             },
             "description": "Maximum number of items to return (1-50)."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pagination cursor — pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page."
           }
         ],
         "responses": {
@@ -1193,6 +1212,15 @@
               "maximum": 50
             },
             "description": "Maximum number of items to return (1-50)."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pagination cursor — pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page."
           }
         ],
         "responses": {
@@ -1382,6 +1410,15 @@
               "maximum": 50
             },
             "description": "Maximum number of items to return (1-50)."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pagination cursor — pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page."
           }
         ],
         "responses": {
@@ -1480,7 +1517,7 @@
       "get": {
         "operationId": "searchTikTok",
         "summary": "General Search",
-        "description": "General TikTok search \u2014 video results from the Top feed.",
+        "description": "General TikTok search — video results from the Top feed.",
         "tags": [
           "TikTok Search"
         ],
@@ -1513,6 +1550,15 @@
               "maximum": 50
             },
             "description": "Maximum number of items to return (1-50)."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pagination cursor — pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page. It is an opaque composite token."
           }
         ],
         "responses": {
@@ -1644,6 +1690,15 @@
               "maximum": 50
             },
             "description": "Maximum number of items to return (1-50)."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pagination cursor — pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page. It is an opaque composite token."
           }
         ],
         "responses": {
@@ -1722,6 +1777,15 @@
               "maximum": 50
             },
             "description": "Maximum number of items to return (1-50)."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pagination cursor — pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page. It is an opaque composite token."
           }
         ],
         "responses": {
@@ -1853,6 +1917,15 @@
               "maximum": 50
             },
             "description": "Maximum number of items to return (1-50)."
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Pagination cursor — pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page. It is an opaque composite token."
           }
         ],
         "responses": {
@@ -2016,7 +2089,7 @@
       "get": {
         "operationId": "getTikTokTrendingHashtags",
         "summary": "Trending Hashtags",
-        "description": "Trending hashtags ranked by usage (served via the on-device signer path \u2014 view counts and distinct-creator counts).",
+        "description": "Trending hashtags ranked by usage (served via the on-device signer path — view counts and distinct-creator counts).",
         "tags": [
           "TikTok Trending"
         ],
@@ -2088,7 +2161,7 @@
       "get": {
         "operationId": "getTikTokTrendingSongs",
         "summary": "Trending Songs",
-        "description": "Trending songs/sounds ranked by usage (served via the on-device signer path \u2014 hot-music feed).",
+        "description": "Trending songs/sounds ranked by usage (served via the on-device signer path — hot-music feed).",
         "tags": [
           "TikTok Trending"
         ],
@@ -2190,7 +2263,7 @@
               "type": "string",
               "default": "DE"
             },
-            "description": "EU region code \u2014 the Ad Library is EU-only (e.g. DE, FR, IE, NL)."
+            "description": "EU region code — the Ad Library is EU-only (e.g. DE, FR, IE, NL)."
           },
           {
             "name": "days",
@@ -2476,7 +2549,7 @@
           },
           "sec_uid": {
             "type": "string",
-            "description": "Secure user id \u2014 needed to call list endpoints."
+            "description": "Secure user id — needed to call list endpoints."
           },
           "unique_id": {
             "type": "string",
@@ -3379,7 +3452,7 @@
           },
           "search_id": {
             "type": "string",
-            "description": "Search endpoints chain rid \u2192 search_id across pages."
+            "description": "Search endpoints chain rid → search_id across pages."
           }
         },
         "description": "Cursor pagination metadata shared by all list endpoints."

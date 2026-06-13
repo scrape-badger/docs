@@ -1,0 +1,60 @@
+---
+title: "List Categories"
+openapi: "GET /v1/shopee/categories"
+description: "Get the full recursive Shopee category tree for a market."
+---
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="sg">
+  Shopee storefront code. The category tree is localized per market.
+
+  Examples: `sg`, `my`, `th`, `vn`
+</ParamField>
+
+## Response
+
+<ResponseField name="market" type="string">Storefront the tree applies to.</ResponseField>
+<ResponseField name="categories" type="array">
+  Recursive array of category nodes.
+
+  <Expandable title="Category object">
+    <ResponseField name="category_id" type="integer">Numeric Shopee category ID. Pass to [category items](/api-reference/endpoint/shopee/category-items).</ResponseField>
+    <ResponseField name="parent_id" type="integer">Parent category ID (`0`/null for top-level).</ResponseField>
+    <ResponseField name="name" type="string">Internal category name.</ResponseField>
+    <ResponseField name="display_name" type="string">Human-facing localized name.</ResponseField>
+    <ResponseField name="image" type="string">Category icon/thumbnail CDN URL (nullable).</ResponseField>
+    <ResponseField name="children" type="array">Recursive array of child category nodes.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "market": "sg",
+  "categories": [
+    {
+      "category_id": 11000001,
+      "parent_id": 0,
+      "name": "Mobile & Gadgets",
+      "display_name": "Mobile & Gadgets",
+      "image": "https://cf.shopee.sg/file/cat-mobile",
+      "children": [
+        {
+          "category_id": 11012345,
+          "parent_id": 11000001,
+          "name": "Audio",
+          "display_name": "Audio",
+          "image": "https://cf.shopee.sg/file/cat-audio",
+          "children": []
+        }
+      ]
+    }
+  ]
+}
+```
+
+<Note>
+  The category tree costs **2 credits**. Failed requests are not charged.
+</Note>

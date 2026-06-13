@@ -17,6 +17,7 @@
     "/openapi-web-scraping.json",
     "/openapi-vinted.json",
     "/openapi-amazon.json",
+    "/openapi-shopee.json",
     "/openapi-tiktok.json",
     "/openapi-reddit.json",
     "/openapi-google.json",
@@ -355,6 +356,43 @@
             "pages": [
               "api-reference/endpoint/amazon/list-markets",
               "api-reference/endpoint/amazon/list-categories"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Shopee",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "shopee/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/shopee/search-products"
+            ]
+          },
+          {
+            "group": "Products",
+            "pages": [
+              "api-reference/endpoint/shopee/get-product",
+              "api-reference/endpoint/shopee/get-reviews"
+            ]
+          },
+          {
+            "group": "Categories",
+            "pages": [
+              "api-reference/endpoint/shopee/category-items",
+              "api-reference/endpoint/shopee/list-categories"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api-reference/endpoint/shopee/list-markets"
             ]
           }
         ]

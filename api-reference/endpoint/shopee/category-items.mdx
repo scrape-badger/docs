@@ -1,0 +1,95 @@
+---
+title: "Category Items"
+openapi: "GET /v1/shopee/category/{category_id}/items"
+description: "List products within a Shopee category."
+---
+
+## Path Parameters
+
+<ParamField path="category_id" type="integer" required>
+  The Shopee category ID to list products from. Look up IDs with [`/v1/shopee/categories`](/api-reference/endpoint/shopee/list-categories).
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="sg">
+  Shopee storefront code.
+
+  Examples: `sg`, `my`, `th`, `vn`
+</ParamField>
+
+<ParamField query="limit" type="integer" default={60}>
+  Number of results to return per page.
+</ParamField>
+
+<ParamField query="offset" type="integer" default={0}>
+  Number of results to skip (offset-based pagination). Page 2 of a 60-item page is `offset=60`.
+</ParamField>
+
+<ParamField query="sort_by" type="string" default="relevancy">
+  Sort order for results.
+
+  | Value | Description |
+  |-------|-------------|
+  | `relevancy` | Best match (default) |
+  | `ctime` | Newest listings first |
+  | `sales` | Best-selling first |
+  | `price_low_to_high` | Cheapest first |
+  | `price_high_to_low` | Most expensive first |
+</ParamField>
+
+## Response
+
+<ResponseField name="category_id" type="integer">The category ID that was listed.</ResponseField>
+<ResponseField name="market" type="string">Storefront code.</ResponseField>
+<ResponseField name="results" type="array">
+  Array of products in the category. Each item uses the same shape as a search [Product object](/api-reference/endpoint/shopee/search-products).
+
+  <Expandable title="Product object">
+    <ResponseField name="item_id" type="integer">Shopee item ID.</ResponseField>
+    <ResponseField name="shop_id" type="integer">Shopee shop ID.</ResponseField>
+    <ResponseField name="name" type="string">Product name.</ResponseField>
+    <ResponseField name="price" type="number">Current price (normalized).</ResponseField>
+    <ResponseField name="currency" type="string">ISO 4217 currency code.</ResponseField>
+    <ResponseField name="rating_star" type="number">Average star rating (0-5).</ResponseField>
+    <ResponseField name="rating_count_total" type="integer">Total number of ratings.</ResponseField>
+    <ResponseField name="sold" type="integer">Recent units sold.</ResponseField>
+    <ResponseField name="historical_sold" type="integer">All-time units sold.</ResponseField>
+    <ResponseField name="image" type="string">Primary product image CDN URL.</ResponseField>
+    <ResponseField name="shop_location" type="string">Seller location.</ResponseField>
+    <ResponseField name="is_official_shop" type="boolean">Whether the seller is a Shopee official shop.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="pagination" type="object">
+  Pagination metadata with `limit`, `offset`, `total`.
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "category_id": 11012345,
+  "market": "sg",
+  "results": [
+    {
+      "item_id": 23456789012,
+      "shop_id": 345678,
+      "name": "TWS Bluetooth Earbuds Noise Cancelling",
+      "price": 29.9,
+      "currency": "SGD",
+      "rating_star": 4.8,
+      "rating_count_total": 12480,
+      "sold": 540,
+      "historical_sold": 18230,
+      "image": "https://cf.shopee.sg/file/abc123",
+      "shop_location": "Singapore",
+      "is_official_shop": true
+    }
+  ],
+  "pagination": { "limit": 60, "offset": 0, "total": 660 }
+}
+```
+
+<Note>
+  Each category request costs **5 credits**. Failed requests are not charged.
+</Note>

@@ -1,0 +1,112 @@
+---
+title: "Get Product Detail"
+openapi: "GET /v1/shopee/product/{shop_id}/{item_id}"
+description: "Full product detail page (price, variants, models, ratings, stock, images, attributes)."
+---
+
+## Path Parameters
+
+<ParamField path="shop_id" type="integer" required>
+  The Shopee shop ID. You can find this in search results or extract it from a product URL (`-i.{shop_id}.{item_id}`).
+</ParamField>
+
+<ParamField path="item_id" type="integer" required>
+  The Shopee item ID.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="sg">
+  Shopee storefront code where the product is listed.
+
+  Examples: `sg`, `my`, `th`, `vn`
+</ParamField>
+
+## Response
+
+<ResponseField name="market" type="string">Storefront the product was fetched from.</ResponseField>
+<ResponseField name="product" type="object">
+  Full product object.
+
+  <Expandable title="Product object">
+    <ResponseField name="item_id" type="integer">Shopee item ID.</ResponseField>
+    <ResponseField name="shop_id" type="integer">Shopee shop ID.</ResponseField>
+    <ResponseField name="name" type="string">Product name.</ResponseField>
+    <ResponseField name="price" type="number">Current price (normalized from Shopee's 1e5 scale).</ResponseField>
+    <ResponseField name="price_min" type="number">Lowest variant price.</ResponseField>
+    <ResponseField name="price_max" type="number">Highest variant price.</ResponseField>
+    <ResponseField name="price_before_discount" type="number">Original price before discount (nullable).</ResponseField>
+    <ResponseField name="discount" type="string">Discount label (nullable).</ResponseField>
+    <ResponseField name="currency" type="string">ISO 4217 currency code.</ResponseField>
+    <ResponseField name="rating_star" type="number">Average star rating (0-5).</ResponseField>
+    <ResponseField name="rating_count_total" type="integer">Total number of ratings.</ResponseField>
+    <ResponseField name="rating" type="object">Per-star count breakdown.</ResponseField>
+    <ResponseField name="stock" type="integer">Available stock.</ResponseField>
+    <ResponseField name="sold" type="integer">Recent units sold.</ResponseField>
+    <ResponseField name="historical_sold" type="integer">All-time units sold.</ResponseField>
+    <ResponseField name="liked_count" type="integer">Number of likes.</ResponseField>
+    <ResponseField name="comment_count" type="integer">Number of reviews/comments.</ResponseField>
+    <ResponseField name="view_count" type="integer">Number of views.</ResponseField>
+    <ResponseField name="image" type="string">Primary image CDN URL.</ResponseField>
+    <ResponseField name="images" type="array">All product image CDN URLs.</ResponseField>
+    <ResponseField name="description" type="string">Full product description.</ResponseField>
+    <ResponseField name="brand" type="string">Brand name (nullable).</ResponseField>
+    <ResponseField name="categories" type="array">Category breadcrumb.</ResponseField>
+    <ResponseField name="attributes" type="array">Product attribute key/value pairs.</ResponseField>
+    <ResponseField name="models" type="array">Per-SKU variations with their own `price`, `stock`, `name`.</ResponseField>
+    <ResponseField name="tier_variations" type="array">Variation axes (e.g. colour, size) with options.</ResponseField>
+    <ResponseField name="shop_location" type="string">Seller location.</ResponseField>
+    <ResponseField name="is_official_shop" type="boolean">Whether the seller is a Shopee official shop.</ResponseField>
+    <ResponseField name="item_status" type="string">Listing status (e.g. `normal`).</ResponseField>
+    <ResponseField name="ctime_utc" type="integer">Listing creation time (Unix).</ResponseField>
+    <ResponseField name="created_at" type="string">Listing creation time (ISO 8601 UTC).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "market": "sg",
+  "product": {
+    "item_id": 23456789012,
+    "shop_id": 345678,
+    "name": "TWS Bluetooth Earbuds Noise Cancelling",
+    "price": 29.9,
+    "price_min": 29.9,
+    "price_max": 39.9,
+    "price_before_discount": 49.9,
+    "discount": "40%",
+    "currency": "SGD",
+    "rating_star": 4.8,
+    "rating_count_total": 12480,
+    "rating": { "5": 10800, "4": 1200, "3": 300, "2": 100, "1": 80 },
+    "stock": 320,
+    "sold": 540,
+    "historical_sold": 18230,
+    "liked_count": 2104,
+    "comment_count": 9450,
+    "view_count": 412000,
+    "image": "https://cf.shopee.sg/file/abc123",
+    "images": ["https://cf.shopee.sg/file/abc123", "https://cf.shopee.sg/file/def456"],
+    "description": "Hi-Fi sound, ENC noise cancelling, 30h battery...",
+    "brand": "Generic",
+    "categories": ["Mobile & Gadgets", "Audio", "Earphones"],
+    "attributes": [{ "name": "Warranty", "value": "1 Year" }],
+    "models": [
+      { "model_id": 99887766, "name": "Black", "price": 29.9, "stock": 200 },
+      { "model_id": 99887767, "name": "White", "price": 31.9, "stock": 120 }
+    ],
+    "tier_variations": [{ "name": "Color", "options": ["Black", "White"] }],
+    "shop_location": "Singapore",
+    "is_official_shop": true,
+    "item_status": "normal",
+    "ctime_utc": 1716960000,
+    "created_at": "2026-05-29T00:00:00Z"
+  }
+}
+```
+
+<Note>
+  Each product detail request costs **5 credits**. Failed requests are not charged.
+</Note>

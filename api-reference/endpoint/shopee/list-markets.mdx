@@ -1,0 +1,44 @@
+---
+title: "List Markets"
+openapi: "GET /v1/shopee/markets"
+description: "List all supported Shopee marketplaces."
+---
+
+## Response
+
+<ResponseField name="markets" type="array">
+  Array of supported Shopee marketplaces.
+
+  <Expandable title="Market object">
+    <ResponseField name="code" type="string">Market code to use in the `market` query parameter (e.g. `"sg"`, `"my"`, `"th"`).</ResponseField>
+    <ResponseField name="domain" type="string">Shopee storefront domain (e.g. `"shopee.sg"`).</ResponseField>
+    <ResponseField name="name" type="string">Marketplace country name.</ResponseField>
+    <ResponseField name="currency" type="string">ISO 4217 currency code used in this market.</ResponseField>
+    <ResponseField name="locale" type="string">Default locale for this market.</ResponseField>
+    <ResponseField name="country_code" type="string">ISO country code used for proxy geo-targeting.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "markets": [
+    { "code": "sg", "domain": "shopee.sg", "name": "Singapore", "currency": "SGD", "locale": "en", "country_code": "SG" },
+    { "code": "my", "domain": "shopee.com.my", "name": "Malaysia", "currency": "MYR", "locale": "en", "country_code": "MY" },
+    { "code": "th", "domain": "shopee.co.th", "name": "Thailand", "currency": "THB", "locale": "th", "country_code": "TH" },
+    { "code": "vn", "domain": "shopee.vn", "name": "Vietnam", "currency": "VND", "locale": "vi", "country_code": "VN" },
+    { "code": "id", "domain": "shopee.co.id", "name": "Indonesia", "currency": "IDR", "locale": "id", "country_code": "ID" },
+    { "code": "ph", "domain": "shopee.ph", "name": "Philippines", "currency": "PHP", "locale": "en", "country_code": "PH" },
+    { "code": "br", "domain": "shopee.com.br", "name": "Brazil", "currency": "BRL", "locale": "pt-br", "country_code": "BR" },
+    { "code": "tw", "domain": "shopee.tw", "name": "Taiwan", "currency": "TWD", "locale": "zh-Hant", "country_code": "TW" },
+    { "code": "co", "domain": "shopee.com.co", "name": "Colombia", "currency": "COP", "locale": "es", "country_code": "CO" },
+    { "code": "cl", "domain": "shopee.cl", "name": "Chile", "currency": "CLP", "locale": "es", "country_code": "CL" },
+    { "code": "mx", "domain": "shopee.com.mx", "name": "Mexico", "currency": "MXN", "locale": "es", "country_code": "MX" }
+  ]
+}
+```
+
+<Note>
+  The markets list is **free** (0 credits).
+</Note>

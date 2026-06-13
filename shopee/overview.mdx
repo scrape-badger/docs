@@ -1,0 +1,140 @@
+---
+title: "Shopee Scraper Overview"
+description: "Scrape Shopee products, reviews, and category listings across 11 Southeast-Asian and LATAM marketplaces with structured JSON responses."
+---
+
+# Shopee Scraper API
+
+Search products, fetch full product detail, pull reviews with star and media filters, list category items, and walk the full category tree from Shopee — Southeast Asia's largest online marketplace. The API handles authentication, anti-bot bypass, session warmup, and marketplace routing automatically.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="11 Marketplaces" icon="earth-asia">
+    Indonesia, Philippines, Vietnam, Brazil, Malaysia, Thailand, Singapore, Taiwan, Colombia, Chile, and Mexico.
+  </Card>
+  <Card title="Anti-Bot Bypass" icon="shield-halved">
+    Real-browser session warmup seeds Shopee's `SPC_*` cookies + TLS fingerprint, so the guarded `/api/v4/` endpoints just work.
+  </Card>
+  <Card title="Rich Product Data" icon="box">
+    Variants, tier options, per-SKU models, ratings breakdown, stock, sold counts, images, attributes, and shop info.
+  </Card>
+  <Card title="Structured Data" icon="database">
+    Clean JSON with prices normalized from Shopee's 1e5-scaled integers and raw values preserved.
+  </Card>
+  <Card title="Country Proxies" icon="globe">
+    Requests are routed through residential proxies matching the target storefront for accurate local pricing.
+  </Card>
+  <Card title="SDK Support" icon="code">
+    First-class support via the ScrapeBadger Node.js and Python SDKs.
+  </Card>
+</CardGroup>
+
+## Supported Marketplaces
+
+Shopee operates across 11 country storefronts. Use the `market` query parameter to target a specific one.
+
+| Market | Domain | Currency | Market | Domain | Currency |
+|--------|--------|----------|--------|--------|----------|
+| :indonesia: `id` | shopee.co.id | IDR | :philippines: `ph` | shopee.ph | PHP |
+| :vietnam: `vn` | shopee.vn | VND | :brazil: `br` | shopee.com.br | BRL |
+| :malaysia: `my` | shopee.com.my | MYR | :thailand: `th` | shopee.co.th | THB |
+| :singapore: `sg` | shopee.sg | SGD | :taiwan: `tw` | shopee.tw | TWD |
+| :colombia: `co` | shopee.com.co | COP | :chile: `cl` | shopee.cl | CLP |
+| :mexico: `mx` | shopee.com.mx | MXN | | | |
+
+<Tip>
+  If no `market` is specified, it defaults to `sg`. Use the [`/v1/shopee/markets`](/api-reference/endpoint/shopee/list-markets) endpoint to get the full list (with currency and locale) programmatically.
+</Tip>
+
+## Quick Start
+
+<CodeGroup>
+
+```javascript Node.js
+import ScrapeBadger from "scrapebadger";
+
+const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" });
+
+const results = await client.shopee.search({
+  keyword: "wireless earbuds",
+  market: "sg",
+  sortBy: "sales",
+  limit: 60,
+});
+
+console.log(results.results);
+```
+
+```python Python
+from scrapebadger import ScrapeBadger
+
+client = ScrapeBadger(api_key="YOUR_API_KEY")
+
+results = client.shopee.search(
+    keyword="wireless earbuds",
+    market="sg",
+    sort_by="sales",
+    limit=60,
+)
+
+print(results.results)
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/shopee/search?keyword=wireless+earbuds&market=sg&sort_by=sales" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+## Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/shopee/search`](/api-reference/endpoint/shopee/search-products) | GET | Search the Shopee catalog with sorting |
+| [`/v1/shopee/product/{shop_id}/{item_id}`](/api-reference/endpoint/shopee/get-product) | GET | Full product detail by shop + item ID |
+| [`/v1/shopee/product/{shop_id}/{item_id}/reviews`](/api-reference/endpoint/shopee/get-reviews) | GET | Product reviews with star/media filters |
+| [`/v1/shopee/category/{category_id}/items`](/api-reference/endpoint/shopee/category-items) | GET | List products within a category |
+| [`/v1/shopee/categories`](/api-reference/endpoint/shopee/list-categories) | GET | Full recursive category tree |
+| [`/v1/shopee/markets`](/api-reference/endpoint/shopee/list-markets) | GET | List all supported marketplaces |
+
+## Credit Costs
+
+| Endpoint | Cost |
+|----------|------|
+| Search products | 5 credits |
+| Get product detail | 5 credits |
+| Get reviews | 5 credits |
+| Category items | 5 credits |
+| List categories (tree) | 2 credits |
+| List markets | 0 credits |
+| Failed requests | 0 credits |
+
+## Authentication
+
+All requests require your API key in the `X-API-Key` header:
+
+```bash
+curl "https://scrapebadger.com/v1/shopee/search?keyword=laptop&market=sg" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+## Anti-Bot Handling
+
+Shopee gates its `/api/v4/` JSON endpoints behind anti-fraud headers (`af-ac-enc-sz-token`, `x-sap-ri`) produced by a bytecode VM that is impractical to mint offline. Rather than block on that, ScrapeBadger warms a genuine Shopee session in a real Chrome browser — seeding the `SPC_*` cookies and a valid TLS fingerprint Shopee's API validates — and serves the GET endpoints against that warm session. You never need to manage proxies, cookies, sessions, or request signing.
+
+<Note>
+  For accurate pricing and availability, requests are routed through residential proxies in the storefront's country. This is handled automatically based on the `market` parameter.
+</Note>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Search Products" icon="magnifying-glass" href="/api-reference/endpoint/shopee/search-products">
+    Full API reference for searching the Shopee catalog
+  </Card>
+  <Card title="Get Product Detail" icon="box" href="/api-reference/endpoint/shopee/get-product">
+    Retrieve full product detail for a specific item
+  </Card>
+</CardGroup>

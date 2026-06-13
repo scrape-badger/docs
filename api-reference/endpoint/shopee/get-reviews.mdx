@@ -1,0 +1,123 @@
+---
+title: "Get Reviews"
+openapi: "GET /v1/shopee/product/{shop_id}/{item_id}/reviews"
+description: "Product reviews and rating summary, with star and media filters."
+---
+
+## Path Parameters
+
+<ParamField path="shop_id" type="integer" required>
+  The Shopee shop ID of the product.
+</ParamField>
+
+<ParamField path="item_id" type="integer" required>
+  The Shopee item ID to fetch reviews for.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="sg">
+  Shopee storefront code where the product is listed.
+
+  Examples: `sg`, `my`, `th`
+</ParamField>
+
+<ParamField query="limit" type="integer" default={20}>
+  Number of reviews to return per page.
+</ParamField>
+
+<ParamField query="offset" type="integer" default={0}>
+  Number of reviews to skip (offset-based pagination).
+</ParamField>
+
+<ParamField query="rating" type="integer" default={0}>
+  Star-rating filter.
+
+  | Value | Description |
+  |-------|-------------|
+  | `0` | All ratings (default) |
+  | `1` - `5` | Only reviews with that exact star rating |
+</ParamField>
+
+<ParamField query="filter" type="integer" default={0}>
+  Content-type filter.
+
+  | Value | Description |
+  |-------|-------------|
+  | `0` | All reviews (default) |
+  | `1` | Only reviews with a comment |
+  | `2` | Only reviews with media (photo/video) |
+  | `3` | Only local-market reviews |
+</ParamField>
+
+## Response
+
+<ResponseField name="shop_id" type="integer">The shop the reviews belong to.</ResponseField>
+<ResponseField name="item_id" type="integer">The item the reviews belong to.</ResponseField>
+<ResponseField name="market" type="string">Storefront code.</ResponseField>
+<ResponseField name="summary" type="object">
+  Aggregate rating summary.
+
+  <Expandable title="Summary object">
+    <ResponseField name="rating_total" type="integer">Total number of reviews.</ResponseField>
+    <ResponseField name="rating_star" type="number">Average star rating.</ResponseField>
+    <ResponseField name="count_by_star" type="object">Review count per star (`5` ... `1`).</ResponseField>
+    <ResponseField name="with_media_count" type="integer">Number of reviews containing photos/videos.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="reviews" type="array">
+  Array of reviews.
+
+  <Expandable title="Review object">
+    <ResponseField name="comment_id" type="integer">Review ID.</ResponseField>
+    <ResponseField name="rating_star" type="integer">Star rating left by the reviewer (1-5).</ResponseField>
+    <ResponseField name="comment" type="string">Review text.</ResponseField>
+    <ResponseField name="author_username" type="string">Reviewer username.</ResponseField>
+    <ResponseField name="author_portrait" type="string">Reviewer avatar CDN URL.</ResponseField>
+    <ResponseField name="images" type="array">Review photo CDN URLs.</ResponseField>
+    <ResponseField name="videos" type="array">Review video URLs.</ResponseField>
+    <ResponseField name="like_count" type="integer">Number of likes on the review.</ResponseField>
+    <ResponseField name="reply" type="object">Seller's reply to the review (nullable).</ResponseField>
+    <ResponseField name="ctime_utc" type="integer">Review time (Unix).</ResponseField>
+    <ResponseField name="created_at" type="string">Review time (ISO 8601 UTC).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="pagination" type="object">
+  Pagination metadata with `limit`, `offset`, `total`.
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "shop_id": 345678,
+  "item_id": 23456789012,
+  "market": "sg",
+  "summary": {
+    "rating_total": 9450,
+    "rating_star": 4.8,
+    "count_by_star": { "5": 8100, "4": 900, "3": 250, "2": 120, "1": 80 },
+    "with_media_count": 3120
+  },
+  "reviews": [
+    {
+      "comment_id": 778899001,
+      "rating_star": 5,
+      "comment": "Great sound and battery life. Fast shipping!",
+      "author_username": "shopper_sg",
+      "author_portrait": "https://cf.shopee.sg/file/avatar123",
+      "images": ["https://cf.shopee.sg/file/review1"],
+      "videos": [],
+      "like_count": 18,
+      "reply": { "comment": "Thank you for your support!", "ctime_utc": 1717050000 },
+      "ctime_utc": 1717046400,
+      "created_at": "2026-05-30T04:00:00Z"
+    }
+  ],
+  "pagination": { "limit": 20, "offset": 0, "total": 9450 }
+}
+```
+
+<Note>
+  Each reviews request costs **5 credits**. Failed requests are not charged.
+</Note>
