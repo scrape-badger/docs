@@ -1,0 +1,105 @@
+---
+title: "Browse a Category"
+openapi: "GET /v1/ebay/categories/{category_id}/items"
+description: "List active listings within an eBay category."
+---
+
+## Path Parameters
+
+<ParamField path="category_id" type="string" required>
+  The eBay category id to browse. Use [`/v1/ebay/categories`](/api-reference/endpoint/ebay/list-categories) to look up ids.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="domain" type="string" default="com">
+  eBay marketplace domain to browse.
+
+  Examples: `com`, `co.uk`, `de`, `fr`
+</ParamField>
+
+<ParamField query="page" type="integer" default={1}>
+  Page number for paginated results. Range: `1` - `100`.
+</ParamField>
+
+<ParamField query="per_page" type="integer">
+  Results per page. Clamped to one of `60`, `120`, or `240`.
+</ParamField>
+
+<ParamField query="sort_by" type="string" default="best_match">
+  Sort order for results.
+
+  | Value | Description |
+  |-------|-------------|
+  | `best_match` | Best match (default) |
+  | `ending_soonest` | Auctions ending soonest first |
+  | `newly_listed` | Most recently listed |
+  | `price_low_to_high` | Cheapest first |
+  | `price_high_to_low` | Most expensive first |
+</ParamField>
+
+<ParamField query="min_price" type="number">
+  Minimum price filter in the marketplace's local currency.
+</ParamField>
+
+<ParamField query="max_price" type="number">
+  Maximum price filter in the marketplace's local currency.
+</ParamField>
+
+## Response
+
+<ResponseField name="domain" type="string">Marketplace domain that was browsed.</ResponseField>
+<ResponseField name="category_id" type="string">The category id that was browsed.</ResponseField>
+<ResponseField name="results" type="array">
+  Array of listings in the category (same `SearchResult` shape as [search](/api-reference/endpoint/ebay/search)).
+
+  <Expandable title="SearchResult object">
+    <ResponseField name="position" type="integer">Position on the page (1-based).</ResponseField>
+    <ResponseField name="item_id" type="string">eBay listing item id.</ResponseField>
+    <ResponseField name="title" type="string">Listing title.</ResponseField>
+    <ResponseField name="url" type="string">Full URL to the listing.</ResponseField>
+    <ResponseField name="image" type="string">Primary image URL.</ResponseField>
+    <ResponseField name="price" type="object">Price object with `value`, `currency`, `symbol`, `raw`.</ResponseField>
+    <ResponseField name="condition" type="string">Item condition label.</ResponseField>
+    <ResponseField name="buying_format" type="string">`Buy It Now`, `Auction`, or `Best Offer`.</ResponseField>
+    <ResponseField name="is_auction" type="boolean">Whether the listing is an auction.</ResponseField>
+    <ResponseField name="shipping" type="string">Shipping text.</ResponseField>
+    <ResponseField name="seller_name" type="string">Seller username (nullable).</ResponseField>
+    <ResponseField name="is_sponsored" type="boolean">Whether the result is a sponsored placement.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="facets" type="object">Available filter facets keyed by name.</ResponseField>
+<ResponseField name="pagination" type="object">Pagination metadata with `current_page`, `per_page`, `total_pages`, `total_results`.</ResponseField>
+<ResponseField name="scraped_at" type="string">ISO 8601 timestamp when the results were scraped.</ResponseField>
+
+### Example Response
+
+```json
+{
+  "domain": "com",
+  "category_id": "139971",
+  "results": [
+    {
+      "position": 1,
+      "item_id": "256123456789",
+      "title": "Nintendo Switch OLED Model White Console - Brand New Sealed",
+      "url": "https://www.ebay.com/itm/256123456789",
+      "image": "https://i.ebayimg.com/images/g/abc/s-l500.jpg",
+      "price": { "value": 299.99, "currency": "USD", "symbol": "$", "raw": "$299.99" },
+      "condition": "Brand New",
+      "buying_format": "Buy It Now",
+      "is_auction": false,
+      "shipping": "Free shipping",
+      "seller_name": "topgames_us",
+      "is_sponsored": false
+    }
+  ],
+  "facets": { "condition": ["New", "Used"] },
+  "pagination": { "current_page": 1, "per_page": 60, "total_pages": 100, "total_results": 6000 },
+  "scraped_at": "2026-06-21T12:00:00Z"
+}
+```
+
+<Note>
+  Each category-browse request costs **5 credits**. Failed requests are not charged.
+</Note>

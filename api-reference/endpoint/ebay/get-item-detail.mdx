@@ -1,0 +1,120 @@
+---
+title: "Get Item Detail"
+openapi: "GET /v1/ebay/items/{item_id}"
+description: "Full detail for a single eBay listing (price, condition, specifics, shipping, seller, ...)."
+---
+
+## Path Parameters
+
+<ParamField path="item_id" type="string" required>
+  The eBay listing item id. You can find this in search results or extract it from a listing URL (`/itm/{item_id}`).
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="domain" type="string" default="com">
+  eBay marketplace domain where the listing lives.
+
+  Examples: `com`, `co.uk`, `de`, `fr`
+</ParamField>
+
+## Response
+
+<ResponseField name="domain" type="string">Marketplace domain the item was fetched from.</ResponseField>
+<ResponseField name="item" type="object">
+  Full item object.
+
+  <Expandable title="Item object">
+    <ResponseField name="item_id" type="string">eBay listing item id.</ResponseField>
+    <ResponseField name="product_id" type="string">eBay catalog product id (nullable).</ResponseField>
+    <ResponseField name="legacy_item_id" type="string">Legacy item id, if different (nullable).</ResponseField>
+    <ResponseField name="title" type="string">Listing title.</ResponseField>
+    <ResponseField name="subtitle" type="string">Listing subtitle (nullable).</ResponseField>
+    <ResponseField name="url" type="string">Full URL to the listing.</ResponseField>
+    <ResponseField name="condition" type="string">Item condition label.</ResponseField>
+    <ResponseField name="condition_id" type="string">eBay numeric condition id (nullable).</ResponseField>
+    <ResponseField name="condition_description" type="string">Seller's free-text condition note (nullable).</ResponseField>
+    <ResponseField name="price" type="object">Current price with `value`, `currency`, `symbol`, `raw`.</ResponseField>
+    <ResponseField name="original_price" type="object">Strikethrough original price (nullable).</ResponseField>
+    <ResponseField name="discount_percent" type="number">Discount percentage off original price (nullable).</ResponseField>
+    <ResponseField name="currency" type="string">ISO 4217 currency code.</ResponseField>
+    <ResponseField name="availability" type="string">Availability/stock message.</ResponseField>
+    <ResponseField name="quantity_available" type="integer">Quantity available (nullable).</ResponseField>
+    <ResponseField name="quantity_sold" type="integer">Quantity sold (nullable).</ResponseField>
+    <ResponseField name="watchers" type="integer">Number of watchers (nullable).</ResponseField>
+    <ResponseField name="buying_format" type="string">`Buy It Now`, `Auction`, or `Best Offer`.</ResponseField>
+    <ResponseField name="is_auction" type="boolean">Whether the listing is an auction.</ResponseField>
+    <ResponseField name="bids" type="integer">Number of bids (auctions only, nullable).</ResponseField>
+    <ResponseField name="time_left" type="string">Time remaining for auctions (nullable).</ResponseField>
+    <ResponseField name="best_offer_enabled" type="boolean">Whether the seller accepts best offers (nullable).</ResponseField>
+    <ResponseField name="brand" type="string">Brand name (nullable).</ResponseField>
+    <ResponseField name="mpn" type="string">Manufacturer part number (nullable).</ResponseField>
+    <ResponseField name="model" type="string">Model name (nullable).</ResponseField>
+    <ResponseField name="color" type="string">Color (nullable).</ResponseField>
+    <ResponseField name="gtin" type="string">GTIN/UPC/EAN (nullable).</ResponseField>
+    <ResponseField name="main_image" type="string">Primary image URL.</ResponseField>
+    <ResponseField name="images" type="array">All image objects with `url`, `width`, `height`.</ResponseField>
+    <ResponseField name="images_count" type="integer">Number of images.</ResponseField>
+    <ResponseField name="description" type="string">Listing description text (nullable).</ResponseField>
+    <ResponseField name="seller_notes" type="string">Seller notes (nullable).</ResponseField>
+    <ResponseField name="item_specifics" type="object">Key-value map of item specifics (e.g. `{"Brand": "Nintendo"}`).</ResponseField>
+    <ResponseField name="categories" type="array">Category breadcrumb path.</ResponseField>
+    <ResponseField name="category_id" type="string">Primary category id (nullable).</ResponseField>
+    <ResponseField name="shipping_options" type="array">Shipping options with `cost`, `is_free`, `service`, `destination_country`, `delivery_estimate`.</ResponseField>
+    <ResponseField name="shipping_cost" type="object">Primary shipping cost (nullable).</ResponseField>
+    <ResponseField name="free_shipping" type="boolean">Whether primary shipping is free (nullable).</ResponseField>
+    <ResponseField name="item_location" type="string">Item location text.</ResponseField>
+    <ResponseField name="ships_to" type="array">List of destinations the seller ships to.</ResponseField>
+    <ResponseField name="returns" type="object">Returns policy with `accepted`, `period`, `cost_paid_by`, `raw`.</ResponseField>
+    <ResponseField name="seller" type="object">Seller summary with `username`, `url`, `feedback_score`, `feedback_percent`, `store_name`, `store_url`.</ResponseField>
+    <ResponseField name="rating" type="number">Catalog rating, if shown (nullable).</ResponseField>
+    <ResponseField name="ratings_total" type="integer">Total ratings, if shown (nullable).</ResponseField>
+    <ResponseField name="date_modified_at" type="string">ISO 8601 timestamp the listing was last modified (nullable).</ResponseField>
+    <ResponseField name="scraped_at" type="string">ISO 8601 timestamp when the item was scraped.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "domain": "com",
+  "item": {
+    "item_id": "256123456789",
+    "product_id": "20057872541",
+    "title": "Nintendo Switch OLED Model White Console - Brand New Sealed",
+    "url": "https://www.ebay.com/itm/256123456789",
+    "condition": "Brand New",
+    "condition_id": "1000",
+    "price": { "value": 299.99, "currency": "USD", "symbol": "$", "raw": "$299.99" },
+    "currency": "USD",
+    "availability": "In Stock",
+    "quantity_available": 12,
+    "quantity_sold": 42,
+    "watchers": 18,
+    "buying_format": "Buy It Now",
+    "is_auction": false,
+    "best_offer_enabled": true,
+    "brand": "Nintendo",
+    "mpn": "HEGSKAAAA",
+    "gtin": "0045496883414",
+    "main_image": "https://i.ebayimg.com/images/g/abc/s-l1600.jpg",
+    "images": [{ "url": "https://i.ebayimg.com/images/g/abc/s-l1600.jpg", "width": 1600, "height": 1600 }],
+    "images_count": 1,
+    "item_specifics": { "Brand": "Nintendo", "Model": "Switch OLED", "Color": "White" },
+    "categories": ["Video Games & Consoles", "Video Game Consoles"],
+    "category_id": "139971",
+    "shipping_options": [{ "cost": { "value": 0, "currency": "USD", "raw": "Free" }, "is_free": true, "service": "Standard Shipping" }],
+    "free_shipping": true,
+    "item_location": "United States",
+    "ships_to": ["United States", "Canada"],
+    "returns": { "accepted": true, "period": "30 days", "cost_paid_by": "buyer", "raw": "30 days returns. Buyer pays return shipping." },
+    "seller": { "username": "topgames_us", "url": "https://www.ebay.com/usr/topgames_us", "feedback_score": 18452, "feedback_percent": 99.4 },
+    "scraped_at": "2026-06-21T12:00:00Z"
+  }
+}
+```
+
+<Note>
+  Each item-detail request costs **5 credits**. Failed requests are not charged.
+</Note>

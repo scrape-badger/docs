@@ -1,0 +1,151 @@
+---
+title: "eBay Scraper Overview"
+description: "Scrape eBay active listings, sold-price history, item details, reviews, and seller data across 18 marketplaces with structured JSON responses."
+---
+
+# eBay Scraper API
+
+Search active listings, pull **completed/sold-price history**, fetch full item detail, list reviews, and retrieve seller profiles, storefronts, and feedback from eBay — one of the world's largest online marketplaces. The API handles authentication, anti-bot bypass, and marketplace routing automatically.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="18 Marketplaces" icon="earth-americas">
+    Access all major eBay marketplaces including US, UK, DE, FR, IT, ES, AU, CA, and more.
+  </Card>
+  <Card title="Sold-Price History" icon="clock-rotate-left">
+    The [`/v1/ebay/completed`](/api-reference/endpoint/ebay/completed) endpoint returns real **sold** listings — the closing prices buyers actually paid.
+  </Card>
+  <Card title="Anti-Bot Bypass" icon="shield-halved">
+    Automatic session management, Chrome TLS impersonation, and fingerprint rotation to avoid blocks.
+  </Card>
+  <Card title="Rich Item Data" icon="box">
+    Prices, conditions, item specifics, shipping options, returns, seller info, ratings, and watchers.
+  </Card>
+  <Card title="Country Proxies" icon="globe">
+    Requests are routed through proxies matching the target marketplace for accurate pricing and availability.
+  </Card>
+  <Card title="SDK Support" icon="code">
+    First-class support via the ScrapeBadger Node.js and Python SDKs.
+  </Card>
+</CardGroup>
+
+## Supported Marketplaces
+
+eBay operates across 18 country domains. Use the `domain` query parameter to target a specific one.
+
+| Market | Domain | Market | Domain |
+|--------|--------|--------|--------|
+| :us: `com` | ebay.com | :gb: `co.uk` | ebay.co.uk |
+| :de: `de` | ebay.de | :fr: `fr` | ebay.fr |
+| :it: `it` | ebay.it | :es: `es` | ebay.es |
+| :australia: `com.au` | ebay.com.au | :canada: `ca` | ebay.ca |
+| :at: `at` | ebay.at | :switzerland: `ch` | ebay.ch |
+| :be: `be` | ebay.be | :ireland: `ie` | ebay.ie |
+| :netherlands: `nl` | ebay.nl | :poland: `pl` | ebay.pl |
+| :hong_kong: `com.hk` | ebay.com.hk | :singapore: `com.sg` | ebay.com.sg |
+| :malaysia: `com.my` | ebay.com.my | :philippines: `ph` | ebay.ph |
+
+<Tip>
+  If no `domain` is specified, it defaults to `com`. Country-style aliases also work (`us` → `com`, `uk`/`gb` → `co.uk`, `au` → `com.au`, `hk`/`sg`/`my`). Use the [`/v1/ebay/markets`](/api-reference/endpoint/ebay/list-markets) endpoint to get the full list (with currency, locale, and site id) programmatically.
+</Tip>
+
+## Quick Start
+
+<CodeGroup>
+
+```javascript Node.js
+import ScrapeBadger from "scrapebadger";
+
+const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" });
+
+const results = await client.ebay.search({
+  query: "nintendo switch oled",
+  domain: "com",
+  page: 1,
+});
+
+console.log(results.results);
+```
+
+```python Python
+from scrapebadger import ScrapeBadger
+
+client = ScrapeBadger(api_key="YOUR_API_KEY")
+
+results = client.ebay.search(
+    query="nintendo switch oled",
+    domain="com",
+    page=1,
+)
+
+print(results.results)
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/ebay/search?query=nintendo+switch+oled&domain=com&page=1" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+## Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/ebay/search`](/api-reference/endpoint/ebay/search) | GET | Search a marketplace for active listings |
+| [`/v1/ebay/completed`](/api-reference/endpoint/ebay/completed) | GET | Completed / sold listings (sold-price history) |
+| [`/v1/ebay/items/{item_id}`](/api-reference/endpoint/ebay/get-item-detail) | GET | Full detail for a single listing |
+| [`/v1/ebay/items/{item_id}/reviews`](/api-reference/endpoint/ebay/get-item-reviews) | GET | Catalog product reviews for a listing |
+| [`/v1/ebay/sellers/{username}`](/api-reference/endpoint/ebay/get-seller) | GET | Seller public profile |
+| [`/v1/ebay/sellers/{username}/items`](/api-reference/endpoint/ebay/get-seller-items) | GET | A seller's active listings |
+| [`/v1/ebay/sellers/{username}/feedback`](/api-reference/endpoint/ebay/get-seller-feedback) | GET | A seller's recent feedback comments |
+| [`/v1/ebay/categories/{category_id}/items`](/api-reference/endpoint/ebay/browse-category) | GET | List listings within a category |
+| [`/v1/ebay/categories`](/api-reference/endpoint/ebay/list-categories) | GET | List top-level category aliases |
+| [`/v1/ebay/autocomplete`](/api-reference/endpoint/ebay/autocomplete) | GET | Keyword autocomplete suggestions |
+| [`/v1/ebay/markets`](/api-reference/endpoint/ebay/list-markets) | GET | List all supported marketplaces |
+
+## Credit Costs
+
+| Endpoint | Cost |
+|----------|------|
+| Search | 5 credits |
+| Completed / sold | 5 credits |
+| Get item detail | 5 credits |
+| Get item reviews | 10 credits |
+| Get seller | 5 credits |
+| Seller items | 5 credits |
+| Seller feedback | 10 credits |
+| Browse category | 5 credits |
+| Autocomplete | 1 credit |
+| List categories | 0 credits |
+| List markets | 0 credits |
+| Failed requests | 0 credits |
+
+## Authentication
+
+All requests require your API key in the `X-API-Key` header:
+
+```bash
+curl "https://scrapebadger.com/v1/ebay/search?query=laptop" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+## Anti-Bot Handling
+
+eBay protects its catalog with IP-reputation scoring, TLS/HTTP-2 fingerprinting, and per-domain server-side rendering. ScrapeBadger clears these automatically using Chrome TLS impersonation on sessions matched to the target marketplace. You never need to manage proxies, sessions, or CAPTCHAs.
+
+<Note>
+  For accurate pricing and availability, requests are routed through proxies in the marketplace's country. This is handled automatically based on the `domain` parameter.
+</Note>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Search Listings" icon="magnifying-glass" href="/api-reference/endpoint/ebay/search">
+    Full API reference for searching the eBay catalog
+  </Card>
+  <Card title="Sold-Price History" icon="clock-rotate-left" href="/api-reference/endpoint/ebay/completed">
+    Retrieve the closing prices of completed/sold listings
+  </Card>
+</CardGroup>

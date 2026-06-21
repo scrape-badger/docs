@@ -1,0 +1,75 @@
+---
+title: "Get Seller Profile"
+openapi: "GET /v1/ebay/sellers/{username}"
+description: "An eBay seller's public profile, feedback summary, and store info."
+---
+
+## Path Parameters
+
+<ParamField path="username" type="string" required>
+  The eBay seller username (e.g. `topgames_us`).
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="domain" type="string" default="com">
+  eBay marketplace domain to resolve the seller on.
+
+  Examples: `com`, `co.uk`, `de`, `fr`
+</ParamField>
+
+## Response
+
+<ResponseField name="domain" type="string">Marketplace domain the seller was fetched from.</ResponseField>
+<ResponseField name="seller" type="object">
+  Seller profile object.
+
+  <Expandable title="Seller object">
+    <ResponseField name="username" type="string">Seller username.</ResponseField>
+    <ResponseField name="url" type="string">URL to the seller's profile page.</ResponseField>
+    <ResponseField name="store_name" type="string">eBay Store name, if the seller has a store (nullable).</ResponseField>
+    <ResponseField name="store_url" type="string">URL to the seller's store (nullable).</ResponseField>
+    <ResponseField name="feedback_score" type="integer">Lifetime feedback score (nullable).</ResponseField>
+    <ResponseField name="feedback_percent" type="number">Positive-feedback percentage (nullable).</ResponseField>
+    <ResponseField name="member_since" type="string">Account creation date text (nullable).</ResponseField>
+    <ResponseField name="location" type="string">Seller location (nullable).</ResponseField>
+    <ResponseField name="items_for_sale" type="integer">Number of active listings (nullable).</ResponseField>
+    <ResponseField name="feedback_12mo" type="object">
+      12-month feedback breakdown.
+
+      <Expandable title="FeedbackBreakdown object">
+        <ResponseField name="positive" type="integer">Positive feedback count (nullable).</ResponseField>
+        <ResponseField name="neutral" type="integer">Neutral feedback count (nullable).</ResponseField>
+        <ResponseField name="negative" type="integer">Negative feedback count (nullable).</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="top_rated" type="boolean">Whether the seller is a Top Rated Seller (nullable).</ResponseField>
+    <ResponseField name="scraped_at" type="string">ISO 8601 timestamp when the seller was scraped.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "domain": "com",
+  "seller": {
+    "username": "topgames_us",
+    "url": "https://www.ebay.com/usr/topgames_us",
+    "store_name": "Top Games US",
+    "store_url": "https://www.ebay.com/str/topgamesus",
+    "feedback_score": 18452,
+    "feedback_percent": 99.4,
+    "member_since": "Mar 2014",
+    "location": "United States",
+    "items_for_sale": 1342,
+    "feedback_12mo": { "positive": 9821, "neutral": 41, "negative": 53 },
+    "top_rated": true,
+    "scraped_at": "2026-06-21T12:00:00Z"
+  }
+}
+```
+
+<Note>
+  Each seller-profile request costs **5 credits**. Failed requests are not charged.
+</Note>

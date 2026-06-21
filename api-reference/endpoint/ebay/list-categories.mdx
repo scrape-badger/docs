@@ -1,0 +1,36 @@
+---
+title: "List Categories"
+openapi: "GET /v1/ebay/categories"
+description: "List eBay's top-level category id aliases."
+---
+
+Returns the reference list of top-level eBay category aliases and their ids. Use a returned `category_id` with [`/v1/ebay/categories/{category_id}/items`](/api-reference/endpoint/ebay/browse-category) to browse listings, or with the [`category_id`](/api-reference/endpoint/ebay/search) parameter on search.
+
+## Response
+
+<ResponseField name="categories" type="array">
+  Array of category aliases.
+
+  <Expandable title="CategoryInfo object">
+    <ResponseField name="name" type="string">Human-readable category name (e.g. `Electronics`).</ResponseField>
+    <ResponseField name="category_id" type="string">eBay category id (e.g. `293`).</ResponseField>
+    <ResponseField name="parent" type="string">Parent category name, if nested (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "categories": [
+    { "name": "Electronics", "category_id": "293", "parent": null },
+    { "name": "Video Games & Consoles", "category_id": "1249", "parent": null },
+    { "name": "Fashion", "category_id": "11450", "parent": null },
+    { "name": "Home & Garden", "category_id": "11700", "parent": null }
+  ]
+}
+```
+
+<Note>
+  Listing categories is a **free** reference endpoint (0 credits).
+</Note>

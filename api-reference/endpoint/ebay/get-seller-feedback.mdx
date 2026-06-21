@@ -1,0 +1,67 @@
+---
+title: "Get Seller Feedback"
+openapi: "GET /v1/ebay/sellers/{username}/feedback"
+description: "A seller's recent buyer-feedback comments."
+---
+
+## Path Parameters
+
+<ParamField path="username" type="string" required>
+  The eBay seller username whose feedback comments you want.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="domain" type="string" default="com">
+  eBay marketplace domain to resolve the seller on.
+
+  Examples: `com`, `co.uk`, `de`, `fr`
+</ParamField>
+
+<ParamField query="page" type="integer" default={1}>
+  Page number for paginated feedback. Range: `1` - `50`.
+</ParamField>
+
+## Response
+
+<ResponseField name="domain" type="string">Marketplace domain the feedback was fetched from.</ResponseField>
+<ResponseField name="username" type="string">The seller whose feedback was returned.</ResponseField>
+<ResponseField name="feedback" type="array">
+  Array of feedback entries.
+
+  <Expandable title="FeedbackEntry object">
+    <ResponseField name="rating" type="string">Feedback rating: `positive`, `neutral`, or `negative` (nullable).</ResponseField>
+    <ResponseField name="comment" type="string">Buyer's free-text feedback comment (nullable).</ResponseField>
+    <ResponseField name="rater" type="string">Buyer username who left the feedback (nullable).</ResponseField>
+    <ResponseField name="item" type="string">The item the feedback relates to (nullable).</ResponseField>
+    <ResponseField name="date_raw" type="string">Raw date string as shown on eBay (nullable).</ResponseField>
+    <ResponseField name="date_at" type="string">ISO 8601 feedback date (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="pagination" type="object">Pagination metadata with `current_page`, `per_page`, `total_pages`, `total_results`.</ResponseField>
+<ResponseField name="scraped_at" type="string">ISO 8601 timestamp when the feedback was scraped.</ResponseField>
+
+### Example Response
+
+```json
+{
+  "domain": "com",
+  "username": "topgames_us",
+  "feedback": [
+    {
+      "rating": "positive",
+      "comment": "Fast shipping, item exactly as described. A+++",
+      "rater": "buyer_jane",
+      "item": "Nintendo Switch OLED Model White",
+      "date_raw": "Jun 10, 2026",
+      "date_at": "2026-06-10T00:00:00Z"
+    }
+  ],
+  "pagination": { "current_page": 1, "per_page": 25, "total_pages": 50, "total_results": 1250 },
+  "scraped_at": "2026-06-21T12:00:00Z"
+}
+```
+
+<Note>
+  Each seller-feedback request costs **10 credits**. Failed requests are not charged.
+</Note>

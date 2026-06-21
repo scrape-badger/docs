@@ -1,0 +1,89 @@
+---
+title: "Get Item Reviews"
+openapi: "GET /v1/ebay/items/{item_id}/reviews"
+description: "Catalog product reviews shown on an eBay listing, with rating summary and histogram."
+---
+
+## Path Parameters
+
+<ParamField path="item_id" type="string" required>
+  The eBay listing item id whose catalog product reviews you want.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="domain" type="string" default="com">
+  eBay marketplace domain where the listing lives.
+
+  Examples: `com`, `co.uk`, `de`, `fr`
+</ParamField>
+
+<ParamField query="page" type="integer" default={1}>
+  Page number for paginated reviews. Range: `1` - `50`.
+</ParamField>
+
+## Response
+
+<ResponseField name="domain" type="string">Marketplace domain the reviews were fetched from.</ResponseField>
+<ResponseField name="item_id" type="string">The item id the reviews were requested for (nullable).</ResponseField>
+<ResponseField name="product_id" type="string">The eBay catalog product id the reviews belong to (nullable).</ResponseField>
+<ResponseField name="rating" type="number">Average star rating across all reviews (0-5, nullable).</ResponseField>
+<ResponseField name="ratings_total" type="integer">Total number of ratings (nullable).</ResponseField>
+<ResponseField name="histogram" type="object">
+  Star-bucket counts.
+
+  <Expandable title="RatingHistogram object">
+    <ResponseField name="five_star" type="integer">Number of 5-star reviews (nullable).</ResponseField>
+    <ResponseField name="four_star" type="integer">Number of 4-star reviews (nullable).</ResponseField>
+    <ResponseField name="three_star" type="integer">Number of 3-star reviews (nullable).</ResponseField>
+    <ResponseField name="two_star" type="integer">Number of 2-star reviews (nullable).</ResponseField>
+    <ResponseField name="one_star" type="integer">Number of 1-star reviews (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="reviews" type="array">
+  Array of reviews.
+
+  <Expandable title="Review object">
+    <ResponseField name="title" type="string">Review title (nullable).</ResponseField>
+    <ResponseField name="body" type="string">Review body text (nullable).</ResponseField>
+    <ResponseField name="rating" type="number">Star rating for this review (0-5, nullable).</ResponseField>
+    <ResponseField name="author" type="string">Reviewer display name (nullable).</ResponseField>
+    <ResponseField name="date_raw" type="string">Raw date string as shown on eBay (nullable).</ResponseField>
+    <ResponseField name="date_at" type="string">ISO 8601 review date (nullable).</ResponseField>
+    <ResponseField name="helpful_votes" type="integer">Number of helpful votes (nullable).</ResponseField>
+    <ResponseField name="verified_purchase" type="boolean">Whether the review is from a verified purchase.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="pagination" type="object">Pagination metadata with `current_page`, `per_page`, `total_pages`, `total_results`.</ResponseField>
+<ResponseField name="scraped_at" type="string">ISO 8601 timestamp when the reviews were scraped.</ResponseField>
+
+### Example Response
+
+```json
+{
+  "domain": "com",
+  "item_id": "256123456789",
+  "product_id": "20057872541",
+  "rating": 4.8,
+  "ratings_total": 1245,
+  "histogram": { "five_star": 1050, "four_star": 120, "three_star": 40, "two_star": 20, "one_star": 15 },
+  "reviews": [
+    {
+      "title": "Excellent console",
+      "body": "Screen is gorgeous and the build quality is great.",
+      "rating": 5.0,
+      "author": "gamer_dad",
+      "date_raw": "May 12, 2026",
+      "date_at": "2026-05-12T00:00:00Z",
+      "helpful_votes": 23,
+      "verified_purchase": true
+    }
+  ],
+  "pagination": { "current_page": 1, "per_page": 20, "total_pages": 50, "total_results": 1245 },
+  "scraped_at": "2026-06-21T12:00:00Z"
+}
+```
+
+<Note>
+  Each item-reviews request costs **10 credits**. Failed requests are not charged.
+</Note>

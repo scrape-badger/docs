@@ -1,0 +1,2915 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ScrapeBadger eBay API",
+    "version": "1.0.0",
+    "description": "eBay marketplace scraping API for searching active and completed (sold) listings, fetching item details, reviews, sellers, seller listings and feedback, category browsing, autocomplete, and reference data across 18 marketplaces."
+  },
+  "servers": [
+    {
+      "url": "https://scrapebadger.com",
+      "description": "Production"
+    }
+  ],
+  "security": [
+    {
+      "apiKeyAuth": []
+    }
+  ],
+  "paths": {
+    "/v1/ebay/search": {
+      "get": {
+        "operationId": "searchEbayListings",
+        "summary": "Search Listings",
+        "description": "Search an eBay marketplace for active listings.",
+        "tags": [
+          "eBay Search"
+        ],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search keywords."
+          },
+          {
+            "name": "domain",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "com"
+            },
+            "description": "eBay marketplace domain TLD or alias (com, co.uk, de, fr, ...)."
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Restrict results to a category id."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "Page number for paginated results."
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 240
+            },
+            "description": "Results per page. Clamped to 60, 120 or 240."
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "best_match",
+              "enum": [
+                "best_match",
+                "ending_soonest",
+                "newly_listed",
+                "price_low_to_high",
+                "price_high_to_low"
+              ]
+            },
+            "description": "Sort order for results."
+          },
+          {
+            "name": "condition",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "new",
+                "open_box",
+                "refurbished",
+                "used",
+                "for_parts"
+              ]
+            },
+            "description": "Item condition filter."
+          },
+          {
+            "name": "buying_format",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "auction",
+                "buy_it_now",
+                "best_offer"
+              ]
+            },
+            "description": "Buying format filter."
+          },
+          {
+            "name": "min_price",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            },
+            "description": "Minimum price filter in the marketplace's local currency."
+          },
+          {
+            "name": "max_price",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            },
+            "description": "Maximum price filter in the marketplace's local currency."
+          },
+          {
+            "name": "free_shipping",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "description": "Only return listings with free shipping."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Active listings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "query": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "domain": {
+                      "type": "string"
+                    },
+                    "category_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "sold": {
+                      "type": "boolean"
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "position": {
+                            "type": "integer"
+                          },
+                          "item_id": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "product_id": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "title": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "url": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "image": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "price": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "symbol": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "raw": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          },
+                          "original_price": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "symbol": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "raw": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          },
+                          "discount_percent": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "currency": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "condition": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "brand": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "buying_format": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "is_auction": {
+                            "type": "boolean"
+                          },
+                          "bids": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "time_left": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "shipping": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "shipping_cost": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "symbol": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "raw": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          },
+                          "free_shipping": {
+                            "type": [
+                              "boolean",
+                              "null"
+                            ]
+                          },
+                          "location": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "returns": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "sold_count": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "watchers": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "coupon": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "rating": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "ratings_total": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "seller_name": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "seller_feedback_percent": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "seller_feedback_score": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "program_badge": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "is_sponsored": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    },
+                    "facets": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "current_page": {
+                          "type": "integer"
+                        },
+                        "per_page": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "total_pages": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "total_results": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        }
+                      }
+                    },
+                    "scraped_utc": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "scraped_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ebay/completed": {
+      "get": {
+        "operationId": "searchEbayCompleted",
+        "summary": "Completed / Sold Listings",
+        "description": "Search completed/sold listings - eBay's real sold-price history.",
+        "tags": [
+          "eBay Search"
+        ],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search keywords."
+          },
+          {
+            "name": "domain",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "com"
+            },
+            "description": "eBay marketplace domain TLD or alias (com, co.uk, de, fr, ...)."
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Restrict results to a category id."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "Page number for paginated results."
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 240
+            },
+            "description": "Results per page. Clamped to 60, 120 or 240."
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "best_match",
+              "enum": [
+                "best_match",
+                "ending_soonest",
+                "newly_listed",
+                "price_low_to_high",
+                "price_high_to_low"
+              ]
+            },
+            "description": "Sort order for results."
+          },
+          {
+            "name": "condition",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "new",
+                "open_box",
+                "refurbished",
+                "used",
+                "for_parts"
+              ]
+            },
+            "description": "Item condition filter."
+          },
+          {
+            "name": "min_price",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            },
+            "description": "Minimum price filter in the marketplace's local currency."
+          },
+          {
+            "name": "max_price",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            },
+            "description": "Maximum price filter in the marketplace's local currency."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Completed/sold listings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "query": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "domain": {
+                      "type": "string"
+                    },
+                    "category_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "sold": {
+                      "type": "boolean"
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "position": {
+                            "type": "integer"
+                          },
+                          "item_id": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "product_id": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "title": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "url": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "image": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "price": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "symbol": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "raw": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          },
+                          "original_price": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "symbol": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "raw": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          },
+                          "discount_percent": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "currency": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "condition": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "brand": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "buying_format": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "is_auction": {
+                            "type": "boolean"
+                          },
+                          "bids": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "time_left": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "shipping": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "shipping_cost": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "symbol": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "raw": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          },
+                          "free_shipping": {
+                            "type": [
+                              "boolean",
+                              "null"
+                            ]
+                          },
+                          "location": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "returns": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "sold_count": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "watchers": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "coupon": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "rating": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "ratings_total": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "seller_name": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "seller_feedback_percent": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "seller_feedback_score": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "program_badge": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "is_sponsored": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    },
+                    "facets": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "current_page": {
+                          "type": "integer"
+                        },
+                        "per_page": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "total_pages": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "total_results": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        }
+                      }
+                    },
+                    "scraped_utc": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "scraped_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ebay/items/{item_id}": {
+      "get": {
+        "operationId": "getEbayItem",
+        "summary": "Get Item Detail",
+        "description": "Get a single eBay listing's full detail.",
+        "tags": [
+          "eBay Items"
+        ],
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The eBay listing item id."
+          },
+          {
+            "name": "domain",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "com"
+            },
+            "description": "eBay marketplace domain TLD or alias (com, co.uk, de, fr, ...)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Item detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "domain": {
+                      "type": "string"
+                    },
+                    "item": {
+                      "type": "object",
+                      "properties": {
+                        "item_id": {
+                          "type": "string"
+                        },
+                        "product_id": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "legacy_item_id": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "title": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "subtitle": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "url": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "condition": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "condition_id": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "condition_description": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "price": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": [
+                                "number",
+                                "null"
+                              ]
+                            },
+                            "currency": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "symbol": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "raw": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            }
+                          }
+                        },
+                        "original_price": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": [
+                                "number",
+                                "null"
+                              ]
+                            },
+                            "currency": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "symbol": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "raw": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            }
+                          }
+                        },
+                        "discount_percent": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        },
+                        "currency": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "availability": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "quantity_available": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "quantity_sold": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "watchers": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "buying_format": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "is_auction": {
+                          "type": "boolean"
+                        },
+                        "bids": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "time_left": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "best_offer_enabled": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ]
+                        },
+                        "brand": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "mpn": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "model": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "color": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "gtin": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "main_image": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "images": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "url": {
+                                "type": "string"
+                              },
+                              "width": {
+                                "type": [
+                                  "integer",
+                                  "null"
+                                ]
+                              },
+                              "height": {
+                                "type": [
+                                  "integer",
+                                  "null"
+                                ]
+                              }
+                            }
+                          }
+                        },
+                        "images_count": {
+                          "type": "integer"
+                        },
+                        "description": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "seller_notes": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "item_specifics": {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": "string"
+                          }
+                        },
+                        "categories": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "category_id": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "shipping_options": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "cost": {
+                                "type": "object",
+                                "properties": {
+                                  "value": {
+                                    "type": [
+                                      "number",
+                                      "null"
+                                    ]
+                                  },
+                                  "currency": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ]
+                                  },
+                                  "symbol": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ]
+                                  },
+                                  "raw": {
+                                    "type": [
+                                      "string",
+                                      "null"
+                                    ]
+                                  }
+                                }
+                              },
+                              "is_free": {
+                                "type": [
+                                  "boolean",
+                                  "null"
+                                ]
+                              },
+                              "service": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "destination_country": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "delivery_estimate": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          }
+                        },
+                        "shipping_cost": {
+                          "type": "object",
+                          "properties": {
+                            "value": {
+                              "type": [
+                                "number",
+                                "null"
+                              ]
+                            },
+                            "currency": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "symbol": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "raw": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            }
+                          }
+                        },
+                        "free_shipping": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ]
+                        },
+                        "item_location": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "ships_to": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "returns": {
+                          "type": "object",
+                          "properties": {
+                            "accepted": {
+                              "type": [
+                                "boolean",
+                                "null"
+                              ]
+                            },
+                            "period": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "cost_paid_by": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "raw": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            }
+                          }
+                        },
+                        "seller": {
+                          "type": "object",
+                          "properties": {
+                            "username": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "url": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "feedback_score": {
+                              "type": [
+                                "integer",
+                                "null"
+                              ]
+                            },
+                            "feedback_percent": {
+                              "type": [
+                                "number",
+                                "null"
+                              ]
+                            },
+                            "store_name": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "store_url": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            }
+                          }
+                        },
+                        "rating": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        },
+                        "ratings_total": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "date_modified_utc": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        },
+                        "date_modified_at": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "scraped_utc": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        },
+                        "scraped_at": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ebay/items/{item_id}/reviews": {
+      "get": {
+        "operationId": "getEbayItemReviews",
+        "summary": "Get Item Reviews",
+        "description": "Get catalog product reviews shown on an eBay listing.",
+        "tags": [
+          "eBay Items"
+        ],
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The eBay listing item id."
+          },
+          {
+            "name": "domain",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "com"
+            },
+            "description": "eBay marketplace domain TLD or alias (com, co.uk, de, fr, ...)."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Page number for reviews."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Reviews",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "domain": {
+                      "type": "string"
+                    },
+                    "item_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "product_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "rating": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "ratings_total": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "histogram": {
+                      "type": "object",
+                      "properties": {
+                        "five_star": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "four_star": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "three_star": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "two_star": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "one_star": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        }
+                      }
+                    },
+                    "reviews": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "body": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "rating": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "author": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "date_raw": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "date_utc": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "date_at": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "helpful_votes": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "verified_purchase": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "current_page": {
+                          "type": "integer"
+                        },
+                        "per_page": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "total_pages": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "total_results": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        }
+                      }
+                    },
+                    "scraped_utc": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "scraped_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ebay/sellers/{username}": {
+      "get": {
+        "operationId": "getEbaySeller",
+        "summary": "Get Seller Profile",
+        "description": "Get an eBay seller's public profile.",
+        "tags": [
+          "eBay Sellers"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The eBay seller username."
+          },
+          {
+            "name": "domain",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "com"
+            },
+            "description": "eBay marketplace domain TLD or alias (com, co.uk, de, fr, ...)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Seller profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "domain": {
+                      "type": "string"
+                    },
+                    "seller": {
+                      "type": "object",
+                      "properties": {
+                        "username": {
+                          "type": "string"
+                        },
+                        "url": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "store_name": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "store_url": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "feedback_score": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "feedback_percent": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        },
+                        "member_since": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "location": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        },
+                        "items_for_sale": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "feedback_12mo": {
+                          "type": "object",
+                          "properties": {
+                            "positive": {
+                              "type": [
+                                "integer",
+                                "null"
+                              ]
+                            },
+                            "neutral": {
+                              "type": [
+                                "integer",
+                                "null"
+                              ]
+                            },
+                            "negative": {
+                              "type": [
+                                "integer",
+                                "null"
+                              ]
+                            }
+                          }
+                        },
+                        "top_rated": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ]
+                        },
+                        "scraped_utc": {
+                          "type": [
+                            "number",
+                            "null"
+                          ]
+                        },
+                        "scraped_at": {
+                          "type": [
+                            "string",
+                            "null"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ebay/sellers/{username}/items": {
+      "get": {
+        "operationId": "getEbaySellerItems",
+        "summary": "Get Seller Listings",
+        "description": "List the active listings of a single eBay seller.",
+        "tags": [
+          "eBay Sellers"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The eBay seller username."
+          },
+          {
+            "name": "domain",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "com"
+            },
+            "description": "eBay marketplace domain TLD or alias (com, co.uk, de, fr, ...)."
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional keyword filter within the seller's store."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "Page number for paginated results."
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 240
+            },
+            "description": "Results per page. Clamped to 60, 120 or 240."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Seller listings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "domain": {
+                      "type": "string"
+                    },
+                    "username": {
+                      "type": "string"
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "position": {
+                            "type": "integer"
+                          },
+                          "item_id": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "product_id": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "title": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "url": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "image": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "price": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "symbol": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "raw": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          },
+                          "original_price": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "symbol": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "raw": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          },
+                          "discount_percent": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "currency": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "condition": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "brand": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "buying_format": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "is_auction": {
+                            "type": "boolean"
+                          },
+                          "bids": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "time_left": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "shipping": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "shipping_cost": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "symbol": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "raw": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          },
+                          "free_shipping": {
+                            "type": [
+                              "boolean",
+                              "null"
+                            ]
+                          },
+                          "location": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "returns": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "sold_count": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "watchers": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "coupon": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "rating": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "ratings_total": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "seller_name": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "seller_feedback_percent": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "seller_feedback_score": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "program_badge": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "is_sponsored": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "current_page": {
+                          "type": "integer"
+                        },
+                        "per_page": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "total_pages": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "total_results": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        }
+                      }
+                    },
+                    "scraped_utc": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "scraped_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ebay/sellers/{username}/feedback": {
+      "get": {
+        "operationId": "getEbaySellerFeedback",
+        "summary": "Get Seller Feedback",
+        "description": "Get a seller's recent feedback comments.",
+        "tags": [
+          "eBay Sellers"
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The eBay seller username."
+          },
+          {
+            "name": "domain",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "com"
+            },
+            "description": "eBay marketplace domain TLD or alias (com, co.uk, de, fr, ...)."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Page number for feedback."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Seller feedback",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "domain": {
+                      "type": "string"
+                    },
+                    "username": {
+                      "type": "string"
+                    },
+                    "feedback": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "rating": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "comment": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "rater": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "item": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "date_raw": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "date_utc": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "date_at": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "current_page": {
+                          "type": "integer"
+                        },
+                        "per_page": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "total_pages": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "total_results": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        }
+                      }
+                    },
+                    "scraped_utc": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "scraped_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ebay/categories/{category_id}/items": {
+      "get": {
+        "operationId": "browseEbayCategory",
+        "summary": "Browse a Category",
+        "description": "List active listings within an eBay category.",
+        "tags": [
+          "eBay Categories"
+        ],
+        "parameters": [
+          {
+            "name": "category_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The eBay category id."
+          },
+          {
+            "name": "domain",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "com"
+            },
+            "description": "eBay marketplace domain TLD or alias (com, co.uk, de, fr, ...)."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "description": "Page number for paginated results."
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 240
+            },
+            "description": "Results per page. Clamped to 60, 120 or 240."
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "best_match",
+              "enum": [
+                "best_match",
+                "ending_soonest",
+                "newly_listed",
+                "price_low_to_high",
+                "price_high_to_low"
+              ]
+            },
+            "description": "Sort order for results."
+          },
+          {
+            "name": "min_price",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            },
+            "description": "Minimum price filter in the marketplace's local currency."
+          },
+          {
+            "name": "max_price",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            },
+            "description": "Maximum price filter in the marketplace's local currency."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category listings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "domain": {
+                      "type": "string"
+                    },
+                    "category_id": {
+                      "type": "string"
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "position": {
+                            "type": "integer"
+                          },
+                          "item_id": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "product_id": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "title": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "url": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "image": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "price": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "symbol": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "raw": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          },
+                          "original_price": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "symbol": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "raw": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          },
+                          "discount_percent": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "currency": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "condition": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "brand": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "buying_format": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "is_auction": {
+                            "type": "boolean"
+                          },
+                          "bids": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "time_left": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "shipping": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "shipping_cost": {
+                            "type": "object",
+                            "properties": {
+                              "value": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "symbol": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "raw": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          },
+                          "free_shipping": {
+                            "type": [
+                              "boolean",
+                              "null"
+                            ]
+                          },
+                          "location": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "returns": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "sold_count": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "watchers": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "coupon": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "rating": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "ratings_total": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "seller_name": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "seller_feedback_percent": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "seller_feedback_score": {
+                            "type": [
+                              "integer",
+                              "null"
+                            ]
+                          },
+                          "program_badge": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          },
+                          "is_sponsored": {
+                            "type": "boolean"
+                          }
+                        }
+                      }
+                    },
+                    "facets": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "current_page": {
+                          "type": "integer"
+                        },
+                        "per_page": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "total_pages": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        },
+                        "total_results": {
+                          "type": [
+                            "integer",
+                            "null"
+                          ]
+                        }
+                      }
+                    },
+                    "scraped_utc": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "scraped_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ebay/categories": {
+      "get": {
+        "operationId": "listEbayCategories",
+        "summary": "List Categories",
+        "description": "List eBay's top-level category id aliases.",
+        "tags": [
+          "eBay Reference"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Categories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "categories": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string"
+                          },
+                          "category_id": {
+                            "type": "string"
+                          },
+                          "parent": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ebay/autocomplete": {
+      "get": {
+        "operationId": "ebayAutocomplete",
+        "summary": "Keyword Suggestions",
+        "description": "Return eBay keyword autocomplete suggestions.",
+        "tags": [
+          "eBay Search"
+        ],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Partial query prefix."
+          },
+          {
+            "name": "domain",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "com"
+            },
+            "description": "eBay marketplace domain TLD or alias (com, co.uk, de, fr, ...)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Suggestions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "query": {
+                      "type": "string"
+                    },
+                    "domain": {
+                      "type": "string"
+                    },
+                    "suggestions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "value": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ebay/markets": {
+      "get": {
+        "operationId": "listEbayMarkets",
+        "summary": "List Markets",
+        "description": "List all supported eBay marketplaces.",
+        "tags": [
+          "eBay Reference"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Supported marketplaces",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "markets": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "code": {
+                            "type": "string",
+                            "description": "Market code (e.g. US, GB, DE)."
+                          },
+                          "domain": {
+                            "type": "string",
+                            "description": "eBay domain TLD for this market (e.g. com, co.uk)."
+                          },
+                          "country": {
+                            "type": "string",
+                            "description": "ISO 3166-1 alpha-2 country code."
+                          },
+                          "currency": {
+                            "type": "string",
+                            "description": "ISO 4217 currency code."
+                          },
+                          "locale": {
+                            "type": "string",
+                            "description": "BCP-47 locale (e.g. en-US)."
+                          },
+                          "name": {
+                            "type": "string",
+                            "description": "Marketplace country name."
+                          },
+                          "site_id": {
+                            "type": "integer",
+                            "description": "eBay legacy global site id."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    }
+  }
+}

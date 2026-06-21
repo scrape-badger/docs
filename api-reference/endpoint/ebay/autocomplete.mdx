@@ -1,0 +1,48 @@
+---
+title: "Keyword Suggestions"
+openapi: "GET /v1/ebay/autocomplete"
+description: "eBay keyword autocomplete suggestions for a partial query."
+---
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Partial query prefix to autocomplete (e.g. `ninten`).
+</ParamField>
+
+<ParamField query="domain" type="string" default="com">
+  eBay marketplace domain to source suggestions from.
+
+  Examples: `com`, `co.uk`, `de`, `fr`
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">The query prefix that was autocompleted.</ResponseField>
+<ResponseField name="domain" type="string">Marketplace domain the suggestions came from.</ResponseField>
+<ResponseField name="suggestions" type="array">
+  Array of suggestion objects.
+
+  <Expandable title="AutocompleteSuggestion object">
+    <ResponseField name="value" type="string">A suggested search term.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "query": "ninten",
+  "domain": "com",
+  "suggestions": [
+    { "value": "nintendo switch" },
+    { "value": "nintendo switch oled" },
+    { "value": "nintendo ds" },
+    { "value": "nintendo 64" }
+  ]
+}
+```
+
+<Note>
+  Each autocomplete request costs **1 credit**. Failed requests are not charged.
+</Note>

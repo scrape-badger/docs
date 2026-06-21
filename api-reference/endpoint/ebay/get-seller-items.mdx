@@ -1,0 +1,87 @@
+---
+title: "Get Seller Listings"
+openapi: "GET /v1/ebay/sellers/{username}/items"
+description: "List the active listings of a single eBay seller."
+---
+
+## Path Parameters
+
+<ParamField path="username" type="string" required>
+  The eBay seller username whose storefront listings you want.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="domain" type="string" default="com">
+  eBay marketplace domain to resolve the seller on.
+
+  Examples: `com`, `co.uk`, `de`, `fr`
+</ParamField>
+
+<ParamField query="query" type="string">
+  Optional keyword filter within the seller's store.
+</ParamField>
+
+<ParamField query="page" type="integer" default={1}>
+  Page number for paginated results. Range: `1` - `100`.
+</ParamField>
+
+<ParamField query="per_page" type="integer">
+  Results per page. Clamped to one of `60`, `120`, or `240`.
+</ParamField>
+
+## Response
+
+<ResponseField name="domain" type="string">Marketplace domain that was searched.</ResponseField>
+<ResponseField name="username" type="string">The seller whose listings were returned.</ResponseField>
+<ResponseField name="results" type="array">
+  Array of the seller's active listings (same `SearchResult` shape as [search](/api-reference/endpoint/ebay/search)).
+
+  <Expandable title="SearchResult object">
+    <ResponseField name="position" type="integer">Position on the page (1-based).</ResponseField>
+    <ResponseField name="item_id" type="string">eBay listing item id.</ResponseField>
+    <ResponseField name="title" type="string">Listing title.</ResponseField>
+    <ResponseField name="url" type="string">Full URL to the listing.</ResponseField>
+    <ResponseField name="image" type="string">Primary image URL.</ResponseField>
+    <ResponseField name="price" type="object">Price object with `value`, `currency`, `symbol`, `raw`.</ResponseField>
+    <ResponseField name="condition" type="string">Item condition label.</ResponseField>
+    <ResponseField name="buying_format" type="string">`Buy It Now`, `Auction`, or `Best Offer`.</ResponseField>
+    <ResponseField name="is_auction" type="boolean">Whether the listing is an auction.</ResponseField>
+    <ResponseField name="shipping" type="string">Shipping text.</ResponseField>
+    <ResponseField name="watchers" type="integer">Number of watchers (nullable).</ResponseField>
+    <ResponseField name="is_sponsored" type="boolean">Whether the result is a sponsored placement.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="pagination" type="object">Pagination metadata with `current_page`, `per_page`, `total_pages`, `total_results`.</ResponseField>
+<ResponseField name="scraped_at" type="string">ISO 8601 timestamp when the results were scraped.</ResponseField>
+
+### Example Response
+
+```json
+{
+  "domain": "com",
+  "username": "topgames_us",
+  "results": [
+    {
+      "position": 1,
+      "item_id": "256123456789",
+      "title": "Nintendo Switch OLED Model White Console - Brand New Sealed",
+      "url": "https://www.ebay.com/itm/256123456789",
+      "image": "https://i.ebayimg.com/images/g/abc/s-l500.jpg",
+      "price": { "value": 299.99, "currency": "USD", "symbol": "$", "raw": "$299.99" },
+      "condition": "Brand New",
+      "buying_format": "Buy It Now",
+      "is_auction": false,
+      "shipping": "Free shipping",
+      "watchers": 18,
+      "is_sponsored": false
+    }
+  ],
+  "pagination": { "current_page": 1, "per_page": 60, "total_pages": 23, "total_results": 1342 },
+  "scraped_at": "2026-06-21T12:00:00Z"
+}
+```
+
+<Note>
+  Each seller-listings request costs **5 credits**. Failed requests are not charged.
+</Note>

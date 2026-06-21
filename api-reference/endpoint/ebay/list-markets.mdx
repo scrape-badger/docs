@@ -1,0 +1,38 @@
+---
+title: "List Markets"
+openapi: "GET /v1/ebay/markets"
+description: "List all supported eBay marketplaces with their domains, currencies, locales, and site ids."
+---
+
+## Response
+
+<ResponseField name="markets" type="array">
+  Array of supported eBay marketplaces.
+
+  <Expandable title="MarketInfo object">
+    <ResponseField name="code" type="string">Market code (e.g. `US`, `GB`, `DE`).</ResponseField>
+    <ResponseField name="domain" type="string">eBay domain TLD to use in the `domain` query parameter (e.g. `com`, `co.uk`).</ResponseField>
+    <ResponseField name="country" type="string">ISO 3166-1 alpha-2 country code.</ResponseField>
+    <ResponseField name="currency" type="string">ISO 4217 currency code used in this market.</ResponseField>
+    <ResponseField name="locale" type="string">BCP-47 locale (e.g. `en-US`).</ResponseField>
+    <ResponseField name="name" type="string">Marketplace country name.</ResponseField>
+    <ResponseField name="site_id" type="integer">eBay legacy global site id.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "markets": [
+    { "code": "US", "domain": "com", "country": "US", "currency": "USD", "locale": "en-US", "name": "United States", "site_id": 0 },
+    { "code": "GB", "domain": "co.uk", "country": "GB", "currency": "GBP", "locale": "en-GB", "name": "United Kingdom", "site_id": 3 },
+    { "code": "DE", "domain": "de", "country": "DE", "currency": "EUR", "locale": "de-DE", "name": "Germany", "site_id": 77 },
+    { "code": "AU", "domain": "com.au", "country": "AU", "currency": "AUD", "locale": "en-AU", "name": "Australia", "site_id": 15 }
+  ]
+}
+```
+
+<Note>
+  Listing markets is a **free** reference endpoint (0 credits).
+</Note>

@@ -17,6 +17,7 @@
     "/openapi-web-scraping.json",
     "/openapi-vinted.json",
     "/openapi-amazon.json",
+    "/openapi-ebay.json",
     "/openapi-shopee.json",
     "/openapi-tiktok.json",
     "/openapi-reddit.json",
@@ -356,6 +357,53 @@
             "pages": [
               "api-reference/endpoint/amazon/list-markets",
               "api-reference/endpoint/amazon/list-categories"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "eBay",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "ebay/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/ebay/search",
+              "api-reference/endpoint/ebay/completed",
+              "api-reference/endpoint/ebay/autocomplete"
+            ]
+          },
+          {
+            "group": "Items",
+            "pages": [
+              "api-reference/endpoint/ebay/get-item-detail",
+              "api-reference/endpoint/ebay/get-item-reviews"
+            ]
+          },
+          {
+            "group": "Sellers",
+            "pages": [
+              "api-reference/endpoint/ebay/get-seller",
+              "api-reference/endpoint/ebay/get-seller-items",
+              "api-reference/endpoint/ebay/get-seller-feedback"
+            ]
+          },
+          {
+            "group": "Categories",
+            "pages": [
+              "api-reference/endpoint/ebay/browse-category",
+              "api-reference/endpoint/ebay/list-categories"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api-reference/endpoint/ebay/list-markets"
             ]
           }
         ]
