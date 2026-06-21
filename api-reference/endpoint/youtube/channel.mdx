@@ -1,0 +1,103 @@
+---
+title: "Get Channel"
+openapi: "GET /v1/youtube/channels/{channel_id}"
+description: "Full detail for a YouTube channel — header, About tab, stats, branding, and links."
+---
+
+## Path Parameters
+
+<ParamField path="channel_id" type="string" required>
+  The channel identifier. Accepts a canonical channel id (`UC…`), an `@handle`, or a custom URL slug. Handles and custom URLs are resolved automatically.
+
+  Examples: `UCBR8-60-B28hp2BmDPdntcQ`, `@YouTube`, `youtube`
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="gl" type="string" default="US">
+  Content region (ISO 3166-1 alpha-2). Examples: `US`, `GB`, `DE`, `JP`.
+</ParamField>
+
+<ParamField query="hl" type="string" default="en">
+  UI / interface language (BCP-47). Examples: `en`, `de`, `fr`, `ja`.
+</ParamField>
+
+## Response
+
+<ResponseField name="channel_id" type="string">Canonical channel id (`UC…`).</ResponseField>
+<ResponseField name="title" type="string">Channel title (nullable).</ResponseField>
+<ResponseField name="channel_name" type="string">Channel display name (nullable).</ResponseField>
+<ResponseField name="channel_username" type="string">Channel `@handle` (nullable).</ResponseField>
+<ResponseField name="custom_url" type="string">Custom URL slug (nullable).</ResponseField>
+<ResponseField name="channel_url" type="string">Full channel URL (nullable).</ResponseField>
+<ResponseField name="description" type="string">Channel description (nullable).</ResponseField>
+<ResponseField name="description_links" type="array">Links parsed from the description, with `title` and `url`.</ResponseField>
+<ResponseField name="number_of_subscribers" type="integer">Subscriber count (nullable).</ResponseField>
+<ResponseField name="subscriber_count_text" type="string">Subscriber count as displayed (nullable).</ResponseField>
+<ResponseField name="hidden_subscriber_count" type="boolean">Whether the subscriber count is hidden (nullable).</ResponseField>
+<ResponseField name="channel_total_videos" type="integer">Total uploaded videos (nullable).</ResponseField>
+<ResponseField name="channel_total_videos_text" type="string">Total videos as displayed (nullable).</ResponseField>
+<ResponseField name="channel_total_views" type="integer">Total channel views (nullable).</ResponseField>
+<ResponseField name="channel_total_views_text" type="string">Total views as displayed (nullable).</ResponseField>
+<ResponseField name="joined_at" type="string">ISO 8601 channel creation date (nullable).</ResponseField>
+<ResponseField name="joined_utc" type="number">Unix channel creation timestamp (nullable).</ResponseField>
+<ResponseField name="country" type="string">Channel country code (nullable).</ResponseField>
+<ResponseField name="channel_location" type="string">Channel location text (nullable).</ResponseField>
+<ResponseField name="keywords" type="array">Channel keywords.</ResponseField>
+<ResponseField name="tags" type="array">Channel tags.</ResponseField>
+<ResponseField name="is_verified" type="boolean">Whether the channel is verified (nullable).</ResponseField>
+<ResponseField name="is_age_restricted" type="boolean">Whether the channel is age-restricted (nullable).</ResponseField>
+<ResponseField name="is_family_safe" type="boolean">Whether the channel is family-safe (nullable).</ResponseField>
+<ResponseField name="is_monetized" type="boolean">Whether the channel is monetized (nullable).</ResponseField>
+<ResponseField name="is_auto_generated" type="boolean">Whether the channel is auto-generated (nullable).</ResponseField>
+<ResponseField name="made_for_kids" type="boolean">Whether the channel is made for kids (nullable).</ResponseField>
+<ResponseField name="avatar" type="string">Avatar image URL (nullable).</ResponseField>
+<ResponseField name="banner" type="string">Banner image URL (nullable).</ResponseField>
+<ResponseField name="tv_banner" type="string">TV banner image URL (nullable).</ResponseField>
+<ResponseField name="mobile_banner" type="string">Mobile banner image URL (nullable).</ResponseField>
+<ResponseField name="avatar_thumbnails" type="array">Avatar variants with `url`, `width`, `height`.</ResponseField>
+<ResponseField name="banner_thumbnails" type="array">Banner variants with `url`, `width`, `height`.</ResponseField>
+<ResponseField name="external_links" type="array">External links from the channel header, with `title` and `url`.</ResponseField>
+<ResponseField name="tabs" type="array">Available channel tabs, e.g. `Videos`, `Shorts`, `Playlists`.</ResponseField>
+<ResponseField name="available_countries" type="array">Country codes where the channel is available.</ResponseField>
+<ResponseField name="related_channels" type="array">Featured / related channel objects.</ResponseField>
+<ResponseField name="latest_videos" type="array">A preview of the channel's latest videos.</ResponseField>
+<ResponseField name="scraped_at" type="string">ISO 8601 timestamp when the channel was scraped.</ResponseField>
+<ResponseField name="scraped_utc" type="number">Unix timestamp when the channel was scraped.</ResponseField>
+
+### Example Response
+
+```json
+{
+  "channel_id": "UCBR8-60-B28hp2BmDPdntcQ",
+  "title": "YouTube",
+  "channel_name": "YouTube",
+  "channel_username": "@YouTube",
+  "custom_url": "@YouTube",
+  "channel_url": "https://www.youtube.com/@YouTube",
+  "description": "YouTube's Official Channel helps you discover what's new & trending globally.",
+  "number_of_subscribers": 42000000,
+  "subscriber_count_text": "42M subscribers",
+  "channel_total_videos": 1200,
+  "channel_total_views": 9800000000,
+  "joined_at": "2005-09-19T00:00:00Z",
+  "country": "US",
+  "is_verified": true,
+  "is_family_safe": true,
+  "avatar": "https://yt3.googleusercontent.com/abc/avatar.jpg",
+  "banner": "https://yt3.googleusercontent.com/abc/banner.jpg",
+  "tabs": ["Home", "Videos", "Shorts", "Playlists", "Community"],
+  "scraped_at": "2026-06-21T12:00:00Z"
+}
+```
+
+## Lightweight Lookups
+
+| Endpoint | Description | Cost |
+|----------|-------------|------|
+| `GET /v1/youtube/channels/{channel_id}/about` | About-tab payload only — description, links, stats, joined date, country (`ChannelAbout`). | 2 credits |
+| `GET /v1/youtube/channels/{channel_id}/subscriber_count` | Fast subscriber-count-only response (`SubscriberCount`). | 2 credits |
+
+<Note>
+  A full channel-detail request costs **5 credits**; the `/about` and `/subscriber_count` lookups cost **2 credits** each. Failed requests are not charged.
+</Note>

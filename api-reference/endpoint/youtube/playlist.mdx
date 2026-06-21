@@ -1,0 +1,108 @@
+---
+title: "Get Playlist"
+openapi: "GET /v1/youtube/playlists/{playlist_id}"
+description: "Full detail for a YouTube playlist plus the first page of its items."
+---
+
+## Path Parameters
+
+<ParamField path="playlist_id" type="string" required>
+  The YouTube playlist id (the `list=` value, e.g. `PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf`).
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="gl" type="string" default="US">
+  Content region (ISO 3166-1 alpha-2). Examples: `US`, `GB`, `DE`, `JP`.
+</ParamField>
+
+<ParamField query="hl" type="string" default="en">
+  UI / interface language (BCP-47). Examples: `en`, `de`, `fr`, `ja`.
+</ParamField>
+
+## Response
+
+<ResponseField name="playlist_id" type="string">The playlist id.</ResponseField>
+<ResponseField name="title" type="string">Playlist title (nullable).</ResponseField>
+<ResponseField name="description" type="string">Playlist description (nullable).</ResponseField>
+<ResponseField name="playlist_url" type="string">Full playlist URL (nullable).</ResponseField>
+<ResponseField name="video_count" type="integer">Number of videos in the playlist (nullable).</ResponseField>
+<ResponseField name="view_count" type="integer">Total playlist views (nullable).</ResponseField>
+<ResponseField name="view_count_text" type="string">Total views as displayed (nullable).</ResponseField>
+<ResponseField name="last_updated_text" type="string">When the playlist was last updated, as displayed (nullable).</ResponseField>
+<ResponseField name="channel_id" type="string">Owner channel id (nullable).</ResponseField>
+<ResponseField name="channel_name" type="string">Owner channel name (nullable).</ResponseField>
+<ResponseField name="channel_url" type="string">Owner channel URL (nullable).</ResponseField>
+<ResponseField name="channel_is_verified" type="boolean">Whether the owner channel is verified (nullable).</ResponseField>
+<ResponseField name="thumbnails" type="array">Playlist thumbnail variants with `url`, `width`, `height`.</ResponseField>
+<ResponseField name="thumbnail" type="string">Best/primary thumbnail URL (nullable).</ResponseField>
+<ResponseField name="privacy_status" type="string">Privacy status, e.g. `PUBLIC`, `UNLISTED` (nullable).</ResponseField>
+<ResponseField name="is_mix" type="boolean">Whether the playlist is an auto-generated mix (nullable).</ResponseField>
+<ResponseField name="videos" type="array">
+  First page of playlist items.
+
+  <Expandable title="PlaylistItem object">
+    <ResponseField name="position" type="integer">1-based position in the playlist (nullable).</ResponseField>
+    <ResponseField name="video_id" type="string">Video id.</ResponseField>
+    <ResponseField name="title" type="string">Video title (nullable).</ResponseField>
+    <ResponseField name="url" type="string">Full watch URL (nullable).</ResponseField>
+    <ResponseField name="length_seconds" type="integer">Duration in seconds (nullable).</ResponseField>
+    <ResponseField name="duration" type="string">Human-readable duration (nullable).</ResponseField>
+    <ResponseField name="channel_id" type="string">Uploader channel id (nullable).</ResponseField>
+    <ResponseField name="channel_name" type="string">Uploader channel name (nullable).</ResponseField>
+    <ResponseField name="channel_url" type="string">Uploader channel URL (nullable).</ResponseField>
+    <ResponseField name="thumbnails" type="array">Thumbnail variants with `url`, `width`, `height`.</ResponseField>
+    <ResponseField name="thumbnail" type="string">Best thumbnail URL (nullable).</ResponseField>
+    <ResponseField name="view_count" type="integer">View count (nullable).</ResponseField>
+    <ResponseField name="view_count_text" type="string">View count as displayed (nullable).</ResponseField>
+    <ResponseField name="published_time_text" type="string">Relative publish time (nullable).</ResponseField>
+    <ResponseField name="is_playable" type="boolean">Whether the item is currently playable (nullable).</ResponseField>
+    <ResponseField name="set_video_id" type="string">Per-playlist-entry id (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="continuation" type="string">Token to fetch the next page of items (nullable when no more pages).</ResponseField>
+<ResponseField name="scraped_at" type="string">ISO 8601 timestamp when the playlist was scraped.</ResponseField>
+<ResponseField name="scraped_utc" type="number">Unix timestamp when the playlist was scraped.</ResponseField>
+
+### Example Response
+
+```json
+{
+  "playlist_id": "PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf",
+  "title": "Top Music Videos",
+  "description": "A rotating collection of the biggest music videos.",
+  "playlist_url": "https://www.youtube.com/playlist?list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf",
+  "video_count": 50,
+  "view_count": 12400000,
+  "view_count_text": "12.4M views",
+  "channel_id": "UCBR8-60-B28hp2BmDPdntcQ",
+  "channel_name": "YouTube",
+  "channel_is_verified": true,
+  "thumbnail": "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+  "privacy_status": "PUBLIC",
+  "is_mix": false,
+  "videos": [
+    {
+      "position": 1,
+      "video_id": "dQw4w9WgXcQ",
+      "title": "Rick Astley - Never Gonna Give You Up (Official Video)",
+      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ&list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf",
+      "length_seconds": 213,
+      "duration": "3:33",
+      "channel_name": "Rick Astley",
+      "view_count": 1600000000,
+      "is_playable": true
+    }
+  ],
+  "continuation": "4qmFsgJhEiRWTFBM...",
+  "scraped_at": "2026-06-21T12:00:00Z"
+}
+```
+
+<Tip>
+  Paginate the remaining items with [`/v1/youtube/playlists/{playlist_id}/items`](/api-reference/endpoint/youtube/playlist-items) using the returned `continuation` token. Auto-generated mixes are available at `GET /v1/youtube/mixes/{mix_id}` and return the same `Playlist` shape with `is_mix: true`.
+</Tip>
+
+<Note>
+  A playlist (or mix) request costs **5 credits**. Failed requests are not charged.
+</Note>

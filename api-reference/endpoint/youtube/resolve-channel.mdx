@@ -1,0 +1,98 @@
+---
+title: "Resolve Channel"
+openapi: "GET /v1/youtube/channels/resolve"
+description: "Resolve a YouTube handle, custom URL, or any YouTube URL to its canonical channel / video / playlist ids."
+---
+
+## Query Parameters
+
+<ParamField query="handle" type="string">
+  A YouTube `@handle` or custom URL slug to resolve (e.g. `@YouTube`, `youtube`). Provide either `handle` or `url`.
+</ParamField>
+
+<ParamField query="url" type="string">
+  Any YouTube URL to resolve (channel, video, or playlist). Provide either `handle` or `url`.
+</ParamField>
+
+## Response
+
+<ResponseField name="input" type="string">The handle or URL that was resolved.</ResponseField>
+<ResponseField name="type" type="string">Resolved entity type: `channel`, `video`, or `playlist` (nullable).</ResponseField>
+<ResponseField name="channel_id" type="string">Canonical channel id, if applicable (nullable).</ResponseField>
+<ResponseField name="channel_username" type="string">Channel `@handle`, if applicable (nullable).</ResponseField>
+<ResponseField name="video_id" type="string">Video id, if the input resolved to a video (nullable).</ResponseField>
+<ResponseField name="playlist_id" type="string">Playlist id, if the input resolved to a playlist (nullable).</ResponseField>
+<ResponseField name="canonical_url" type="string">The canonical URL of the resolved entity (nullable).</ResponseField>
+
+### Example Response
+
+```json
+{
+  "input": "@YouTube",
+  "type": "channel",
+  "channel_id": "UCBR8-60-B28hp2BmDPdntcQ",
+  "channel_username": "@YouTube",
+  "video_id": null,
+  "playlist_id": null,
+  "canonical_url": "https://www.youtube.com/channel/UCBR8-60-B28hp2BmDPdntcQ"
+}
+```
+
+<Note>
+  A resolve request costs **2 credits**. Failed requests are not charged.
+</Note>
+
+## Reference & Utility Endpoints
+
+These low-cost helper endpoints share this section.
+
+### oEmbed
+
+`GET /v1/youtube/oembed?url=...` returns YouTube's public oEmbed metadata for a video or playlist URL — `title`, `author_name`, `author_url`, `thumbnail_url`, `html` embed snippet, and dimensions. **Costs 1 credit.**
+
+```json
+{
+  "type": "video",
+  "version": "1.0",
+  "title": "Rick Astley - Never Gonna Give You Up (Official Video)",
+  "author_name": "Rick Astley",
+  "author_url": "https://www.youtube.com/@RickAstleyYT",
+  "provider_name": "YouTube",
+  "thumbnail_url": "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+  "html": "<iframe width=\"480\" height=\"270\" src=\"https://www.youtube.com/embed/dQw4w9WgXcQ\"></iframe>",
+  "width": 480,
+  "height": 270
+}
+```
+
+### Categories
+
+`GET /v1/youtube/categories?gl=US` returns the video category reference list for a region. Each row has `id` and `title`. **Free (0 credits).**
+
+```json
+{ "gl": "US", "categories": [ { "id": "10", "title": "Music" }, { "id": "20", "title": "Gaming" } ] }
+```
+
+### Languages
+
+`GET /v1/youtube/languages` returns the supported UI languages (valid `hl` values), each with `id` (code) and `title`. **Free (0 credits).**
+
+```json
+{ "languages": [ { "id": "en", "title": "English" }, { "id": "de", "title": "German" } ] }
+```
+
+### Regions
+
+`GET /v1/youtube/regions` returns the supported content regions (valid `gl` values), each with `id` (code) and `title`. **Free (0 credits).**
+
+```json
+{ "regions": [ { "id": "US", "title": "United States" }, { "id": "GB", "title": "United Kingdom" } ] }
+```
+
+### Markets
+
+`GET /v1/youtube/markets` returns the supported markets reference (region + language pairings). **Free (0 credits).**
+
+<Note>
+  oEmbed costs **1 credit**; categories, languages, regions, and markets are **free** reference endpoints (0 credits). Failed requests are not charged.
+</Note>

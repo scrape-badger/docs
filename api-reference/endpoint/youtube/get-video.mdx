@@ -1,0 +1,160 @@
+---
+title: "Get Video"
+openapi: "GET /v1/youtube/videos/{video_id}"
+description: "Full detail for a single YouTube video (metadata, engagement, chapters, heatmap, live details, ...)."
+---
+
+## Path Parameters
+
+<ParamField path="video_id" type="string" required>
+  The YouTube video id (the 11-character `v=` value, e.g. `dQw4w9WgXcQ`).
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="gl" type="string" default="US">
+  Content region (ISO 3166-1 alpha-2). Examples: `US`, `GB`, `DE`, `JP`.
+</ParamField>
+
+<ParamField query="hl" type="string" default="en">
+  UI / interface language (BCP-47). Examples: `en`, `de`, `fr`, `ja`.
+</ParamField>
+
+## Response
+
+<ResponseField name="video_id" type="string">The YouTube video id.</ResponseField>
+<ResponseField name="title" type="string">Video title.</ResponseField>
+<ResponseField name="url" type="string">Full watch URL.</ResponseField>
+<ResponseField name="description" type="string">Full video description (nullable).</ResponseField>
+<ResponseField name="description_links" type="array">Links extracted from the description.</ResponseField>
+<ResponseField name="length_seconds" type="integer">Duration in seconds (nullable).</ResponseField>
+<ResponseField name="duration" type="string">Duration as `HH:MM:SS` (nullable).</ResponseField>
+<ResponseField name="view_count" type="integer">View count (nullable).</ResponseField>
+<ResponseField name="view_count_text" type="string">View count as displayed (nullable).</ResponseField>
+<ResponseField name="like_count" type="integer">Like count (nullable).</ResponseField>
+<ResponseField name="like_count_text" type="string">Like count as displayed (nullable).</ResponseField>
+<ResponseField name="comment_count" type="integer">Comment count (nullable).</ResponseField>
+<ResponseField name="dislike_count" type="integer">Dislike count — private platform-wide since 2021, always `null`.</ResponseField>
+<ResponseField name="channel_id" type="string">Uploader channel id (nullable).</ResponseField>
+<ResponseField name="channel_name" type="string">Uploader channel name (nullable).</ResponseField>
+<ResponseField name="channel_username" type="string">Uploader `@handle` (nullable).</ResponseField>
+<ResponseField name="channel_url" type="string">Uploader channel URL (nullable).</ResponseField>
+<ResponseField name="channel_thumbnail" type="string">Uploader avatar URL (nullable).</ResponseField>
+<ResponseField name="channel_is_verified" type="boolean">Whether the channel is verified (nullable).</ResponseField>
+<ResponseField name="is_official_artist" type="boolean">Whether the channel is an official artist channel (nullable).</ResponseField>
+<ResponseField name="number_of_subscribers" type="integer">Channel subscriber count (nullable).</ResponseField>
+<ResponseField name="subscriber_count_text" type="string">Subscriber count as displayed (nullable).</ResponseField>
+<ResponseField name="published_at" type="string">ISO 8601 publish timestamp (nullable).</ResponseField>
+<ResponseField name="published_utc" type="number">Unix publish timestamp (nullable).</ResponseField>
+<ResponseField name="upload_at" type="string">ISO 8601 upload timestamp (nullable).</ResponseField>
+<ResponseField name="upload_utc" type="number">Unix upload timestamp (nullable).</ResponseField>
+<ResponseField name="published_time_text" type="string">Relative publish text, e.g. `13 years ago` (nullable).</ResponseField>
+<ResponseField name="keywords" type="array">Video keywords.</ResponseField>
+<ResponseField name="tags" type="array">Video tags.</ResponseField>
+<ResponseField name="hashtags" type="array">Hashtags used in the video.</ResponseField>
+<ResponseField name="category" type="string">Category name (nullable).</ResponseField>
+<ResponseField name="category_id" type="string">Category id (nullable).</ResponseField>
+<ResponseField name="topic_categories" type="array">Wikipedia topic URLs (official-API only; usually empty).</ResponseField>
+<ResponseField name="thumbnails" type="array">Thumbnail objects with `url`, `width`, `height`.</ResponseField>
+<ResponseField name="thumbnail" type="string">Best/primary thumbnail URL (nullable).</ResponseField>
+<ResponseField name="storyboards" type="object">Storyboard spec, if present (nullable).</ResponseField>
+<ResponseField name="chapters" type="array">
+  Video chapters.
+
+  <Expandable title="Chapter object">
+    <ResponseField name="title" type="string">Chapter title.</ResponseField>
+    <ResponseField name="start_seconds" type="integer">Chapter start offset in seconds.</ResponseField>
+    <ResponseField name="start_time_text" type="string">Chapter start as displayed.</ResponseField>
+    <ResponseField name="thumbnail" type="string">Chapter thumbnail URL (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="heatmap" type="array">
+  Most-replayed graph points.
+
+  <Expandable title="HeatMarker object">
+    <ResponseField name="start_seconds" type="number">Marker start offset in seconds.</ResponseField>
+    <ResponseField name="duration_seconds" type="number">Marker duration in seconds.</ResponseField>
+    <ResponseField name="intensity" type="number">Normalized replay intensity (0.0-1.0).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="is_live_content" type="boolean">Whether the video is/was a live broadcast (nullable).</ResponseField>
+<ResponseField name="live_now" type="boolean">Whether the stream is currently live (nullable).</ResponseField>
+<ResponseField name="is_upcoming" type="boolean">Whether it is an upcoming premiere/stream (nullable).</ResponseField>
+<ResponseField name="live_streaming_details" type="object">Live/premiere timing with `actual_start_at`, `scheduled_start_at`, `concurrent_viewers`, `active_live_chat_id` (nullable).</ResponseField>
+<ResponseField name="is_family_safe" type="boolean">Whether the video is family-safe (nullable).</ResponseField>
+<ResponseField name="is_age_restricted" type="boolean">Whether age-restricted (nullable).</ResponseField>
+<ResponseField name="is_members_only" type="boolean">Whether members-only (nullable).</ResponseField>
+<ResponseField name="is_unlisted" type="boolean">Whether unlisted (nullable).</ResponseField>
+<ResponseField name="is_private" type="boolean">Whether private (nullable).</ResponseField>
+<ResponseField name="is_short" type="boolean">Whether the video is a Short (nullable).</ResponseField>
+<ResponseField name="is_monetized" type="boolean">Whether the video is monetized (nullable).</ResponseField>
+<ResponseField name="comments_turned_off" type="boolean">Whether comments are disabled (nullable).</ResponseField>
+<ResponseField name="has_paid_product_placement" type="boolean">Whether the video declares paid placement (nullable).</ResponseField>
+<ResponseField name="available_countries" type="array">ISO country codes where the video is available.</ResponseField>
+<ResponseField name="region_restriction" type="object">Region restriction with `allowed` and `blocked` country lists (nullable).</ResponseField>
+<ResponseField name="playability_status" type="string">Playability status, e.g. `OK` (nullable).</ResponseField>
+<ResponseField name="definition" type="string">`hd` or `sd` (nullable).</ResponseField>
+<ResponseField name="dimension" type="string">`2d` or `3d` (nullable).</ResponseField>
+<ResponseField name="projection" type="string">`rectangular` or `360` (nullable).</ResponseField>
+<ResponseField name="captions_available" type="boolean">Whether captions exist (nullable).</ResponseField>
+<ResponseField name="caption_languages" type="array">Available caption language codes.</ResponseField>
+<ResponseField name="shopping_results" type="array">Product shelf entries with `title`, `price`, `vendor`, `thumbnail`, `link`.</ResponseField>
+<ResponseField name="related_videos" type="array">Related video objects (also available via `/related`).</ResponseField>
+<ResponseField name="related_videos_continuation" type="string">Token to page related videos (nullable).</ResponseField>
+<ResponseField name="sound_id" type="string">Sound id (Shorts, nullable).</ResponseField>
+<ResponseField name="sound_title" type="string">Sound title (Shorts, nullable).</ResponseField>
+<ResponseField name="streams" type="object">Streaming data — only populated when requested via `/streams` (nullable).</ResponseField>
+<ResponseField name="embed_url" type="string">Embeddable player URL (nullable).</ResponseField>
+<ResponseField name="scraped_at" type="string">ISO 8601 timestamp when the video was scraped.</ResponseField>
+<ResponseField name="scraped_utc" type="number">Unix timestamp when the video was scraped.</ResponseField>
+
+### Example Response
+
+```json
+{
+  "video_id": "dQw4w9WgXcQ",
+  "title": "Rick Astley - Never Gonna Give You Up (Official Video)",
+  "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  "description": "The official video for “Never Gonna Give You Up” by Rick Astley...",
+  "length_seconds": 213,
+  "duration": "00:03:33",
+  "view_count": 1600000000,
+  "view_count_text": "1.6B views",
+  "like_count": 18000000,
+  "comment_count": 2400000,
+  "dislike_count": null,
+  "channel_id": "UCuAXFkgsw1L7xaCfnd5JJOw",
+  "channel_name": "Rick Astley",
+  "channel_username": "@RickAstleyYT",
+  "channel_is_verified": true,
+  "number_of_subscribers": 4200000,
+  "published_at": "2009-10-25T00:00:00Z",
+  "published_time_text": "13 years ago",
+  "keywords": ["rick astley", "never gonna give you up"],
+  "hashtags": ["#RickAstley"],
+  "category": "Music",
+  "category_id": "10",
+  "thumbnail": "https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg",
+  "chapters": [],
+  "heatmap": [{ "start_seconds": 0.0, "duration_seconds": 2.13, "intensity": 1.0 }],
+  "is_live_content": false,
+  "is_family_safe": true,
+  "captions_available": true,
+  "caption_languages": ["en", "es", "fr"],
+  "definition": "hd",
+  "scraped_at": "2026-06-21T12:00:00Z"
+}
+```
+
+## Related Endpoints
+
+| Endpoint | Description |
+|----------|-------------|
+| `GET /v1/youtube/videos/{video_id}/related` | Related / recommended videos (returns `results` + `continuation`). |
+| `GET /v1/youtube/videos/{video_id}/streams` | Streaming formats (muxed + adaptive); `client` selects `ANDROID_VR`/`IOS`. **15 credits.** |
+| `GET /v1/youtube/videos/{video_id}/live_chat` | Live chat / chat replay messages (`continuation` paginated). |
+| `POST /v1/youtube/videos/batch` | Up to 50 video ids in one request (body `{ "video_ids": [...] }`); billed **10 credits per video**. |
+
+<Note>
+  A video-detail request costs **10 credits**. The `/streams` sub-endpoint costs **15 credits**; `/related` and `/live_chat` cost **5 credits** each. Failed requests are not charged.
+</Note>

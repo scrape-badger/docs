@@ -1,0 +1,77 @@
+---
+title: "Hashtag Videos"
+openapi: "GET /v1/youtube/hashtags/{tag}"
+description: "Videos published under a YouTube hashtag, paginated by continuation token."
+---
+
+## Path Parameters
+
+<ParamField path="tag" type="string" required>
+  The hashtag, without the leading `#` (e.g. `shorts`, `lofi`).
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="gl" type="string" default="US">
+  Content region (ISO 3166-1 alpha-2). Examples: `US`, `GB`, `DE`, `JP`.
+</ParamField>
+
+<ParamField query="hl" type="string" default="en">
+  UI / interface language (BCP-47). Examples: `en`, `de`, `fr`, `ja`.
+</ParamField>
+
+<ParamField query="continuation" type="string">
+  Continuation token from a previous response to fetch the next page.
+</ParamField>
+
+## Response
+
+<ResponseField name="tag" type="string">The hashtag that was queried.</ResponseField>
+<ResponseField name="results" type="array">
+  Array of videos under the hashtag (polymorphic `SearchResult` shape).
+
+  <Expandable title="SearchResult object">
+    <ResponseField name="type" type="string">Result type, e.g. `video` or `short`.</ResponseField>
+    <ResponseField name="video_id" type="string">Video id (nullable).</ResponseField>
+    <ResponseField name="title" type="string">Video title (nullable).</ResponseField>
+    <ResponseField name="url" type="string">Full watch URL (nullable).</ResponseField>
+    <ResponseField name="thumbnail" type="string">Best thumbnail URL (nullable).</ResponseField>
+    <ResponseField name="duration" type="string">Human-readable duration (nullable).</ResponseField>
+    <ResponseField name="length_seconds" type="integer">Duration in seconds (nullable).</ResponseField>
+    <ResponseField name="view_count" type="integer">View count (nullable).</ResponseField>
+    <ResponseField name="view_count_text" type="string">View count as displayed (nullable).</ResponseField>
+    <ResponseField name="published_time_text" type="string">Relative publish time (nullable).</ResponseField>
+    <ResponseField name="channel_id" type="string">Uploader channel id (nullable).</ResponseField>
+    <ResponseField name="channel_name" type="string">Uploader channel name (nullable).</ResponseField>
+    <ResponseField name="channel_is_verified" type="boolean">Whether the channel is verified (nullable).</ResponseField>
+    <ResponseField name="is_short" type="boolean">Whether the item is a Short (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="continuation" type="string">Token to fetch the next page (nullable when no more pages).</ResponseField>
+
+### Example Response
+
+```json
+{
+  "tag": "lofi",
+  "results": [
+    {
+      "type": "video",
+      "video_id": "jfKfPfyJRdk",
+      "title": "lofi hip hop radio - beats to relax/study to",
+      "url": "https://www.youtube.com/watch?v=jfKfPfyJRdk",
+      "thumbnail": "https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg",
+      "view_count_text": "Live · 42K watching",
+      "published_time_text": "Streamed 2 years ago",
+      "channel_name": "Lofi Girl",
+      "channel_is_verified": true,
+      "is_short": false
+    }
+  ],
+  "continuation": "4qmFsgKQARIaRkVoYXNodGFn..."
+}
+```
+
+<Note>
+  Each hashtag request costs **5 credits**. Failed requests are not charged.
+</Note>

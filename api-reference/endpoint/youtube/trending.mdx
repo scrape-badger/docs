@@ -1,0 +1,101 @@
+---
+title: "Trending"
+openapi: "GET /v1/youtube/trending"
+description: "YouTube trending feed for a region — Now, Music, Gaming, or Movies."
+---
+
+## Query Parameters
+
+<ParamField query="gl" type="string" default="US">
+  Content region (ISO 3166-1 alpha-2) whose trending feed to fetch. Examples: `US`, `GB`, `DE`, `JP`.
+</ParamField>
+
+<ParamField query="hl" type="string" default="en">
+  UI / interface language (BCP-47). Examples: `en`, `de`, `fr`, `ja`.
+</ParamField>
+
+<ParamField query="type" type="string" default="now">
+  Which trending tab to return.
+
+  | Value | Description |
+  |-------|-------------|
+  | `now` | Trending now (default) |
+  | `music` | Trending music |
+  | `gaming` | Trending gaming |
+  | `movies` | Trending movies |
+</ParamField>
+
+<ParamField query="continuation" type="string">
+  Continuation token from a previous response to fetch the next page.
+</ParamField>
+
+## Response
+
+<ResponseField name="gl" type="string">The region the feed was fetched for (nullable).</ResponseField>
+<ResponseField name="type" type="string">The trending tab that was returned (nullable).</ResponseField>
+<ResponseField name="items" type="array">
+  Array of trending items.
+
+  <Expandable title="TrendingItem object">
+    <ResponseField name="position" type="integer">Position in the feed (nullable).</ResponseField>
+    <ResponseField name="category" type="string">Source category, e.g. `Now`, `Music`, `Gaming` (nullable).</ResponseField>
+    <ResponseField name="video_id" type="string">Video id (nullable).</ResponseField>
+    <ResponseField name="title" type="string">Video title (nullable).</ResponseField>
+    <ResponseField name="url" type="string">Full watch URL (nullable).</ResponseField>
+    <ResponseField name="thumbnails" type="array">Thumbnail variants with `url`, `width`, `height`.</ResponseField>
+    <ResponseField name="thumbnail" type="string">Best thumbnail URL (nullable).</ResponseField>
+    <ResponseField name="duration" type="string">Human-readable duration (nullable).</ResponseField>
+    <ResponseField name="length_seconds" type="integer">Duration in seconds (nullable).</ResponseField>
+    <ResponseField name="view_count" type="integer">View count (nullable).</ResponseField>
+    <ResponseField name="view_count_text" type="string">View count as displayed (nullable).</ResponseField>
+    <ResponseField name="published_time_text" type="string">Relative publish time (nullable).</ResponseField>
+    <ResponseField name="description_snippet" type="string">Short description snippet (nullable).</ResponseField>
+    <ResponseField name="channel_id" type="string">Uploader channel id (nullable).</ResponseField>
+    <ResponseField name="channel_name" type="string">Uploader channel name (nullable).</ResponseField>
+    <ResponseField name="channel_url" type="string">Uploader channel URL (nullable).</ResponseField>
+    <ResponseField name="channel_thumbnail" type="string">Uploader avatar URL (nullable).</ResponseField>
+    <ResponseField name="channel_is_verified" type="boolean">Whether the channel is verified (nullable).</ResponseField>
+    <ResponseField name="badges" type="array">Item badges.</ResponseField>
+    <ResponseField name="is_live" type="boolean">Whether the item is live (nullable).</ResponseField>
+    <ResponseField name="is_short" type="boolean">Whether the item is a Short (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="continuation" type="string">Token to fetch the next page (nullable when no more pages).</ResponseField>
+
+### Example Response
+
+```json
+{
+  "gl": "US",
+  "type": "now",
+  "items": [
+    {
+      "position": 1,
+      "category": "Now",
+      "video_id": "abc123XYZ_0",
+      "title": "The video everyone is watching today",
+      "url": "https://www.youtube.com/watch?v=abc123XYZ_0",
+      "thumbnail": "https://i.ytimg.com/vi/abc123XYZ_0/hqdefault.jpg",
+      "duration": "12:08",
+      "view_count": 4200000,
+      "view_count_text": "4.2M views",
+      "published_time_text": "18 hours ago",
+      "channel_name": "Trending Creator",
+      "channel_is_verified": true,
+      "is_live": false
+    }
+  ],
+  "continuation": "4qmFsgKZARIYRkV0cmVuZGlu..."
+}
+```
+
+## Related Feeds
+
+| Endpoint | Returns |
+|----------|---------|
+| `GET /v1/youtube/trending/shorts` | The trending Shorts shelf (`items` of Shorts). |
+| `GET /v1/youtube/home` | The guest home / recommendations feed (`HomeResponse`). |
+
+<Note>
+  Each trending or home request costs **5 credits**. Failed requests are not charged.
+</Note>

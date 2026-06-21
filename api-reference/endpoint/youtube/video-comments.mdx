@@ -1,0 +1,104 @@
+---
+title: "Video Comments"
+openapi: "GET /v1/youtube/videos/{video_id}/comments"
+description: "Top-level comments for a YouTube video, paginated by continuation token."
+---
+
+## Path Parameters
+
+<ParamField path="video_id" type="string" required>
+  The YouTube video id (e.g. `dQw4w9WgXcQ`).
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="sort_by" type="string" default="top">
+  Comment sort order.
+
+  | Value | Description |
+  |-------|-------------|
+  | `top` | Top comments (default) |
+  | `newest` | Newest first |
+</ParamField>
+
+<ParamField query="continuation" type="string">
+  Continuation token from a previous response to fetch the next page of comments.
+</ParamField>
+
+## Response
+
+<ResponseField name="video_id" type="string">The video the comments belong to.</ResponseField>
+<ResponseField name="comments" type="array">
+  Array of top-level comments.
+
+  <Expandable title="Comment object">
+    <ResponseField name="comment_id" type="string">Unique comment id.</ResponseField>
+    <ResponseField name="text" type="string">Comment text (nullable).</ResponseField>
+    <ResponseField name="published_time_text" type="string">Relative publish time, e.g. `2 weeks ago` (nullable).</ResponseField>
+    <ResponseField name="published_utc" type="number">Unix publish timestamp (nullable).</ResponseField>
+    <ResponseField name="author" type="string">Author display name (nullable).</ResponseField>
+    <ResponseField name="author_channel_id" type="string">Author channel id (nullable).</ResponseField>
+    <ResponseField name="author_channel_url" type="string">Author channel URL (nullable).</ResponseField>
+    <ResponseField name="author_thumbnail" type="string">Author avatar URL (nullable).</ResponseField>
+    <ResponseField name="author_is_verified" type="boolean">Whether the author is verified (nullable).</ResponseField>
+    <ResponseField name="author_is_artist" type="boolean">Whether the author is an official artist (nullable).</ResponseField>
+    <ResponseField name="author_is_channel_owner" type="boolean">Whether the author is the video's uploader (nullable).</ResponseField>
+    <ResponseField name="author_badges" type="array">Author badges (e.g. member badges).</ResponseField>
+    <ResponseField name="like_count" type="integer">Number of likes (nullable).</ResponseField>
+    <ResponseField name="reply_count" type="integer">Number of replies (nullable).</ResponseField>
+    <ResponseField name="has_creator_heart" type="boolean">Whether the creator hearted the comment (nullable).</ResponseField>
+    <ResponseField name="is_pinned" type="boolean">Whether the comment is pinned (nullable).</ResponseField>
+    <ResponseField name="is_reply" type="boolean">Whether the comment is a reply (nullable).</ResponseField>
+    <ResponseField name="reply_to_cid" type="string">Parent comment id, if a reply (nullable).</ResponseField>
+    <ResponseField name="replies_continuation" type="string">Token to fetch this comment's replies (nullable).</ResponseField>
+    <ResponseField name="paid_comment_amount" type="string">Super Thanks purchase amount, if any (nullable).</ResponseField>
+    <ResponseField name="video_id" type="string">The video id the comment belongs to (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="comment_count" type="integer">Total comment count on the video (nullable).</ResponseField>
+<ResponseField name="sorting_tokens" type="array">Sort options with `title` and `token` (e.g. `top`, `newest`).</ResponseField>
+<ResponseField name="continuation" type="string">Token to fetch the next page (nullable when no more pages).</ResponseField>
+
+### Example Response
+
+```json
+{
+  "video_id": "dQw4w9WgXcQ",
+  "comments": [
+    {
+      "comment_id": "UgxKREWxIgDrw8w2e_Z4AaABAg",
+      "text": "Who's still listening in 2026?",
+      "published_time_text": "3 days ago",
+      "author": "@musiclover",
+      "author_channel_id": "UCabc123",
+      "author_is_verified": false,
+      "like_count": 1820,
+      "reply_count": 42,
+      "is_pinned": false,
+      "is_reply": false,
+      "replies_continuation": "Eg0SC2RRdzR3OVdnWGNR..."
+    }
+  ],
+  "comment_count": 2400000,
+  "sorting_tokens": [
+    { "title": "Top comments", "token": "..." },
+    { "title": "Newest first", "token": "..." }
+  ],
+  "continuation": "Eg0SC2RRdzR3OVdnWGNRGAYyJg..."
+}
+```
+
+## Replies
+
+To fetch replies to a specific comment, call:
+
+```bash
+curl "https://scrapebadger.com/v1/youtube/videos/dQw4w9WgXcQ/comments/UgxKREWxIgDrw8w2e_Z4AaABAg/replies" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+This returns a `RepliesResponse` with `comment_id`, a `replies` array (same `Comment` shape), and a `continuation` token. You can also pass the `replies_continuation` value from a comment directly as the `continuation` query parameter.
+
+<Note>
+  Each comments page and each replies page costs **5 credits**. Failed requests are not charged.
+</Note>

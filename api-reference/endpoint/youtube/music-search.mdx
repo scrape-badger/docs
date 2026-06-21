@@ -1,0 +1,75 @@
+---
+title: "Music Search"
+openapi: "GET /v1/youtube/music/search"
+description: "Search YouTube Music for songs, videos, albums, artists, and playlists."
+---
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords.
+</ParamField>
+
+<ParamField query="gl" type="string" default="US">
+  Content region (ISO 3166-1 alpha-2). Examples: `US`, `GB`, `DE`, `JP`.
+</ParamField>
+
+<ParamField query="hl" type="string" default="en">
+  UI / interface language (BCP-47). Examples: `en`, `de`, `fr`, `ja`.
+</ParamField>
+
+<ParamField query="continuation" type="string">
+  Continuation token from a previous response to fetch the next page.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">The search query that was executed.</ResponseField>
+<ResponseField name="results" type="array">
+  Array of YouTube Music results (polymorphic `SearchResult` shape, keyed by `type`).
+
+  <Expandable title="SearchResult object">
+    <ResponseField name="type" type="string">Result type, e.g. `video`, `channel` (artist), or `playlist` (album).</ResponseField>
+    <ResponseField name="video_id" type="string">Track / video id (nullable).</ResponseField>
+    <ResponseField name="title" type="string">Track or item title (nullable).</ResponseField>
+    <ResponseField name="url" type="string">Full URL to the item (nullable).</ResponseField>
+    <ResponseField name="thumbnail" type="string">Best thumbnail / cover art URL (nullable).</ResponseField>
+    <ResponseField name="duration" type="string">Human-readable duration (nullable).</ResponseField>
+    <ResponseField name="length_seconds" type="integer">Duration in seconds (nullable).</ResponseField>
+    <ResponseField name="view_count_text" type="string">Play / view count as displayed (nullable).</ResponseField>
+    <ResponseField name="channel_id" type="string">Artist channel id (nullable).</ResponseField>
+    <ResponseField name="channel_name" type="string">Artist / uploader name (nullable).</ResponseField>
+    <ResponseField name="channel_is_verified" type="boolean">Whether the artist channel is verified (nullable).</ResponseField>
+    <ResponseField name="playlist_id" type="string">Album / playlist id (playlist results, nullable).</ResponseField>
+    <ResponseField name="video_count" type="integer">Track count (album / playlist results, nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="continuation" type="string">Token to fetch the next page (nullable when no more pages).</ResponseField>
+
+### Example Response
+
+```json
+{
+  "query": "never gonna give you up",
+  "results": [
+    {
+      "type": "video",
+      "video_id": "dQw4w9WgXcQ",
+      "title": "Never Gonna Give You Up",
+      "url": "https://music.youtube.com/watch?v=dQw4w9WgXcQ",
+      "thumbnail": "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg",
+      "duration": "3:33",
+      "length_seconds": 213,
+      "view_count_text": "1.6B plays",
+      "channel_id": "UCuAXFkgsw1L7xaCfnd5JJOw",
+      "channel_name": "Rick Astley",
+      "channel_is_verified": true
+    }
+  ],
+  "continuation": "EpcDEgxuZXZlciBnb25uYS..."
+}
+```
+
+<Note>
+  Each music-search request costs **5 credits**. Failed requests are not charged.
+</Note>

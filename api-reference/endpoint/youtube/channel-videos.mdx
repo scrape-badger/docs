@@ -1,0 +1,93 @@
+---
+title: "Channel Videos"
+openapi: "GET /v1/youtube/channels/{channel_id}/videos"
+description: "List a YouTube channel's uploaded videos, paginated by continuation token."
+---
+
+## Path Parameters
+
+<ParamField path="channel_id" type="string" required>
+  The channel id (`UC…`), an `@handle`, or a custom URL slug.
+
+  Examples: `UCBR8-60-B28hp2BmDPdntcQ`, `@YouTube`
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="sort_by" type="string" default="newest">
+  Sort order for the channel's videos.
+
+  | Value | Description |
+  |-------|-------------|
+  | `newest` | Most recent first (default) |
+  | `oldest` | Oldest first |
+  | `popular` | Most popular first |
+</ParamField>
+
+<ParamField query="continuation" type="string">
+  Continuation token from a previous response to fetch the next page.
+</ParamField>
+
+## Response
+
+<ResponseField name="channel_id" type="string">The channel id the items belong to.</ResponseField>
+<ResponseField name="items" type="array">
+  Array of the channel's videos (polymorphic `SearchResult` shape).
+
+  <Expandable title="SearchResult object">
+    <ResponseField name="type" type="string">Result type, e.g. `video` or `short`.</ResponseField>
+    <ResponseField name="video_id" type="string">Video id (nullable).</ResponseField>
+    <ResponseField name="title" type="string">Video title (nullable).</ResponseField>
+    <ResponseField name="url" type="string">Full watch URL (nullable).</ResponseField>
+    <ResponseField name="thumbnail" type="string">Best thumbnail URL (nullable).</ResponseField>
+    <ResponseField name="duration" type="string">Human-readable duration (nullable).</ResponseField>
+    <ResponseField name="length_seconds" type="integer">Duration in seconds (nullable).</ResponseField>
+    <ResponseField name="view_count" type="integer">View count (nullable).</ResponseField>
+    <ResponseField name="view_count_text" type="string">View count as displayed (nullable).</ResponseField>
+    <ResponseField name="published_time_text" type="string">Relative publish time (nullable).</ResponseField>
+    <ResponseField name="badges" type="array">Result badges, e.g. `4K`, `CC`.</ResponseField>
+    <ResponseField name="is_live" type="boolean">Whether the video is live (nullable).</ResponseField>
+    <ResponseField name="is_short" type="boolean">Whether the item is a Short (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="continuation" type="string">Token to fetch the next page (nullable when no more pages).</ResponseField>
+
+### Example Response
+
+```json
+{
+  "channel_id": "UCBR8-60-B28hp2BmDPdntcQ",
+  "items": [
+    {
+      "type": "video",
+      "video_id": "abc123XYZ_0",
+      "title": "What's new on YouTube",
+      "url": "https://www.youtube.com/watch?v=abc123XYZ_0",
+      "thumbnail": "https://i.ytimg.com/vi/abc123XYZ_0/hqdefault.jpg",
+      "duration": "2:14",
+      "length_seconds": 134,
+      "view_count": 1820000,
+      "view_count_text": "1.8M views",
+      "published_time_text": "3 weeks ago",
+      "is_short": false
+    }
+  ],
+  "continuation": "4qmFsgKZARIY..."
+}
+```
+
+## Other Channel Tabs
+
+The same paginated shape powers every channel sub-surface — swap the path segment:
+
+| Endpoint | Returns |
+|----------|---------|
+| `GET /v1/youtube/channels/{channel_id}/shorts` | The channel's Shorts |
+| `GET /v1/youtube/channels/{channel_id}/streams` | The channel's live streams |
+| `GET /v1/youtube/channels/{channel_id}/playlists` | The channel's playlists |
+| `GET /v1/youtube/channels/{channel_id}/community` | The channel's community posts (`posts` array of `CommunityPost`) |
+| `GET /v1/youtube/channels/{channel_id}/search?query=...` | Search within the channel (returns a `SearchResponse`) |
+
+<Note>
+  Each channel-tab page costs **5 credits**. Failed requests are not charged.
+</Note>

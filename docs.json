@@ -18,6 +18,7 @@
     "/openapi-vinted.json",
     "/openapi-amazon.json",
     "/openapi-ebay.json",
+    "/openapi-youtube.json",
     "/openapi-shopee.json",
     "/openapi-tiktok.json",
     "/openapi-reddit.json",
@@ -404,6 +405,51 @@
             "group": "Reference",
             "pages": [
               "api-reference/endpoint/ebay/list-markets"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "YouTube",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "youtube/overview"
+            ]
+          },
+          {
+            "group": "Search & Discovery",
+            "pages": [
+              "api-reference/endpoint/youtube/search",
+              "api-reference/endpoint/youtube/trending",
+              "api-reference/endpoint/youtube/hashtag",
+              "api-reference/endpoint/youtube/music-search"
+            ]
+          },
+          {
+            "group": "Videos & Shorts",
+            "pages": [
+              "api-reference/endpoint/youtube/get-video",
+              "api-reference/endpoint/youtube/video-comments",
+              "api-reference/endpoint/youtube/video-transcript",
+              "api-reference/endpoint/youtube/short"
+            ]
+          },
+          {
+            "group": "Channels",
+            "pages": [
+              "api-reference/endpoint/youtube/channel",
+              "api-reference/endpoint/youtube/channel-videos",
+              "api-reference/endpoint/youtube/resolve-channel"
+            ]
+          },
+          {
+            "group": "Playlists & Community",
+            "pages": [
+              "api-reference/endpoint/youtube/playlist",
+              "api-reference/endpoint/youtube/playlist-items",
+              "api-reference/endpoint/youtube/community-post"
             ]
           }
         ]

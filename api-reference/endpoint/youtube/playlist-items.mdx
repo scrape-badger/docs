@@ -1,0 +1,71 @@
+---
+title: "Playlist Items"
+openapi: "GET /v1/youtube/playlists/{playlist_id}/items"
+description: "A continuation page of items within a YouTube playlist."
+---
+
+## Path Parameters
+
+<ParamField path="playlist_id" type="string" required>
+  The YouTube playlist id (the `list=` value).
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="continuation" type="string">
+  Continuation token from a previous [playlist](/api-reference/endpoint/youtube/playlist) or playlist-items response. Omit it to fetch the first page.
+</ParamField>
+
+## Response
+
+<ResponseField name="playlist_id" type="string">The playlist id the items belong to.</ResponseField>
+<ResponseField name="items" type="array">
+  Array of playlist items.
+
+  <Expandable title="PlaylistItem object">
+    <ResponseField name="position" type="integer">1-based position in the playlist (nullable).</ResponseField>
+    <ResponseField name="video_id" type="string">Video id.</ResponseField>
+    <ResponseField name="title" type="string">Video title (nullable).</ResponseField>
+    <ResponseField name="url" type="string">Full watch URL (nullable).</ResponseField>
+    <ResponseField name="length_seconds" type="integer">Duration in seconds (nullable).</ResponseField>
+    <ResponseField name="duration" type="string">Human-readable duration (nullable).</ResponseField>
+    <ResponseField name="channel_id" type="string">Uploader channel id (nullable).</ResponseField>
+    <ResponseField name="channel_name" type="string">Uploader channel name (nullable).</ResponseField>
+    <ResponseField name="channel_url" type="string">Uploader channel URL (nullable).</ResponseField>
+    <ResponseField name="thumbnails" type="array">Thumbnail variants with `url`, `width`, `height`.</ResponseField>
+    <ResponseField name="thumbnail" type="string">Best thumbnail URL (nullable).</ResponseField>
+    <ResponseField name="view_count" type="integer">View count (nullable).</ResponseField>
+    <ResponseField name="view_count_text" type="string">View count as displayed (nullable).</ResponseField>
+    <ResponseField name="published_time_text" type="string">Relative publish time (nullable).</ResponseField>
+    <ResponseField name="is_playable" type="boolean">Whether the item is currently playable (nullable).</ResponseField>
+    <ResponseField name="set_video_id" type="string">Per-playlist-entry id (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="continuation" type="string">Token to fetch the next page (nullable when no more pages).</ResponseField>
+
+### Example Response
+
+```json
+{
+  "playlist_id": "PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf",
+  "items": [
+    {
+      "position": 101,
+      "video_id": "9bZkp7q19f0",
+      "title": "PSY - GANGNAM STYLE",
+      "url": "https://www.youtube.com/watch?v=9bZkp7q19f0&list=PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf",
+      "length_seconds": 252,
+      "duration": "4:12",
+      "channel_name": "officialpsy",
+      "view_count": 5100000000,
+      "is_playable": true,
+      "set_video_id": "PLrAXtmErZgOeiKm4sgNOknGvNjby9efdf9bZkp7q19f0"
+    }
+  ],
+  "continuation": "4qmFsgJhEiRWTFBMckFY..."
+}
+```
+
+<Note>
+  Each playlist-items page costs **5 credits**. Failed requests are not charged.
+</Note>

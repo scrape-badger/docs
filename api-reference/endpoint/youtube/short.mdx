@@ -1,0 +1,89 @@
+---
+title: "Get Short"
+openapi: "GET /v1/youtube/shorts/{video_id}"
+description: "Full detail for a single YouTube Short (vertical reel), including its sound."
+---
+
+## Path Parameters
+
+<ParamField path="video_id" type="string" required>
+  The Shorts video id (the id from a `/shorts/{id}` URL, e.g. `aBcD1234efg`).
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="gl" type="string" default="US">
+  Content region (ISO 3166-1 alpha-2). Examples: `US`, `GB`, `DE`, `JP`.
+</ParamField>
+
+<ParamField query="hl" type="string" default="en">
+  UI / interface language (BCP-47). Examples: `en`, `de`, `fr`, `ja`.
+</ParamField>
+
+## Response
+
+A Short is a `Video` with `is_short: true` plus a Shorts-specific vertical thumbnail and sound fields. The full field set matches [Get Video](/api-reference/endpoint/youtube/get-video); the most relevant Shorts fields are listed below.
+
+<ResponseField name="video_id" type="string">The Shorts video id.</ResponseField>
+<ResponseField name="title" type="string">Short title (nullable).</ResponseField>
+<ResponseField name="url" type="string">Full watch URL (nullable).</ResponseField>
+<ResponseField name="description" type="string">Short description (nullable).</ResponseField>
+<ResponseField name="length_seconds" type="integer">Duration in seconds (nullable).</ResponseField>
+<ResponseField name="view_count" type="integer">View count (nullable).</ResponseField>
+<ResponseField name="like_count" type="integer">Like count (nullable).</ResponseField>
+<ResponseField name="comment_count" type="integer">Comment count (nullable).</ResponseField>
+<ResponseField name="channel_id" type="string">Uploader channel id (nullable).</ResponseField>
+<ResponseField name="channel_name" type="string">Uploader channel name (nullable).</ResponseField>
+<ResponseField name="channel_username" type="string">Uploader `@handle` (nullable).</ResponseField>
+<ResponseField name="channel_is_verified" type="boolean">Whether the channel is verified (nullable).</ResponseField>
+<ResponseField name="published_at" type="string">ISO 8601 publish timestamp (nullable).</ResponseField>
+<ResponseField name="hashtags" type="array">Hashtags used in the Short.</ResponseField>
+<ResponseField name="thumbnail" type="string">Best/primary thumbnail URL (nullable).</ResponseField>
+<ResponseField name="thumbnail_vertical" type="string">Vertical (portrait) thumbnail URL (nullable).</ResponseField>
+<ResponseField name="is_short" type="boolean">Always `true` for Shorts.</ResponseField>
+<ResponseField name="sound_id" type="string">Sound id used by the Short (nullable).</ResponseField>
+<ResponseField name="sound_title" type="string">Sound title (nullable).</ResponseField>
+<ResponseField name="sound_artist" type="string">Sound artist (nullable).</ResponseField>
+<ResponseField name="scraped_at" type="string">ISO 8601 timestamp when the Short was scraped.</ResponseField>
+
+### Example Response
+
+```json
+{
+  "video_id": "aBcD1234efg",
+  "title": "60-second pasta hack #shorts",
+  "url": "https://www.youtube.com/shorts/aBcD1234efg",
+  "length_seconds": 58,
+  "view_count": 8200000,
+  "like_count": 410000,
+  "comment_count": 3200,
+  "channel_id": "UCabc123",
+  "channel_name": "Quick Recipes",
+  "channel_username": "@QuickRecipes",
+  "channel_is_verified": true,
+  "published_at": "2026-05-30T00:00:00Z",
+  "hashtags": ["#shorts", "#cooking"],
+  "thumbnail": "https://i.ytimg.com/vi/aBcD1234efg/hqdefault.jpg",
+  "thumbnail_vertical": "https://i.ytimg.com/vi/aBcD1234efg/oardefault.jpg",
+  "is_short": true,
+  "sound_id": "MPSDxyz123",
+  "sound_title": "Original audio",
+  "sound_artist": "Quick Recipes",
+  "scraped_at": "2026-06-21T12:00:00Z"
+}
+```
+
+## Shorts by Sound
+
+To list Shorts that use a given sound, call:
+
+```bash
+curl "https://scrapebadger.com/v1/youtube/shorts/by_sound/MPSDxyz123" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+This returns an `items` array of Shorts plus a `continuation` token for pagination.
+
+<Note>
+  A Short-detail request and a shorts-by-sound page each cost **5 credits**. Failed requests are not charged.
+</Note>

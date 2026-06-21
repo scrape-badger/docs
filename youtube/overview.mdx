@@ -1,0 +1,203 @@
+---
+title: "YouTube Scraper Overview"
+description: "Scrape YouTube videos, Shorts, channels, playlists, comments, transcripts, trending, and community posts across regions with structured JSON responses."
+---
+
+# YouTube Scraper API
+
+Search YouTube, pull full **video and Shorts detail**, fetch comments and replies, export **transcripts** (SRT/VTT/plain text), enumerate a channel's videos, shorts, streams, playlists, and community posts, and retrieve trending feeds, hashtags, and playlists — from the world's largest video platform. The API handles authentication, anti-bot bypass, and region routing automatically.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="Widest Coverage" icon="layer-group">
+    39 endpoints — videos, Shorts, channels, playlists, comments, transcripts, trending, hashtags, community posts, and music search.
+  </Card>
+  <Card title="Transcripts & Captions" icon="closed-captioning">
+    The [`/v1/youtube/videos/{id}/transcript`](/api-reference/endpoint/youtube/video-transcript) endpoint returns timed segments plus ready-to-use **SRT**, **VTT**, and full-text exports.
+  </Card>
+  <Card title="Anti-Bot Bypass" icon="shield-halved">
+    Automatic session management, Chrome TLS impersonation, and fingerprint rotation to avoid blocks.
+  </Card>
+  <Card title="Rich Video Data" icon="video">
+    Views, likes, chapters, heatmap (most-replayed), keywords, hashtags, live details, and streaming formats.
+  </Card>
+  <Card title="Region & Language" icon="globe">
+    Target any content region with `gl` and any UI language with `hl` for accurate, localized results.
+  </Card>
+  <Card title="SDK Support" icon="code">
+    First-class support via the ScrapeBadger Node.js and Python SDKs.
+  </Card>
+</CardGroup>
+
+## Regions & Languages
+
+YouTube results are localized by **content region** and **UI language**. Two query parameters control this on most endpoints:
+
+| Parameter | Meaning | Example |
+|-----------|---------|---------|
+| `gl` | Content region (ISO 3166-1 alpha-2 country code) | `US`, `GB`, `DE`, `JP` |
+| `hl` | UI / interface language (BCP-47 language code) | `en`, `de`, `fr`, `ja` |
+
+<Tip>
+  If omitted, `gl` defaults to `US` and `hl` defaults to `en`. Use the free [`/v1/youtube/regions`](/api-reference/endpoint/youtube/resolve-channel) and [`/v1/youtube/languages`](/api-reference/endpoint/youtube/resolve-channel) reference endpoints to fetch the full list of valid codes programmatically.
+</Tip>
+
+## Pagination
+
+YouTube list endpoints do **not** use page numbers. Every paginated response includes a `continuation` token; pass it back as the `continuation` query parameter to fetch the next page. When `continuation` is `null`, you have reached the end.
+
+## Quick Start
+
+<CodeGroup>
+
+```javascript Node.js
+import ScrapeBadger from "scrapebadger";
+
+const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" });
+
+const results = await client.youtube.search({
+  query: "lofi hip hop",
+  gl: "US",
+  hl: "en",
+});
+
+console.log(results.results);
+```
+
+```python Python
+from scrapebadger import ScrapeBadger
+
+client = ScrapeBadger(api_key="YOUR_API_KEY")
+
+results = client.youtube.search(
+    query="lofi hip hop",
+    gl="US",
+    hl="en",
+)
+
+print(results.results)
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/youtube/search?query=lofi+hip+hop&gl=US&hl=en" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+## Endpoints
+
+### Search & Discovery
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/youtube/search`](/api-reference/endpoint/youtube/search) | GET | Search videos, channels, playlists, or movies |
+| [`/v1/youtube/autocomplete`](/api-reference/endpoint/youtube/search) | GET | Keyword autocomplete suggestions |
+| [`/v1/youtube/trending`](/api-reference/endpoint/youtube/trending) | GET | Trending feed (Now / Music / Gaming / Movies) |
+| [`/v1/youtube/trending/shorts`](/api-reference/endpoint/youtube/trending) | GET | Trending Shorts shelf |
+| [`/v1/youtube/hashtags/{tag}`](/api-reference/endpoint/youtube/hashtag) | GET | Videos under a hashtag |
+| [`/v1/youtube/home`](/api-reference/endpoint/youtube/trending) | GET | Guest home / recommendations feed |
+| [`/v1/youtube/music/search`](/api-reference/endpoint/youtube/music-search) | GET | YouTube Music search (songs, albums, artists) |
+
+### Videos & Shorts
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/youtube/videos/{video_id}`](/api-reference/endpoint/youtube/get-video) | GET | Full video detail |
+| [`/v1/youtube/videos/batch`](/api-reference/endpoint/youtube/get-video) | POST | Up to 50 videos in one request |
+| [`/v1/youtube/videos/{video_id}/related`](/api-reference/endpoint/youtube/get-video) | GET | Related / recommended videos |
+| [`/v1/youtube/videos/{video_id}/comments`](/api-reference/endpoint/youtube/video-comments) | GET | Top-level comments |
+| [`/v1/youtube/videos/{video_id}/comments/{comment_id}/replies`](/api-reference/endpoint/youtube/video-comments) | GET | Replies to a comment |
+| [`/v1/youtube/videos/{video_id}/transcript`](/api-reference/endpoint/youtube/video-transcript) | GET | Timed transcript (SRT / VTT / text) |
+| [`/v1/youtube/videos/{video_id}/captions`](/api-reference/endpoint/youtube/video-transcript) | GET | Available caption tracks |
+| [`/v1/youtube/videos/{video_id}/streams`](/api-reference/endpoint/youtube/get-video) | GET | Streaming formats (best-effort URLs) |
+| [`/v1/youtube/videos/{video_id}/live_chat`](/api-reference/endpoint/youtube/get-video) | GET | Live chat / chat replay messages |
+| [`/v1/youtube/shorts/{video_id}`](/api-reference/endpoint/youtube/short) | GET | Full Shorts detail |
+| [`/v1/youtube/shorts/by_sound/{sound_id}`](/api-reference/endpoint/youtube/short) | GET | Shorts using a given sound |
+
+### Channels
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/youtube/channels/{channel_id}`](/api-reference/endpoint/youtube/channel) | GET | Full channel detail (accepts `UC…`, `@handle`, or custom URL) |
+| [`/v1/youtube/channels/{channel_id}/videos`](/api-reference/endpoint/youtube/channel-videos) | GET | A channel's videos |
+| [`/v1/youtube/channels/{channel_id}/shorts`](/api-reference/endpoint/youtube/channel-videos) | GET | A channel's Shorts |
+| [`/v1/youtube/channels/{channel_id}/streams`](/api-reference/endpoint/youtube/channel-videos) | GET | A channel's live streams |
+| [`/v1/youtube/channels/{channel_id}/playlists`](/api-reference/endpoint/youtube/channel-videos) | GET | A channel's playlists |
+| [`/v1/youtube/channels/{channel_id}/community`](/api-reference/endpoint/youtube/channel-videos) | GET | A channel's community posts |
+| [`/v1/youtube/channels/{channel_id}/about`](/api-reference/endpoint/youtube/channel) | GET | Lightweight channel about payload |
+| [`/v1/youtube/channels/{channel_id}/subscriber_count`](/api-reference/endpoint/youtube/channel) | GET | Fast subscriber-count-only lookup |
+| [`/v1/youtube/channels/{channel_id}/search`](/api-reference/endpoint/youtube/channel-videos) | GET | Search within a channel |
+| [`/v1/youtube/channels/resolve`](/api-reference/endpoint/youtube/resolve-channel) | GET | Resolve a handle / URL to canonical ids |
+
+### Playlists
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/youtube/playlists/{playlist_id}`](/api-reference/endpoint/youtube/playlist) | GET | Full playlist detail + first item page |
+| [`/v1/youtube/playlists/{playlist_id}/items`](/api-reference/endpoint/youtube/playlist-items) | GET | A page of playlist items |
+| [`/v1/youtube/mixes/{mix_id}`](/api-reference/endpoint/youtube/playlist) | GET | An auto-generated mix |
+
+### Community & Reference
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/youtube/posts/{post_id}`](/api-reference/endpoint/youtube/community-post) | GET | A community post |
+| [`/v1/youtube/posts/{post_id}/comments`](/api-reference/endpoint/youtube/community-post) | GET | Comments on a community post |
+| [`/v1/youtube/oembed`](/api-reference/endpoint/youtube/resolve-channel) | GET | Public oEmbed metadata for a URL |
+| [`/v1/youtube/categories`](/api-reference/endpoint/youtube/resolve-channel) | GET | Video category reference list |
+| [`/v1/youtube/languages`](/api-reference/endpoint/youtube/resolve-channel) | GET | Supported UI languages (`hl`) |
+| [`/v1/youtube/regions`](/api-reference/endpoint/youtube/resolve-channel) | GET | Supported content regions (`gl`) |
+| [`/v1/youtube/markets`](/api-reference/endpoint/youtube/resolve-channel) | GET | Supported markets reference |
+
+## Credit Costs
+
+| Endpoint | Cost |
+|----------|------|
+| Search | 5 credits |
+| Trending / hashtag / home | 5 credits |
+| Music search | 5 credits |
+| Video detail | 10 credits |
+| Batch videos | 10 credits per video |
+| Related / comments / replies / live chat | 5 credits |
+| Transcript | 5 credits |
+| Streams | 15 credits |
+| Captions | 2 credits |
+| Short detail / shorts by sound | 5 credits |
+| Channel detail | 5 credits |
+| Channel videos / shorts / streams / playlists / community / search | 5 credits |
+| Channel about / subscriber count / resolve | 2 credits |
+| Playlist / playlist items / mix | 5 credits |
+| Community post / post comments | 5 credits |
+| Autocomplete / oEmbed | 1 credit |
+| Categories / languages / regions / markets | 0 credits |
+| Failed requests | 0 credits |
+
+## Authentication
+
+All requests require your API key in the `X-API-Key` header:
+
+```bash
+curl "https://scrapebadger.com/v1/youtube/videos/dQw4w9WgXcQ" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+## Anti-Bot Handling
+
+YouTube protects its data with IP-reputation scoring, TLS/HTTP-2 fingerprinting, bot-guard challenges, and PO-token requirements on media. ScrapeBadger clears these automatically using Chrome TLS impersonation on sessions matched to the target region. You never need to manage proxies, sessions, or tokens.
+
+<Note>
+  For accurate, localized results, requests are routed through proxies in the `gl` region. This is handled automatically. Some fields (such as `dislike_count` and direct media `url`s) are restricted by YouTube platform-wide and may be `null`.
+</Note>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Search YouTube" icon="magnifying-glass" href="/api-reference/endpoint/youtube/search">
+    Full API reference for searching videos, channels, and playlists
+  </Card>
+  <Card title="Get Video Detail" icon="video" href="/api-reference/endpoint/youtube/get-video">
+    Fetch full metadata for a single video
+  </Card>
+</CardGroup>

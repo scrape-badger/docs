@@ -1,0 +1,82 @@
+---
+title: "Community Post"
+openapi: "GET /v1/youtube/posts/{post_id}"
+description: "Detail for a single YouTube community post (text, poll, image, or shared content)."
+---
+
+## Path Parameters
+
+<ParamField path="post_id" type="string" required>
+  The community post id (the `lc=`/`Ug…` value from a `/post/{id}` URL).
+</ParamField>
+
+## Response
+
+<ResponseField name="post_id" type="string">The community post id.</ResponseField>
+<ResponseField name="post_url" type="string">Full URL to the post (nullable).</ResponseField>
+<ResponseField name="post_type" type="string">Post type: `text`, `poll`, `image`, `video`, or `shared` (nullable).</ResponseField>
+<ResponseField name="text" type="string">Post body text (nullable).</ResponseField>
+<ResponseField name="text_links" type="array">Links parsed from the post text.</ResponseField>
+<ResponseField name="channel_id" type="string">Author channel id (nullable).</ResponseField>
+<ResponseField name="channel_name" type="string">Author channel name (nullable).</ResponseField>
+<ResponseField name="channel_url" type="string">Author channel URL (nullable).</ResponseField>
+<ResponseField name="channel_thumbnail" type="string">Author avatar URL (nullable).</ResponseField>
+<ResponseField name="published_time_text" type="string">Relative publish time, e.g. `2 days ago` (nullable).</ResponseField>
+<ResponseField name="published_utc" type="number">Unix publish timestamp (nullable).</ResponseField>
+<ResponseField name="like_count" type="integer">Number of likes (nullable).</ResponseField>
+<ResponseField name="like_count_text" type="string">Like count as displayed (nullable).</ResponseField>
+<ResponseField name="comment_count" type="integer">Number of comments (nullable).</ResponseField>
+<ResponseField name="poll_choices" type="array">
+  Poll options (poll posts only).
+
+  <Expandable title="PollChoice object">
+    <ResponseField name="text" type="string">Option text (nullable).</ResponseField>
+    <ResponseField name="percentage" type="number">Vote share as a percentage (nullable).</ResponseField>
+    <ResponseField name="votes" type="integer">Vote count (nullable).</ResponseField>
+    <ResponseField name="image" type="string">Option image URL, for image polls (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="poll_total_votes" type="integer">Total votes cast (poll posts only, nullable).</ResponseField>
+<ResponseField name="images" type="array">Attached images, with `url`, `width`, `height`.</ResponseField>
+<ResponseField name="attached_video" type="object">Attached video object, if any (nullable).</ResponseField>
+<ResponseField name="shared_post" type="object">The original post, for shared posts (nullable).</ResponseField>
+<ResponseField name="scraped_at" type="string">ISO 8601 timestamp when the post was scraped.</ResponseField>
+<ResponseField name="scraped_utc" type="number">Unix timestamp when the post was scraped.</ResponseField>
+
+### Example Response
+
+```json
+{
+  "post_id": "UgkxAbCdEfGhIjKlMnOpQrStUvWxYz",
+  "post_url": "https://www.youtube.com/post/UgkxAbCdEfGhIjKlMnOpQrStUvWxYz",
+  "post_type": "poll",
+  "text": "Which video should we make next?",
+  "channel_id": "UCBR8-60-B28hp2BmDPdntcQ",
+  "channel_name": "YouTube",
+  "published_time_text": "2 days ago",
+  "like_count": 18200,
+  "comment_count": 940,
+  "poll_choices": [
+    { "text": "Behind the scenes", "percentage": 62.0, "votes": 31000 },
+    { "text": "Q&A", "percentage": 38.0, "votes": 19000 }
+  ],
+  "poll_total_votes": 50000,
+  "images": [],
+  "scraped_at": "2026-06-21T12:00:00Z"
+}
+```
+
+## Post Comments
+
+To page the comments on a community post, call:
+
+```bash
+curl "https://scrapebadger.com/v1/youtube/posts/UgkxAbCdEfGhIjKlMnOpQrStUvWxYz/comments" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+This returns a `CommentsResponse` (the same `comments` + `continuation` shape as [video comments](/api-reference/endpoint/youtube/video-comments)).
+
+<Note>
+  A community-post request and a post-comments page each cost **5 credits**. Failed requests are not charged.
+</Note>

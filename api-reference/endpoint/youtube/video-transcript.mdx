@@ -1,0 +1,83 @@
+---
+title: "Video Transcript"
+openapi: "GET /v1/youtube/videos/{video_id}/transcript"
+description: "Timed transcript for a YouTube video, with ready-to-use SRT, VTT, and plain-text exports."
+---
+
+## Path Parameters
+
+<ParamField path="video_id" type="string" required>
+  The YouTube video id (e.g. `dQw4w9WgXcQ`).
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="lang" type="string">
+  Preferred transcript language code (e.g. `en`, `de`). Falls back to the default available track.
+</ParamField>
+
+<ParamField query="type" type="string">
+  Track type preference: `manual` (human-authored) or `asr` (auto-generated).
+</ParamField>
+
+## Response
+
+<ResponseField name="video_id" type="string">The video the transcript belongs to.</ResponseField>
+<ResponseField name="language" type="string">Language code of the returned transcript (nullable).</ResponseField>
+<ResponseField name="language_name" type="string">Human-readable language name (nullable).</ResponseField>
+<ResponseField name="type" type="string">Track type: `manual` or `asr` (auto-generated) (nullable).</ResponseField>
+<ResponseField name="is_translatable" type="boolean">Whether the track can be machine-translated (nullable).</ResponseField>
+<ResponseField name="available_transcripts" type="array">Other available transcript tracks (with language metadata).</ResponseField>
+<ResponseField name="translation_languages" type="array">Languages the transcript can be translated into.</ResponseField>
+<ResponseField name="segments" type="array">
+  Timed transcript lines.
+
+  <Expandable title="TranscriptSegment object">
+    <ResponseField name="start_ms" type="integer">Segment start offset in milliseconds (nullable).</ResponseField>
+    <ResponseField name="end_ms" type="integer">Segment end offset in milliseconds (nullable).</ResponseField>
+    <ResponseField name="duration_ms" type="integer">Segment duration in milliseconds (nullable).</ResponseField>
+    <ResponseField name="start_time_text" type="string">Start offset as displayed, e.g. `0:12` (nullable).</ResponseField>
+    <ResponseField name="text" type="string">The line text (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="full_text" type="string">The entire transcript as a single plain-text string (nullable).</ResponseField>
+<ResponseField name="srt" type="string">The transcript formatted as a ready-to-use SubRip (`.srt`) file (nullable).</ResponseField>
+<ResponseField name="vtt" type="string">The transcript formatted as a ready-to-use WebVTT (`.vtt`) file (nullable).</ResponseField>
+
+### Example Response
+
+```json
+{
+  "video_id": "dQw4w9WgXcQ",
+  "language": "en",
+  "language_name": "English",
+  "type": "manual",
+  "is_translatable": true,
+  "available_transcripts": [
+    { "language": "en", "language_name": "English", "type": "manual" },
+    { "language": "es", "language_name": "Spanish", "type": "asr" }
+  ],
+  "segments": [
+    { "start_ms": 18000, "end_ms": 21000, "duration_ms": 3000, "start_time_text": "0:18", "text": "Never gonna give you up" },
+    { "start_ms": 21000, "end_ms": 24000, "duration_ms": 3000, "start_time_text": "0:21", "text": "Never gonna let you down" }
+  ],
+  "full_text": "Never gonna give you up Never gonna let you down ...",
+  "srt": "1\n00:00:18,000 --> 00:00:21,000\nNever gonna give you up\n\n2\n00:00:21,000 --> 00:00:24,000\nNever gonna let you down\n",
+  "vtt": "WEBVTT\n\n00:00:18.000 --> 00:00:21.000\nNever gonna give you up\n\n00:00:21.000 --> 00:00:24.000\nNever gonna let you down\n"
+}
+```
+
+## Available Caption Tracks
+
+To list the caption tracks for a video without downloading the full transcript, call:
+
+```bash
+curl "https://scrapebadger.com/v1/youtube/videos/dQw4w9WgXcQ/captions" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+This returns a `CaptionsResponse` with `video_id`, a `tracks` array (each with `language`, `language_name`, `type`, `is_translatable`, `base_url`), and `translation_languages`. The captions endpoint costs **2 credits**.
+
+<Note>
+  A transcript request costs **5 credits**; the `/captions` listing costs **2 credits**. Failed requests are not charged.
+</Note>
