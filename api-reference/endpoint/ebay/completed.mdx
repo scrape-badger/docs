@@ -75,6 +75,8 @@ Identical shape to [`/v1/ebay/search`](/api-reference/endpoint/ebay/search), exc
     <ResponseField name="buying_format" type="string">`Buy It Now`, `Auction`, or `Best Offer`.</ResponseField>
     <ResponseField name="is_auction" type="boolean">Whether the listing was an auction.</ResponseField>
     <ResponseField name="bids" type="integer">Number of bids the auction received (nullable).</ResponseField>
+    <ResponseField name="time_left" type="string">Relative time remaining, e.g. `12h 16m` (auctions only, nullable).</ResponseField>
+    <ResponseField name="current_bid" type="object">Current high bid for auction listings with `value`, `currency`, `symbol`, `raw`; mirrors `price`. Null for non-auction (fixed-price) listings.</ResponseField>
     <ResponseField name="shipping" type="string">Shipping text.</ResponseField>
     <ResponseField name="location" type="string">Item location text.</ResponseField>
     <ResponseField name="seller_name" type="string">Seller username (nullable).</ResponseField>
@@ -104,6 +106,8 @@ Identical shape to [`/v1/ebay/search`](/api-reference/endpoint/ebay/search), exc
       "buying_format": "Auction",
       "is_auction": true,
       "bids": 14,
+      "time_left": null,
+      "current_bid": { "value": 215.5, "currency": "USD", "symbol": "$", "raw": "$215.50" },
       "shipping": "Free shipping",
       "location": "United States",
       "seller_name": "gamerdeals99",

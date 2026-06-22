@@ -22,6 +22,9 @@ Search active listings, pull **completed/sold-price history**, fetch full item d
   <Card title="Rich Item Data" icon="box">
     Prices, conditions, item specifics, shipping options, returns, seller info, ratings, and watchers.
   </Card>
+  <Card title="Auction Data" icon="gavel">
+    Live auction fields — bid count, time remaining, current high bid, absolute end time, and Buy It Now price — on search cards and item detail.
+  </Card>
   <Card title="Country Proxies" icon="globe">
     Requests are routed through proxies matching the target marketplace for accurate pricing and availability.
   </Card>
@@ -138,6 +141,21 @@ eBay protects its catalog with IP-reputation scoring, TLS/HTTP-2 fingerprinting,
 <Note>
   For accurate pricing and availability, requests are routed through proxies in the marketplace's country. This is handled automatically based on the `domain` parameter.
 </Note>
+
+## Auction Data
+
+Auction listings are fully supported across search cards and item detail. When a listing is an auction (`is_auction` is `true`), these fields are populated:
+
+| Field | Where | Description |
+|-------|-------|-------------|
+| `bids` | cards + detail | Number of bids placed so far. |
+| `time_left` | cards + detail | Relative time remaining, e.g. `12h 16m`. |
+| `current_bid` | cards + detail | Current high bid (an `EbayPrice`, mirrors `price`). |
+| `end_time_utc` | detail | Absolute end time as a Unix timestamp (float seconds). |
+| `end_time_at` | detail | Absolute end time as an ISO-8601 Z string, e.g. `2026-06-22T19:50:51Z`. |
+| `buy_it_now_price` | detail | Buy It Now price (an `EbayPrice`); `null` for pure auctions. |
+
+For non-auction (fixed-price) listings, `current_bid`, `end_time_utc`, and `end_time_at` are `null`, and `buy_it_now_price` mirrors `price`. Use [`buying_format=auction`](/api-reference/endpoint/ebay/search) on search, or [`sort_by=ending_soonest`](/api-reference/endpoint/ebay/search), to surface auctions.
 
 ## Next Steps
 
