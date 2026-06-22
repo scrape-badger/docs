@@ -45,7 +45,11 @@ description: "Full detail for a single eBay listing (price, condition, specifics
     <ResponseField name="buying_format" type="string">`Buy It Now`, `Auction`, or `Best Offer`.</ResponseField>
     <ResponseField name="is_auction" type="boolean">Whether the listing is an auction.</ResponseField>
     <ResponseField name="bids" type="integer">Number of bids (auctions only, nullable).</ResponseField>
-    <ResponseField name="time_left" type="string">Time remaining for auctions (nullable).</ResponseField>
+    <ResponseField name="time_left" type="string">Relative time remaining for auctions, e.g. `12h 16m` (auctions only, nullable).</ResponseField>
+    <ResponseField name="current_bid" type="object">Current high bid for auction listings with `value`, `currency`, `symbol`, `raw`; mirrors `price`. Null for non-auction (fixed-price) listings.</ResponseField>
+    <ResponseField name="end_time_utc" type="number">Absolute auction end time as a Unix timestamp (float seconds). Null for non-auction listings.</ResponseField>
+    <ResponseField name="end_time_at" type="string">Absolute auction end time as an ISO-8601 UTC string, e.g. `2026-06-22T19:50:51Z` (nullable).</ResponseField>
+    <ResponseField name="buy_it_now_price" type="object">Buy It Now price for fixed-price listings (mirrors `price`) or auction-with-Buy-It-Now listings, with `value`, `currency`, `symbol`, `raw`. Null for pure auctions.</ResponseField>
     <ResponseField name="best_offer_enabled" type="boolean">Whether the seller accepts best offers (nullable).</ResponseField>
     <ResponseField name="brand" type="string">Brand name (nullable).</ResponseField>
     <ResponseField name="mpn" type="string">Manufacturer part number (nullable).</ResponseField>
@@ -94,6 +98,12 @@ description: "Full detail for a single eBay listing (price, condition, specifics
     "watchers": 18,
     "buying_format": "Buy It Now",
     "is_auction": false,
+    "bids": null,
+    "time_left": null,
+    "current_bid": null,
+    "end_time_utc": null,
+    "end_time_at": null,
+    "buy_it_now_price": { "value": 299.99, "currency": "USD", "symbol": "$", "raw": "$299.99" },
     "best_offer_enabled": true,
     "brand": "Nintendo",
     "mpn": "HEGSKAAAA",
@@ -111,6 +121,33 @@ description: "Full detail for a single eBay listing (price, condition, specifics
     "returns": { "accepted": true, "period": "30 days", "cost_paid_by": "buyer", "raw": "30 days returns. Buyer pays return shipping." },
     "seller": { "username": "topgames_us", "url": "https://www.ebay.com/usr/topgames_us", "feedback_score": 18452, "feedback_percent": 99.4 },
     "scraped_at": "2026-06-21T12:00:00Z"
+  }
+}
+```
+
+### Auction data
+
+Auction listings are fully supported. For auctions, `is_auction` is `true` and the auction-specific fields are populated: `bids` (bid count), `time_left` (relative remaining time), `current_bid` (the current high bid, mirroring `price`), and the absolute end time as both `end_time_utc` (Unix timestamp) and `end_time_at` (ISO-8601 Z string). For pure auctions `buy_it_now_price` is `null`; for fixed-price or auction-with-Buy-It-Now listings it carries the BIN price.
+
+```json
+{
+  "domain": "com",
+  "item": {
+    "item_id": "256987654321",
+    "title": "Vintage Omega Seamaster Automatic Watch - No Reserve",
+    "url": "https://www.ebay.com/itm/256987654321",
+    "condition": "Pre-owned",
+    "price": { "value": 412.0, "currency": "USD", "symbol": "$", "raw": "$412.00" },
+    "currency": "USD",
+    "buying_format": "Auction",
+    "is_auction": true,
+    "bids": 23,
+    "time_left": "12h 16m",
+    "current_bid": { "value": 412.0, "currency": "USD", "symbol": "$", "raw": "$412.00" },
+    "end_time_utc": 1781034651.0,
+    "end_time_at": "2026-06-22T19:50:51Z",
+    "buy_it_now_price": null,
+    "scraped_at": "2026-06-22T07:34:51Z"
   }
 }
 ```

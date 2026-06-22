@@ -98,7 +98,8 @@ description: "Search an eBay marketplace for active listings."
     <ResponseField name="buying_format" type="string">`Buy It Now`, `Auction`, or `Best Offer`.</ResponseField>
     <ResponseField name="is_auction" type="boolean">Whether the listing is an auction.</ResponseField>
     <ResponseField name="bids" type="integer">Number of bids (auctions only, nullable).</ResponseField>
-    <ResponseField name="time_left" type="string">Time remaining for auctions (nullable).</ResponseField>
+    <ResponseField name="time_left" type="string">Relative time remaining for auctions, e.g. `12h 16m` (auctions only, nullable).</ResponseField>
+    <ResponseField name="current_bid" type="object">Current high bid for auction listings with `value`, `currency`, `symbol`, `raw`; mirrors `price`. Null for non-auction (fixed-price) listings.</ResponseField>
     <ResponseField name="shipping" type="string">Raw shipping text.</ResponseField>
     <ResponseField name="shipping_cost" type="object">Parsed shipping cost (nullable).</ResponseField>
     <ResponseField name="free_shipping" type="boolean">Whether shipping is free (nullable).</ResponseField>
@@ -147,6 +148,7 @@ description: "Search an eBay marketplace for active listings."
       "is_auction": false,
       "bids": null,
       "time_left": null,
+      "current_bid": null,
       "shipping": "Free shipping",
       "free_shipping": true,
       "location": "United States",
@@ -155,6 +157,25 @@ description: "Search an eBay marketplace for active listings."
       "seller_name": "topgames_us",
       "seller_feedback_percent": 99.4,
       "seller_feedback_score": 18452,
+      "is_sponsored": false
+    },
+    {
+      "position": 2,
+      "item_id": "256987654321",
+      "title": "Nintendo Switch OLED Console - No Reserve Auction",
+      "url": "https://www.ebay.com/itm/256987654321",
+      "image": "https://i.ebayimg.com/images/g/def/s-l500.jpg",
+      "price": { "value": 212.5, "currency": "USD", "symbol": "$", "raw": "$212.50" },
+      "condition": "Used",
+      "buying_format": "Auction",
+      "is_auction": true,
+      "bids": 17,
+      "time_left": "12h 16m",
+      "current_bid": { "value": 212.5, "currency": "USD", "symbol": "$", "raw": "$212.50" },
+      "shipping": "Free shipping",
+      "free_shipping": true,
+      "location": "United States",
+      "seller_name": "retro_deals",
       "is_sponsored": false
     }
   ],

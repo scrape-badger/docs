@@ -312,6 +312,39 @@
                               "null"
                             ]
                           },
+                          "current_bid": {
+                            "type": [
+                              "object",
+                              "null"
+                            ],
+                            "description": "Current high bid for auction listings; mirrors `price`. Null for non-auction (fixed-price) listings.",
+                            "properties": {
+                              "value": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "symbol": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "raw": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          },
                           "shipping": {
                             "type": [
                               "string",
@@ -753,6 +786,39 @@
                               "null"
                             ]
                           },
+                          "current_bid": {
+                            "type": [
+                              "object",
+                              "null"
+                            ],
+                            "description": "Current high bid for auction listings; mirrors `price`. Null for non-auction (fixed-price) listings.",
+                            "properties": {
+                              "value": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "symbol": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "raw": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          },
                           "shipping": {
                             "type": [
                               "string",
@@ -1128,6 +1194,86 @@
                             "string",
                             "null"
                           ]
+                        },
+                        "current_bid": {
+                          "type": [
+                            "object",
+                            "null"
+                          ],
+                          "description": "Current high bid for auction listings; mirrors `price`. Null for non-auction (fixed-price) listings.",
+                          "properties": {
+                            "value": {
+                              "type": [
+                                "number",
+                                "null"
+                              ]
+                            },
+                            "currency": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "symbol": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "raw": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            }
+                          }
+                        },
+                        "end_time_utc": {
+                          "type": [
+                            "number",
+                            "null"
+                          ],
+                          "description": "Absolute auction end time as a Unix timestamp (float seconds). Null for non-auction listings."
+                        },
+                        "end_time_at": {
+                          "type": [
+                            "string",
+                            "null"
+                          ],
+                          "description": "Absolute auction end time as an ISO-8601 UTC string (e.g. \"2026-06-22T19:50:51Z\"). Null for non-auction listings."
+                        },
+                        "buy_it_now_price": {
+                          "type": [
+                            "object",
+                            "null"
+                          ],
+                          "description": "Buy It Now price for fixed-price listings (mirrors `price`) or auction-with-Buy-It-Now listings. Null for pure auctions.",
+                          "properties": {
+                            "value": {
+                              "type": [
+                                "number",
+                                "null"
+                              ]
+                            },
+                            "currency": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "symbol": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "raw": {
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            }
+                          }
                         },
                         "best_offer_enabled": {
                           "type": [
@@ -2021,6 +2167,39 @@
                               "null"
                             ]
                           },
+                          "current_bid": {
+                            "type": [
+                              "object",
+                              "null"
+                            ],
+                            "description": "Current high bid for auction listings; mirrors `price`. Null for non-auction (fixed-price) listings.",
+                            "properties": {
+                              "value": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "symbol": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "raw": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
+                          },
                           "shipping": {
                             "type": [
                               "string",
@@ -2566,6 +2745,39 @@
                               "string",
                               "null"
                             ]
+                          },
+                          "current_bid": {
+                            "type": [
+                              "object",
+                              "null"
+                            ],
+                            "description": "Current high bid for auction listings; mirrors `price`. Null for non-auction (fixed-price) listings.",
+                            "properties": {
+                              "value": {
+                                "type": [
+                                  "number",
+                                  "null"
+                                ]
+                              },
+                              "currency": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "symbol": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              },
+                              "raw": {
+                                "type": [
+                                  "string",
+                                  "null"
+                                ]
+                              }
+                            }
                           },
                           "shipping": {
                             "type": [
