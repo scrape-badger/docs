@@ -205,7 +205,8 @@
           {
             "group": "Flights",
             "pages": [
-              "api-reference/google/google-flights/flights-search"
+              "api-reference/google/google-flights/flights-search",
+              "api-reference/google/google-flights/flights-booking-options"
             ]
           },
           {
