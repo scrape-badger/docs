@@ -47,7 +47,7 @@ curl "https://scrapebadger.com/v1/google/shopping/offers?barcode=0711719541028" 
 from scrapebadger import ScrapeBadger
 
 async with ScrapeBadger(api_key="YOUR_API_KEY") as client:
-    result = await client.google.shopping_offers(barcode="0711719541028")
+    result = await client.google.shopping.offers(barcode="0711719541028", gl="us")
     print(result["product_title"])  # "Sony PlayStation 5 Console"
     for offer in result["offers"]:
         print(offer["source"], offer["price"]["extracted"])
@@ -58,7 +58,7 @@ import { ScrapeBadger } from "scrapebadger";
 
 const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" });
 
-const result = await client.google.shoppingOffers({ barcode: "0711719541028" });
+const result = await client.google.shopping.offers({ barcode: "0711719541028", gl: "us" });
 console.log(result.product_title); // "Sony PlayStation 5 Console"
 for (const offer of result.offers) {
   console.log(offer.source, offer.price.extracted);
@@ -78,11 +78,11 @@ curl "https://scrapebadger.com/v1/google/shopping/offers?barcode=9300633572457&g
 from scrapebadger import ScrapeBadger
 
 async with ScrapeBadger(api_key="YOUR_API_KEY") as client:
-    result = await client.google.shopping_offers(barcode="9300633572457", gl="au")
+    result = await client.google.shopping.offers(barcode="9300633572457", gl="au")
 ```
 
 ```javascript Node.js
-const result = await client.google.shoppingOffers({
+const result = await client.google.shopping.offers({
   barcode: "9300633572457",
   gl: "au",
 });
