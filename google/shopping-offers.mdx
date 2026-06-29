@@ -1,0 +1,145 @@
+---
+title: "Shopping Offers by Barcode"
+description: "Get multi-seller Google Shopping prices for a product looked up by its barcode (GTIN/UPC/EAN)."
+---
+
+# Shopping Offers by Barcode
+
+Google Shopping no longer matches raw barcodes — pasting a GTIN/UPC/EAN into Shopping returns nothing. The `/v1/google/shopping/offers` endpoint bridges that gap: it **resolves the barcode to a product** via a Google web search, then returns that product's Google Shopping **seller offers** — one entry per merchant `source`, each with its own `price`.
+
+## How It Works
+
+1. The barcode is validated (length + check digit). GTIN-8, UPC-A, EAN-13, and GTIN-14 are accepted.
+2. A Google **web search** resolves the barcode to a product (the matched product name is returned as `resolved_query` / `product_title`).
+3. A Google **Shopping** fetch for that product returns the per-merchant offers.
+
+Because this performs **two Google fetches**, each call costs **14 credits**.
+
+## Query Parameters
+
+<ParamField query="barcode" type="string" required>
+  Product barcode to look up. Accepts GTIN-8, UPC-A (12 digits), EAN-13, or GTIN-14. The check digit is validated — a malformed or checksum-failing barcode returns `422`.
+
+  Example: `0711719541028`
+</ParamField>
+
+<ParamField query="gl" type="string">
+  Country to run the search and Shopping fetch in, as an ISO-3166 alpha-2 code. Controls which merchants and currency you see.
+
+  Examples: `us`, `au`, `gb`, `de`
+</ParamField>
+
+<ParamField query="hl" type="string" default="en">
+  Language code for the search and results.
+
+  Examples: `en`, `de`, `fr`
+</ParamField>
+
+## Example
+
+<CodeGroup>
+```bash cURL
+curl "https://scrapebadger.com/v1/google/shopping/offers?barcode=0711719541028" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+```python Python
+from scrapebadger import ScrapeBadger
+
+async with ScrapeBadger(api_key="YOUR_API_KEY") as client:
+    result = await client.google.shopping_offers(barcode="0711719541028")
+    print(result["product_title"])  # "Sony PlayStation 5 Console"
+    for offer in result["offers"]:
+        print(offer["source"], offer["price"]["extracted"])
+```
+
+```javascript Node.js
+import { ScrapeBadger } from "scrapebadger";
+
+const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" });
+
+const result = await client.google.shoppingOffers({ barcode: "0711719541028" });
+console.log(result.product_title); // "Sony PlayStation 5 Console"
+for (const offer of result.offers) {
+  console.log(offer.source, offer.price.extracted);
+}
+```
+</CodeGroup>
+
+Pass `gl` to scope to a regional marketplace — for example, an Australian Woolworths grocery barcode:
+
+<CodeGroup>
+```bash cURL
+curl "https://scrapebadger.com/v1/google/shopping/offers?barcode=9300633572457&gl=au" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+```python Python
+from scrapebadger import ScrapeBadger
+
+async with ScrapeBadger(api_key="YOUR_API_KEY") as client:
+    result = await client.google.shopping_offers(barcode="9300633572457", gl="au")
+```
+
+```javascript Node.js
+const result = await client.google.shoppingOffers({
+  barcode: "9300633572457",
+  gl: "au",
+});
+```
+</CodeGroup>
+
+## Response Shape
+
+```json
+{
+  "barcode": "0711719541028",
+  "resolved_query": "Sony PlayStation 5 Console",
+  "product_title": "Sony PlayStation 5 Console",
+  "offers": [
+    {
+      "title": "PlayStation 5 Console (Slim)",
+      "source": "Walmart",
+      "price": { "value": 499.0, "currency": "USD", "extracted": "$499.00" },
+      "link": "https://www.walmart.com/ip/PlayStation-5-Console/...",
+      "rating": 4.8
+    },
+    {
+      "title": "Sony PlayStation 5 Slim Disc Console",
+      "source": "Best Buy",
+      "price": { "value": 499.99, "currency": "USD", "extracted": "$499.99" },
+      "link": "https://www.bestbuy.com/site/...",
+      "rating": 4.7
+    }
+  ]
+}
+```
+
+| Field | Description |
+|---|---|
+| `barcode` | The barcode you passed in, echoed back. |
+| `resolved_query` | The product query the barcode resolved to via Google web search. |
+| `product_title` | The matched product's title. |
+| `offers` | List of per-merchant Shopping offers. |
+| `offers[].title` | The product title as listed by that merchant. |
+| `offers[].source` | The merchant / seller name (e.g. `Walmart`, `Best Buy`). |
+| `offers[].price.value` | Numeric price. |
+| `offers[].price.currency` | ISO currency code. |
+| `offers[].price.extracted` | The price as displayed, including symbol. |
+| `offers[].link` | Link to the merchant's listing. |
+| `offers[].rating` | Product rating on that merchant, if shown. |
+
+## Pricing
+
+Each call costs **14 credits** — it runs two Google fetches (one web search to resolve the barcode, one Shopping fetch for the offers).
+
+## Errors
+
+| Status | Meaning |
+|---|---|
+| `422` | The `barcode` is malformed or fails its check-digit validation. |
+| `404` | The barcode is valid but could not be resolved to a product (no Google web-search match). |
+
+## Why This Exists
+
+Google Shopping indexes by product, not by barcode — a GTIN/UPC/EAN typed directly into Shopping yields no matches. Resolving the barcode through a normal Google web search first finds the product page, and only then does a Shopping fetch return the seller offers. This endpoint packages that two-step flow into a single call so you can go straight from a barcode to live multi-seller prices.
