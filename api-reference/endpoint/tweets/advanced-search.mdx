@@ -2,3 +2,32 @@
 title: Advanced Tweet Search
 openapi: get /v1/twitter/tweets/advanced_search
 ---
+
+## Choosing `query_type`
+
+| `query_type` | Behaviour |
+|--------------|-----------|
+| `Top` (default) | Algorithmic ranking — returns **more** results, surfacing popular/relevant tweets. |
+| `Latest` | Reverse-chronological — returns **fewer, most-recent** tweets in time order. |
+| `Media` | Tweets that contain media (images/video). |
+
+Use `Latest` when you need a fresh, chronological feed (e.g. monitoring), and `Top` when you want maximum coverage of relevant tweets for a query.
+
+## Pagination
+
+Paginate with the **`cursor`** parameter. Each response includes a top-level **`next_cursor`** — pass it back as `cursor` to fetch the next page.
+
+```python Python
+resp = client.twitter.advanced_search(query="from:nasa", query_type="Latest")
+tweets = resp["tweets"]
+
+# Next page
+if resp.get("next_cursor"):
+    page2 = client.twitter.advanced_search(
+        query="from:nasa", query_type="Latest", cursor=resp["next_cursor"]
+    )
+```
+
+<Note>
+  The response has **no `meta` field**. Pagination state lives in the top-level `next_cursor` — don't read `data["meta"]`.
+</Note>

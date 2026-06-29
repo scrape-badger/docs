@@ -3,3 +3,7 @@ title: "Google web search"
 description: "Search Google and get structured results (organic, ads, KG, AI overview, PAA)."
 openapi: "GET /v1/google/search"
 ---
+
+<Warning>
+  **The `num` parameter is deprecated.** Google no longer honours `num` to widen a page — a single request returns roughly **10 organic results per page**, regardless of the value you pass. To collect more results, paginate with the **`start`** offset (`start=0`, `10`, `20`, …) and merge the pages client-side.
+</Warning>
