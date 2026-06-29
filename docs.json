@@ -83,7 +83,8 @@
             "group": "Overview",
             "pages": [
               "google/overview",
-              "google/shopping-click-enrichment"
+              "google/shopping-click-enrichment",
+              "google/shopping-offers"
             ]
           },
           {
