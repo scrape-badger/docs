@@ -3,3 +3,24 @@ title: "Interest over time"
 description: "Time-series interest data for up to 5 search terms (TIMESERIES widget). Stable response shape; direct shortcut to /trends/search?data_type=TIMESERIES."
 openapi: "GET /v1/google/trends/interest"
 ---
+
+## Time range (`date`)
+
+The `date` parameter only accepts Google Trends' own time-range formats — there is **no** arbitrary custom range outside the values Google itself supports.
+
+| `date` value | Range |
+|--------------|-------|
+| `now 1-H` | Past hour |
+| `now 4-H` | Past 4 hours |
+| `now 1-d` | Past day |
+| `now 7-d` | Past 7 days |
+| `today 1-m` | Past 30 days |
+| `today 3-m` | Past 90 days |
+| `today 12-m` | Past 12 months |
+| `today 5-y` | Past 5 years |
+| `all` | 2004–present (default) |
+| `YYYY-MM-DD YYYY-MM-DD` | Explicit start/end dates (space-separated) |
+
+<Note>
+  The explicit `YYYY-MM-DD YYYY-MM-DD` form must still fall within Google's accepted bounds (from 2004 to the present). Values outside these formats are rejected.
+</Note>

@@ -74,6 +74,16 @@ You only pay for the method that succeeds — escalation costs are **not cumulat
   Use the `max_cost` parameter to set a credit budget per request. The request will fail rather than exceed your budget.
 </Tip>
 
+## Caching
+
+`/v1/web/detect` caches its result per domain for **5 minutes**. A cached `detect` response is returned with status `200` and costs **0 credits** — handy when you probe the same domain repeatedly. To get a fresh detection within that window, wait for the 5-minute TTL to lapse.
+
+`/v1/web/scrape` does **not** cache page content: every scrape performs a fresh crawl and is billed for the engine that produced the result. There is no stale-content window to work around.
+
+## Unsupported Sites
+
+Some sites with aggressive, account-gated bot detection are **not supported** and may return errors. In particular, walled social platforms such as **Facebook**, **Instagram**, and **LinkedIn** block automated access behind login and are out of scope for `/v1/web/scrape`. For supported social and marketplace data, use the dedicated source APIs (Twitter/X, Reddit, TikTok, YouTube, etc.).
+
 ## Quick Example
 
 <CodeGroup>

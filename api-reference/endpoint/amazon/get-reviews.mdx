@@ -19,7 +19,9 @@ description: "Customer reviews for an ASIN (featured + paginated, with filters).
 </ParamField>
 
 <ParamField query="page" type="integer" default={1}>
-  Page number for paginated reviews. Starts at `1`.
+  Page number for paginated reviews. Starts at `1` and is capped at `20`.
+
+  Amazon exposes roughly 10 reviews per page, so this endpoint returns at most **~200 reviews per product** (20 pages). Requesting a `page` beyond `20` returns no additional reviews.
 </ParamField>
 
 <ParamField query="sort_by" type="string" default="helpful">
@@ -105,10 +107,10 @@ description: "Customer reviews for an ASIN (featured + paginated, with filters).
       "images": ["https://m.media-amazon.com/images/I/71review1.jpg"]
     }
   ],
-  "pagination": { "current_page": 1, "total_pages": 100, "total_results": 1000 }
+  "pagination": { "current_page": 1, "total_pages": 20, "total_results": 200 }
 }
 ```
 
 <Note>
-  Each reviews request costs **10 credits**. Amazon exposes a public *featured* subset of reviews; full review history is login-gated. Failed requests are not charged.
+  Each reviews request costs **10 credits**. Amazon exposes a public *featured* subset of reviews; full review history is login-gated. The `page` parameter is capped at **20** (~200 reviews per product) — there is no way to page deeper. Failed requests are not charged.
 </Note>

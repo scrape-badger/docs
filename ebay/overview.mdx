@@ -20,7 +20,7 @@ Search active listings, pull **completed/sold-price history**, fetch full item d
     Automatic session management, Chrome TLS impersonation, and fingerprint rotation to avoid blocks.
   </Card>
   <Card title="Rich Item Data" icon="box">
-    Prices, conditions, item specifics, shipping options, returns, seller info, ratings, and watchers.
+    Prices, conditions, item specifics, shipping options, returns, seller info, ratings, and sold counts.
   </Card>
   <Card title="Auction Data" icon="gavel">
     Live auction fields — bid count, time remaining, current high bid, absolute end time, and Buy It Now price — on search cards and item detail.
@@ -32,6 +32,10 @@ Search active listings, pull **completed/sold-price history**, fetch full item d
     First-class support via the ScrapeBadger Node.js and Python SDKs.
   </Card>
 </CardGroup>
+
+<Note>
+  eBay no longer exposes public **watcher counts**, so the `watchers` field is often `null` on search, seller-items, and item-detail responses. **Sold counts** (`sold_count`, and the `/v1/ebay/completed` sold-price history) remain available and are the reliable signal for demand.
+</Note>
 
 ## Supported Marketplaces
 

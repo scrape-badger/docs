@@ -3,3 +3,20 @@ title: "Immersive product detail"
 description: "Get deep product details from Google's immersive product page."
 openapi: "GET /v1/google/products/detail"
 ---
+
+## Identifying the product
+
+This endpoint does **not** take an arbitrary `product_id`. To look a product up you must supply its **`gpcid`** — Google's Shopping product identifier — together with the original search query `q` that surfaced it. Pass the `gpcid` value in the `product_id` parameter:
+
+```bash cURL
+curl "https://scrapebadger.com/v1/google/products/detail?product_id=12337842083609640743&q=wireless+earbuds" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+<Note>
+  The `gpcid` is returned as the `gpcid` (also surfaced as `product_id`) field on every [`/v1/google/shopping/search`](/api-reference/google/google-shopping/search-products) result tile. The `q` is required because Google's RPC re-renders the SERP for that exact query to mint the session tokens used to fetch the detail page — so the product must be discoverable via `q`.
+</Note>
+
+<Tip>
+  **Prefer `page_token` for new integrations.** Each `/v1/google/shopping/search` tile also returns a bundled `page_token` that encodes the `gpcid`, `q`, `gl`, `hl`, and `domain` for you. Passing `page_token` alone takes precedence over the legacy `product_id` + `q` form, so you don't have to track the original query yourself.
+</Tip>
