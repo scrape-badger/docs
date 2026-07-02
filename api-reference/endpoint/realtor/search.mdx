@@ -1,0 +1,215 @@
+---
+title: "Search Listings"
+openapi: "GET /v1/realtor/search"
+description: "Search a realtor.com (US) or realtor.ca (CA) market for property listings."
+---
+
+## Query Parameters
+
+<ParamField query="location" type="string" required>
+  Free-text location: a city ("Austin, TX"), a ZIP/postal code, or a region ("Toronto, ON"). Required unless you pass a Canada bounding box (`lat_min`/`lat_max`/`lng_min`/`lng_max`).
+</ParamField>
+
+<ParamField query="market" type="string" default="us">
+  Which market to search: `us` (realtor.com, USD) or `ca` (realtor.ca, CAD).
+</ParamField>
+
+<ParamField query="status" type="string" default="for_sale">
+  Listing status filter.
+
+  | Value | Description |
+  |-------|-------------|
+  | `for_sale` | Active for-sale listings (default) |
+  | `for_rent` | Rental listings |
+  | `sold` | Recently sold listings |
+  | `pending` | Pending / under contract |
+</ParamField>
+
+<ParamField query="price_min" type="number">
+  Minimum list price in the market's local currency.
+</ParamField>
+
+<ParamField query="price_max" type="number">
+  Maximum list price in the market's local currency.
+</ParamField>
+
+<ParamField query="beds_min" type="integer">
+  Minimum number of bedrooms.
+</ParamField>
+
+<ParamField query="baths_min" type="integer">
+  Minimum number of bathrooms.
+</ParamField>
+
+<ParamField query="sqft_min" type="integer">
+  Minimum interior square footage. **US market only.**
+</ParamField>
+
+<ParamField query="sqft_max" type="integer">
+  Maximum interior square footage. **US market only.**
+</ParamField>
+
+<ParamField query="property_type" type="string">
+  Comma-separated list of property types. **US market only.**
+
+  Values: `single_family`, `condos`, `townhomes`, `multi_family`, `mobile`, `land`.
+</ParamField>
+
+<ParamField query="sort" type="string" default="relevant">
+  Sort order for results.
+
+  | Value | Description |
+  |-------|-------------|
+  | `relevant` | Best match (default) |
+  | `newest` | Most recently listed |
+  | `price_low` | Cheapest first |
+  | `price_high` | Most expensive first |
+  | `photo_count` | Most photos first |
+</ParamField>
+
+<ParamField query="page" type="integer" default={1}>
+  Page number for paginated results.
+</ParamField>
+
+<ParamField query="limit" type="integer">
+  Results per page. Range: `1` - `200`.
+</ParamField>
+
+<ParamField query="lat_min" type="number">
+  South edge of a bounding box. **Canada power-user option** (realtor.ca caps ~600 results per box).
+</ParamField>
+
+<ParamField query="lat_max" type="number">
+  North edge of a bounding box. **Canada only.**
+</ParamField>
+
+<ParamField query="lng_min" type="number">
+  West edge of a bounding box. **Canada only.**
+</ParamField>
+
+<ParamField query="lng_max" type="number">
+  East edge of a bounding box. **Canada only.**
+</ParamField>
+
+## Response
+
+<ResponseField name="market" type="string">The market that was searched (`us` or `ca`).</ResponseField>
+<ResponseField name="country" type="string">ISO 3166-1 alpha-2 country code for the market (`US` or `CA`).</ResponseField>
+<ResponseField name="total" type="integer">Total number of matching listings.</ResponseField>
+<ResponseField name="count" type="integer">Number of listings returned on this page.</ResponseField>
+<ResponseField name="page" type="integer">Current page number.</ResponseField>
+<ResponseField name="total_pages" type="integer">Total number of pages available.</ResponseField>
+<ResponseField name="results" type="array">
+  Array of matching properties.
+
+  <Expandable title="Property object">
+    <ResponseField name="property_id" type="string">Portal property id.</ResponseField>
+    <ResponseField name="listing_id" type="string">Portal listing id (nullable).</ResponseField>
+    <ResponseField name="mls_number" type="string">MLS number (nullable).</ResponseField>
+    <ResponseField name="market" type="string">Market (`us` or `ca`).</ResponseField>
+    <ResponseField name="country" type="string">ISO country code.</ResponseField>
+    <ResponseField name="url" type="string">Full URL to the listing.</ResponseField>
+    <ResponseField name="status" type="string">Listing status (`for_sale`, `for_rent`, `sold`, `pending`).</ResponseField>
+    <ResponseField name="transaction_type" type="string">`sale` or `rent` (nullable).</ResponseField>
+    <ResponseField name="currency" type="string">ISO 4217 currency code.</ResponseField>
+    <ResponseField name="list_price" type="number">List price (nullable).</ResponseField>
+    <ResponseField name="list_price_formatted" type="string">Human-formatted price, e.g. `$450,000` (nullable).</ResponseField>
+    <ResponseField name="list_price_min" type="number">Lower bound of a price range, if listed as a range (nullable).</ResponseField>
+    <ResponseField name="list_price_max" type="number">Upper bound of a price range (nullable).</ResponseField>
+    <ResponseField name="price_per_sqft" type="number">Price per square foot (nullable).</ResponseField>
+    <ResponseField name="price_reduced_amount" type="number">Amount the price was reduced (nullable).</ResponseField>
+    <ResponseField name="last_sold_price" type="number">Last sold price (nullable).</ResponseField>
+    <ResponseField name="last_sold_date_utc" type="number">Last sold date as a Unix timestamp (nullable).</ResponseField>
+    <ResponseField name="last_sold_date_at" type="string">Last sold date as an ISO-8601 string (nullable).</ResponseField>
+    <ResponseField name="hoa_fee" type="number">Monthly HOA fee (nullable).</ResponseField>
+    <ResponseField name="property_type" type="string">Property type (e.g. `single_family`) (nullable).</ResponseField>
+    <ResponseField name="sub_type" type="string">Property sub-type (nullable).</ResponseField>
+    <ResponseField name="beds" type="integer">Number of bedrooms (nullable).</ResponseField>
+    <ResponseField name="baths" type="number">Total number of bathrooms (nullable).</ResponseField>
+    <ResponseField name="baths_full" type="integer">Full bathrooms (nullable).</ResponseField>
+    <ResponseField name="baths_half" type="integer">Half bathrooms (nullable).</ResponseField>
+    <ResponseField name="sqft" type="integer">Interior square footage (nullable).</ResponseField>
+    <ResponseField name="lot_sqft" type="integer">Lot square footage (nullable).</ResponseField>
+    <ResponseField name="year_built" type="integer">Year the property was built (nullable).</ResponseField>
+    <ResponseField name="stories" type="integer">Number of stories (nullable).</ResponseField>
+    <ResponseField name="garage" type="integer">Garage spaces (nullable).</ResponseField>
+    <ResponseField name="rooms" type="integer">Total rooms (nullable).</ResponseField>
+    <ResponseField name="parking_spaces" type="integer">Parking spaces (nullable).</ResponseField>
+    <ResponseField name="address" type="object">Address with `line`, `city`, `state`, `state_code`, `postal_code`, `country`, `neighborhood`, `county`, and `coordinate` (`{lat, lon}`).</ResponseField>
+    <ResponseField name="description_text" type="string">Listing description (nullable).</ResponseField>
+    <ResponseField name="primary_photo" type="string">Primary photo URL (nullable).</ResponseField>
+    <ResponseField name="photo_count" type="integer">Total number of photos.</ResponseField>
+    <ResponseField name="photos" type="array">Photo objects with `href`, `href_high`, `href_med`, `href_low`, `tags[]`, `description`.</ResponseField>
+    <ResponseField name="virtual_tours" type="array">Virtual tour URLs.</ResponseField>
+    <ResponseField name="videos" type="array">Video URLs.</ResponseField>
+    <ResponseField name="flags" type="object">Boolean flags: `is_new_listing`, `is_pending`, `is_contingent`, `is_foreclosure`, `is_new_construction`, `is_price_reduced`, `is_coming_soon`.</ResponseField>
+    <ResponseField name="tags" type="array">Feature tags.</ResponseField>
+    <ResponseField name="list_date_utc" type="number">List date as a Unix timestamp (nullable).</ResponseField>
+    <ResponseField name="list_date_at" type="string">List date as an ISO-8601 string (nullable).</ResponseField>
+    <ResponseField name="last_update_utc" type="number">Last update as a Unix timestamp (nullable).</ResponseField>
+    <ResponseField name="last_update_at" type="string">Last update as an ISO-8601 string (nullable).</ResponseField>
+    <ResponseField name="days_on_market" type="integer">Days on market (nullable).</ResponseField>
+    <ResponseField name="agents" type="array">Listing agents (see the [Agent object](/api-reference/endpoint/realtor/get-property)).</ResponseField>
+    <ResponseField name="source_mls_id" type="string">Source MLS id (nullable).</ResponseField>
+    <ResponseField name="source_mls_name" type="string">Source MLS name (nullable).</ResponseField>
+    <ResponseField name="open_houses" type="array">Open house objects with `start_utc`, `start_at`, `end_utc`, `end_at`, `description`, `time_zone`, `href`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "market": "us",
+  "country": "US",
+  "total": 842,
+  "count": 20,
+  "page": 1,
+  "total_pages": 43,
+  "results": [
+    {
+      "property_id": "1234567890",
+      "listing_id": "2960000001",
+      "mls_number": "ACT1234567",
+      "market": "us",
+      "country": "US",
+      "url": "https://www.realtor.com/realestateandhomes-detail/1234567890",
+      "status": "for_sale",
+      "transaction_type": "sale",
+      "currency": "USD",
+      "list_price": 450000,
+      "list_price_formatted": "$450,000",
+      "price_per_sqft": 250,
+      "hoa_fee": 45,
+      "property_type": "single_family",
+      "beds": 3,
+      "baths": 2,
+      "baths_full": 2,
+      "baths_half": 0,
+      "sqft": 1800,
+      "lot_sqft": 6500,
+      "year_built": 2015,
+      "address": {
+        "line": "123 Main St",
+        "city": "Austin",
+        "state": "Texas",
+        "state_code": "TX",
+        "postal_code": "78701",
+        "country": "US",
+        "neighborhood": "Downtown",
+        "county": "Travis",
+        "coordinate": { "lat": 30.2672, "lon": -97.7431 }
+      },
+      "primary_photo": "https://ap.rdcpix.com/abc/s.jpg",
+      "photo_count": 32,
+      "flags": { "is_new_listing": true, "is_price_reduced": false },
+      "days_on_market": 4,
+      "agents": [{ "agent_id": "A1", "name": "Jane Doe", "email": "jane@realty.com" }]
+    }
+  ]
+}
+```
+
+<Note>
+  Each search request costs **8 credits**. Failed requests are not charged.
+</Note>

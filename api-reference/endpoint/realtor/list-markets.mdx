@@ -1,0 +1,35 @@
+---
+title: "List Markets"
+openapi: "GET /v1/realtor/markets"
+description: "List all supported realtor markets with their portals, currencies, and locales."
+---
+
+## Response
+
+<ResponseField name="markets" type="array">
+  Array of supported markets.
+
+  <Expandable title="Market object">
+    <ResponseField name="code" type="string">Market code to use in the `market` query parameter (`us` or `ca`).</ResponseField>
+    <ResponseField name="domain" type="string">Portal domain (`realtor.com` or `realtor.ca`).</ResponseField>
+    <ResponseField name="country" type="string">ISO 3166-1 alpha-2 country code.</ResponseField>
+    <ResponseField name="currency" type="string">ISO 4217 currency code used in this market.</ResponseField>
+    <ResponseField name="locale" type="string">BCP-47 locale (e.g. `en-US`).</ResponseField>
+    <ResponseField name="name" type="string">Market country name.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "markets": [
+    { "code": "us", "domain": "realtor.com", "country": "US", "currency": "USD", "locale": "en-US", "name": "United States" },
+    { "code": "ca", "domain": "realtor.ca", "country": "CA", "currency": "CAD", "locale": "en-CA", "name": "Canada" }
+  ]
+}
+```
+
+<Note>
+  Listing markets is a **free** reference endpoint (0 credits).
+</Note>

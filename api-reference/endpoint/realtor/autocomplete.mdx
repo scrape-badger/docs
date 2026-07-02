@@ -1,0 +1,69 @@
+---
+title: "Location Suggestions"
+openapi: "GET /v1/realtor/autocomplete"
+description: "Autocomplete locations (cities, ZIPs, neighborhoods, addresses) for a partial query."
+---
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Partial location to autocomplete (e.g. `austi`, `9021`, `toron`).
+</ParamField>
+
+<ParamField query="market" type="string" default="us">
+  Which market to source suggestions from: `us` (realtor.com) or `ca` (realtor.ca).
+</ParamField>
+
+<ParamField query="limit" type="integer" default={10}>
+  Maximum number of suggestions to return. Range: `1` - `25`.
+</ParamField>
+
+## Response
+
+<ResponseField name="market" type="string">The market the suggestions came from.</ResponseField>
+<ResponseField name="query" type="string">The query prefix that was autocompleted.</ResponseField>
+<ResponseField name="suggestions" type="array">
+  Array of suggestion objects.
+
+  <Expandable title="Suggestion object">
+    <ResponseField name="id" type="string">Suggestion id.</ResponseField>
+    <ResponseField name="type" type="string">Suggestion type, e.g. `city`, `postal_code`, `neighborhood`, `address`.</ResponseField>
+    <ResponseField name="label" type="string">Human-readable label, e.g. `Austin, TX`.</ResponseField>
+    <ResponseField name="city" type="string">City (nullable).</ResponseField>
+    <ResponseField name="state_code" type="string">State/province code (nullable).</ResponseField>
+    <ResponseField name="postal_code" type="string">Postal/ZIP code (nullable).</ResponseField>
+    <ResponseField name="country" type="string">ISO country code (nullable).</ResponseField>
+    <ResponseField name="slug_id" type="string">Portal slug id (nullable).</ResponseField>
+    <ResponseField name="geo_id" type="string">Portal geo id (nullable).</ResponseField>
+    <ResponseField name="coordinate" type="object">Center coordinate `{lat, lon}` (nullable).</ResponseField>
+    <ResponseField name="market" type="string">Market the suggestion belongs to.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "market": "us",
+  "query": "austi",
+  "suggestions": [
+    {
+      "id": "city:austin_tx",
+      "type": "city",
+      "label": "Austin, TX",
+      "city": "Austin",
+      "state_code": "TX",
+      "postal_code": null,
+      "country": "US",
+      "slug_id": "Austin_TX",
+      "geo_id": "1234",
+      "coordinate": { "lat": 30.2672, "lon": -97.7431 },
+      "market": "us"
+    }
+  ]
+}
+```
+
+<Note>
+  Each autocomplete request costs **2 credits**. Failed requests are not charged.
+</Note>

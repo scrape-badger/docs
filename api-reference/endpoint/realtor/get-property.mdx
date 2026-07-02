@@ -1,0 +1,195 @@
+---
+title: "Get Property Detail"
+openapi: "GET /v1/realtor/properties/{property_id}"
+description: "Full detail for a single property — price/tax history, schools, amenities, agents, and estimates."
+---
+
+## Path Parameters
+
+<ParamField path="property_id" type="string" required>
+  The portal property id. You can find this in search results or extract it from a listing URL.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="us">
+  Which market the property lives in: `us` (realtor.com) or `ca` (realtor.ca).
+</ParamField>
+
+## Response
+
+The response is a `PropertyDetail` object returned at the top level (no wrapper). It contains every field of a search-result `Property` plus the detail-only fields below.
+
+<ResponseField name="property_id" type="string">Portal property id.</ResponseField>
+<ResponseField name="listing_id" type="string">Portal listing id (nullable).</ResponseField>
+<ResponseField name="mls_number" type="string">MLS number (nullable).</ResponseField>
+<ResponseField name="market" type="string">Market (`us` or `ca`).</ResponseField>
+<ResponseField name="country" type="string">ISO country code.</ResponseField>
+<ResponseField name="url" type="string">Full URL to the listing.</ResponseField>
+<ResponseField name="status" type="string">Listing status (`for_sale`, `for_rent`, `sold`, `pending`).</ResponseField>
+<ResponseField name="currency" type="string">ISO 4217 currency code.</ResponseField>
+<ResponseField name="list_price" type="number">List price (nullable).</ResponseField>
+<ResponseField name="list_price_formatted" type="string">Human-formatted price (nullable).</ResponseField>
+<ResponseField name="price_per_sqft" type="number">Price per square foot (nullable).</ResponseField>
+<ResponseField name="hoa_fee" type="number">Monthly HOA fee (nullable).</ResponseField>
+<ResponseField name="property_type" type="string">Property type (nullable).</ResponseField>
+<ResponseField name="beds" type="integer">Bedrooms (nullable).</ResponseField>
+<ResponseField name="baths" type="number">Bathrooms (nullable).</ResponseField>
+<ResponseField name="sqft" type="integer">Interior square footage (nullable).</ResponseField>
+<ResponseField name="lot_sqft" type="integer">Lot square footage (nullable).</ResponseField>
+<ResponseField name="year_built" type="integer">Year built (nullable).</ResponseField>
+<ResponseField name="address" type="object">Address with `line`, `city`, `state`, `state_code`, `postal_code`, `country`, `neighborhood`, `county`, and `coordinate` (`{lat, lon}`).</ResponseField>
+<ResponseField name="description_text" type="string">Listing description (nullable).</ResponseField>
+<ResponseField name="primary_photo" type="string">Primary photo URL (nullable).</ResponseField>
+<ResponseField name="photo_count" type="integer">Total number of photos.</ResponseField>
+<ResponseField name="photos" type="array">Photo objects with `href`, `href_high`, `href_med`, `href_low`, `tags[]`, `description`.</ResponseField>
+<ResponseField name="virtual_tours" type="array">Virtual tour URLs.</ResponseField>
+<ResponseField name="videos" type="array">Video URLs.</ResponseField>
+<ResponseField name="flags" type="object">Boolean flags: `is_new_listing`, `is_pending`, `is_contingent`, `is_foreclosure`, `is_new_construction`, `is_price_reduced`, `is_coming_soon`.</ResponseField>
+<ResponseField name="days_on_market" type="integer">Days on market (nullable).</ResponseField>
+<ResponseField name="agents" type="array">
+  Listing agents.
+
+  <Expandable title="Agent object">
+    <ResponseField name="agent_id" type="string">Agent id.</ResponseField>
+    <ResponseField name="name" type="string">Full name.</ResponseField>
+    <ResponseField name="first_name" type="string">First name (nullable).</ResponseField>
+    <ResponseField name="last_name" type="string">Last name (nullable).</ResponseField>
+    <ResponseField name="title" type="string">Title (nullable).</ResponseField>
+    <ResponseField name="type" type="string">Agent type, e.g. `seller`, `buyer` (nullable).</ResponseField>
+    <ResponseField name="email" type="string">Email (nullable).</ResponseField>
+    <ResponseField name="phones" type="array">Phone objects with `number`, `type`, `ext`, `primary`.</ResponseField>
+    <ResponseField name="photo" type="string">Agent photo URL (nullable).</ResponseField>
+    <ResponseField name="href" type="string">Agent profile URL (nullable).</ResponseField>
+    <ResponseField name="office" type="object">Office with `name`, `email`, `href`, `logo`, `phones[]`, `address`.</ResponseField>
+    <ResponseField name="broker" type="string">Brokerage name (nullable).</ResponseField>
+    <ResponseField name="nrds_id" type="string">NRDS id (nullable).</ResponseField>
+    <ResponseField name="state_license" type="string">State license number (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="open_houses" type="array">Open house objects with `start_utc`, `start_at`, `end_utc`, `end_at`, `description`, `time_zone`, `href`.</ResponseField>
+<ResponseField name="details" type="array">
+  Grouped listing details.
+
+  <Expandable title="Detail group object">
+    <ResponseField name="category" type="string">Detail category, e.g. `Interior Features`.</ResponseField>
+    <ResponseField name="text" type="array">List of detail strings in the category.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="amenities" type="array">List of amenity strings.</ResponseField>
+<ResponseField name="tax_history" type="array">
+  Yearly tax records.
+
+  <Expandable title="Tax record object">
+    <ResponseField name="year" type="integer">Tax year.</ResponseField>
+    <ResponseField name="tax" type="number">Tax amount (nullable).</ResponseField>
+    <ResponseField name="assessment_building" type="number">Building assessment (nullable).</ResponseField>
+    <ResponseField name="assessment_land" type="number">Land assessment (nullable).</ResponseField>
+    <ResponseField name="assessment_total" type="number">Total assessment (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="price_history" type="array">
+  Price / listing events over time.
+
+  <Expandable title="Price event object">
+    <ResponseField name="date_utc" type="number">Event date as a Unix timestamp (nullable).</ResponseField>
+    <ResponseField name="date_at" type="string">Event date as an ISO-8601 string (nullable).</ResponseField>
+    <ResponseField name="event" type="string">Event type, e.g. `Listed`, `Sold`, `Price Changed`.</ResponseField>
+    <ResponseField name="price" type="number">Price at the event (nullable).</ResponseField>
+    <ResponseField name="price_per_sqft" type="number">Price per sqft at the event (nullable).</ResponseField>
+    <ResponseField name="source_listing_id" type="string">Source listing id (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="schools" type="array">
+  Nearby schools.
+
+  <Expandable title="School object">
+    <ResponseField name="name" type="string">School name.</ResponseField>
+    <ResponseField name="rating" type="number">School rating (nullable).</ResponseField>
+    <ResponseField name="education_levels" type="array">Education levels served, e.g. `["elementary"]`.</ResponseField>
+    <ResponseField name="grades" type="string">Grade range, e.g. `K-5` (nullable).</ResponseField>
+    <ResponseField name="distance_miles" type="number">Distance from the property in miles (nullable).</ResponseField>
+    <ResponseField name="district" type="string">School district (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="estimates" type="array">
+  Value estimates.
+
+  <Expandable title="Estimate object">
+    <ResponseField name="source" type="string">Estimate source.</ResponseField>
+    <ResponseField name="estimate" type="number">Point estimate (nullable).</ResponseField>
+    <ResponseField name="estimate_high" type="number">High estimate (nullable).</ResponseField>
+    <ResponseField name="estimate_low" type="number">Low estimate (nullable).</ResponseField>
+    <ResponseField name="date_utc" type="number">Estimate date as a Unix timestamp (nullable).</ResponseField>
+    <ResponseField name="date_at" type="string">Estimate date as an ISO-8601 string (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "property_id": "1234567890",
+  "listing_id": "2960000001",
+  "mls_number": "ACT1234567",
+  "market": "us",
+  "country": "US",
+  "url": "https://www.realtor.com/realestateandhomes-detail/1234567890",
+  "status": "for_sale",
+  "currency": "USD",
+  "list_price": 450000,
+  "list_price_formatted": "$450,000",
+  "price_per_sqft": 250,
+  "hoa_fee": 45,
+  "property_type": "single_family",
+  "beds": 3,
+  "baths": 2,
+  "sqft": 1800,
+  "lot_sqft": 6500,
+  "year_built": 2015,
+  "address": {
+    "line": "123 Main St",
+    "city": "Austin",
+    "state": "Texas",
+    "state_code": "TX",
+    "postal_code": "78701",
+    "country": "US",
+    "neighborhood": "Downtown",
+    "county": "Travis",
+    "coordinate": { "lat": 30.2672, "lon": -97.7431 }
+  },
+  "primary_photo": "https://ap.rdcpix.com/abc/s.jpg",
+  "photo_count": 32,
+  "days_on_market": 4,
+  "agents": [
+    {
+      "agent_id": "A1",
+      "name": "Jane Doe",
+      "email": "jane@realty.com",
+      "phones": [{ "number": "512-555-0100", "type": "mobile", "primary": true }],
+      "office": { "name": "Downtown Realty", "href": "https://www.realtor.com/realestateagency/..." },
+      "broker": "Downtown Realty Group"
+    }
+  ],
+  "details": [
+    { "category": "Interior Features", "text": ["Hardwood floors", "Granite countertops"] }
+  ],
+  "amenities": ["Pool", "Garage"],
+  "tax_history": [
+    { "year": 2024, "tax": 6200, "assessment_building": 300000, "assessment_land": 120000, "assessment_total": 420000 }
+  ],
+  "price_history": [
+    { "date_at": "2026-06-01T00:00:00Z", "event": "Listed", "price": 450000, "price_per_sqft": 250 }
+  ],
+  "schools": [
+    { "name": "Austin Elementary", "rating": 8, "education_levels": ["elementary"], "grades": "K-5", "distance_miles": 0.4, "district": "Austin ISD" }
+  ],
+  "estimates": [
+    { "source": "realtor", "estimate": 455000, "estimate_high": 475000, "estimate_low": 435000, "date_at": "2026-06-20T00:00:00Z" }
+  ]
+}
+```
+
+<Note>
+  Each property-detail request costs **10 credits**. Failed requests are not charged.
+</Note>

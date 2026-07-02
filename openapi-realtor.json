@@ -1,0 +1,1362 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ScrapeBadger Realtor API",
+    "version": "1.0.0",
+    "description": "Unified real-estate scraping API over realtor.com (US) and realtor.ca (Canada) for searching listings, fetching full property detail (price/tax history, schools, agents, estimates), location autocomplete, and reference data."
+  },
+  "servers": [
+    {
+      "url": "https://scrapebadger.com",
+      "description": "Production"
+    }
+  ],
+  "security": [
+    {
+      "apiKeyAuth": []
+    }
+  ],
+  "paths": {
+    "/v1/realtor/search": {
+      "get": {
+        "operationId": "searchRealtorListings",
+        "summary": "Search Listings",
+        "description": "Search a realtor.com (US) or realtor.ca (CA) market for property listings.",
+        "tags": [
+          "Realtor Search"
+        ],
+        "parameters": [
+          {
+            "name": "location",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Free-text location (city, ZIP/postal code, or region). Required unless a Canada bounding box is supplied."
+          },
+          {
+            "name": "market",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "us",
+              "enum": [
+                "us",
+                "ca"
+              ]
+            },
+            "description": "Market to search: us (realtor.com, USD) or ca (realtor.ca, CAD)."
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "for_sale",
+              "enum": [
+                "for_sale",
+                "for_rent",
+                "sold",
+                "pending"
+              ]
+            },
+            "description": "Listing status filter."
+          },
+          {
+            "name": "price_min",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            },
+            "description": "Minimum list price in the market's local currency."
+          },
+          {
+            "name": "price_max",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "minimum": 0
+            },
+            "description": "Maximum list price in the market's local currency."
+          },
+          {
+            "name": "beds_min",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Minimum number of bedrooms."
+          },
+          {
+            "name": "baths_min",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Minimum number of bathrooms."
+          },
+          {
+            "name": "sqft_min",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Minimum interior square footage (US market only)."
+          },
+          {
+            "name": "sqft_max",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Maximum interior square footage (US market only)."
+          },
+          {
+            "name": "property_type",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated property types (US market only): single_family, condos, townhomes, multi_family, mobile, land."
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "relevant",
+              "enum": [
+                "relevant",
+                "newest",
+                "price_low",
+                "price_high",
+                "photo_count"
+              ]
+            },
+            "description": "Sort order for results."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
+            "description": "Page number for paginated results."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200
+            },
+            "description": "Results per page (1-200)."
+          },
+          {
+            "name": "lat_min",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "description": "South edge of a bounding box (Canada power-user option; realtor.ca caps ~600 results per box)."
+          },
+          {
+            "name": "lat_max",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "description": "North edge of a bounding box (Canada only)."
+          },
+          {
+            "name": "lng_min",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "description": "West edge of a bounding box (Canada only)."
+          },
+          {
+            "name": "lng_max",
+            "in": "query",
+            "schema": {
+              "type": "number"
+            },
+            "description": "East edge of a bounding box (Canada only)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching listings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "market": {
+                      "type": "string"
+                    },
+                    "country": {
+                      "type": "string"
+                    },
+                    "total": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "count": {
+                      "type": "integer"
+                    },
+                    "page": {
+                      "type": "integer"
+                    },
+                    "total_pages": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Property"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/realtor/properties/{property_id}": {
+      "get": {
+        "operationId": "getRealtorProperty",
+        "summary": "Get Property Detail",
+        "description": "Get a single property's full detail (price/tax history, schools, amenities, agents, estimates).",
+        "tags": [
+          "Realtor Properties"
+        ],
+        "parameters": [
+          {
+            "name": "property_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The portal property id."
+          },
+          {
+            "name": "market",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "us",
+              "enum": [
+                "us",
+                "ca"
+              ]
+            },
+            "description": "Market the property lives in: us (realtor.com) or ca (realtor.ca)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Property detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PropertyDetail"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/realtor/autocomplete": {
+      "get": {
+        "operationId": "realtorAutocomplete",
+        "summary": "Location Suggestions",
+        "description": "Return location autocomplete suggestions for a partial query.",
+        "tags": [
+          "Realtor Search"
+        ],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Partial location prefix."
+          },
+          {
+            "name": "market",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "us",
+              "enum": [
+                "us",
+                "ca"
+              ]
+            },
+            "description": "Market to source suggestions from."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 25
+            },
+            "description": "Maximum number of suggestions (1-25)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Suggestions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "market": {
+                      "type": "string"
+                    },
+                    "query": {
+                      "type": "string"
+                    },
+                    "suggestions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Suggestion"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/realtor/markets": {
+      "get": {
+        "operationId": "listRealtorMarkets",
+        "summary": "List Markets",
+        "description": "List all supported realtor markets.",
+        "tags": [
+          "Realtor Reference"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Supported markets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "markets": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Market"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    },
+    "schemas": {
+      "Coordinate": {
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "lon": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        }
+      },
+      "Address": {
+        "type": "object",
+        "properties": {
+          "line": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "city": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "postal_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "country": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "neighborhood": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "county": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "coordinate": {
+            "$ref": "#/components/schemas/Coordinate"
+          }
+        }
+      },
+      "Photo": {
+        "type": "object",
+        "properties": {
+          "href": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "href_high": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "href_med": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "href_low": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "Flags": {
+        "type": "object",
+        "properties": {
+          "is_new_listing": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "is_pending": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "is_contingent": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "is_foreclosure": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "is_new_construction": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "is_price_reduced": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "is_coming_soon": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        }
+      },
+      "Phone": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ext": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "primary": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        }
+      },
+      "Office": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "href": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "logo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "phones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Phone"
+            }
+          },
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          }
+        }
+      },
+      "Agent": {
+        "type": "object",
+        "properties": {
+          "agent_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "first_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "last_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "phones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Phone"
+            }
+          },
+          "photo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "href": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "office": {
+            "$ref": "#/components/schemas/Office"
+          },
+          "broker": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "nrds_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state_license": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "OpenHouse": {
+        "type": "object",
+        "properties": {
+          "start_utc": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "start_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "end_utc": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "end_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "time_zone": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "href": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "Property": {
+        "type": "object",
+        "properties": {
+          "property_id": {
+            "type": "string"
+          },
+          "listing_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "mls_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "market": {
+            "type": "string"
+          },
+          "country": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "transaction_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "currency": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "list_price": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "list_price_formatted": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "list_price_min": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "list_price_max": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "price_per_sqft": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "price_reduced_amount": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "last_sold_price": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "last_sold_date_utc": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "last_sold_date_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "hoa_fee": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "property_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sub_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "beds": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "baths": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "baths_full": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "baths_half": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "sqft": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "lot_sqft": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "year_built": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "stories": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "garage": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "rooms": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "parking_spaces": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "address": {
+            "$ref": "#/components/schemas/Address"
+          },
+          "description_text": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "primary_photo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "photo_count": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "photos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Photo"
+            }
+          },
+          "virtual_tours": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "videos": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "flags": {
+            "$ref": "#/components/schemas/Flags"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "list_date_utc": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "list_date_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "last_update_utc": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "last_update_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "days_on_market": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "agents": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Agent"
+            }
+          },
+          "source_mls_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_mls_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "open_houses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OpenHouse"
+            }
+          }
+        }
+      },
+      "PropertyDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Property"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "details": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "category": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "text": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              },
+              "amenities": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "tax_history": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "year": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "tax": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "assessment_building": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "assessment_land": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "assessment_total": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              },
+              "price_history": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "date_utc": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "date_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "event": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "price": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "price_per_sqft": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "source_listing_id": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              },
+              "schools": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "rating": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "education_levels": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "grades": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "distance_miles": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "district": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              },
+              "estimates": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    },
+                    "estimate": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "estimate_high": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "estimate_low": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "date_utc": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "date_at": {
+                      "type": [
+                        "string",
+                        "null"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Suggestion": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "label": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "city": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "postal_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "country": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "slug_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "geo_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "coordinate": {
+            "$ref": "#/components/schemas/Coordinate"
+          },
+          "market": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "Market": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Market code for the `market` query parameter (us or ca)."
+          },
+          "domain": {
+            "type": "string",
+            "description": "Portal domain (realtor.com or realtor.ca)."
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-2 country code."
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO 4217 currency code."
+          },
+          "locale": {
+            "type": "string",
+            "description": "BCP-47 locale (e.g. en-US)."
+          },
+          "name": {
+            "type": "string",
+            "description": "Market country name."
+          }
+        }
+      }
+    }
+  }
+}
