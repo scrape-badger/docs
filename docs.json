@@ -18,6 +18,7 @@
     "/openapi-vinted.json",
     "/openapi-amazon.json",
     "/openapi-ebay.json",
+    "/openapi-realtor.json",
     "/openapi-youtube.json",
     "/openapi-shopee.json",
     "/openapi-tiktok.json",
@@ -406,6 +407,36 @@
             "group": "Reference",
             "pages": [
               "api-reference/endpoint/ebay/list-markets"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Realtor",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "realtor/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/realtor/search",
+              "api-reference/endpoint/realtor/autocomplete"
+            ]
+          },
+          {
+            "group": "Properties",
+            "pages": [
+              "api-reference/endpoint/realtor/get-property"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api-reference/endpoint/realtor/list-markets"
             ]
           }
         ]

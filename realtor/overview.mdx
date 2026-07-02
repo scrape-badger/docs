@@ -1,0 +1,149 @@
+---
+title: "Realtor Scraper Overview"
+description: "Scrape US (realtor.com) and Canada (realtor.ca) real-estate listings — search, full property detail, price/tax history, schools, agents, and open houses — with structured JSON responses."
+---
+
+# Realtor Scraper API
+
+Search for-sale, for-rent, sold, and pending listings, pull **full property detail** with price and tax history, schools, and agent contacts, and autocomplete locations across **realtor.com (US)** and **realtor.ca (Canada)** — a unified real-estate API over both markets. The API handles authentication, anti-bot bypass, and market routing automatically.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="Dual Coverage" icon="earth-americas">
+    One API over **realtor.com (US, USD)** and **realtor.ca (Canada, CAD)**. Pick a market with the `market` parameter.
+  </Card>
+  <Card title="Rich Property Data" icon="house">
+    Beds, baths, sqft, lot size, year built, HOA, price-per-sqft, coordinates, photos, videos, and virtual tours.
+  </Card>
+  <Card title="History & Estimates" icon="clock-rotate-left">
+    Full **price history**, **tax history**, and value estimates on the [`/v1/realtor/properties/{id}`](/api-reference/endpoint/realtor/get-property) detail endpoint.
+  </Card>
+  <Card title="Schools & Agents" icon="graduation-cap">
+    Nearby schools with ratings, plus agent/office/broker contact details (name, email, phones).
+  </Card>
+  <Card title="Anti-Bot Bypass" icon="shield-halved">
+    Automatic session management, Chrome TLS impersonation, and fingerprint rotation to avoid blocks.
+  </Card>
+  <Card title="Country Proxies" icon="globe">
+    Requests are routed through proxies matching the target market for accurate listings and availability.
+  </Card>
+</CardGroup>
+
+<Note>
+  realtor.ca (Canada) caps bounding-box searches at roughly **600 results per box**. For dense metros, split large areas into smaller `lat_min`/`lat_max`/`lng_min`/`lng_max` tiles.
+</Note>
+
+## Supported Markets
+
+The API covers two national real-estate portals. Use the `market` query parameter to target one.
+
+| Market | Portal | Country | Currency | Locale |
+|--------|--------|---------|----------|--------|
+| :us: `us` | realtor.com | US | USD | en-US |
+| :canada: `ca` | realtor.ca | CA | CAD | en-CA |
+
+<Tip>
+  If no `market` is specified, it defaults to `us`. Use the [`/v1/realtor/markets`](/api-reference/endpoint/realtor/list-markets) endpoint to get the full list (with domain, currency, and locale) programmatically.
+</Tip>
+
+## Quick Start
+
+<CodeGroup>
+
+```javascript Node.js
+import ScrapeBadger from "scrapebadger";
+
+const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" });
+
+const results = await client.realtor.search({
+  location: "Austin, TX",
+  market: "us",
+  status: "for_sale",
+});
+
+console.log(results.results);
+```
+
+```python Python
+from scrapebadger import ScrapeBadger
+
+client = ScrapeBadger(api_key="YOUR_API_KEY")
+
+results = client.realtor.search(
+    location="Austin, TX",
+    market="us",
+    status="for_sale",
+)
+
+print(results.results)
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/realtor/search?location=Austin,+TX&market=us&status=for_sale" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+## Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/realtor/search`](/api-reference/endpoint/realtor/search) | GET | Search a market for listings |
+| [`/v1/realtor/properties/{property_id}`](/api-reference/endpoint/realtor/get-property) | GET | Full detail for a single property |
+| [`/v1/realtor/autocomplete`](/api-reference/endpoint/realtor/autocomplete) | GET | Location autocomplete suggestions |
+| [`/v1/realtor/markets`](/api-reference/endpoint/realtor/list-markets) | GET | List all supported markets |
+
+## Credit Costs
+
+| Endpoint | Cost |
+|----------|------|
+| Search | 8 credits |
+| Get property detail | 10 credits |
+| Autocomplete | 2 credits |
+| List markets | 0 credits |
+| Failed requests | 0 credits |
+
+## Authentication
+
+All requests require your API key in the `X-API-Key` header:
+
+```bash
+curl "https://scrapebadger.com/v1/realtor/search?location=Miami,+FL" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+## Anti-Bot Handling
+
+Both realtor.com and realtor.ca protect their listings with IP-reputation scoring, TLS/HTTP-2 fingerprinting, and server-side rendering. ScrapeBadger clears these automatically using Chrome TLS impersonation on sessions matched to the target market. You never need to manage proxies, sessions, or CAPTCHAs.
+
+<Note>
+  For accurate listings and availability, requests are routed through proxies in the market's country. This is handled automatically based on the `market` parameter.
+</Note>
+
+## Rich Datapoints
+
+Every property carries a deep set of structured fields:
+
+| Group | Fields |
+|-------|--------|
+| **Pricing** | `list_price`, `list_price_formatted`, `price_per_sqft`, `price_reduced_amount`, `hoa_fee`, `last_sold_price` |
+| **Size** | `beds`, `baths`, `baths_full`, `baths_half`, `sqft`, `lot_sqft`, `year_built`, `stories`, `garage`, `rooms`, `parking_spaces` |
+| **Location** | `address` (line, city, state, postal, county, neighborhood), `coordinate` (lat/lon) |
+| **Media** | `primary_photo`, `photos[]`, `photo_count`, `videos[]`, `virtual_tours[]` |
+| **History** | `price_history[]`, `tax_history[]`, `estimates[]`, `days_on_market`, `last_sold_date_at` |
+| **Context** | `schools[]`, `amenities[]`, `details[]`, `open_houses[]`, `agents[]`, `flags` (new/pending/foreclosure/…) |
+
+Search returns each result as a `Property`; the [property detail](/api-reference/endpoint/realtor/get-property) endpoint returns a `PropertyDetail` that adds `details`, `amenities`, `tax_history`, `price_history`, `schools`, and `estimates`.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Search Listings" icon="magnifying-glass" href="/api-reference/endpoint/realtor/search">
+    Full API reference for searching the realtor.com / realtor.ca catalogs
+  </Card>
+  <Card title="Property Detail" icon="house" href="/api-reference/endpoint/realtor/get-property">
+    Retrieve full detail, price/tax history, schools, and agents for a property
+  </Card>
+</CardGroup>
