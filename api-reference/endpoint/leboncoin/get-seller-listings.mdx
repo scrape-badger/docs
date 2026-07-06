@@ -1,0 +1,98 @@
+---
+title: "Get Seller Listings"
+openapi: "GET /v1/leboncoin/sellers/{user_id}/listings"
+description: "List the active ads of a single Leboncoin seller."
+---
+
+## Path Parameters
+
+<ParamField path="user_id" type="string" required>
+  The Leboncoin seller id (a UUID) whose active ads you want.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="page" type="integer" default={1}>
+  Page number for paginated results.
+</ParamField>
+
+<ParamField query="limit" type="integer" default={35}>
+  Results per page. Maximum `100`.
+</ParamField>
+
+## Response
+
+<ResponseField name="user_id" type="string">The seller whose ads were returned.</ResponseField>
+<ResponseField name="ads" type="array">
+  Array of the seller's active ads (same `Ad` shape as [search](/api-reference/endpoint/leboncoin/search-ads)).
+
+  <Expandable title="Ad object">
+    <ResponseField name="list_id" type="integer">Leboncoin ad id (integer).</ResponseField>
+    <ResponseField name="subject" type="string">Ad title.</ResponseField>
+    <ResponseField name="body" type="string">Ad description text.</ResponseField>
+    <ResponseField name="ad_type" type="string">`offer` or `demand`.</ResponseField>
+    <ResponseField name="url" type="string">Full URL to the ad.</ResponseField>
+    <ResponseField name="category_id" type="string">Leboncoin category id.</ResponseField>
+    <ResponseField name="category_name" type="string">Human-readable category name.</ResponseField>
+    <ResponseField name="price" type="array">Price in euros as an array of integers.</ResponseField>
+    <ResponseField name="price_eur" type="number">Price in euros as a number (nullable).</ResponseField>
+    <ResponseField name="currency" type="string">Currency code. Always `EUR`.</ResponseField>
+    <ResponseField name="first_publication_at" type="string">ISO 8601 first-publication timestamp.</ResponseField>
+    <ResponseField name="images" type="object">Image set with `nb_images`, `urls`, `urls_thumb`, `urls_large`.</ResponseField>
+    <ResponseField name="location" type="object">Location with `region_id`, `region_name`, `department_id`, `city_label`, `zipcode`, `lat`, `lng`.</ResponseField>
+    <ResponseField name="owner" type="object">Owner summary with `user_id`, `type`, `name`.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="total" type="integer">Total number of active ads for this seller.</ResponseField>
+<ResponseField name="page" type="integer">The page that was returned.</ResponseField>
+<ResponseField name="limit" type="integer">The page size that was applied.</ResponseField>
+
+### Example Response
+
+```json
+{
+  "user_id": "b3f1c2a0-8d4e-4a1b-9c2d-1e2f3a4b5c6d",
+  "ads": [
+    {
+      "list_id": 2845123456,
+      "subject": "Vélo électrique VTC 500W - Excellent état",
+      "body": "Vélo électrique acheté il y a 6 mois, très peu servi.",
+      "ad_type": "offer",
+      "url": "https://www.leboncoin.fr/velos/2845123456.htm",
+      "category_id": "24",
+      "category_name": "Vélos",
+      "price": [890],
+      "price_eur": 890.0,
+      "currency": "EUR",
+      "first_publication_at": "2026-06-18T09:42:11Z",
+      "images": {
+        "nb_images": 3,
+        "urls": ["https://img.leboncoin.fr/api/v1/lbcpb1/images/ab/cd/abcd.jpg"],
+        "urls_thumb": ["https://img.leboncoin.fr/api/v1/lbcpb1/images/ab/cd/abcd_thumb.jpg"],
+        "urls_large": ["https://img.leboncoin.fr/api/v1/lbcpb1/images/ab/cd/abcd_large.jpg"]
+      },
+      "location": {
+        "region_id": "22",
+        "region_name": "Île-de-France",
+        "department_id": "75",
+        "city_label": "Paris 11e",
+        "zipcode": "75011",
+        "lat": 48.8594,
+        "lng": 2.3765
+      },
+      "owner": {
+        "user_id": "b3f1c2a0-8d4e-4a1b-9c2d-1e2f3a4b5c6d",
+        "type": "pro",
+        "name": "Cycles Paris Pro"
+      }
+    }
+  ],
+  "total": 214,
+  "page": 1,
+  "limit": 35
+}
+```
+
+<Note>
+  Each seller-listings request costs **5 credits**. Failed requests are not charged.
+</Note>

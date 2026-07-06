@@ -1,0 +1,67 @@
+---
+title: "Search Locations"
+openapi: "GET /v1/leboncoin/locations/search"
+description: "Autocomplete a Leboncoin location by name, resolving it to region, department, and coordinates."
+---
+
+Resolve a free-text place name (city, department, or region) into structured location suggestions you can use with the [`city`](/api-reference/endpoint/leboncoin/search-ads), `zipcode`, `region_id`, or `department_id` search parameters.
+
+## Query Parameters
+
+<ParamField query="q" type="string" required>
+  The location name to autocomplete (e.g. `Lyon`).
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">The location query that was executed.</ResponseField>
+<ResponseField name="suggestions" type="array">
+  Array of matching location suggestions.
+
+  <Expandable title="LocationSuggestion object">
+    <ResponseField name="label" type="string">Display label for the suggestion (e.g. `Lyon 69000`).</ResponseField>
+    <ResponseField name="city" type="string">City name (nullable).</ResponseField>
+    <ResponseField name="zipcode" type="string">Postal code (nullable).</ResponseField>
+    <ResponseField name="region_id" type="string">French region id (nullable).</ResponseField>
+    <ResponseField name="region_name" type="string">Region name (nullable).</ResponseField>
+    <ResponseField name="department_id" type="string">Department id (nullable).</ResponseField>
+    <ResponseField name="department_name" type="string">Department name (nullable).</ResponseField>
+    <ResponseField name="lat" type="number">Latitude (nullable).</ResponseField>
+    <ResponseField name="lng" type="number">Longitude (nullable).</ResponseField>
+    <ResponseField name="type" type="string">Suggestion type: `city`, `department`, or `region`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "query": "Lyon",
+  "suggestions": [
+    {
+      "label": "Lyon (69000)",
+      "city": "Lyon",
+      "zipcode": "69000",
+      "region_id": "20",
+      "region_name": "Auvergne-Rhône-Alpes",
+      "department_id": "69",
+      "department_name": "Rhône",
+      "lat": 45.7578,
+      "lng": 4.832,
+      "type": "city"
+    },
+    {
+      "label": "Rhône (69)",
+      "region_id": "20",
+      "region_name": "Auvergne-Rhône-Alpes",
+      "department_id": "69",
+      "department_name": "Rhône",
+      "type": "department"
+    }
+  ]
+}
+```
+
+<Note>
+  Each location-search request costs **2 credits**. Failed requests are not charged.
+</Note>

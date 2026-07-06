@@ -1,0 +1,88 @@
+---
+title: "Get Similar Ads"
+openapi: "GET /v1/leboncoin/ads/{list_id}/similar"
+description: "Ads similar to a given Leboncoin ad."
+---
+
+## Path Parameters
+
+<ParamField path="list_id" type="integer" required>
+  The Leboncoin ad id (an integer) to find similar ads for.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="limit" type="integer" default={20}>
+  Maximum number of similar ads to return. Maximum `100`.
+</ParamField>
+
+## Response
+
+<ResponseField name="list_id" type="integer">The ad id the similar ads were requested for.</ResponseField>
+<ResponseField name="ads" type="array">
+  Array of similar ads (same `Ad` shape as [search](/api-reference/endpoint/leboncoin/search-ads)).
+
+  <Expandable title="Ad object">
+    <ResponseField name="list_id" type="integer">Leboncoin ad id (integer).</ResponseField>
+    <ResponseField name="subject" type="string">Ad title.</ResponseField>
+    <ResponseField name="body" type="string">Ad description text.</ResponseField>
+    <ResponseField name="ad_type" type="string">`offer` or `demand`.</ResponseField>
+    <ResponseField name="url" type="string">Full URL to the ad.</ResponseField>
+    <ResponseField name="category_id" type="string">Leboncoin category id.</ResponseField>
+    <ResponseField name="category_name" type="string">Human-readable category name.</ResponseField>
+    <ResponseField name="price" type="array">Price in euros as an array of integers.</ResponseField>
+    <ResponseField name="price_eur" type="number">Price in euros as a number (nullable).</ResponseField>
+    <ResponseField name="currency" type="string">Currency code. Always `EUR`.</ResponseField>
+    <ResponseField name="first_publication_at" type="string">ISO 8601 first-publication timestamp.</ResponseField>
+    <ResponseField name="images" type="object">Image set with `nb_images`, `urls`, `urls_thumb`, `urls_large`.</ResponseField>
+    <ResponseField name="location" type="object">Location with `region_id`, `region_name`, `department_id`, `city_label`, `zipcode`, `lat`, `lng`.</ResponseField>
+    <ResponseField name="owner" type="object">Owner summary with `user_id`, `type`, `name`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "list_id": 2845123456,
+  "ads": [
+    {
+      "list_id": 2846987654,
+      "subject": "Vélo électrique ville - Bon état",
+      "body": "Vélo électrique urbain, batterie récente, freins à disque.",
+      "ad_type": "offer",
+      "url": "https://www.leboncoin.fr/velos/2846987654.htm",
+      "category_id": "24",
+      "category_name": "Vélos",
+      "price": [750],
+      "price_eur": 750.0,
+      "currency": "EUR",
+      "first_publication_at": "2026-06-19T11:05:00Z",
+      "images": {
+        "nb_images": 2,
+        "urls": ["https://img.leboncoin.fr/api/v1/lbcpb1/images/ef/gh/efgh.jpg"],
+        "urls_thumb": ["https://img.leboncoin.fr/api/v1/lbcpb1/images/ef/gh/efgh_thumb.jpg"],
+        "urls_large": ["https://img.leboncoin.fr/api/v1/lbcpb1/images/ef/gh/efgh_large.jpg"]
+      },
+      "location": {
+        "region_id": "22",
+        "region_name": "Île-de-France",
+        "department_id": "92",
+        "city_label": "Boulogne-Billancourt",
+        "zipcode": "92100",
+        "lat": 48.8355,
+        "lng": 2.2404
+      },
+      "owner": {
+        "user_id": "c4a2d3b1-9e5f-4b2c-8d3e-2f3a4b5c6d7e",
+        "type": "private",
+        "name": "Amélie"
+      }
+    }
+  ]
+}
+```
+
+<Note>
+  Each similar-ads request costs **5 credits**. Failed requests are not charged.
+</Note>

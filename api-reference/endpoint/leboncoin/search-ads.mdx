@@ -1,0 +1,242 @@
+---
+title: "Search Ads"
+openapi: "GET /v1/leboncoin/search"
+description: "Search Leboncoin classified ads across France with location, price, and seller filters."
+---
+
+## Query Parameters
+
+<ParamField query="text" type="string">
+  Search keywords. Matches against ad titles and descriptions.
+</ParamField>
+
+<ParamField query="category" type="string">
+  Restrict results to a Leboncoin category id. Use [`/v1/leboncoin/categories`](/api-reference/endpoint/leboncoin/list-categories) to look up ids.
+</ParamField>
+
+<ParamField query="region_id" type="string">
+  Restrict results to a French region (includes DOM-TOM overseas territories). Use [`/v1/leboncoin/regions`](/api-reference/endpoint/leboncoin/list-regions) to look up ids.
+</ParamField>
+
+<ParamField query="department_id" type="string">
+  Restrict results to a French department. Use [`/v1/leboncoin/departments`](/api-reference/endpoint/leboncoin/list-departments) to look up ids.
+</ParamField>
+
+<ParamField query="city" type="string">
+  Restrict results to a city name. Resolve names with [`/v1/leboncoin/locations/search`](/api-reference/endpoint/leboncoin/search-locations).
+</ParamField>
+
+<ParamField query="zipcode" type="string">
+  Restrict results to a French postal code.
+</ParamField>
+
+<ParamField query="price_min" type="integer">
+  Minimum price filter in euros.
+</ParamField>
+
+<ParamField query="price_max" type="integer">
+  Maximum price filter in euros.
+</ParamField>
+
+<ParamField query="owner_type" type="string" default="all">
+  Filter by seller type.
+
+  | Value | Description |
+  |-------|-------------|
+  | `all` | All sellers (default) |
+  | `pro` | Professional sellers only |
+  | `private` | Private individuals only |
+</ParamField>
+
+<ParamField query="ad_type" type="string" default="offer">
+  Filter by ad type.
+
+  | Value | Description |
+  |-------|-------------|
+  | `offer` | Items offered for sale (default) |
+  | `demand` | Wanted / demand ads |
+</ParamField>
+
+<ParamField query="sort" type="string" default="relevance">
+  Sort order for results.
+
+  | Value | Description |
+  |-------|-------------|
+  | `relevance` | Best match (default) |
+  | `newest` | Most recently published first |
+  | `oldest` | Oldest first |
+  | `price_low` | Cheapest first |
+  | `price_high` | Most expensive first |
+</ParamField>
+
+<ParamField query="page" type="integer" default={1}>
+  Page number for paginated results.
+</ParamField>
+
+<ParamField query="limit" type="integer" default={35}>
+  Results per page. Maximum `100`.
+</ParamField>
+
+## Response
+
+<ResponseField name="ads" type="array">
+  Array of matching ads.
+
+  <Expandable title="Ad object">
+    <ResponseField name="list_id" type="integer">Leboncoin ad id (integer).</ResponseField>
+    <ResponseField name="subject" type="string">Ad title.</ResponseField>
+    <ResponseField name="body" type="string">Ad description text.</ResponseField>
+    <ResponseField name="brand" type="string">Brand name, if detected (nullable).</ResponseField>
+    <ResponseField name="ad_type" type="string">`offer` or `demand`.</ResponseField>
+    <ResponseField name="url" type="string">Full URL to the ad.</ResponseField>
+    <ResponseField name="status" type="string">Ad status (e.g. `active`).</ResponseField>
+    <ResponseField name="category_id" type="string">Leboncoin category id.</ResponseField>
+    <ResponseField name="category_name" type="string">Human-readable category name.</ResponseField>
+    <ResponseField name="price" type="array">Price in euros as an array (Leboncoin returns price as a list of integers).</ResponseField>
+    <ResponseField name="price_cents" type="integer">Price in cents (nullable).</ResponseField>
+    <ResponseField name="price_eur" type="number">Price in euros as a number (nullable).</ResponseField>
+    <ResponseField name="currency" type="string">Currency code. Always `EUR`.</ResponseField>
+    <ResponseField name="first_publication_date" type="string">Raw first-publication date as shown on Leboncoin.</ResponseField>
+    <ResponseField name="first_publication_at" type="string">ISO 8601 first-publication timestamp.</ResponseField>
+    <ResponseField name="index_date" type="string">Raw index (last-bumped) date.</ResponseField>
+    <ResponseField name="index_at" type="string">ISO 8601 index timestamp.</ResponseField>
+    <ResponseField name="expiration_date" type="string">Raw expiration date (nullable).</ResponseField>
+    <ResponseField name="expiration_at" type="string">ISO 8601 expiration timestamp (nullable).</ResponseField>
+    <ResponseField name="has_phone" type="boolean">Whether the seller published a phone number.</ResponseField>
+    <ResponseField name="favorites" type="integer">Number of times the ad was favorited (nullable).</ResponseField>
+    <ResponseField name="images" type="object">
+      Image set for the ad.
+
+      <Expandable title="Images object">
+        <ResponseField name="nb_images" type="integer">Total number of images.</ResponseField>
+        <ResponseField name="urls" type="array">Standard-resolution image URLs.</ResponseField>
+        <ResponseField name="urls_thumb" type="array">Thumbnail image URLs.</ResponseField>
+        <ResponseField name="urls_large" type="array">Large / full-resolution image URLs.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="attributes" type="array">
+      Category-specific attributes.
+
+      <Expandable title="AdAttribute object">
+        <ResponseField name="key" type="string">Attribute machine key (e.g. `brand`).</ResponseField>
+        <ResponseField name="key_label" type="string">Human-readable attribute label (e.g. `Marque`).</ResponseField>
+        <ResponseField name="value" type="string">Attribute machine value.</ResponseField>
+        <ResponseField name="value_label" type="string">Human-readable attribute value.</ResponseField>
+        <ResponseField name="values" type="array">List of values for multi-value attributes (nullable).</ResponseField>
+        <ResponseField name="generic" type="boolean">Whether the attribute is generic (shared across categories).</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="location" type="object">
+      Geographic location of the ad.
+
+      <Expandable title="Location object">
+        <ResponseField name="country_id" type="string">Country id. Always `FR`.</ResponseField>
+        <ResponseField name="region_id" type="string">French region id (nullable).</ResponseField>
+        <ResponseField name="region_name" type="string">Region name (nullable).</ResponseField>
+        <ResponseField name="department_id" type="string">Department id (nullable).</ResponseField>
+        <ResponseField name="department_name" type="string">Department name (nullable).</ResponseField>
+        <ResponseField name="city" type="string">City machine name (nullable).</ResponseField>
+        <ResponseField name="city_label" type="string">City display name (nullable).</ResponseField>
+        <ResponseField name="zipcode" type="string">Postal code (nullable).</ResponseField>
+        <ResponseField name="district" type="string">District / neighbourhood (nullable).</ResponseField>
+        <ResponseField name="lat" type="number">Latitude (nullable).</ResponseField>
+        <ResponseField name="lng" type="number">Longitude (nullable).</ResponseField>
+        <ResponseField name="is_shape" type="boolean">Whether the location is an approximate shape rather than an exact point.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="owner" type="object">
+      Ad owner summary.
+
+      <Expandable title="Owner object">
+        <ResponseField name="user_id" type="string">Seller UUID.</ResponseField>
+        <ResponseField name="store_id" type="string">Store id, for pro sellers with a storefront (nullable).</ResponseField>
+        <ResponseField name="type" type="string">`private` or `pro`.</ResponseField>
+        <ResponseField name="name" type="string">Seller display name.</ResponseField>
+        <ResponseField name="siren" type="string">SIREN company registration number, for pro sellers (nullable).</ResponseField>
+        <ResponseField name="no_salesmen" type="boolean">Whether the seller opted out of solicitation.</ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="total" type="integer">Number of ads matching the current filters.</ResponseField>
+<ResponseField name="total_all" type="integer">Total ads matching the query across all seller types.</ResponseField>
+<ResponseField name="total_pro" type="integer">Total matching ads from professional sellers.</ResponseField>
+<ResponseField name="total_private" type="integer">Total matching ads from private sellers.</ResponseField>
+<ResponseField name="total_shippable" type="integer">Total matching ads eligible for shipping.</ResponseField>
+<ResponseField name="max_pages" type="integer">Maximum number of pages available for this query.</ResponseField>
+<ResponseField name="page" type="integer">The page that was returned.</ResponseField>
+<ResponseField name="limit" type="integer">The page size that was applied.</ResponseField>
+<ResponseField name="source" type="string">The upstream source the results were scraped from.</ResponseField>
+
+### Example Response
+
+```json
+{
+  "ads": [
+    {
+      "list_id": 2845123456,
+      "subject": "Vélo électrique VTC 500W - Excellent état",
+      "body": "Vélo électrique acheté il y a 6 mois, très peu servi. Batterie 48V.",
+      "brand": "Moustache",
+      "ad_type": "offer",
+      "url": "https://www.leboncoin.fr/velos/2845123456.htm",
+      "status": "active",
+      "category_id": "24",
+      "category_name": "Vélos",
+      "price": [890],
+      "price_cents": 89000,
+      "price_eur": 890.0,
+      "currency": "EUR",
+      "first_publication_date": "2026-06-18 09:42:11",
+      "first_publication_at": "2026-06-18T09:42:11Z",
+      "index_date": "2026-06-20 14:10:03",
+      "index_at": "2026-06-20T14:10:03Z",
+      "expiration_date": "2026-08-17 09:42:11",
+      "expiration_at": "2026-08-17T09:42:11Z",
+      "has_phone": true,
+      "favorites": 12,
+      "images": {
+        "nb_images": 3,
+        "urls": ["https://img.leboncoin.fr/api/v1/lbcpb1/images/ab/cd/abcd.jpg"],
+        "urls_thumb": ["https://img.leboncoin.fr/api/v1/lbcpb1/images/ab/cd/abcd_thumb.jpg"],
+        "urls_large": ["https://img.leboncoin.fr/api/v1/lbcpb1/images/ab/cd/abcd_large.jpg"]
+      },
+      "attributes": [
+        { "key": "brand", "key_label": "Marque", "value": "moustache", "value_label": "Moustache", "generic": true }
+      ],
+      "location": {
+        "country_id": "FR",
+        "region_id": "22",
+        "region_name": "Île-de-France",
+        "department_id": "75",
+        "department_name": "Paris",
+        "city": "paris",
+        "city_label": "Paris 11e",
+        "zipcode": "75011",
+        "lat": 48.8594,
+        "lng": 2.3765,
+        "is_shape": false
+      },
+      "owner": {
+        "user_id": "b3f1c2a0-8d4e-4a1b-9c2d-1e2f3a4b5c6d",
+        "type": "private",
+        "name": "Julien",
+        "no_salesmen": true
+      }
+    }
+  ],
+  "total": 1284,
+  "total_all": 1284,
+  "total_pro": 312,
+  "total_private": 972,
+  "total_shippable": 540,
+  "max_pages": 37,
+  "page": 1,
+  "limit": 35,
+  "source": "leboncoin.fr"
+}
+```
+
+<Note>
+  Each search request costs **5 credits**. Failed requests are not charged.
+</Note>
