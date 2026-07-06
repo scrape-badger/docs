@@ -1,0 +1,150 @@
+---
+title: "Zillow Scraper Overview"
+description: "Scrape Zillow (zillow.com) real-estate listings — search, maximal property detail with resoFacts, price/tax/Zestimate history, schools, and agent profiles — with structured JSON responses."
+---
+
+# Zillow Scraper API
+
+Search for-sale, for-rent, and sold listings, pull **maximal property detail** with the full `resoFacts` home-facts block, price / tax / Zestimate history, schools, and listing-agent attribution, look up agent profiles with reviews and past sales, and autocomplete locations across **zillow.com** — a dedicated Zillow real-estate API. The API handles authentication, anti-bot bypass, and session/proxy routing automatically.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="Deep Property Detail" icon="house">
+    ~99 top-level fields per property plus a nested `home_facts` block distilled from Zillow's `resoFacts` MLS record — beds, baths, sqft, lot size, systems, features, HOA, parcel, and more.
+  </Card>
+  <Card title="History & Estimates" icon="clock-rotate-left">
+    Full **price history**, **tax history**, and **Zestimate value history** on the [`/v1/zillow/property/{zpid}`](/api-reference/endpoint/zillow/get-property) detail endpoint, plus current Zestimate and Rent Zestimate.
+  </Card>
+  <Card title="Schools & Agents" icon="graduation-cap">
+    Nearby schools with ratings, listing-agent attribution, and full [agent profiles](/api-reference/endpoint/zillow/get-agent) with reviews, past sales, and licenses.
+  </Card>
+  <Card title="Map-Bounds Tiling" icon="map">
+    Beat Zillow's ~820-result (20-page) cap by re-issuing a search over subdivided `north`/`south`/`east`/`west` map-bound boxes returned in `map_bounds`.
+  </Card>
+  <Card title="Anti-Bot Bypass" icon="shield-halved">
+    Automatic session management, Chrome TLS impersonation, and fingerprint rotation to avoid blocks.
+  </Card>
+  <Card title="US Proxies" icon="globe">
+    Requests are pinned to US residential IPs — Zillow serves all inventory (including Canadian MLS feeds) from zillow.com behind a US IP.
+  </Card>
+</CardGroup>
+
+<Note>
+  Zillow caps a single search at **20 pages (~820 results)**. For dense metros, split the area into smaller `north`/`south`/`east`/`west` map-bound tiles using the `map_bounds` box returned on each search.
+</Note>
+
+## Coverage
+
+Zillow is a **single-domain, single-locale** target: every market is served from `zillow.com` in USD / en-US behind a US residential IP. `zillow.ca` redirects to zillow.com and Canadian inventory is an MLS data feed surfaced inside zillow.com — there is no separate Canadian portal or currency/locale switcher.
+
+| Market | Portal | Country | Currency | Locale |
+|--------|--------|---------|----------|--------|
+| :us: `US` | zillow.com | US | USD | en-US |
+| :canada: `CA` | zillow.com | CA | USD | en-US |
+
+<Tip>
+  Use the [`/v1/zillow/markets`](/api-reference/endpoint/zillow/list-markets) endpoint to get the advertised coverage (with domain, currency, and locale) programmatically. Markets are informational only — there is no `market` routing parameter.
+</Tip>
+
+## Quick Start
+
+<CodeGroup>
+
+```javascript Node.js
+import ScrapeBadger from "scrapebadger";
+
+const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" });
+
+const results = await client.zillow.search({
+  location: "Austin, TX",
+  status: "for_sale",
+});
+
+console.log(results.results);
+```
+
+```python Python
+from scrapebadger import ScrapeBadger
+
+client = ScrapeBadger(api_key="YOUR_API_KEY")
+
+results = client.zillow.search(
+    location="Austin, TX",
+    status="for_sale",
+)
+
+print(results.results)
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/zillow/search?location=Austin,+TX&status=for_sale" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+## Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/zillow/search`](/api-reference/endpoint/zillow/search) | GET | Search Zillow for listings |
+| [`/v1/zillow/property/{zpid}`](/api-reference/endpoint/zillow/get-property) | GET | Full detail for a single property |
+| [`/v1/zillow/agent`](/api-reference/endpoint/zillow/get-agent) | GET | Agent profile, reviews, past sales, listings |
+| [`/v1/zillow/autocomplete`](/api-reference/endpoint/zillow/autocomplete) | GET | Location autocomplete suggestions |
+| [`/v1/zillow/markets`](/api-reference/endpoint/zillow/list-markets) | GET | List advertised coverage markets |
+
+## Credit Costs
+
+| Endpoint | Cost |
+|----------|------|
+| Search | 5 credits |
+| Get property detail | 5 credits |
+| Get agent profile | 5 credits |
+| Autocomplete | 2 credits |
+| List markets | 0 credits |
+| Failed requests | 0 credits |
+
+## Authentication
+
+All requests require your API key in the `X-API-Key` header:
+
+```bash
+curl "https://scrapebadger.com/v1/zillow/search?location=Miami,+FL" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+## Anti-Bot Handling
+
+Zillow protects its listings with PerimeterX/HUMAN fingerprinting, IP-reputation scoring, and TLS/HTTP-2 fingerprinting, and renders most data as embedded page JSON (`__NEXT_DATA__` search state and `gdpClientCache` property detail). ScrapeBadger clears these automatically using Chrome TLS impersonation on US-pinned sessions. You never need to manage proxies, sessions, or CAPTCHAs.
+
+<Note>
+  A few Zillow datapoints (comparable sales, Walk/Transit/Bike scores, climate risk) are lazy-loaded client-side and are **not** in the server-rendered JSON, so they are intentionally absent from responses.
+</Note>
+
+## Rich Datapoints
+
+Every property carries a deep set of structured fields:
+
+| Group | Fields |
+|-------|--------|
+| **Pricing** | `price`, `zestimate`, `rent_zestimate`, `tax_assessed_value`, `monthly_hoa_fee`, `property_tax_rate`, `last_sold_price`, `price_change` |
+| **Size** | `bedrooms`, `bathrooms`, `living_area`, `lot_size`, `lot_area_value`, `year_built`, plus `home_facts` bath/story/area breakdowns |
+| **Location** | `street_address`, `city`, `state`, `zipcode`, `county`, `neighborhood`, `latitude`, `longitude`, `time_zone` |
+| **Media** | `photos[]`, `photo_count`, `virtual_tour_url`, `has_3d_model`, `street_view_image_url`, `static_map_url` |
+| **History** | `price_history[]`, `tax_history[]`, `zestimate_history[]`, `days_on_zillow` |
+| **Facts** | `home_facts` (heating, cooling, appliances, flooring, parking, pool, HOA, green, features, parcel — ~125 fields) |
+| **Context** | `schools[]`, `home_insights[]`, `open_house_schedule[]`, `nearby_cities/neighborhoods/zipcodes`, `agent` attribution, `mortgage_rates` |
+
+Search returns each result as a `Listing` (~50 fields); the [property detail](/api-reference/endpoint/zillow/get-property) endpoint returns a full `Property` with the nested `home_facts`, history, schools, and agent blocks.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Search Listings" icon="magnifying-glass" href="/api-reference/endpoint/zillow/search">
+    Full API reference for searching the Zillow catalog
+  </Card>
+  <Card title="Property Detail" icon="house" href="/api-reference/endpoint/zillow/get-property">
+    Retrieve full detail, home facts, price/tax/Zestimate history, schools, and agent for a property
+  </Card>
+</CardGroup>

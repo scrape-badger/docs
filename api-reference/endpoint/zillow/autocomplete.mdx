@@ -1,0 +1,51 @@
+---
+title: "Location Suggestions"
+openapi: "GET /v1/zillow/autocomplete"
+description: "Autocomplete locations (cities, ZIPs, neighborhoods, addresses) for a partial query."
+---
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Partial location to autocomplete — a city, ZIP, address, or neighborhood (e.g. `austi`, `9021`, `travis heights`).
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">The query prefix that was autocompleted.</ResponseField>
+<ResponseField name="results" type="array">
+  Array of suggestion objects.
+
+  <Expandable title="Suggestion object">
+    <ResponseField name="display" type="string">Human-readable label, e.g. `Austin, TX` (nullable).</ResponseField>
+    <ResponseField name="region_id" type="integer">Zillow region id — pass-through key for a region (nullable).</ResponseField>
+    <ResponseField name="region_type" type="string">Suggestion type, e.g. `city`, `zipcode`, `neighborhood`, `county`, `state` (nullable).</ResponseField>
+    <ResponseField name="latitude" type="number">Center latitude (nullable).</ResponseField>
+    <ResponseField name="longitude" type="number">Center longitude (nullable).</ResponseField>
+    <ResponseField name="zpid" type="string">Zillow property id — populated when the suggestion is a specific home (nullable).</ResponseField>
+    <ResponseField name="metro_id" type="integer">Metro area id (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "query": "austi",
+  "results": [
+    {
+      "display": "Austin, TX",
+      "region_id": 10221,
+      "region_type": "city",
+      "latitude": 30.2672,
+      "longitude": -97.7431,
+      "zpid": null,
+      "metro_id": 394355
+    }
+  ]
+}
+```
+
+<Note>
+  Each autocomplete request costs **2 credits**. Failed requests are not charged.
+</Note>

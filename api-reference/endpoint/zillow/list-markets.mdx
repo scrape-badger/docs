@@ -1,0 +1,35 @@
+---
+title: "List Markets"
+openapi: "GET /v1/zillow/markets"
+description: "List Zillow's advertised coverage markets with their domain, currency, and locale."
+---
+
+## Response
+
+<ResponseField name="markets" type="array">
+  Array of advertised coverage markets. Informational only — Zillow serves all inventory from `zillow.com`, so there is no `market` routing parameter.
+
+  <Expandable title="Market object">
+    <ResponseField name="code" type="string">Market code (`US` or `CA`).</ResponseField>
+    <ResponseField name="domain" type="string">Portal domain (always `zillow.com`).</ResponseField>
+    <ResponseField name="country" type="string">ISO 3166-1 alpha-2 country code.</ResponseField>
+    <ResponseField name="currency" type="string">ISO 4217 currency code (always `USD`).</ResponseField>
+    <ResponseField name="locale" type="string">BCP-47 locale (always `en-US`).</ResponseField>
+    <ResponseField name="name" type="string">Market country name.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "markets": [
+    { "code": "US", "domain": "zillow.com", "country": "US", "currency": "USD", "locale": "en-US", "name": "United States" },
+    { "code": "CA", "domain": "zillow.com", "country": "CA", "currency": "USD", "locale": "en-US", "name": "Canada (MLS feed on zillow.com)" }
+  ]
+}
+```
+
+<Note>
+  Listing markets is a **free** reference endpoint (0 credits).
+</Note>

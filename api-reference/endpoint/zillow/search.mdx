@@ -1,0 +1,240 @@
+---
+title: "Search Properties"
+openapi: "GET /v1/zillow/search"
+description: "Search Zillow for for-sale / for-rent / sold listings with rich filters."
+---
+
+## Query Parameters
+
+<ParamField query="location" type="string" required>
+  Free-text location: a city ("Austin, TX"), a ZIP, an address, or a neighborhood.
+</ParamField>
+
+<ParamField query="status" type="string" default="for_sale">
+  Listing status filter.
+
+  | Value | Description |
+  |-------|-------------|
+  | `for_sale` | Active for-sale listings (default) |
+  | `for_rent` | Rental listings |
+  | `sold` | Recently sold listings |
+</ParamField>
+
+<ParamField query="page" type="integer" default={1}>
+  Page number for paginated results. Zillow caps search at **20 pages (~820 results)**. Range: `1` - `20`.
+</ParamField>
+
+<ParamField query="sort" type="string">
+  Sort order for results.
+
+  | Value | Description |
+  |-------|-------------|
+  | `homes_for_you` | Best match |
+  | `newest` | Most recently listed |
+  | `price_high_to_low` | Most expensive first |
+  | `price_low_to_high` | Cheapest first |
+  | `bedrooms` | By bedroom count |
+  | `bathrooms` | By bathroom count |
+  | `square_feet` | By interior area |
+  | `lot_size` | By lot size |
+  | `year_built` | By year built |
+</ParamField>
+
+<ParamField query="price_min" type="integer">
+  Minimum price in USD.
+</ParamField>
+
+<ParamField query="price_max" type="integer">
+  Maximum price in USD.
+</ParamField>
+
+<ParamField query="beds_min" type="integer">
+  Minimum number of bedrooms. Range: `0` - `10`.
+</ParamField>
+
+<ParamField query="baths_min" type="number">
+  Minimum number of bathrooms. Range: `0` - `10`.
+</ParamField>
+
+<ParamField query="home_type" type="string">
+  Comma-separated list of home types.
+
+  Values: `houses`, `condos`, `townhomes`, `apartments`, `manufactured`, `lots`, `multi_family`.
+</ParamField>
+
+<ParamField query="sqft_min" type="integer">
+  Minimum interior square footage.
+</ParamField>
+
+<ParamField query="sqft_max" type="integer">
+  Maximum interior square footage.
+</ParamField>
+
+<ParamField query="lot_min" type="integer">
+  Minimum lot size in square feet.
+</ParamField>
+
+<ParamField query="lot_max" type="integer">
+  Maximum lot size in square feet.
+</ParamField>
+
+<ParamField query="year_built_min" type="integer">
+  Earliest year built.
+</ParamField>
+
+<ParamField query="year_built_max" type="integer">
+  Latest year built.
+</ParamField>
+
+<ParamField query="hoa_max" type="integer">
+  Maximum monthly HOA fee.
+</ParamField>
+
+<ParamField query="keywords" type="string">
+  Match listing-description keywords.
+</ParamField>
+
+<ParamField query="days_on" type="string">
+  Days-on-Zillow filter (e.g. `1`, `7`, `30`).
+</ParamField>
+
+<ParamField query="north" type="number">
+  North latitude of a map-bounds box. **Power-user option** for tiling past the ~820-result cap.
+</ParamField>
+
+<ParamField query="south" type="number">
+  South latitude of a map-bounds box.
+</ParamField>
+
+<ParamField query="east" type="number">
+  East longitude of a map-bounds box.
+</ParamField>
+
+<ParamField query="west" type="number">
+  West longitude of a map-bounds box.
+</ParamField>
+
+## Response
+
+<ResponseField name="location" type="string">The location that was searched.</ResponseField>
+<ResponseField name="status" type="string">The status filter that was applied (`for_sale`, `for_rent`, `sold`).</ResponseField>
+<ResponseField name="map_results_count" type="integer">Total number of listings Zillow reports inside the map bounds (may exceed the page cap).</ResponseField>
+<ResponseField name="region" type="object">
+  The resolved region: `region_id` and `region_type`. Re-use `region_id` to tile or refine searches.
+</ResponseField>
+<ResponseField name="map_bounds" type="object">
+  The map bounding box the search covers: `north`, `east`, `south`, `west`. Subdivide this to beat the 820-result cap.
+</ResponseField>
+<ResponseField name="pagination" type="object">
+  Page-number pagination: `current_page`, `per_page`, `total_pages`, `total_results`.
+</ResponseField>
+<ResponseField name="scraped_utc" type="number">Scrape time as a Unix timestamp (nullable).</ResponseField>
+<ResponseField name="scraped_at" type="string">Scrape time as an ISO-8601 string (nullable).</ResponseField>
+<ResponseField name="results" type="array">
+  Array of matching listing cards.
+
+  <Expandable title="Listing object">
+    <ResponseField name="position" type="integer">1-based position within the result set.</ResponseField>
+    <ResponseField name="zpid" type="string">Zillow property id — pass to the [property detail](/api-reference/endpoint/zillow/get-property) endpoint (nullable).</ResponseField>
+    <ResponseField name="id" type="string">Internal listing id (nullable).</ResponseField>
+    <ResponseField name="detail_url" type="string">Full URL to the listing (nullable).</ResponseField>
+    <ResponseField name="home_type" type="string">Home type, e.g. `SINGLE_FAMILY`, `CONDO`, `TOWNHOUSE`, `APARTMENT` (nullable).</ResponseField>
+    <ResponseField name="home_status" type="string">Home status, e.g. `FOR_SALE`, `FOR_RENT`, `SOLD`, `PENDING` (nullable).</ResponseField>
+    <ResponseField name="status_text" type="string">Human status text, e.g. `House for sale` (nullable).</ResponseField>
+    <ResponseField name="status_type" type="string">Status type (nullable).</ResponseField>
+    <ResponseField name="marketing_status" type="string">Marketing status (nullable).</ResponseField>
+    <ResponseField name="contingent_listing_type" type="string">Contingency type (nullable).</ResponseField>
+    <ResponseField name="price" type="integer">Price in USD (nullable).</ResponseField>
+    <ResponseField name="price_raw" type="string">Raw price string, e.g. `$460,000` or `$2,400/mo` (nullable).</ResponseField>
+    <ResponseField name="currency" type="string">ISO 4217 currency code (nullable).</ResponseField>
+    <ResponseField name="price_change" type="integer">Signed price change amount (nullable).</ResponseField>
+    <ResponseField name="date_price_changed_utc" type="number">Price-change date as a Unix timestamp (nullable).</ResponseField>
+    <ResponseField name="date_price_changed_at" type="string">Price-change date as an ISO-8601 string (nullable).</ResponseField>
+    <ResponseField name="price_reduction" type="string">Price-reduction label (nullable).</ResponseField>
+    <ResponseField name="flex_field_text" type="string">Marketing badge text, e.g. `Price cut` (nullable).</ResponseField>
+    <ResponseField name="zestimate" type="integer">Zillow value estimate (nullable).</ResponseField>
+    <ResponseField name="rent_zestimate" type="integer">Zillow rent estimate (nullable).</ResponseField>
+    <ResponseField name="tax_assessed_value" type="integer">Tax-assessed value (nullable).</ResponseField>
+    <ResponseField name="beds" type="number">Number of bedrooms (nullable).</ResponseField>
+    <ResponseField name="baths" type="number">Number of bathrooms (nullable).</ResponseField>
+    <ResponseField name="living_area" type="integer">Interior square footage (nullable).</ResponseField>
+    <ResponseField name="lot_area_value" type="number">Lot size value (nullable).</ResponseField>
+    <ResponseField name="lot_area_unit" type="string">Lot size unit, e.g. `sqft`, `acres` (nullable).</ResponseField>
+    <ResponseField name="address" type="string">Full one-line address (nullable).</ResponseField>
+    <ResponseField name="street_address" type="string">Street line (nullable).</ResponseField>
+    <ResponseField name="unit" type="string">Unit / apartment number (nullable).</ResponseField>
+    <ResponseField name="city" type="string">City (nullable).</ResponseField>
+    <ResponseField name="state" type="string">State code (nullable).</ResponseField>
+    <ResponseField name="zipcode" type="string">ZIP code (nullable).</ResponseField>
+    <ResponseField name="country" type="string">Country code (nullable).</ResponseField>
+    <ResponseField name="is_undisclosed_address" type="boolean">Whether the address is withheld (nullable).</ResponseField>
+    <ResponseField name="latitude" type="number">Latitude (nullable).</ResponseField>
+    <ResponseField name="longitude" type="number">Longitude (nullable).</ResponseField>
+    <ResponseField name="broker_name" type="string">Listing broker name (nullable).</ResponseField>
+    <ResponseField name="provider_listing_id" type="string">Provider listing id (nullable).</ResponseField>
+    <ResponseField name="days_on_zillow" type="integer">Days on Zillow (nullable).</ResponseField>
+    <ResponseField name="is_zillow_owned" type="boolean">Whether Zillow owns the home (nullable).</ResponseField>
+    <ResponseField name="is_featured" type="boolean">Featured listing flag (nullable).</ResponseField>
+    <ResponseField name="is_showcase" type="boolean">Showcase listing flag (nullable).</ResponseField>
+    <ResponseField name="is_fsba" type="boolean">For-sale-by-agent flag (nullable).</ResponseField>
+    <ResponseField name="is_new_construction" type="boolean">New-construction flag (nullable).</ResponseField>
+    <ResponseField name="is_premier_builder" type="boolean">Premier-builder flag (nullable).</ResponseField>
+    <ResponseField name="is_preforeclosure_auction" type="boolean">Pre-foreclosure / auction flag (nullable).</ResponseField>
+    <ResponseField name="is_non_owner_occupied" type="boolean">Non-owner-occupied flag (nullable).</ResponseField>
+    <ResponseField name="img_src" type="string">Primary photo URL (nullable).</ResponseField>
+    <ResponseField name="has_image" type="boolean">Whether the listing has photos (nullable).</ResponseField>
+    <ResponseField name="has_video" type="boolean">Whether the listing has video (nullable).</ResponseField>
+    <ResponseField name="has_3d_model" type="boolean">Whether the listing has a 3D model (nullable).</ResponseField>
+    <ResponseField name="has_open_house" type="boolean">Whether an open house is scheduled (nullable).</ResponseField>
+    <ResponseField name="open_house_start" type="string">Open-house start (nullable).</ResponseField>
+    <ResponseField name="open_house_end" type="string">Open-house end (nullable).</ResponseField>
+    <ResponseField name="photos" type="array">Additional photo URLs.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "location": "Austin, TX",
+  "status": "for_sale",
+  "map_results_count": 842,
+  "region": { "region_id": 10221, "region_type": 6 },
+  "map_bounds": { "north": 30.52, "east": -97.56, "south": 30.09, "west": -97.94 },
+  "pagination": { "current_page": 1, "per_page": 40, "total_pages": 20, "total_results": 842 },
+  "scraped_at": "2026-07-07T12:00:00Z",
+  "results": [
+    {
+      "position": 1,
+      "zpid": "29499726",
+      "detail_url": "https://www.zillow.com/homedetails/123-Main-St-Austin-TX-78701/29499726_zpid/",
+      "home_type": "SINGLE_FAMILY",
+      "home_status": "FOR_SALE",
+      "status_text": "House for sale",
+      "price": 460000,
+      "price_raw": "$460,000",
+      "currency": "USD",
+      "zestimate": 468000,
+      "rent_zestimate": 2600,
+      "beds": 3,
+      "baths": 2,
+      "living_area": 1800,
+      "lot_area_value": 6500,
+      "lot_area_unit": "sqft",
+      "address": "123 Main St, Austin, TX 78701",
+      "city": "Austin",
+      "state": "TX",
+      "zipcode": "78701",
+      "latitude": 30.2672,
+      "longitude": -97.7431,
+      "days_on_zillow": 4,
+      "is_fsba": true,
+      "img_src": "https://photos.zillowstatic.com/fp/abc-p_e.jpg"
+    }
+  ]
+}
+```
+
+<Note>
+  Each search request costs **5 credits**. Failed requests are not charged.
+</Note>

@@ -19,6 +19,7 @@
     "/openapi-amazon.json",
     "/openapi-ebay.json",
     "/openapi-realtor.json",
+    "/openapi-zillow.json",
     "/openapi-youtube.json",
     "/openapi-shopee.json",
     "/openapi-tiktok.json",
@@ -478,6 +479,42 @@
             "group": "Reference",
             "pages": [
               "api-reference/endpoint/realtor/list-markets"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Zillow",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "zillow/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/zillow/search",
+              "api-reference/endpoint/zillow/autocomplete"
+            ]
+          },
+          {
+            "group": "Properties",
+            "pages": [
+              "api-reference/endpoint/zillow/get-property"
+            ]
+          },
+          {
+            "group": "Agents",
+            "pages": [
+              "api-reference/endpoint/zillow/get-agent"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api-reference/endpoint/zillow/list-markets"
             ]
           }
         ]

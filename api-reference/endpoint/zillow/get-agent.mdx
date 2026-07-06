@@ -1,0 +1,153 @@
+---
+title: "Get Agent Profile"
+openapi: "GET /v1/zillow/agent"
+description: "Full detail for a Zillow real-estate professional — profile, reviews, past sales, licenses, and active listings."
+---
+
+## Query Parameters
+
+Provide **either** `username` or `url`.
+
+<ParamField query="username" type="string">
+  Zillow profile username (screen name), e.g. `jane-doe`. Taken from a `/profile/<username>/` URL.
+</ParamField>
+
+<ParamField query="url" type="string">
+  Full Zillow `/profile/...` URL (alternative to `username`).
+</ParamField>
+
+## Response
+
+The response wraps a single `Agent` object under an `agent` key.
+
+<ResponseField name="agent" type="object">
+  <Expandable title="Agent object">
+    <ResponseField name="username" type="string">Profile username (nullable).</ResponseField>
+    <ResponseField name="encoded_zuid" type="string">Zillow user id (nullable).</ResponseField>
+    <ResponseField name="name" type="string">Full name (nullable).</ResponseField>
+    <ResponseField name="url" type="string">Profile URL (nullable).</ResponseField>
+    <ResponseField name="profile_photo" type="string">Profile photo URL (nullable).</ResponseField>
+    <ResponseField name="phone" type="string">Phone (nullable).</ResponseField>
+    <ResponseField name="email" type="string">Email (nullable).</ResponseField>
+    <ResponseField name="business_name" type="string">Business / brokerage name (nullable).</ResponseField>
+    <ResponseField name="business_address" type="string">Business address (nullable).</ResponseField>
+    <ResponseField name="broker_name" type="string">Broker name (nullable).</ResponseField>
+    <ResponseField name="title" type="string">Title (nullable).</ResponseField>
+    <ResponseField name="bio" type="string">Biography (nullable).</ResponseField>
+    <ResponseField name="rating" type="number">Average review rating (nullable).</ResponseField>
+    <ResponseField name="review_count" type="integer">Number of reviews (nullable).</ResponseField>
+    <ResponseField name="recent_sales_count" type="integer">Recent sales count (nullable).</ResponseField>
+    <ResponseField name="total_sales_last_year" type="integer">Total sales in the last year (nullable).</ResponseField>
+    <ResponseField name="for_sale_count" type="integer">Active for-sale listings count (nullable).</ResponseField>
+    <ResponseField name="for_rent_count" type="integer">Active for-rent listings count (nullable).</ResponseField>
+    <ResponseField name="past_sales_count" type="integer">Past sales count (nullable).</ResponseField>
+    <ResponseField name="years_experience" type="integer">Years of experience (nullable).</ResponseField>
+    <ResponseField name="is_top_agent" type="boolean">Top-agent flag (nullable).</ResponseField>
+    <ResponseField name="is_team_lead" type="boolean">Team-lead flag (nullable).</ResponseField>
+    <ResponseField name="license_number" type="string">Primary license number (nullable).</ResponseField>
+    <ResponseField name="license_state" type="string">Primary license state (nullable).</ResponseField>
+    <ResponseField name="website_url" type="string">Personal website URL (nullable).</ResponseField>
+    <ResponseField name="facebook_url" type="string">Facebook URL (nullable).</ResponseField>
+    <ResponseField name="linkedin_url" type="string">LinkedIn URL (nullable).</ResponseField>
+    <ResponseField name="x_url" type="string">X / Twitter URL (nullable).</ResponseField>
+    <ResponseField name="video_url" type="string">Intro video URL (nullable).</ResponseField>
+    <ResponseField name="specialties" type="array">Specialty tags (list of strings).</ResponseField>
+    <ResponseField name="service_areas" type="array">Service area names (list of strings).</ResponseField>
+    <ResponseField name="languages" type="array">Languages spoken (list of strings).</ResponseField>
+    <ResponseField name="licenses" type="array">
+      Professional licenses.
+
+      <Expandable title="License object">
+        <ResponseField name="state" type="string">License state (nullable).</ResponseField>
+        <ResponseField name="license_type" type="string">License type (nullable).</ResponseField>
+        <ResponseField name="license_number" type="string">License number (nullable).</ResponseField>
+        <ResponseField name="status" type="string">License status (nullable).</ResponseField>
+        <ResponseField name="expiration" type="string">Expiration date (nullable).</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="professional_information" type="array">Raw professional-information label/value records.</ResponseField>
+    <ResponseField name="reviews" type="array">
+      Agent reviews.
+
+      <Expandable title="Review object">
+        <ResponseField name="rating" type="integer">Star rating (nullable).</ResponseField>
+        <ResponseField name="comment" type="string">Review text (nullable).</ResponseField>
+        <ResponseField name="date" type="string">Raw date label (nullable).</ResponseField>
+        <ResponseField name="date_utc" type="number">Date as a Unix timestamp (nullable).</ResponseField>
+        <ResponseField name="date_at" type="string">Date as an ISO-8601 string (nullable).</ResponseField>
+        <ResponseField name="work_description" type="string">Work described in the review (nullable).</ResponseField>
+        <ResponseField name="reviewer_name" type="string">Reviewer name (nullable).</ResponseField>
+        <ResponseField name="rebuttal" type="string">Agent's response to the review (nullable).</ResponseField>
+        <ResponseField name="sub_ratings" type="array">Category sub-ratings: `{ description, score }`.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="past_sales" type="array">
+      Closed transactions.
+
+      <Expandable title="Past sale object">
+        <ResponseField name="zpid" type="string">Property id (nullable).</ResponseField>
+        <ResponseField name="street_address" type="string">Street line (nullable).</ResponseField>
+        <ResponseField name="city_state_zip" type="string">City, state, ZIP (nullable).</ResponseField>
+        <ResponseField name="price" type="integer">Sold price (nullable).</ResponseField>
+        <ResponseField name="sold_date" type="string">Raw sold date label (nullable).</ResponseField>
+        <ResponseField name="sold_date_utc" type="number">Sold date as a Unix timestamp (nullable).</ResponseField>
+        <ResponseField name="sold_date_at" type="string">Sold date as an ISO-8601 string (nullable).</ResponseField>
+        <ResponseField name="bedrooms" type="number">Bedrooms (nullable).</ResponseField>
+        <ResponseField name="bathrooms" type="number">Bathrooms (nullable).</ResponseField>
+        <ResponseField name="living_area" type="integer">Interior area (nullable).</ResponseField>
+        <ResponseField name="latitude" type="number">Latitude (nullable).</ResponseField>
+        <ResponseField name="longitude" type="number">Longitude (nullable).</ResponseField>
+        <ResponseField name="represented" type="string">Side represented: `buyer`, `seller`, or `both` (nullable).</ResponseField>
+        <ResponseField name="image_url" type="string">Photo URL (nullable).</ResponseField>
+        <ResponseField name="url" type="string">Listing URL (nullable).</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="listings" type="array">The agent's active listings — same shape as a search [`Listing`](/api-reference/endpoint/zillow/search) object.</ResponseField>
+    <ResponseField name="scraped_utc" type="number">Scrape time as a Unix timestamp (nullable).</ResponseField>
+    <ResponseField name="scraped_at" type="string">Scrape time as an ISO-8601 string (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "agent": {
+    "username": "jane-doe",
+    "encoded_zuid": "X1-ZU10abcd1234_5xyz9",
+    "name": "Jane Doe",
+    "url": "https://www.zillow.com/profile/jane-doe/",
+    "profile_photo": "https://photos.zillowstatic.com/h/p/jane.jpg",
+    "phone": "512-555-0100",
+    "business_name": "Downtown Realty Group",
+    "title": "Real Estate Agent",
+    "rating": 4.9,
+    "review_count": 128,
+    "recent_sales_count": 34,
+    "years_experience": 12,
+    "is_top_agent": true,
+    "license_number": "0654321",
+    "license_state": "TX",
+    "specialties": ["Buyer's Agent", "Listing Agent"],
+    "service_areas": ["Austin, TX", "Round Rock, TX"],
+    "languages": ["English", "Spanish"],
+    "licenses": [
+      { "state": "TX", "license_type": "Real Estate Agent", "license_number": "0654321", "status": "Active" }
+    ],
+    "reviews": [
+      { "rating": 5, "comment": "Fantastic to work with!", "reviewer_name": "buyer123", "work_description": "Helped me buy a home", "sub_ratings": [{ "description": "Responsiveness", "score": 5 }] }
+    ],
+    "past_sales": [
+      { "zpid": "29499726", "street_address": "123 Main St", "city_state_zip": "Austin, TX 78701", "price": 455000, "sold_date_at": "2026-03-15T00:00:00Z", "represented": "seller" }
+    ],
+    "listings": [
+      { "position": 1, "zpid": "30112233", "home_status": "FOR_SALE", "price": 525000, "beds": 4, "baths": 3, "city": "Austin", "state": "TX" }
+    ],
+    "scraped_at": "2026-07-07T12:00:00Z"
+  }
+}
+```
+
+<Note>
+  Each agent-profile request costs **5 credits**. Failed requests are not charged.
+</Note>
