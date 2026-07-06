@@ -1,0 +1,42 @@
+---
+title: "List Departments"
+openapi: "GET /v1/leboncoin/departments"
+description: "List Leboncoin's French departments, optionally filtered by region."
+---
+
+Returns the reference list of French departments used by Leboncoin. Use a returned `id` with the [`department_id`](/api-reference/endpoint/leboncoin/search-ads) parameter on search.
+
+## Query Parameters
+
+<ParamField query="region_id" type="string">
+  Restrict the list to departments within a single region. Use [`/v1/leboncoin/regions`](/api-reference/endpoint/leboncoin/list-regions) to look up region ids. Omit to return all departments.
+</ParamField>
+
+## Response
+
+<ResponseField name="departments" type="array">
+  Array of departments.
+
+  <Expandable title="Department object">
+    <ResponseField name="id" type="string">Leboncoin department id (e.g. `75`).</ResponseField>
+    <ResponseField name="name" type="string">Department name (e.g. `Paris`).</ResponseField>
+    <ResponseField name="region_id" type="string">The region this department belongs to.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "departments": [
+    { "id": "75", "name": "Paris", "region_id": "22" },
+    { "id": "77", "name": "Seine-et-Marne", "region_id": "22" },
+    { "id": "92", "name": "Hauts-de-Seine", "region_id": "22" },
+    { "id": "93", "name": "Seine-Saint-Denis", "region_id": "22" }
+  ]
+}
+```
+
+<Note>
+  Listing departments is a **free** reference endpoint (0 credits).
+</Note>

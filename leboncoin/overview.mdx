@@ -1,0 +1,150 @@
+---
+title: "Leboncoin Scraper Overview"
+description: "Scrape Leboncoin classified ads, ad details, sellers, and storefronts across France with region, department, and city filters and structured JSON responses."
+---
+
+# Leboncoin Scraper API
+
+Search classified ads, pull full ad detail, fetch similar ads, and retrieve seller profiles and storefronts from **Leboncoin** — France's largest classifieds marketplace. The API handles authentication, DataDome anti-bot bypass, and French location routing automatically.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="France Coverage" icon="earth-europe">
+    Full national coverage of leboncoin.fr, filterable by region, department, city, or postal code.
+  </Card>
+  <Card title="Location Filters" icon="location-dot">
+    Narrow searches by [`region_id`](/api-reference/endpoint/leboncoin/list-regions), [`department_id`](/api-reference/endpoint/leboncoin/list-departments), `city`, or `zipcode`, including DOM-TOM overseas territories.
+  </Card>
+  <Card title="DataDome Bypass" icon="shield-halved">
+    Automatic session management, Chrome TLS impersonation, and fingerprint rotation to clear Leboncoin's DataDome protection.
+  </Card>
+  <Card title="Rich Ad Data" icon="box">
+    Prices, category-specific attributes, images, publication dates, shipping eligibility, and seller info.
+  </Card>
+  <Card title="Seller Insights" icon="store">
+    Private and pro seller profiles, feedback scores, store ratings, reviews, and full storefront listings.
+  </Card>
+  <Card title="French Proxies" icon="globe">
+    Requests are routed through French proxies for accurate pricing, availability, and DataDome trust.
+  </Card>
+  <Card title="SDK Support" icon="code">
+    First-class support via the ScrapeBadger Node.js and Python SDKs.
+  </Card>
+</CardGroup>
+
+<Note>
+  Leboncoin is a **single-country marketplace** (France only). There is no `domain` or `market` selector — instead you scope results geographically with `region_id`, `department_id`, `city`, or `zipcode`. Overseas territories (DOM-TOM) are exposed as region values.
+</Note>
+
+## Coverage & Locations
+
+Leboncoin operates as one national marketplace (`leboncoin.fr`). Instead of picking a country domain, you filter results by French administrative geography:
+
+| Filter | Parameter | Lookup endpoint |
+|--------|-----------|-----------------|
+| Region (incl. DOM-TOM) | `region_id` | [`/v1/leboncoin/regions`](/api-reference/endpoint/leboncoin/list-regions) |
+| Department | `department_id` | [`/v1/leboncoin/departments`](/api-reference/endpoint/leboncoin/list-departments) |
+| City / postal code | `city`, `zipcode` | [`/v1/leboncoin/locations/search`](/api-reference/endpoint/leboncoin/search-locations) |
+
+<Tip>
+  Use [`/v1/leboncoin/locations/search`](/api-reference/endpoint/leboncoin/search-locations) to resolve a free-text place name (e.g. `Lyon`) into a structured location with its `region_id`, `department_id`, and coordinates. Use [`/v1/leboncoin/markets`](/api-reference/endpoint/leboncoin/list-markets) to get the market metadata (currency, locale) programmatically.
+</Tip>
+
+## Quick Start
+
+<CodeGroup>
+
+```javascript Node.js
+import ScrapeBadger from "scrapebadger";
+
+const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" });
+
+const results = await client.leboncoin.search({
+  text: "vélo électrique",
+  region_id: "22",
+  page: 1,
+});
+
+console.log(results.ads);
+```
+
+```python Python
+from scrapebadger import ScrapeBadger
+
+client = ScrapeBadger(api_key="YOUR_API_KEY")
+
+results = client.leboncoin.search(
+    text="vélo électrique",
+    region_id="22",
+    page=1,
+)
+
+print(results.ads)
+```
+
+```bash cURL
+curl "https://api.scrapebadger.com/v1/leboncoin/search?text=v%C3%A9lo+%C3%A9lectrique&region_id=22&page=1" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+## Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/leboncoin/search`](/api-reference/endpoint/leboncoin/search-ads) | GET | Search ads across France |
+| [`/v1/leboncoin/ads/{list_id}`](/api-reference/endpoint/leboncoin/get-ad) | GET | Full detail for a single ad |
+| [`/v1/leboncoin/ads/{list_id}/similar`](/api-reference/endpoint/leboncoin/get-similar-ads) | GET | Ads similar to a given ad |
+| [`/v1/leboncoin/sellers/{user_id}`](/api-reference/endpoint/leboncoin/get-seller) | GET | Seller public profile |
+| [`/v1/leboncoin/sellers/{user_id}/listings`](/api-reference/endpoint/leboncoin/get-seller-listings) | GET | A seller's active listings |
+| [`/v1/leboncoin/categories`](/api-reference/endpoint/leboncoin/list-categories) | GET | List categories |
+| [`/v1/leboncoin/regions`](/api-reference/endpoint/leboncoin/list-regions) | GET | List French regions (incl. DOM-TOM) |
+| [`/v1/leboncoin/departments`](/api-reference/endpoint/leboncoin/list-departments) | GET | List departments |
+| [`/v1/leboncoin/locations/search`](/api-reference/endpoint/leboncoin/search-locations) | GET | Autocomplete a location by name |
+| [`/v1/leboncoin/markets`](/api-reference/endpoint/leboncoin/list-markets) | GET | List supported markets |
+
+## Credit Costs
+
+| Endpoint | Cost |
+|----------|------|
+| Search | 5 credits |
+| Get ad detail | 5 credits |
+| Get similar ads | 5 credits |
+| Get seller | 5 credits |
+| Seller listings | 5 credits |
+| Search locations | 2 credits |
+| List categories | 0 credits |
+| List regions | 0 credits |
+| List departments | 0 credits |
+| List markets | 0 credits |
+| Failed requests | 0 credits |
+
+## Authentication
+
+All requests require your API key in the `X-API-Key` header:
+
+```bash
+curl "https://api.scrapebadger.com/v1/leboncoin/search?text=iphone" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+## Anti-Bot Handling
+
+Leboncoin protects its catalog with **DataDome**, which combines IP-reputation scoring, TLS/HTTP-2 fingerprinting, and JavaScript challenges. ScrapeBadger clears these automatically using Chrome TLS impersonation on French sessions. You never need to manage proxies, sessions, or CAPTCHAs.
+
+<Note>
+  For accurate pricing, availability, and DataDome trust, requests are routed through French proxies. This is handled automatically.
+</Note>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Search Ads" icon="magnifying-glass" href="/api-reference/endpoint/leboncoin/search-ads">
+    Full API reference for searching Leboncoin classifieds
+  </Card>
+  <Card title="Get Ad Detail" icon="box" href="/api-reference/endpoint/leboncoin/get-ad">
+    Retrieve the full detail for a single ad by `list_id`
+  </Card>
+</CardGroup>

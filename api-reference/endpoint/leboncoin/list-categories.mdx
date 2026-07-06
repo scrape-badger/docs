@@ -1,0 +1,37 @@
+---
+title: "List Categories"
+openapi: "GET /v1/leboncoin/categories"
+description: "List Leboncoin's categories and their ids."
+---
+
+Returns the reference list of Leboncoin categories and their ids. Use a returned `id` with the [`category`](/api-reference/endpoint/leboncoin/search-ads) parameter on search.
+
+## Response
+
+<ResponseField name="categories" type="array">
+  Array of categories.
+
+  <Expandable title="Category object">
+    <ResponseField name="id" type="string">Leboncoin category id (e.g. `24`).</ResponseField>
+    <ResponseField name="name" type="string">Human-readable category name (e.g. `Vélos`).</ResponseField>
+    <ResponseField name="parent_id" type="string">Parent category id, if nested (nullable).</ResponseField>
+    <ResponseField name="parent_name" type="string">Parent category name, if nested (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "categories": [
+    { "id": "1", "name": "Véhicules", "parent_id": null, "parent_name": null },
+    { "id": "2", "name": "Voitures", "parent_id": "1", "parent_name": "Véhicules" },
+    { "id": "24", "name": "Vélos", "parent_id": "1", "parent_name": "Véhicules" },
+    { "id": "9", "name": "Immobilier", "parent_id": null, "parent_name": null }
+  ]
+}
+```
+
+<Note>
+  Listing categories is a **free** reference endpoint (0 credits).
+</Note>

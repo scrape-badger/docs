@@ -412,6 +412,47 @@
         ]
       },
       {
+        "tab": "Leboncoin",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "leboncoin/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/leboncoin/search-ads"
+            ]
+          },
+          {
+            "group": "Ads",
+            "pages": [
+              "api-reference/endpoint/leboncoin/get-ad",
+              "api-reference/endpoint/leboncoin/get-similar-ads"
+            ]
+          },
+          {
+            "group": "Sellers",
+            "pages": [
+              "api-reference/endpoint/leboncoin/get-seller",
+              "api-reference/endpoint/leboncoin/get-seller-listings"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api-reference/endpoint/leboncoin/list-categories",
+              "api-reference/endpoint/leboncoin/list-regions",
+              "api-reference/endpoint/leboncoin/list-departments",
+              "api-reference/endpoint/leboncoin/search-locations",
+              "api-reference/endpoint/leboncoin/list-markets"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Realtor",
         "groups": [
           {

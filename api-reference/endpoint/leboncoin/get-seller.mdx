@@ -1,0 +1,101 @@
+---
+title: "Get Seller Profile"
+openapi: "GET /v1/leboncoin/sellers/{user_id}"
+description: "A Leboncoin seller's public profile, feedback summary, and store info."
+---
+
+## Path Parameters
+
+<ParamField path="user_id" type="string" required>
+  The Leboncoin seller id (a UUID). You can find this in the `owner.user_id` field of any ad.
+</ParamField>
+
+## Response
+
+<ResponseField name="seller" type="object">
+  Seller profile object.
+
+  <Expandable title="Seller object">
+    <ResponseField name="user_id" type="string">Seller UUID.</ResponseField>
+    <ResponseField name="store_id" type="string">Store id, for pro sellers with a storefront (nullable).</ResponseField>
+    <ResponseField name="name" type="string">Seller display name.</ResponseField>
+    <ResponseField name="account_type" type="string">`private` or `pro`.</ResponseField>
+    <ResponseField name="registered_at" type="string">ISO 8601 account creation timestamp (nullable).</ResponseField>
+    <ResponseField name="total_ads" type="integer">Number of active listings (nullable).</ResponseField>
+    <ResponseField name="description" type="string">Seller / store description (nullable).</ResponseField>
+    <ResponseField name="profile_picture_url" type="string">URL to the seller's profile picture (nullable).</ResponseField>
+    <ResponseField name="location" type="string">Seller location (nullable).</ResponseField>
+    <ResponseField name="badges" type="array">List of badge strings awarded to the seller.</ResponseField>
+    <ResponseField name="feedback" type="object">
+      Buyer feedback summary.
+
+      <Expandable title="Feedback object">
+        <ResponseField name="overall_score" type="number">Overall feedback score (nullable).</ResponseField>
+        <ResponseField name="received_count" type="integer">Number of feedback entries received (nullable).</ResponseField>
+        <ResponseField name="category_scores" type="object">Per-category score map (e.g. `{"communication": 4.8}`).</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="reply_rate" type="number">Message reply rate (0-1 or percent, nullable).</ResponseField>
+    <ResponseField name="presence_status" type="string">Seller presence status (e.g. `online`, nullable).</ResponseField>
+    <ResponseField name="siren" type="string">SIREN company registration number, for pro sellers (nullable).</ResponseField>
+    <ResponseField name="siret" type="string">SIRET establishment registration number, for pro sellers (nullable).</ResponseField>
+    <ResponseField name="activity_sector" type="string">Business activity sector, for pro sellers (nullable).</ResponseField>
+    <ResponseField name="website_url" type="string">Seller website URL (nullable).</ResponseField>
+    <ResponseField name="store_rating_value" type="number">Average store rating (nullable).</ResponseField>
+    <ResponseField name="store_ratings_total" type="integer">Total number of store ratings (nullable).</ResponseField>
+    <ResponseField name="store_reviews" type="array">
+      Recent store reviews.
+
+      <Expandable title="StoreReview object">
+        <ResponseField name="author_name" type="string">Reviewer display name (nullable).</ResponseField>
+        <ResponseField name="rating_value" type="number">Star rating for this review (nullable).</ResponseField>
+        <ResponseField name="text" type="string">Review body text (nullable).</ResponseField>
+        <ResponseField name="review_time" type="string">ISO 8601 review timestamp (nullable).</ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "seller": {
+    "user_id": "b3f1c2a0-8d4e-4a1b-9c2d-1e2f3a4b5c6d",
+    "store_id": "1029384756",
+    "name": "Cycles Paris Pro",
+    "account_type": "pro",
+    "registered_at": "2019-04-12T00:00:00Z",
+    "total_ads": 214,
+    "description": "Vente de vélos neufs et d'occasion, réparation et entretien.",
+    "profile_picture_url": "https://img.leboncoin.fr/api/v1/lbcpb1/images/pp/cyclesparis.jpg",
+    "location": "Paris 11e (75011)",
+    "badges": ["verified_id", "fast_reply"],
+    "feedback": {
+      "overall_score": 4.7,
+      "received_count": 318,
+      "category_scores": { "communication": 4.8, "shipping": 4.6, "conformity": 4.7 }
+    },
+    "reply_rate": 0.96,
+    "presence_status": "online",
+    "siren": "812345678",
+    "siret": "81234567800012",
+    "activity_sector": "Commerce de détail de cycles",
+    "website_url": "https://cyclesparispro.fr",
+    "store_rating_value": 4.7,
+    "store_ratings_total": 318,
+    "store_reviews": [
+      {
+        "author_name": "Marc D.",
+        "rating_value": 5.0,
+        "text": "Vélo conforme à la description, vendeur réactif.",
+        "review_time": "2026-06-10T15:22:00Z"
+      }
+    ]
+  }
+}
+```
+
+<Note>
+  Each seller-profile request costs **5 credits**. Failed requests are not charged.
+</Note>

@@ -1,0 +1,37 @@
+---
+title: "List Regions"
+openapi: "GET /v1/leboncoin/regions"
+description: "List Leboncoin's French regions, including DOM-TOM overseas territories."
+---
+
+Returns the reference list of French regions used by Leboncoin. Use a returned `id` with the [`region_id`](/api-reference/endpoint/leboncoin/search-ads) parameter on search. Overseas territories (DOM-TOM) are included as region values.
+
+## Response
+
+<ResponseField name="regions" type="array">
+  Array of regions.
+
+  <Expandable title="Region object">
+    <ResponseField name="id" type="string">Leboncoin region id (e.g. `22`).</ResponseField>
+    <ResponseField name="name" type="string">Region name (e.g. `Île-de-France`).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "regions": [
+    { "id": "22", "name": "Île-de-France" },
+    { "id": "20", "name": "Auvergne-Rhône-Alpes" },
+    { "id": "6", "name": "Provence-Alpes-Côte d'Azur" },
+    { "id": "26", "name": "Guadeloupe" },
+    { "id": "27", "name": "Martinique" },
+    { "id": "29", "name": "La Réunion" }
+  ]
+}
+```
+
+<Note>
+  Listing regions is a **free** reference endpoint (0 credits).
+</Note>
