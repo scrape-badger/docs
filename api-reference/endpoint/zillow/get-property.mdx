@@ -1,0 +1,296 @@
+---
+title: "Get Property Detail"
+openapi: "GET /v1/zillow/property/{zpid}"
+description: "Maximal detail for a single Zillow property — home facts, price/tax/Zestimate history, schools, agent, and mortgage rates."
+---
+
+## Path Parameters
+
+<ParamField path="zpid" type="string" required>
+  The Zillow property id (`zpid`). You can find it in search results (`zpid`) or extract it from a `/homedetails/...` URL (the `NNNNN_zpid` segment).
+</ParamField>
+
+<Tip>
+  You can also fetch a property by full URL: `GET /v1/zillow/property?url=<Zillow /homedetails/... URL>`.
+</Tip>
+
+## Response
+
+The response wraps a single `Property` object under a `property` key. It carries ~99 top-level fields plus the nested blocks below.
+
+<ResponseField name="property" type="object">
+  <Expandable title="Property object">
+    <ResponseField name="zpid" type="string">Zillow property id.</ResponseField>
+    <ResponseField name="id" type="string">Internal id (nullable).</ResponseField>
+    <ResponseField name="url" type="string">Full listing URL (nullable).</ResponseField>
+    <ResponseField name="home_status" type="string">Home status, e.g. `FOR_SALE`, `SOLD`, `PENDING` (nullable).</ResponseField>
+    <ResponseField name="home_type" type="string">Home type, e.g. `SINGLE_FAMILY`, `CONDO` (nullable).</ResponseField>
+    <ResponseField name="property_type" type="string">Property type (nullable).</ResponseField>
+    <ResponseField name="listing_type" type="string">Listing type (nullable).</ResponseField>
+    <ResponseField name="posting_product_type" type="string">Posting product type (nullable).</ResponseField>
+    <ResponseField name="listing_data_source" type="string">Listing data source (nullable).</ResponseField>
+    <ResponseField name="mls_id" type="string">MLS number (nullable).</ResponseField>
+    <ResponseField name="parcel_id" type="string">Parcel id (nullable).</ResponseField>
+    <ResponseField name="county_fips" type="string">County FIPS code (nullable).</ResponseField>
+    <ResponseField name="provider_listing_id" type="string">Provider listing id (nullable).</ResponseField>
+    <ResponseField name="broker_id" type="string">Broker id (nullable).</ResponseField>
+    <ResponseField name="contingent_listing_type" type="string">Contingency type (nullable).</ResponseField>
+    <ResponseField name="listing_sub_type" type="object">Listing sub-type flags: `is_fsba`, `is_fsbo`, `is_foreclosure`, `is_bank_owned`, `is_for_auction`, `is_coming_soon`, `is_new_home`, `is_pending` (nullable).</ResponseField>
+    <ResponseField name="price" type="integer">Current price in USD (nullable).</ResponseField>
+    <ResponseField name="currency" type="string">ISO 4217 currency code (nullable).</ResponseField>
+    <ResponseField name="list_price_low" type="integer">Lower bound of a price range (nullable).</ResponseField>
+    <ResponseField name="monthly_hoa_fee" type="integer">Monthly HOA fee (nullable).</ResponseField>
+    <ResponseField name="property_tax_rate" type="number">Property tax rate (nullable).</ResponseField>
+    <ResponseField name="annual_homeowners_insurance" type="integer">Annual homeowners insurance estimate (nullable).</ResponseField>
+    <ResponseField name="last_sold_price" type="integer">Last sold price (nullable).</ResponseField>
+    <ResponseField name="date_sold_utc" type="number">Last sold date as a Unix timestamp (nullable).</ResponseField>
+    <ResponseField name="date_sold_at" type="string">Last sold date as an ISO-8601 string (nullable).</ResponseField>
+    <ResponseField name="price_change" type="integer">Signed price change amount (nullable).</ResponseField>
+    <ResponseField name="price_change_date_utc" type="number">Price-change date as a Unix timestamp (nullable).</ResponseField>
+    <ResponseField name="price_change_date_at" type="string">Price-change date as an ISO-8601 string (nullable).</ResponseField>
+    <ResponseField name="zestimate" type="integer">Current Zestimate value (nullable).</ResponseField>
+    <ResponseField name="rent_zestimate" type="integer">Current Rent Zestimate (nullable).</ResponseField>
+    <ResponseField name="zestimate_low_percent" type="string">Zestimate low bound as a percent (nullable).</ResponseField>
+    <ResponseField name="zestimate_high_percent" type="string">Zestimate high bound as a percent (nullable).</ResponseField>
+    <ResponseField name="rent_zestimate_low_percent" type="string">Rent Zestimate low bound as a percent (nullable).</ResponseField>
+    <ResponseField name="rent_zestimate_high_percent" type="string">Rent Zestimate high bound as a percent (nullable).</ResponseField>
+    <ResponseField name="zestimate_30_days_ago" type="integer">Zestimate 30 days ago (nullable).</ResponseField>
+    <ResponseField name="rent_zestimate_30_days_ago" type="integer">Rent Zestimate 30 days ago (nullable).</ResponseField>
+    <ResponseField name="tax_assessed_value" type="integer">Tax-assessed value (nullable).</ResponseField>
+    <ResponseField name="zestimate_history" type="array">
+      Zestimate value-history series.
+
+      <Expandable title="Zestimate point">
+        <ResponseField name="date" type="string">Raw date label (nullable).</ResponseField>
+        <ResponseField name="date_utc" type="number">Date as a Unix timestamp (nullable).</ResponseField>
+        <ResponseField name="date_at" type="string">Date as an ISO-8601 string (nullable).</ResponseField>
+        <ResponseField name="value" type="integer">Zestimate value at the point (nullable).</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="bedrooms" type="number">Number of bedrooms (nullable).</ResponseField>
+    <ResponseField name="bathrooms" type="number">Number of bathrooms (nullable).</ResponseField>
+    <ResponseField name="living_area" type="integer">Interior area (nullable).</ResponseField>
+    <ResponseField name="living_area_units" type="string">Interior area units (nullable).</ResponseField>
+    <ResponseField name="lot_size" type="integer">Lot size (nullable).</ResponseField>
+    <ResponseField name="lot_area_value" type="number">Lot area value (nullable).</ResponseField>
+    <ResponseField name="lot_area_units" type="string">Lot area units (nullable).</ResponseField>
+    <ResponseField name="year_built" type="integer">Year built (nullable).</ResponseField>
+    <ResponseField name="move_in_ready" type="boolean">Move-in-ready flag (nullable).</ResponseField>
+    <ResponseField name="move_in_completion_date" type="string">Move-in completion date (nullable).</ResponseField>
+    <ResponseField name="latitude" type="number">Latitude (nullable).</ResponseField>
+    <ResponseField name="longitude" type="number">Longitude (nullable).</ResponseField>
+    <ResponseField name="street_address" type="string">Street line (nullable).</ResponseField>
+    <ResponseField name="abbreviated_address" type="string">Abbreviated address (nullable).</ResponseField>
+    <ResponseField name="city" type="string">City (nullable).</ResponseField>
+    <ResponseField name="state" type="string">State code (nullable).</ResponseField>
+    <ResponseField name="zipcode" type="string">ZIP code (nullable).</ResponseField>
+    <ResponseField name="county" type="string">County (nullable).</ResponseField>
+    <ResponseField name="country" type="string">Country code (nullable).</ResponseField>
+    <ResponseField name="time_zone" type="string">IANA time zone (nullable).</ResponseField>
+    <ResponseField name="neighborhood" type="string">Neighborhood (nullable).</ResponseField>
+    <ResponseField name="is_undisclosed_address" type="boolean">Whether the address is withheld (nullable).</ResponseField>
+    <ResponseField name="is_income_restricted" type="boolean">Income-restricted flag (nullable).</ResponseField>
+    <ResponseField name="days_on_zillow" type="integer">Days on Zillow (nullable).</ResponseField>
+    <ResponseField name="time_on_zillow" type="string">Human time-on-Zillow string (nullable).</ResponseField>
+    <ResponseField name="page_view_count" type="integer">Page view count (nullable).</ResponseField>
+    <ResponseField name="favorite_count" type="integer">Favorite/save count (nullable).</ResponseField>
+    <ResponseField name="tour_view_count" type="integer">Tour view count (nullable).</ResponseField>
+    <ResponseField name="photo_count" type="integer">Number of photos (nullable).</ResponseField>
+    <ResponseField name="description" type="string">Listing description (nullable).</ResponseField>
+    <ResponseField name="what_i_love" type="string">Owner's "what I love" note (nullable).</ResponseField>
+    <ResponseField name="home_insights" type="array">Editorial insight tags (list of strings).</ResponseField>
+    <ResponseField name="marketing_name" type="string">Marketing name (nullable).</ResponseField>
+    <ResponseField name="brokerage_name" type="string">Brokerage name (nullable).</ResponseField>
+    <ResponseField name="is_showcase_listing" type="boolean">Showcase listing flag (nullable).</ResponseField>
+    <ResponseField name="has_vr_model" type="boolean">VR model flag (nullable).</ResponseField>
+    <ResponseField name="has_3d_model" type="boolean">3D model flag (nullable).</ResponseField>
+    <ResponseField name="virtual_tour_url" type="string">Virtual tour URL (nullable).</ResponseField>
+    <ResponseField name="interactive_floor_plan_url" type="string">Interactive floor plan URL (nullable).</ResponseField>
+    <ResponseField name="street_view_image_url" type="string">Street View image URL (nullable).</ResponseField>
+    <ResponseField name="static_map_url" type="string">Static map image URL (nullable).</ResponseField>
+    <ResponseField name="new_construction_type" type="string">New-construction type (nullable).</ResponseField>
+    <ResponseField name="builder_name" type="string">Builder name (nullable).</ResponseField>
+    <ResponseField name="promotion_headline" type="string">Promotion headline (nullable).</ResponseField>
+    <ResponseField name="promotion_description" type="string">Promotion description (nullable).</ResponseField>
+    <ResponseField name="has_promotion" type="boolean">Whether a promotion is present (nullable).</ResponseField>
+    <ResponseField name="address" type="object">Structured address: `street_address`, `city`, `state`, `zipcode`, `community`, `subdivision`, `neighborhood` (nullable).</ResponseField>
+    <ResponseField name="home_facts" type="object">
+      High-value subset of Zillow's `resoFacts` MLS block (~125 fields), grouped below (nullable).
+
+      <Expandable title="HomeFacts object">
+        <ResponseField name="Bath breakdown">`bathrooms_full`, `bathrooms_half`, `bathrooms_three_quarter`, `bathrooms_one_quarter`.</ResponseField>
+        <ResponseField name="Structure">`stories`, `stories_decimal`, `levels`, `property_condition`, `architectural_style`, `structure_type`, `building_name`, `construction_materials[]`, `foundation_details[]`, `roof_type`, `year_built_effective`.</ResponseField>
+        <ResponseField name="Area">`above_grade_finished_area`, `below_grade_finished_area`, `lot_size_dimensions`, `main_level_bedrooms`, `main_level_bathrooms`, `basement`, `has_basement`, `attic`.</ResponseField>
+        <ResponseField name="Systems">`heating[]`, `cooling[]`, `appliances[]`, `flooring[]`, `utilities[]`, `electric[]`, `gas[]`, `sewer[]`, `water_source[]`.</ResponseField>
+        <ResponseField name="Green / energy">`green_building_verification_type[]`, `green_energy_efficient[]`, `green_energy_generation[]`, `green_sustainability[]`, `green_water_conservation[]`.</ResponseField>
+        <ResponseField name="Features">`interior_features[]`, `exterior_features[]`, `lot_features[]`, `community_features[]`, `accessibility_features[]`, `door_features[]`, `window_features[]`, `laundry_features[]`, `patio_and_porch_features[]`, `fencing[]`, `other_structures[]`, `view[]`, `has_view`, `waterfront_features[]`, `water_view`, `water_body_name`, `security_features[]`.</ResponseField>
+        <ResponseField name="Parking">`parking_features[]`, `parking_capacity`, `garage_parking_capacity`, `carport_parking_capacity`, `covered_parking_capacity`, `open_parking_capacity`, `has_attached_garage`, `has_garage`, `has_carport`, `has_open_parking`.</ResponseField>
+        <ResponseField name="Amenities">`pool_features[]`, `has_private_pool`, `spa_features[]`, `fireplaces`, `fireplace_features[]`, `has_fireplace`.</ResponseField>
+        <ResponseField name="HOA / fees / tax">`association_name`, `association_name2`, `association_fee`, `association_fee2`, `association_fee_includes[]`, `association_amenities[]`, `association_phone`, `has_association`, `hoa_fee`, `hoa_fee_total`, `tax_annual_amount`, `price_per_square_foot`.</ResponseField>
+        <ResponseField name="Land / lease">`has_land_lease`, `land_lease_amount`, `land_lease_expiration_date`, `can_raise_horses`, `additional_parcels_description`, `road_surface_type[]`.</ResponseField>
+        <ResponseField name="Market timing">`on_market_date`, `cumulative_days_on_market`, `offer_review_date`.</ResponseField>
+        <ResponseField name="Rental / multi-unit">`number_of_units_in_community`, `availability_date`, `lease_term`, `tenant_pays[]`, `has_pets_allowed`, `pets_max_weight`, `has_rent_control`.</ResponseField>
+        <ResponseField name="Schools (MLS-named)">`elementary_school`, `middle_school`, `high_school`, `elementary_school_district`, `middle_school_district`, `high_school_district`.</ResponseField>
+        <ResponseField name="Parcel / legal">`parcel_number`, `subdivision_name`, `municipality`, `city_region`, `zoning`, `zoning_description`, `ownership`, `ownership_type`, `property_sub_type[]`, `special_listing_conditions`, `listing_terms`, `inclusions`, `exclusions`.</ResponseField>
+        <ResponseField name="Flags">`is_new_construction`, `is_senior_community`, `has_home_warranty`, `furnished`, `development_status`, `park_name`.</ResponseField>
+        <ResponseField name="Bulk facts">`at_a_glance_facts[]`, `rooms[]` — label/value pairs Zillow ships verbatim.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="agent" type="object">
+      Listing-agent / broker attribution (from `attributionInfo`).
+
+      <Expandable title="Agent attribution object">
+        <ResponseField name="agent_name" type="string">Listing agent name (nullable).</ResponseField>
+        <ResponseField name="agent_phone" type="string">Listing agent phone (nullable).</ResponseField>
+        <ResponseField name="agent_email" type="string">Listing agent email (nullable).</ResponseField>
+        <ResponseField name="agent_license_number" type="string">Listing agent license number (nullable).</ResponseField>
+        <ResponseField name="co_agent_name" type="string">Co-agent name (nullable).</ResponseField>
+        <ResponseField name="co_agent_number" type="string">Co-agent phone (nullable).</ResponseField>
+        <ResponseField name="co_agent_license_number" type="string">Co-agent license number (nullable).</ResponseField>
+        <ResponseField name="broker_name" type="string">Broker name (nullable).</ResponseField>
+        <ResponseField name="broker_phone" type="string">Broker phone (nullable).</ResponseField>
+        <ResponseField name="buyer_agent_name" type="string">Buyer agent name (nullable).</ResponseField>
+        <ResponseField name="buyer_brokerage_name" type="string">Buyer brokerage name (nullable).</ResponseField>
+        <ResponseField name="mls_id" type="string">MLS id (nullable).</ResponseField>
+        <ResponseField name="mls_name" type="string">MLS name (nullable).</ResponseField>
+        <ResponseField name="mls_disclaimer" type="string">MLS disclaimer text (nullable).</ResponseField>
+        <ResponseField name="listing_agreement" type="string">Listing agreement type (nullable).</ResponseField>
+        <ResponseField name="listing_attribution_contact" type="string">Attribution contact (nullable).</ResponseField>
+        <ResponseField name="provider_logo" type="string">Provider logo URL (nullable).</ResponseField>
+        <ResponseField name="true_status" type="string">True listing status (nullable).</ResponseField>
+        <ResponseField name="last_checked" type="string">Last-checked timestamp (nullable).</ResponseField>
+        <ResponseField name="last_updated" type="string">Last-updated timestamp (nullable).</ResponseField>
+        <ResponseField name="listing_agents" type="array">Raw listing-agent records.</ResponseField>
+        <ResponseField name="listing_offices" type="array">Raw listing-office records.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="mortgage_rates" type="object">Current mortgage rates: `fifteen_year_fixed`, `thirty_year_fixed`, `arm_5`, each `{ rate, rate_source, last_updated_utc, last_updated_at }` (nullable).</ResponseField>
+    <ResponseField name="price_history" type="array">
+      Price / listing events over time.
+
+      <Expandable title="Price event object">
+        <ResponseField name="date" type="string">Raw date label (nullable).</ResponseField>
+        <ResponseField name="date_utc" type="number">Event date as a Unix timestamp (nullable).</ResponseField>
+        <ResponseField name="date_at" type="string">Event date as an ISO-8601 string (nullable).</ResponseField>
+        <ResponseField name="event" type="string">Event type, e.g. `Listed for sale`, `Price change`, `Sold` (nullable).</ResponseField>
+        <ResponseField name="price" type="integer">Price at the event (nullable).</ResponseField>
+        <ResponseField name="price_per_square_foot" type="integer">Price per sqft at the event (nullable).</ResponseField>
+        <ResponseField name="price_change_rate" type="number">Price change rate (nullable).</ResponseField>
+        <ResponseField name="source" type="string">Event source (nullable).</ResponseField>
+        <ResponseField name="buyer_agent" type="string">Buyer agent (nullable).</ResponseField>
+        <ResponseField name="seller_agent" type="string">Seller agent (nullable).</ResponseField>
+        <ResponseField name="posting_is_rental" type="boolean">Whether the event was a rental posting (nullable).</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="tax_history" type="array">
+      Yearly tax records.
+
+      <Expandable title="Tax event object">
+        <ResponseField name="year_utc" type="number">Tax year as a Unix timestamp (nullable).</ResponseField>
+        <ResponseField name="year_at" type="string">Tax year as an ISO-8601 string (nullable).</ResponseField>
+        <ResponseField name="value" type="integer">Assessed value (nullable).</ResponseField>
+        <ResponseField name="value_increase_rate" type="number">Assessed-value increase rate (nullable).</ResponseField>
+        <ResponseField name="tax_paid" type="number">Tax paid (nullable).</ResponseField>
+        <ResponseField name="tax_increase_rate" type="number">Tax increase rate (nullable).</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="schools" type="array">
+      Nearby schools.
+
+      <Expandable title="School object">
+        <ResponseField name="name" type="string">School name (nullable).</ResponseField>
+        <ResponseField name="rating" type="integer">GreatSchools rating (nullable).</ResponseField>
+        <ResponseField name="grades" type="string">Grade range, e.g. `K-5` (nullable).</ResponseField>
+        <ResponseField name="level" type="string">Level, e.g. `Elementary`, `Middle`, `High`, `Primary` (nullable).</ResponseField>
+        <ResponseField name="type" type="string">Type, e.g. `Public`, `Private`, `Charter` (nullable).</ResponseField>
+        <ResponseField name="distance" type="number">Distance from the property in miles (nullable).</ResponseField>
+        <ResponseField name="link" type="string">School profile URL (nullable).</ResponseField>
+        <ResponseField name="student_count" type="integer">Student count (nullable).</ResponseField>
+        <ResponseField name="assigned" type="boolean">Whether the school is assigned to this home (nullable).</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="photos" type="array">Photo objects: `url`, `caption`, `subject_type`, and responsive `sources[]` (`{ url, width, format }`).</ResponseField>
+    <ResponseField name="open_house_schedule" type="array">Open-house objects: `start_utc`, `start_at`, `end_utc`, `end_at`, `note`.</ResponseField>
+    <ResponseField name="nearby_cities" type="array">Linked nearby cities: `name`, `region_type`, `url`.</ResponseField>
+    <ResponseField name="nearby_neighborhoods" type="array">Linked nearby neighborhoods: `name`, `region_type`, `url`.</ResponseField>
+    <ResponseField name="nearby_zipcodes" type="array">Linked nearby ZIP codes: `name`, `region_type`, `url`.</ResponseField>
+    <ResponseField name="nearby_homes" type="array">Nearby homes (usually empty in server-rendered JSON; same shape as a search `Listing`).</ResponseField>
+    <ResponseField name="scraped_utc" type="number">Scrape time as a Unix timestamp (nullable).</ResponseField>
+    <ResponseField name="scraped_at" type="string">Scrape time as an ISO-8601 string (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "property": {
+    "zpid": "29499726",
+    "url": "https://www.zillow.com/homedetails/123-Main-St-Austin-TX-78701/29499726_zpid/",
+    "home_status": "FOR_SALE",
+    "home_type": "SINGLE_FAMILY",
+    "price": 460000,
+    "currency": "USD",
+    "monthly_hoa_fee": 45,
+    "zestimate": 468000,
+    "rent_zestimate": 2600,
+    "tax_assessed_value": 420000,
+    "bedrooms": 3,
+    "bathrooms": 2,
+    "living_area": 1800,
+    "lot_size": 6500,
+    "year_built": 2015,
+    "street_address": "123 Main St",
+    "city": "Austin",
+    "state": "TX",
+    "zipcode": "78701",
+    "county": "Travis",
+    "latitude": 30.2672,
+    "longitude": -97.7431,
+    "photo_count": 32,
+    "description": "Charming single-family home in the heart of downtown...",
+    "home_insights": ["Hardwood floors", "Updated kitchen"],
+    "home_facts": {
+      "bathrooms_full": 2,
+      "stories": 2,
+      "architectural_style": "Traditional",
+      "heating": ["Central"],
+      "cooling": ["Central Air"],
+      "appliances": ["Dishwasher", "Refrigerator"],
+      "has_garage": true,
+      "parcel_number": "0203040506",
+      "tax_annual_amount": 6200
+    },
+    "agent": {
+      "agent_name": "Jane Doe",
+      "agent_phone": "512-555-0100",
+      "broker_name": "Downtown Realty Group",
+      "mls_id": "ACT1234567",
+      "mls_name": "ACTRIS"
+    },
+    "mortgage_rates": {
+      "thirty_year_fixed": { "rate": 6.8, "rate_source": "Zillow" }
+    },
+    "price_history": [
+      { "date_at": "2026-06-01T00:00:00Z", "event": "Listed for sale", "price": 460000, "price_per_square_foot": 256 }
+    ],
+    "tax_history": [
+      { "year_at": "2024-01-01T00:00:00Z", "value": 420000, "tax_paid": 6200 }
+    ],
+    "zestimate_history": [
+      { "date_at": "2026-05-01T00:00:00Z", "value": 465000 }
+    ],
+    "schools": [
+      { "name": "Austin Elementary", "rating": 8, "grades": "K-5", "level": "Elementary", "type": "Public", "distance": 0.4, "assigned": true }
+    ],
+    "photos": [
+      { "url": "https://photos.zillowstatic.com/fp/abc-p_f.jpg", "caption": "Front", "sources": [{ "url": "https://photos.zillowstatic.com/fp/abc-p_e.webp", "width": 768, "format": "webp" }] }
+    ],
+    "scraped_at": "2026-07-07T12:00:00Z"
+  }
+}
+```
+
+<Note>
+  Each property-detail request costs **5 credits**. Failed requests are not charged.
+</Note>
