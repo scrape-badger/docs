@@ -5,13 +5,32 @@ description: "Connect ScrapeBadger to Claude Desktop via MCP."
 
 # Claude Desktop
 
-## Prerequisites
+## One-Click Setup (Recommended)
+
+Claude Desktop and claude.ai support custom connectors with OAuth — no API key or config file needed:
+
+<Steps>
+  <Step title="Add the Connector">
+    Go to **Settings** > **Connectors** > **Add custom connector** and enter:
+
+    ```
+    https://mcp.scrapebadger.com/mcp
+    ```
+  </Step>
+  <Step title="Sign In and Approve">
+    Click **Connect**. Your browser opens the ScrapeBadger consent screen — sign in and approve. Access is tied to your account and can be revoked anytime by deactivating your API key in the dashboard.
+  </Step>
+</Steps>
+
+## Alternative: Config File (API Key)
+
+If you prefer API-key auth via a config file:
+
+### Prerequisites
 
 - [Claude Desktop](https://claude.ai/download) installed
 - Node.js 18+ (for `npx mcp-remote`)
 - ScrapeBadger API key
-
-## Setup
 
 <Steps>
   <Step title="Open Config File">
@@ -47,7 +66,7 @@ Claude Desktop uses stdio transport only. The `npx mcp-remote` package bridges b
 
 ## Verify
 
-After restarting, click the tools icon (hammer) in Claude Desktop. You should see 92 ScrapeBadger tools listed (Twitter, Google, Vinted, and Web Scraping).
+After restarting, click the tools icon (hammer) in Claude Desktop. You should see 216 ScrapeBadger tools listed (Twitter/X, Google, YouTube, TikTok, Amazon, eBay, Reddit, real estate, and web scraping).
 
 ## Examples
 

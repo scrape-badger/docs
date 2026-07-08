@@ -1,6 +1,6 @@
 ---
 title: "MCP Server"
-description: "Connect AI agents to ScrapeBadger via Model Context Protocol. 92 tools for Twitter, Google, Vinted, and web scraping."
+description: "Connect AI agents to ScrapeBadger via Model Context Protocol. 216 tools for Twitter/X, Google, YouTube, TikTok, Amazon, eBay, Reddit, real estate, and web scraping. One-click OAuth for Claude."
 ---
 
 # MCP Server
@@ -14,11 +14,11 @@ ScrapeBadger provides a hosted MCP (Model Context Protocol) server at `mcp.scrap
 ## Key Features
 
 <CardGroup cols={3}>
-  <Card title="92 Tools" icon="wrench">
+  <Card title="216 Tools" icon="wrench">
     Every ScrapeBadger API endpoint is available as a typed MCP tool with structured parameters.
   </Card>
   <Card title="Zero Setup" icon="bolt">
-    Hosted at mcp.scrapebadger.com — just add one config snippet to your AI tool.
+    Hosted at mcp.scrapebadger.com — connect Claude with one click, or add one config snippet to any other AI tool.
   </Card>
   <Card title="10 Platforms" icon="plug">
     Works with Claude, Cursor, Windsurf, VS Code, Gemini, ChatGPT, OpenClaw, Cline, and more.
@@ -26,36 +26,37 @@ ScrapeBadger provides a hosted MCP (Model Context Protocol) server at `mcp.scrap
   <Card title="Same Pricing" icon="credit-card">
     No extra cost — MCP uses the same credit-based pricing as the REST API.
   </Card>
-  <Card title="4 Products" icon="layer-group">
-    Twitter/X data, Google (16 products), Vinted marketplace, and general web scraping — all in one server.
+  <Card title="14 Products" icon="layer-group">
+    Twitter/X, Google, YouTube, TikTok, Amazon, eBay, Reddit, Vinted, Leboncoin, Zillow, Realtor, Idealista, Immobiliare, and general web scraping — all in one server.
   </Card>
-  <Card title="Bearer Auth" icon="key">
-    Secure API key authentication via Authorization header or query parameter.
+  <Card title="OAuth or API Key" icon="key">
+    Connect Claude via one-click OAuth consent (no key handling), or authenticate any client with your API key.
   </Card>
 </CardGroup>
 
 ## Available Tools
 
-| Category | Tools | Description |
+| Product | Tools | Description |
 |----------|-------|-------------|
-| **Twitter Users** | 11 | Profiles, search, followers, following, mentions, subscriptions |
-| **Twitter Tweets** | 11 | Get tweets, advanced search, replies, quotes, retweeters, edit history |
-| **Twitter Discovery** | 12 | Trends, communities, lists, places, spaces, broadcasts |
-| **Twitter Streams** | 8 | Real-time stream monitors, webhooks, delivery logs |
-| **Twitter Filter Rules** | 8 | Query-based monitoring, pricing tiers, delivery logs |
-| **Google Search** | 6 | Web search (SERP), Images, Videos, Autocomplete, AI Mode, Lens |
-| **Google Maps** | 5 | Place search, details, reviews, photos, business posts |
-| **Google News & Content** | 8 | News search/topics/trending, Scholar, Patents search + detail, Finance, Products |
-| **Google Shopping** | 3 | Product search, product detail, merchant URL enrichment |
-| **Google Specialized** | 7 | Hotels (search + details), Trends (4 endpoints), Jobs |
+| **Twitter/X** | 49 | Profiles, tweets, advanced search, trends, communities, lists, spaces, real-time stream monitors, filter rules |
+| **Google** | 32 | Web search (SERP), Images, Videos, AI Mode, Lens, Maps, News, Trends, Jobs, Hotels, Shopping, Patents, Scholar, Finance, Flights |
+| **YouTube** | 27 | Search, video/Shorts detail, comments, transcripts, channels, playlists, trending, hashtags, community posts, music search |
+| **TikTok** | 22 | Profiles, videos, comments, transcripts, hashtags, music, search, trending, ad library |
+| **Amazon** | 14 | Product search, PDP detail, offers, reviews, bestsellers, deals, category browse, sellers (20 marketplaces) |
+| **Reddit** | 12 | Post/subreddit/user search, comment trees, trending, domain posts |
+| **eBay** | 11 | Active + sold listing search, item detail, reviews, sellers, categories (18 marketplaces) |
+| **Leboncoin** | 10 | French classifieds search, ad detail, sellers, categories, regions |
 | **Vinted** | 8 | Item search, details, seller profiles, brands, markets |
-| **YouTube** | 39 | Search, video/Shorts detail, comments, transcripts, channels, playlists, trending, hashtags, community posts, music search |
-| **Realtor** | 4 | Location autocomplete, listing search, property detail, markets (realtor.com US + realtor.ca CA) |
-| **Web Scraping** | 6 | Scrape URLs, screenshots, AI extraction, batch jobs |
+| **Idealista** | 8 | Location suggest, listing search, full-inventory search, property detail + stats, agencies (ES, IT, PT) |
+| **Immobiliare** | 7 | Listing search, detail, agencies, price insights (IT, ES, GR, LU) |
+| **Web Scraping** | 6 | Scrape any URL, anti-bot detection, screenshots, AI extraction, batch jobs |
+| **Zillow** | 5 | Property search, detail + valuation, agents (US + CA) |
+| **Realtor** | 4 | Listing search, property detail, autocomplete (realtor.com + realtor.ca) |
+| **Account** | 1 | Credit balance, tier, and rate-limit info |
 
 ## Google Tools
 
-All 29 Google MCP tools are prefixed with `google_`:
+Google MCP tools are prefixed with `google_` — highlights:
 
 <Tabs>
   <Tab title="Search & Discovery">
@@ -111,21 +112,31 @@ All 29 Google MCP tools are prefixed with `google_`:
 
 ## Quick Start
 
+**Using Claude?** No API key needed:
+
 <Steps>
-  <Step title="Get an API Key">
-    Sign up at [scrapebadger.com](https://scrapebadger.com) and create an API key from the dashboard.
+  <Step title="Add the Connector">
+    In [claude.ai](https://claude.ai) (or Claude Desktop), go to **Settings** > **Connectors** > **Add custom connector** and enter `https://mcp.scrapebadger.com/mcp`.
   </Step>
-  <Step title="Choose Your AI Tool">
-    See the [integration guides](/mcp/integrations/claude-desktop) for copy-paste config snippets for each platform.
+  <Step title="Sign In and Approve">
+    Click **Connect** — you'll be redirected to sign in with your ScrapeBadger account and approve access. That's the whole setup.
   </Step>
   <Step title="Start Using Tools">
-    Ask your AI agent to search tweets, scrape websites, or look up Vinted items — it will discover and call the right tools automatically.
+    Ask Claude to search tweets, scrape websites, or look up products — it discovers and calls the right tools automatically.
   </Step>
 </Steps>
 
+**Using another AI tool?** Sign up at [scrapebadger.com](https://scrapebadger.com), create an API key from the dashboard, and grab the config snippet from the [integration guides](/mcp/integrations/claude-desktop).
+
 ## Authentication
 
-Pass your API key using one of these methods:
+Two authentication modes are supported:
+
+### OAuth (recommended for Claude)
+
+Clients that support MCP OAuth (claude.ai, Claude Desktop, Claude Code, ChatGPT) can connect without any key handling: add the server URL, sign in with your ScrapeBadger account, and approve the consent screen. Access is tied to your account's API key and can be revoked anytime by deactivating that key in the dashboard.
+
+### API key
 
 | Method | Example | Best For |
 |--------|---------|----------|
