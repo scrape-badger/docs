@@ -1,0 +1,138 @@
+---
+title: "Get Agency Profile"
+openapi: "GET /v1/immobiliare/agencies/{id}"
+description: "Full agency profile — address, GPS, phones, opening hours, ads / sales counts and the agent roster."
+---
+
+Fetch a real-estate agency's full profile by its numeric id (from a listing's
+`agency.id` or its portal URL). Pair with
+[`/agencies/{id}/listings`](/api-reference/endpoint/immobiliare/get-agency-listings)
+to pull the agency's active inventory.
+
+## Path Parameters
+
+<ParamField path="id" type="integer" required>
+  Immobiliare agency id, e.g. `41235`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="it">
+  Market the agency belongs to. One of `it`, `es`, `gr`, `lu`.
+</ParamField>
+
+## Response
+
+The full `AgencyProfile`:
+
+<ResponseField name="id" type="integer">Agency id.</ResponseField>
+<ResponseField name="type" type="string">e.g. `agency`, `builder`.</ResponseField>
+<ResponseField name="name" type="string" />
+<ResponseField name="url" type="string">Agency profile URL on the portal.</ResponseField>
+<ResponseField name="address" type="string">Street address of the office.</ResponseField>
+<ResponseField name="description" type="string">Agency self-description.</ResponseField>
+<ResponseField name="website" type="string">Agency's own website.</ResponseField>
+<ResponseField name="image" type="string">Agency logo URL.</ResponseField>
+<ResponseField name="is_paid" type="boolean">Paid portal customer.</ResponseField>
+<ResponseField name="partnership" type="string">Franchise / network affiliation, e.g. `tecnocasa`.</ResponseField>
+<ResponseField name="real_estate_ads" type="integer">Active listings count.</ResponseField>
+<ResponseField name="real_estate_sales" type="integer">Completed sales count.</ResponseField>
+<ResponseField name="region" type="string" />
+<ResponseField name="province" type="string" />
+<ResponseField name="city" type="string" />
+<ResponseField name="macrozone" type="string" />
+<ResponseField name="latitude" type="number" />
+<ResponseField name="longitude" type="number" />
+<ResponseField name="phones" type="string[]">Office phone numbers.</ResponseField>
+<ResponseField name="opening_hours" type="string[]">Opening-hours lines.</ResponseField>
+<ResponseField name="agents" type="Agent[]">
+  Agent roster.
+
+  <Expandable title="Agent">
+    <ResponseField name="id" type="integer" />
+    <ResponseField name="name" type="string" />
+    <ResponseField name="surname" type="string" />
+    <ResponseField name="gender" type="string" />
+    <ResponseField name="thumbnail" type="string">Agent photo URL.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="market" type="string">Echo of the requested market.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.scrapebadger.com/v1/immobiliare/agencies/41235?market=it",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const agency = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://api.scrapebadger.com/v1/immobiliare/agencies/41235",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"market": "it"},
+)
+agency = res.json()
+```
+
+```bash cURL
+curl "https://api.scrapebadger.com/v1/immobiliare/agencies/41235?market=it" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "id": 41235,
+  "type": "agency",
+  "name": "Tecnocasa Milano Crescenzago",
+  "url": "https://www.immobiliare.it/agenzie-immobiliari/41235/tecnocasa-milano/",
+  "address": "Via Padova 130, 20127 Milano",
+  "description": "Affiliato Tecnocasa attivo dal 2003 nella zona Cimiano-Crescenzago. Compravendite e locazioni residenziali, valutazioni gratuite.",
+  "website": "https://milano-crescenzago.tecnocasa.it",
+  "image": "https://pic.im-cdn.it/agency/41235/large.png",
+  "is_paid": true,
+  "partnership": "tecnocasa",
+  "real_estate_ads": 48,
+  "real_estate_sales": 312,
+  "region": "Lombardia",
+  "province": "Milano",
+  "city": "Milano",
+  "macrozone": "Cimiano, Crescenzago, Adriano",
+  "latitude": 45.498,
+  "longitude": 9.2301,
+  "phones": ["+39 02 2846120", "+39 02 2846121"],
+  "opening_hours": [
+    "Mon-Fri 09:00-13:00, 14:30-19:00",
+    "Sat 09:00-12:30"
+  ],
+  "agents": [
+    {
+      "id": 998877,
+      "name": "Marco",
+      "surname": "Rossi",
+      "gender": "male",
+      "thumbnail": "https://pic.im-cdn.it/agent/998877/thumb.jpg"
+    },
+    {
+      "id": 998878,
+      "name": "Giulia",
+      "surname": "Bianchi",
+      "gender": "female",
+      "thumbnail": "https://pic.im-cdn.it/agent/998878/thumb.jpg"
+    }
+  ],
+  "market": "it"
+}
+```
+
+<Note>
+  Each agency-profile request costs **5 credits**. Failed requests are not charged.
+</Note>

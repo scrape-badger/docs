@@ -1,0 +1,113 @@
+---
+title: "Autocomplete"
+openapi: "GET /v1/immobiliare/autocomplete"
+description: "Resolve a free-text place into Immobiliare geography suggestions (region_id, province_id, city_id, macrozone_ids)."
+---
+
+Turn a free-text place into structured Immobiliare geography suggestions —
+nations, regions, provinces, cities (comuni) or zones. Use the returned
+`region_id` / `province_id` / `city_id` to drive precise
+[`/search`](/api-reference/endpoint/immobiliare/search) and
+[`/market-insights/prices`](/api-reference/endpoint/immobiliare/price-insights)
+queries.
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Partial location — city, province, region or zone, e.g. `Milano`.
+</ParamField>
+
+<ParamField query="market" type="string" default="it">
+  Market to search in. One of `it`, `es`, `gr`, `lu`.
+</ParamField>
+
+## Response
+
+<ResponseField name="suggestions" type="Suggestion[]">
+  Geography suggestions, most relevant first.
+
+  <Expandable title="Suggestion">
+    <ResponseField name="id" type="string">Id of the suggested geography entity.</ResponseField>
+    <ResponseField name="label" type="string">Human-readable label, e.g. `Milano`.</ResponseField>
+    <ResponseField name="type" type="string">One of `nation`, `region`, `province`, `comune`, `zone`.</ResponseField>
+    <ResponseField name="region_id" type="string">Region id — feed to `/search` and `/market-insights/prices`.</ResponseField>
+    <ResponseField name="province_id" type="string">Province id.</ResponseField>
+    <ResponseField name="city_id" type="string">City (comune) id.</ResponseField>
+    <ResponseField name="macrozone_ids" type="integer[]">Macrozone ids when the suggestion is a `zone`.</ResponseField>
+    <ResponseField name="url" type="string">Search-results path on the market's portal.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="market" type="string">Echo of the requested market.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.scrapebadger.com/v1/immobiliare/autocomplete?" +
+    new URLSearchParams({ query: "Milano", market: "it" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://api.scrapebadger.com/v1/immobiliare/autocomplete",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "Milano", "market": "it"},
+)
+data = res.json()
+```
+
+```bash cURL
+curl "https://api.scrapebadger.com/v1/immobiliare/autocomplete?query=Milano&market=it" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "suggestions": [
+    {
+      "id": "8042",
+      "label": "Milano",
+      "type": "comune",
+      "region_id": "10",
+      "province_id": "MI",
+      "city_id": "8042",
+      "macrozone_ids": [],
+      "url": "/vendita-case/milano/"
+    },
+    {
+      "id": "MI",
+      "label": "Milano (provincia)",
+      "type": "province",
+      "region_id": "10",
+      "province_id": "MI",
+      "city_id": null,
+      "macrozone_ids": [],
+      "url": "/vendita-case/milano-provincia/"
+    },
+    {
+      "id": "10046",
+      "label": "Navigli - Darsena, Milano",
+      "type": "zone",
+      "region_id": "10",
+      "province_id": "MI",
+      "city_id": "8042",
+      "macrozone_ids": [10046],
+      "url": "/vendita-case/milano/navigli/"
+    }
+  ],
+  "market": "it"
+}
+```
+
+<Note>
+  Each autocomplete request costs **2 credits**. Failed requests are not charged.
+</Note>

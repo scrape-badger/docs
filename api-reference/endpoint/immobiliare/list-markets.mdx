@@ -1,0 +1,89 @@
+---
+title: "List Markets"
+openapi: "GET /v1/immobiliare/markets"
+description: "List the four Immobiliare Group markets — Italy, Spain, Greece, Luxembourg."
+---
+
+List the covered Immobiliare Group markets. All four portals share one
+platform, so every endpoint behaves identically across them — pass the market's
+`code` as the `market` parameter on any other endpoint.
+
+## Response
+
+A JSON array of `Market` objects:
+
+<ResponseField name="code" type="string">Market code — pass as `market`, e.g. `it`.</ResponseField>
+<ResponseField name="domain" type="string">Portal domain, e.g. `www.immobiliare.it`.</ResponseField>
+<ResponseField name="country_code" type="string">ISO country code, e.g. `IT`.</ResponseField>
+<ResponseField name="locale" type="string">Portal locale, e.g. `it`, `es`, `el`, `fr`.</ResponseField>
+<ResponseField name="currency" type="string">Always `EUR`.</ResponseField>
+<ResponseField name="name" type="string">Human-readable market name.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```javascript Node.js
+const res = await fetch("https://api.scrapebadger.com/v1/immobiliare/markets", {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+});
+const markets = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://api.scrapebadger.com/v1/immobiliare/markets",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+markets = res.json()
+```
+
+```bash cURL
+curl "https://api.scrapebadger.com/v1/immobiliare/markets" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+```json Response
+[
+  {
+    "code": "it",
+    "domain": "www.immobiliare.it",
+    "country_code": "IT",
+    "locale": "it",
+    "currency": "EUR",
+    "name": "Italy (Immobiliare.it)"
+  },
+  {
+    "code": "es",
+    "domain": "www.indomio.es",
+    "country_code": "ES",
+    "locale": "es",
+    "currency": "EUR",
+    "name": "Spain (Indomio.es)"
+  },
+  {
+    "code": "gr",
+    "domain": "www.indomio.gr",
+    "country_code": "GR",
+    "locale": "el",
+    "currency": "EUR",
+    "name": "Greece (Indomio.gr)"
+  },
+  {
+    "code": "lu",
+    "domain": "www.immotop.lu",
+    "country_code": "LU",
+    "locale": "fr",
+    "currency": "EUR",
+    "name": "Luxembourg (Immotop.lu)"
+  }
+]
+```
+
+<Note>
+  Listing markets is a **free** reference endpoint (0 credits).
+</Note>

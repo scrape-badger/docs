@@ -1,0 +1,114 @@
+---
+title: "Price Insights"
+openapi: "GET /v1/immobiliare/market-insights/prices"
+description: "Monthly €/m² price-history time series for a region, province or city — sale or rent."
+---
+
+Fetch the monthly **€/m²** price time series Immobiliare publishes for an area.
+Query at region, province or city granularity (most-specific id wins) and pick
+`sale` or `rent`. Get the geography ids from
+[`/autocomplete`](/api-reference/endpoint/immobiliare/autocomplete).
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="it">
+  Market. One of `it`, `es`, `gr`, `lu`.
+</ParamField>
+
+<ParamField query="region_id" type="string" required>
+  Region id (from `/autocomplete`).
+</ParamField>
+
+<ParamField query="province_id" type="string">
+  Province id — narrows the series to the province.
+</ParamField>
+
+<ParamField query="city_id" type="string">
+  City (comune) id — narrows the series to the city. Requires `province_id`.
+</ParamField>
+
+<ParamField query="contract" type="string" default="sale">
+  Price series to return. One of `sale`, `rent`.
+</ParamField>
+
+## Response
+
+<ResponseField name="contract" type="string">Echo of the requested contract (`sale` or `rent`).</ResponseField>
+<ResponseField name="unit" type="string">Always `EUR/m²`.</ResponseField>
+<ResponseField name="points" type="PricePoint[]">
+  Monthly time series, oldest first.
+
+  <Expandable title="PricePoint">
+    <ResponseField name="label" type="string">Month, e.g. `2026-06`.</ResponseField>
+    <ResponseField name="value" type="number">Average price in EUR per m².</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="market" type="string">Echo of the requested market.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.scrapebadger.com/v1/immobiliare/market-insights/prices?" +
+    new URLSearchParams({
+      market: "it",
+      region_id: "10",
+      province_id: "MI",
+      city_id: "8042",
+      contract: "sale",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://api.scrapebadger.com/v1/immobiliare/market-insights/prices",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "market": "it",
+        "region_id": "10",
+        "province_id": "MI",
+        "city_id": "8042",
+        "contract": "sale",
+    },
+)
+data = res.json()
+```
+
+```bash cURL
+curl "https://api.scrapebadger.com/v1/immobiliare/market-insights/prices?market=it&region_id=10&province_id=MI&city_id=8042&contract=sale" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "contract": "sale",
+  "unit": "EUR/m²",
+  "points": [
+    { "label": "2025-08", "value": 5412 },
+    { "label": "2025-09", "value": 5438 },
+    { "label": "2025-10", "value": 5461 },
+    { "label": "2025-11", "value": 5449 },
+    { "label": "2025-12", "value": 5470 },
+    { "label": "2026-01", "value": 5492 },
+    { "label": "2026-02", "value": 5518 },
+    { "label": "2026-03", "value": 5544 },
+    { "label": "2026-04", "value": 5571 },
+    { "label": "2026-05", "value": 5590 },
+    { "label": "2026-06", "value": 5603 }
+  ],
+  "market": "it"
+}
+```
+
+<Note>
+  Each price-insights request costs **10 credits**. Failed requests are not charged.
+</Note>

@@ -1,0 +1,249 @@
+---
+title: "Get Agency Listings"
+openapi: "GET /v1/immobiliare/agencies/{id}/listings"
+description: "Page through an agency's active listings — the same full Listing objects as /search."
+---
+
+Fetch an agency's active listings, paginated. Each item is the same full
+`Listing` object returned by
+[`/search`](/api-reference/endpoint/immobiliare/search).
+
+## Path Parameters
+
+<ParamField path="id" type="integer" required>
+  Immobiliare agency id, e.g. `41235`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="it">
+  Market the agency belongs to. One of `it`, `es`, `gr`, `lu`.
+</ParamField>
+
+<ParamField query="contract" type="string" default="sale">
+  Contract type to list. One of `sale`, `rent`.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  Result page.
+</ParamField>
+
+## Response
+
+<ResponseField name="agency_id" type="integer">Echo of the requested agency id.</ResponseField>
+<ResponseField name="listings" type="Listing[]">
+  The agency's listings for this page.
+
+  <Expandable title="Listing">
+    <ResponseField name="id" type="integer">Immobiliare listing id — feed to [`/listings/{id}`](/api-reference/endpoint/immobiliare/get-listing).</ResponseField>
+    <ResponseField name="uuid" type="string">Stable listing UUID.</ResponseField>
+    <ResponseField name="url" type="string">Canonical listing URL on the market's portal.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="contract" type="string">`sale` or `rent`.</ResponseField>
+    <ResponseField name="is_new" type="boolean">New construction.</ResponseField>
+    <ResponseField name="luxury" type="boolean">Luxury (LuxuryEstate) listing.</ResponseField>
+    <ResponseField name="is_project" type="boolean">Off-plan / development project.</ResponseField>
+    <ResponseField name="is_mosaic" type="boolean">Multi-unit "mosaic" listing grouping several units.</ResponseField>
+    <ResponseField name="visibility" type="string">Paid visibility tier, e.g. `premium`, `top`, `star`.</ResponseField>
+    <ResponseField name="typology" type="string">Property typology, e.g. `Apartment`, `Villa`.</ResponseField>
+    <ResponseField name="category" type="string">e.g. `residential`.</ResponseField>
+    <ResponseField name="price" type="object">
+      `value`, `formatted`, `min_value`, `max_value`, `currency`, `visible`,
+      `price_per_sqm`, `loan_from`.
+    </ResponseField>
+    <ResponseField name="location" type="object">
+      `address`, `latitude`, `longitude`, `region`, `province`, `city`,
+      `macrozone`, `microzone`, `zipcode`, `nation_code`, `nation_name`.
+    </ResponseField>
+    <ResponseField name="surface" type="string">e.g. `85 m²`.</ResponseField>
+    <ResponseField name="rooms" type="string" />
+    <ResponseField name="bathrooms" type="string" />
+    <ResponseField name="floor" type="string" />
+    <ResponseField name="energy_class" type="string" />
+    <ResponseField name="description" type="string" />
+    <ResponseField name="photo_count" type="integer" />
+    <ResponseField name="has_virtual_tour" type="boolean" />
+    <ResponseField name="photos" type="Photo[]">`id`, `caption`, `small`, `medium`, `large`.</ResponseField>
+    <ResponseField name="agency" type="object">
+      `id`, `type`, `display_name`, `label`, `url`, `is_paid`, `guaranteed`,
+      `show_logo`, `image_small`, `image_large`, `phones[]`.
+    </ResponseField>
+    <ResponseField name="agent" type="object">
+      `type`, `display_name`, `label`, `image_gender`, `image_url`, `phones[]`.
+    </ResponseField>
+    <ResponseField name="properties_count" type="integer">Number of units in this listing.</ResponseField>
+    <ResponseField name="properties" type="PropertyUnit[]">
+      Per-unit breakdown: `is_main`, `surface`, `surface_value`, `rooms`,
+      `bathrooms`, `bedrooms`, `floor`, `elevator`, `garage`, `heating`,
+      `energy_class`, `condominium_fees`, `typology`, `category`, `caption`,
+      `description`, `price`, `features[{type,label,compact_label}]`,
+      `ga4_features[]`, `views[]`, `photos[]`.
+    </ResponseField>
+    <ResponseField name="creation_date" type="string">When the listing was published.</ResponseField>
+    <ResponseField name="last_modified_utc" type="string">Last modification (UTC, ISO 8601).</ResponseField>
+    <ResponseField name="last_modified_at" type="string">Last modification (portal-local formatting).</ResponseField>
+    <ResponseField name="features_full" type="string[]">All feature labels, flattened.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="count" type="integer">Listings returned on this page.</ResponseField>
+<ResponseField name="page" type="integer">Echo of the requested page.</ResponseField>
+<ResponseField name="market" type="string">Echo of the requested market.</ResponseField>
+
+<Note>
+  The full `Listing` field reference — including the nested `price`,
+  `location`, `photos[]`, `agency`, `agent` and `properties[]` shapes — is
+  documented on [`/search`](/api-reference/endpoint/immobiliare/search#response).
+</Note>
+
+## Example
+
+<CodeGroup>
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.scrapebadger.com/v1/immobiliare/agencies/41235/listings?" +
+    new URLSearchParams({ market: "it", page: "1" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://api.scrapebadger.com/v1/immobiliare/agencies/41235/listings",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"market": "it", "page": 1},
+)
+data = res.json()
+```
+
+```bash cURL
+curl "https://api.scrapebadger.com/v1/immobiliare/agencies/41235/listings?market=it&page=1" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "agency_id": 41235,
+  "listings": [
+    {
+      "id": 121584766,
+      "uuid": "c1f8a3f2-9a41-4a6e-bb3e-1e2f9d3a7c55",
+      "url": "https://www.immobiliare.it/annunci/121584766/",
+      "title": "Trilocale via Padova 120, Cimiano, Milano",
+      "contract": "sale",
+      "is_new": false,
+      "luxury": false,
+      "is_project": false,
+      "is_mosaic": false,
+      "visibility": "premium",
+      "typology": "Apartment",
+      "category": "residential",
+      "price": {
+        "value": 285000,
+        "formatted": "€ 285.000",
+        "min_value": null,
+        "max_value": null,
+        "currency": "EUR",
+        "visible": true,
+        "price_per_sqm": "3.353 €/m²",
+        "loan_from": "€ 741/month"
+      },
+      "location": {
+        "address": "via Padova, 120",
+        "latitude": 45.4972,
+        "longitude": 9.2296,
+        "region": "Lombardia",
+        "province": "Milano",
+        "city": "Milano",
+        "macrozone": "Cimiano, Crescenzago, Adriano",
+        "microzone": "Padova",
+        "zipcode": "20127",
+        "nation_code": "IT",
+        "nation_name": "Italia"
+      },
+      "surface": "85 m²",
+      "rooms": "3",
+      "bathrooms": "2",
+      "floor": "3",
+      "energy_class": "E",
+      "description": "Luminoso trilocale al terzo piano con ascensore...",
+      "photo_count": 24,
+      "has_virtual_tour": true,
+      "photos": [
+        {
+          "id": 987654321,
+          "caption": "soggiorno",
+          "small": "https://pic.im-cdn.it/image/987654321/xsmall.jpg",
+          "medium": "https://pic.im-cdn.it/image/987654321/medium.jpg",
+          "large": "https://pic.im-cdn.it/image/987654321/large.jpg"
+        }
+      ],
+      "agency": {
+        "id": 41235,
+        "type": "agency",
+        "display_name": "Tecnocasa Milano Crescenzago",
+        "label": "Tecnocasa",
+        "url": "https://www.immobiliare.it/agenzie-immobiliari/41235/tecnocasa-milano/",
+        "is_paid": true,
+        "guaranteed": true,
+        "show_logo": true,
+        "image_small": "https://pic.im-cdn.it/agency/41235/small.png",
+        "image_large": "https://pic.im-cdn.it/agency/41235/large.png",
+        "phones": ["+39 02 2846120"]
+      },
+      "agent": {
+        "type": "agent",
+        "display_name": "Marco Rossi",
+        "label": "Agente",
+        "image_gender": "male",
+        "image_url": "https://pic.im-cdn.it/agent/998877/photo.jpg",
+        "phones": ["+39 340 5512347"]
+      },
+      "properties_count": 1,
+      "properties": [
+        {
+          "is_main": true,
+          "surface": "85 m²",
+          "surface_value": 85,
+          "rooms": "3",
+          "bathrooms": "2",
+          "bedrooms": "2",
+          "floor": "3° floor, with lift",
+          "elevator": true,
+          "garage": null,
+          "heating": "Centralized, radiators, gas powered",
+          "energy_class": "E",
+          "condominium_fees": "€ 120/month",
+          "typology": "Apartment",
+          "category": "Residential",
+          "caption": "Main unit",
+          "description": "Luminoso trilocale al terzo piano con ascensore...",
+          "price": "€ 285.000",
+          "features": [
+            { "type": "balcony", "label": "Balcony", "compact_label": "Balcony" }
+          ],
+          "ga4_features": ["balcony", "cellar"],
+          "views": [],
+          "photos": []
+        }
+      ],
+      "creation_date": "2026-05-18",
+      "last_modified_utc": "2026-07-02T09:14:05Z",
+      "last_modified_at": "2026-07-02 11:14",
+      "features_full": ["balcony", "cellar", "fitted wardrobes", "concierge"]
+    }
+  ],
+  "count": 25,
+  "page": 1,
+  "market": "it"
+}
+```
+
+<Note>
+  Each agency-listings request costs **5 credits**. Failed requests are not charged.
+</Note>
