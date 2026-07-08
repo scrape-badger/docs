@@ -13,6 +13,15 @@ Run this command in your terminal:
 
 ```bash
 claude mcp add --transport http scrapebadger \
+  https://mcp.scrapebadger.com/mcp
+```
+
+No API key needed — the first time Claude Code connects, your browser opens the ScrapeBadger sign-in and consent screen (OAuth).
+
+To use an API key instead, pass it as a header:
+
+```bash
+claude mcp add --transport http scrapebadger \
   https://mcp.scrapebadger.com/mcp \
   --header "Authorization: Bearer YOUR_API_KEY"
 ```
@@ -35,7 +44,7 @@ Or add to `.mcp.json` in your project root:
 
 ## Verify
 
-Inside a Claude Code session, type `/mcp` to see connected servers. ScrapeBadger should show 92 tools.
+Inside a Claude Code session, type `/mcp` to see connected servers. ScrapeBadger should show 216 tools.
 
 ## Scopes
 
