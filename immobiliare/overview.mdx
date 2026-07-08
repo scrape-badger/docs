@@ -1,0 +1,144 @@
+---
+title: "Immobiliare.it Scraper Overview"
+description: "Scrape Immobiliare Group real-estate listings, full property detail, agency profiles, and €/m² price insights across Italy, Spain, Greece, and Luxembourg with structured JSON responses."
+---
+
+# Immobiliare.it Scraper API
+
+Search listings, pull full property detail, fetch agency profiles and their active inventory, and read €/m² price-history insights from **Immobiliare.it** — Italy's #1 real-estate portal — and the whole **Immobiliare Group**. One API covers four portals that share the same platform: Italy (`immobiliare.it`), Spain (`indomio.es`), Greece (`indomio.gr`), and Luxembourg (`immotop.lu`). ScrapeBadger handles authentication, rotating proxies, anti-bot evasion, and parsing automatically — no upstream API key required.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="Four Markets, One API" icon="earth-europe">
+    Italy, Spain, Greece, and Luxembourg through a single `market` parameter — same endpoints, filters, and response models across all four portals.
+  </Card>
+  <Card title="Rich Listing Search" icon="magnifying-glass">
+    Free-text [`location`](/api-reference/endpoint/immobiliare/search) or precise `region_id` / `province_id` / `city_id`, with `sale` / `rent` contracts, categories, and price, surface, rooms, and bathroom filters.
+  </Card>
+  <Card title="Full Property Detail" icon="house">
+    Price + €/m² + loan estimate, surface, rooms, floor, energy class, condo fees, GPS, every photo in three sizes, and a per-unit `properties[]` breakdown.
+  </Card>
+  <Card title="Agency & Agent Contacts" icon="address-book">
+    Agency profiles with address, GPS, phone numbers, opening hours, ads / sales counts, and the full agent roster — plus the agency's active listings.
+  </Card>
+  <Card title="Price Insights" icon="chart-line">
+    Monthly €/m² time series per region, province, or city — for sale or rent — the same market data behind Immobiliare's price pages.
+  </Card>
+  <Card title="SDK Support" icon="code">
+    First-class support via the ScrapeBadger Node.js and Python SDKs.
+  </Card>
+</CardGroup>
+
+<Note>
+  All four portals (`immobiliare.it`, `indomio.es`, `indomio.gr`, `immotop.lu`) run on one shared platform. Every endpoint, filter, and response model behaves identically across markets — only the inventory, language, and geography ids differ. Switch markets with the `market` parameter.
+</Note>
+
+## Coverage & Markets
+
+| Code | Country | Portal | Locale | Currency |
+|------|---------|--------|--------|----------|
+| `it` | 🇮🇹 Italy | www.immobiliare.it | it | EUR |
+| `es` | 🇪🇸 Spain | www.indomio.es | es | EUR |
+| `gr` | 🇬🇷 Greece | www.indomio.gr | el | EUR |
+| `lu` | 🇱🇺 Luxembourg | www.immotop.lu | fr | EUR |
+
+<Tip>
+  Start from [`/autocomplete`](/api-reference/endpoint/immobiliare/autocomplete) to turn a free-text place (e.g. `Milano`) into precise `region_id` / `province_id` / `city_id` values, feed them to [`/search`](/api-reference/endpoint/immobiliare/search), then reuse the same ids on [`/market-insights/prices`](/api-reference/endpoint/immobiliare/price-insights) for that area's €/m² history.
+</Tip>
+
+## Quick Start
+
+<CodeGroup>
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.scrapebadger.com/v1/immobiliare/search?" +
+    new URLSearchParams({
+      location: "Milano",
+      contract: "sale",
+      category: "residential",
+      price_max: "300000",
+      rooms_min: "3",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+console.log(data.count, "of", data.total_ads, "listings");
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://api.scrapebadger.com/v1/immobiliare/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "location": "Milano",
+        "contract": "sale",
+        "category": "residential",
+        "price_max": 300000,
+        "rooms_min": 3,
+    },
+)
+data = res.json()
+print(data["count"], "of", data["total_ads"], "listings")
+```
+
+```bash cURL
+curl "https://api.scrapebadger.com/v1/immobiliare/search?location=Milano&contract=sale&category=residential&price_max=300000&rooms_min=3" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+## Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/immobiliare/search`](/api-reference/endpoint/immobiliare/search) | GET | Search listings (sale / rent) |
+| [`/v1/immobiliare/listings/{id}`](/api-reference/endpoint/immobiliare/get-listing) | GET | Full detail for a single listing |
+| [`/v1/immobiliare/agencies/{id}`](/api-reference/endpoint/immobiliare/get-agency) | GET | Agency profile |
+| [`/v1/immobiliare/agencies/{id}/listings`](/api-reference/endpoint/immobiliare/get-agency-listings) | GET | An agency's active listings |
+| [`/v1/immobiliare/market-insights/prices`](/api-reference/endpoint/immobiliare/price-insights) | GET | Monthly €/m² price time series |
+| [`/v1/immobiliare/autocomplete`](/api-reference/endpoint/immobiliare/autocomplete) | GET | Resolve a place into geography ids |
+| [`/v1/immobiliare/markets`](/api-reference/endpoint/immobiliare/list-markets) | GET | List supported markets |
+
+## Credit Costs
+
+| Endpoint | Cost |
+|----------|------|
+| Search | 5 credits |
+| Get listing detail | 10 credits |
+| Get agency profile | 5 credits |
+| Get agency listings | 5 credits |
+| Price insights | 10 credits |
+| Autocomplete | 2 credits |
+| List markets | 0 credits |
+| Failed requests | 0 credits |
+
+## Authentication
+
+All requests require your API key in the `X-API-Key` header:
+
+```bash
+curl "https://api.scrapebadger.com/v1/immobiliare/search?location=Milano" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+Credits are charged per request (see the table above) and reported on the `X-Credits-Used` response header.
+
+## Anti-Bot & Proxies
+
+Immobiliare Group portals protect their catalog with IP-reputation scoring and TLS/HTTP fingerprinting. ScrapeBadger clears these automatically using rotating proxies and browser fingerprint rotation on market-appropriate sessions. You never manage proxies, sessions, or CAPTCHAs, and you never need an upstream API key.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Search Listings" icon="magnifying-glass" href="/api-reference/endpoint/immobiliare/search">
+    Full API reference for searching Immobiliare Group listings
+  </Card>
+  <Card title="Get Listing Detail" icon="house" href="/api-reference/endpoint/immobiliare/get-listing">
+    Retrieve a listing's complete detail by its numeric id
+  </Card>
+</CardGroup>

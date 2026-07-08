@@ -454,6 +454,49 @@
         ]
       },
       {
+        "tab": "Immobiliare",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "immobiliare/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/immobiliare/search"
+            ]
+          },
+          {
+            "group": "Listings",
+            "pages": [
+              "api-reference/endpoint/immobiliare/get-listing"
+            ]
+          },
+          {
+            "group": "Agencies",
+            "pages": [
+              "api-reference/endpoint/immobiliare/get-agency",
+              "api-reference/endpoint/immobiliare/get-agency-listings"
+            ]
+          },
+          {
+            "group": "Insights",
+            "pages": [
+              "api-reference/endpoint/immobiliare/price-insights"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api-reference/endpoint/immobiliare/autocomplete",
+              "api-reference/endpoint/immobiliare/list-markets"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Realtor",
         "groups": [
           {

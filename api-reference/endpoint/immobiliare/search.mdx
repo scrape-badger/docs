@@ -1,0 +1,375 @@
+---
+title: "Search Listings"
+openapi: "GET /v1/immobiliare/search"
+description: "Search Immobiliare Group listings — sale / rent, all categories, with price, surface, rooms and bathrooms filters."
+---
+
+Search a market's portal for listings. Target an area either with free-text
+`location` (auto-resolved via autocomplete) **or** with precise geography ids
+(`region_id` / `province_id` / `city_id`, e.g. from
+[`/autocomplete`](/api-reference/endpoint/immobiliare/autocomplete)).
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="it">
+  Market to search. One of `it`, `es`, `gr`, `lu`.
+</ParamField>
+
+<ParamField query="location" type="string">
+  Free-text place, auto-resolved to a geography — e.g. `Milano`, `Roma Trastevere`.
+  Provide either `location` **or** the id parameters below.
+</ParamField>
+
+<ParamField query="region_id" type="string">
+  Region id (from `/autocomplete`). Alternative to `location`.
+</ParamField>
+
+<ParamField query="province_id" type="string">
+  Province id (from `/autocomplete`).
+</ParamField>
+
+<ParamField query="city_id" type="string">
+  City (comune) id (from `/autocomplete`).
+</ParamField>
+
+<ParamField query="contract" type="string" default="sale">
+  Contract type. One of `sale`, `rent`.
+</ParamField>
+
+<ParamField query="category" type="string" default="residential">
+  Listing category. One of `residential`, `commercial`, `garages`, `offices`,
+  `land`, `buildings`, `warehouses`.
+</ParamField>
+
+<ParamField query="price_min" type="integer">Minimum price (EUR).</ParamField>
+<ParamField query="price_max" type="integer">Maximum price (EUR).</ParamField>
+<ParamField query="surface_min" type="integer">Minimum surface (m²).</ParamField>
+<ParamField query="surface_max" type="integer">Maximum surface (m²).</ParamField>
+<ParamField query="rooms_min" type="integer">Minimum number of rooms.</ParamField>
+<ParamField query="rooms_max" type="integer">Maximum number of rooms.</ParamField>
+<ParamField query="bathrooms_min" type="integer">Minimum number of bathrooms.</ParamField>
+
+<ParamField query="sort" type="string" default="relevance">
+  Sort order. One of `relevance`, `price_asc`, `price_desc`, `newest`,
+  `oldest`, `surface_desc`, `surface_asc`.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  Result page.
+</ParamField>
+
+## Response
+
+<ResponseField name="listings" type="Listing[]">
+  Listing cards for this page.
+
+  <Expandable title="Listing">
+    <ResponseField name="id" type="integer">Immobiliare listing id — feed to [`/listings/{id}`](/api-reference/endpoint/immobiliare/get-listing).</ResponseField>
+    <ResponseField name="uuid" type="string">Stable listing UUID.</ResponseField>
+    <ResponseField name="url" type="string">Canonical listing URL on the market's portal.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="contract" type="string">`sale` or `rent`.</ResponseField>
+    <ResponseField name="is_new" type="boolean">New construction.</ResponseField>
+    <ResponseField name="luxury" type="boolean">Luxury (LuxuryEstate) listing.</ResponseField>
+    <ResponseField name="is_project" type="boolean">Off-plan / development project.</ResponseField>
+    <ResponseField name="is_mosaic" type="boolean">Multi-unit "mosaic" listing grouping several units.</ResponseField>
+    <ResponseField name="visibility" type="string">Paid visibility tier, e.g. `premium`, `top`, `star`.</ResponseField>
+    <ResponseField name="typology" type="string">Property typology, e.g. `Apartment`, `Villa`.</ResponseField>
+    <ResponseField name="category" type="string">e.g. `residential`.</ResponseField>
+    <ResponseField name="price" type="object">
+      <Expandable title="price">
+        <ResponseField name="value" type="integer">Price in EUR (null when hidden).</ResponseField>
+        <ResponseField name="formatted" type="string">e.g. `€ 285.000`.</ResponseField>
+        <ResponseField name="min_value" type="integer">Range lower bound (project/mosaic listings).</ResponseField>
+        <ResponseField name="max_value" type="integer">Range upper bound.</ResponseField>
+        <ResponseField name="currency" type="string">Always `EUR`.</ResponseField>
+        <ResponseField name="visible" type="boolean">`false` = price on request.</ResponseField>
+        <ResponseField name="price_per_sqm" type="string">e.g. `3.353 €/m²`.</ResponseField>
+        <ResponseField name="loan_from" type="string">Estimated loan installment, e.g. `€ 741/month`.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="location" type="object">
+      <Expandable title="location">
+        <ResponseField name="address" type="string" />
+        <ResponseField name="latitude" type="number" />
+        <ResponseField name="longitude" type="number" />
+        <ResponseField name="region" type="string" />
+        <ResponseField name="province" type="string" />
+        <ResponseField name="city" type="string" />
+        <ResponseField name="macrozone" type="string" />
+        <ResponseField name="microzone" type="string" />
+        <ResponseField name="zipcode" type="string" />
+        <ResponseField name="nation_code" type="string">e.g. `IT`.</ResponseField>
+        <ResponseField name="nation_name" type="string" />
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="surface" type="string">e.g. `85 m²`.</ResponseField>
+    <ResponseField name="rooms" type="string" />
+    <ResponseField name="bathrooms" type="string" />
+    <ResponseField name="floor" type="string" />
+    <ResponseField name="energy_class" type="string" />
+    <ResponseField name="description" type="string" />
+    <ResponseField name="photo_count" type="integer" />
+    <ResponseField name="has_virtual_tour" type="boolean" />
+    <ResponseField name="photos" type="Photo[]">
+      <Expandable title="Photo">
+        <ResponseField name="id" type="integer" />
+        <ResponseField name="caption" type="string" />
+        <ResponseField name="small" type="string">Small image URL.</ResponseField>
+        <ResponseField name="medium" type="string">Medium image URL.</ResponseField>
+        <ResponseField name="large" type="string">Large image URL.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="agency" type="object">
+      <Expandable title="agency">
+        <ResponseField name="id" type="integer">Agency id — feed to [`/agencies/{id}`](/api-reference/endpoint/immobiliare/get-agency).</ResponseField>
+        <ResponseField name="type" type="string">e.g. `agency`, `builder`.</ResponseField>
+        <ResponseField name="display_name" type="string" />
+        <ResponseField name="label" type="string" />
+        <ResponseField name="url" type="string">Agency profile URL on the portal.</ResponseField>
+        <ResponseField name="is_paid" type="boolean" />
+        <ResponseField name="guaranteed" type="boolean" />
+        <ResponseField name="show_logo" type="boolean" />
+        <ResponseField name="image_small" type="string" />
+        <ResponseField name="image_large" type="string" />
+        <ResponseField name="phones" type="string[]" />
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="agent" type="object">
+      <Expandable title="agent">
+        <ResponseField name="type" type="string" />
+        <ResponseField name="display_name" type="string" />
+        <ResponseField name="label" type="string" />
+        <ResponseField name="image_gender" type="string" />
+        <ResponseField name="image_url" type="string" />
+        <ResponseField name="phones" type="string[]" />
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="properties_count" type="integer">Number of units in this listing.</ResponseField>
+    <ResponseField name="properties" type="PropertyUnit[]">
+      Per-unit breakdown (a plain listing has one main unit; projects/mosaics
+      have several).
+
+      <Expandable title="PropertyUnit">
+        <ResponseField name="is_main" type="boolean" />
+        <ResponseField name="surface" type="string">e.g. `85 m²`.</ResponseField>
+        <ResponseField name="surface_value" type="number">Numeric surface (m²).</ResponseField>
+        <ResponseField name="rooms" type="string" />
+        <ResponseField name="bathrooms" type="string" />
+        <ResponseField name="bedrooms" type="string" />
+        <ResponseField name="floor" type="string">e.g. `3° floor, with lift`.</ResponseField>
+        <ResponseField name="elevator" type="boolean" />
+        <ResponseField name="garage" type="string">e.g. `1 in garage/box`.</ResponseField>
+        <ResponseField name="heating" type="string">e.g. `Centralized, radiators, gas powered`.</ResponseField>
+        <ResponseField name="energy_class" type="string" />
+        <ResponseField name="condominium_fees" type="string">e.g. `€ 120/month`.</ResponseField>
+        <ResponseField name="typology" type="string" />
+        <ResponseField name="category" type="string" />
+        <ResponseField name="caption" type="string" />
+        <ResponseField name="description" type="string" />
+        <ResponseField name="price" type="string" />
+        <ResponseField name="features" type="Feature[]">
+          <Expandable title="Feature">
+            <ResponseField name="type" type="string">e.g. `balcony`.</ResponseField>
+            <ResponseField name="label" type="string" />
+            <ResponseField name="compact_label" type="string" />
+          </Expandable>
+        </ResponseField>
+        <ResponseField name="ga4_features" type="string[]">Machine-readable feature slugs.</ResponseField>
+        <ResponseField name="views" type="string[]">Views, e.g. `sea view`.</ResponseField>
+        <ResponseField name="photos" type="Photo[]">Same shape as the listing-level `photos[]`.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="creation_date" type="string">When the listing was published.</ResponseField>
+    <ResponseField name="last_modified_utc" type="string">Last modification (UTC, ISO 8601).</ResponseField>
+    <ResponseField name="last_modified_at" type="string">Last modification (portal-local formatting).</ResponseField>
+    <ResponseField name="features_full" type="string[]">All feature labels, flattened.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="count" type="integer">Listings returned on this page.</ResponseField>
+<ResponseField name="total_ads" type="integer">Total matching listings.</ResponseField>
+<ResponseField name="current_page" type="integer" />
+<ResponseField name="max_pages" type="integer">Last available page.</ResponseField>
+<ResponseField name="is_results_limit_reached" type="boolean">
+  `true` when the portal capped the result set — narrow the filters or split
+  the area to get everything.
+</ResponseField>
+<ResponseField name="related_searches" type="object[]">
+  Portal-suggested related searches for this area.
+</ResponseField>
+<ResponseField name="market" type="string">Echo of the requested market.</ResponseField>
+<ResponseField name="source" type="string">Portal domain the data came from, e.g. `www.immobiliare.it`.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.scrapebadger.com/v1/immobiliare/search?" +
+    new URLSearchParams({
+      location: "Milano",
+      contract: "sale",
+      category: "residential",
+      price_max: "300000",
+      rooms_min: "3",
+      sort: "newest",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://api.scrapebadger.com/v1/immobiliare/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "location": "Milano",
+        "contract": "sale",
+        "category": "residential",
+        "price_max": 300000,
+        "rooms_min": 3,
+        "sort": "newest",
+    },
+)
+data = res.json()
+```
+
+```bash cURL
+curl "https://api.scrapebadger.com/v1/immobiliare/search?location=Milano&contract=sale&category=residential&price_max=300000&rooms_min=3&sort=newest" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "listings": [
+    {
+      "id": 121584766,
+      "uuid": "c1f8a3f2-9a41-4a6e-bb3e-1e2f9d3a7c55",
+      "url": "https://www.immobiliare.it/annunci/121584766/",
+      "title": "Trilocale via Padova 120, Cimiano, Milano",
+      "contract": "sale",
+      "is_new": false,
+      "luxury": false,
+      "is_project": false,
+      "is_mosaic": false,
+      "visibility": "premium",
+      "typology": "Apartment",
+      "category": "residential",
+      "price": {
+        "value": 285000,
+        "formatted": "€ 285.000",
+        "min_value": null,
+        "max_value": null,
+        "currency": "EUR",
+        "visible": true,
+        "price_per_sqm": "3.353 €/m²",
+        "loan_from": "€ 741/month"
+      },
+      "location": {
+        "address": "via Padova, 120",
+        "latitude": 45.4972,
+        "longitude": 9.2296,
+        "region": "Lombardia",
+        "province": "Milano",
+        "city": "Milano",
+        "macrozone": "Cimiano, Crescenzago, Adriano",
+        "microzone": "Padova",
+        "zipcode": "20127",
+        "nation_code": "IT",
+        "nation_name": "Italia"
+      },
+      "surface": "85 m²",
+      "rooms": "3",
+      "bathrooms": "2",
+      "floor": "3",
+      "energy_class": "E",
+      "description": "Luminoso trilocale al terzo piano con ascensore, doppia esposizione, balcone e cantina...",
+      "photo_count": 24,
+      "has_virtual_tour": true,
+      "photos": [
+        {
+          "id": 987654321,
+          "caption": "soggiorno",
+          "small": "https://pic.im-cdn.it/image/987654321/xsmall.jpg",
+          "medium": "https://pic.im-cdn.it/image/987654321/medium.jpg",
+          "large": "https://pic.im-cdn.it/image/987654321/large.jpg"
+        }
+      ],
+      "agency": {
+        "id": 41235,
+        "type": "agency",
+        "display_name": "Tecnocasa Milano Crescenzago",
+        "label": "Tecnocasa",
+        "url": "https://www.immobiliare.it/agenzie-immobiliari/41235/tecnocasa-milano/",
+        "is_paid": true,
+        "guaranteed": true,
+        "show_logo": true,
+        "image_small": "https://pic.im-cdn.it/agency/41235/small.png",
+        "image_large": "https://pic.im-cdn.it/agency/41235/large.png",
+        "phones": ["+39 02 2846120"]
+      },
+      "agent": {
+        "type": "agent",
+        "display_name": "Marco Rossi",
+        "label": "Agente",
+        "image_gender": "male",
+        "image_url": "https://pic.im-cdn.it/agent/998877/photo.jpg",
+        "phones": ["+39 340 5512347"]
+      },
+      "properties_count": 1,
+      "properties": [
+        {
+          "is_main": true,
+          "surface": "85 m²",
+          "surface_value": 85,
+          "rooms": "3",
+          "bathrooms": "2",
+          "bedrooms": "2",
+          "floor": "3° floor, with lift",
+          "elevator": true,
+          "garage": null,
+          "heating": "Centralized, radiators, gas powered",
+          "energy_class": "E",
+          "condominium_fees": "€ 120/month",
+          "typology": "Apartment",
+          "category": "Residential",
+          "caption": "Main unit",
+          "description": "Luminoso trilocale al terzo piano con ascensore...",
+          "price": "€ 285.000",
+          "features": [
+            { "type": "balcony", "label": "Balcony", "compact_label": "Balcony" },
+            { "type": "cellar", "label": "Cellar", "compact_label": "Cellar" }
+          ],
+          "ga4_features": ["balcony", "cellar", "external_exposure"],
+          "views": [],
+          "photos": []
+        }
+      ],
+      "creation_date": "2026-05-18",
+      "last_modified_utc": "2026-07-02T09:14:05Z",
+      "last_modified_at": "2026-07-02 11:14",
+      "features_full": ["balcony", "cellar", "fitted wardrobes", "concierge"]
+    }
+  ],
+  "count": 25,
+  "total_ads": 3417,
+  "current_page": 1,
+  "max_pages": 137,
+  "is_results_limit_reached": false,
+  "related_searches": [
+    { "label": "Case in vendita Sesto San Giovanni", "url": "/vendita-case/sesto-san-giovanni/" }
+  ],
+  "market": "it",
+  "source": "www.immobiliare.it"
+}
+```
+
+<Note>
+  Each search request costs **5 credits**. Failed requests are not charged.
+</Note>
