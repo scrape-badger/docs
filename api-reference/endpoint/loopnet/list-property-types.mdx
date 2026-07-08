@@ -1,0 +1,45 @@
+---
+title: "List Property Types"
+openapi: "GET /v1/loopnet/property-types"
+description: "List all LoopNet property-type slugs accepted by the search `property_type` parameter."
+---
+
+## Response
+
+<ResponseField name="property_types" type="array">
+  Array of supported property types.
+
+  <Expandable title="Property type object">
+    <ResponseField name="slug" type="string">Slug to use in the search `property_type` query parameter (e.g. `office`).</ResponseField>
+    <ResponseField name="name" type="string">Human-readable name (e.g. `Office`).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "property_types": [
+    { "slug": "commercial-real-estate", "name": "All Commercial Real Estate" },
+    { "slug": "office", "name": "Office" },
+    { "slug": "office-buildings", "name": "Office Buildings" },
+    { "slug": "coworking", "name": "Coworking / Flexible Office" },
+    { "slug": "retail", "name": "Retail" },
+    { "slug": "restaurants", "name": "Restaurants" },
+    { "slug": "industrial", "name": "Industrial" },
+    { "slug": "warehouses", "name": "Warehouses" },
+    { "slug": "flex", "name": "Flex" },
+    { "slug": "apartment-buildings", "name": "Multifamily / Apartments" },
+    { "slug": "land", "name": "Land" },
+    { "slug": "hospitality", "name": "Hospitality / Hotel" },
+    { "slug": "health-care-facilities", "name": "Healthcare" },
+    { "slug": "specialty", "name": "Specialty" },
+    { "slug": "self-storage", "name": "Self-Storage" },
+    { "slug": "sports-and-entertainment", "name": "Sports & Entertainment" }
+  ]
+}
+```
+
+<Note>
+  Listing property types is a **free** reference endpoint (0 credits).
+</Note>

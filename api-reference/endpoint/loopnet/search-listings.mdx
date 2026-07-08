@@ -1,0 +1,181 @@
+---
+title: "Search Listings"
+openapi: "GET /v1/loopnet/search"
+description: "Search a LoopNet market for commercial real-estate listings — for-lease, for-sale, or auctions."
+---
+
+## Query Parameters
+
+<ParamField query="location" type="string" required>
+  Free-text location: a city ("Houston, TX"), a ZIP code ("77002"), a state code ("TX"), or `usa` for the whole country.
+</ParamField>
+
+<ParamField query="market" type="string" default="us">
+  Which market to search: `us` (loopnet.com, USD), `ca` (loopnet.ca, CAD), `uk` (loopnet.co.uk, GBP), `fr` (loopnet.fr, EUR), or `es` (loopnet.es, EUR).
+</ParamField>
+
+<ParamField query="listing_type" type="string" default="for-lease">
+  Listing type filter.
+
+  | Value | Description |
+  |-------|-------------|
+  | `for-lease` | Space for lease (default) |
+  | `for-sale` | Properties for sale |
+  | `auctions` | Auction listings |
+</ParamField>
+
+<ParamField query="property_type" type="string">
+  Property-type slug, e.g. `office`, `retail`, `industrial`, `apartment-buildings`, `land`. Defaults to all commercial real estate. Use the [`/v1/loopnet/property-types`](/api-reference/endpoint/loopnet/list-property-types) endpoint for the full list.
+</ParamField>
+
+<ParamField query="page" type="integer" default={1}>
+  Page number for paginated results. Range: `1` - `20` (LoopNet caps results at roughly 500 per query, ~25 per page).
+</ParamField>
+
+<ParamField query="min_price" type="number">
+  Minimum price in the market's local currency.
+</ParamField>
+
+<ParamField query="max_price" type="number">
+  Maximum price in the market's local currency.
+</ParamField>
+
+<ParamField query="price_type" type="string">
+  How `min_price` / `max_price` are interpreted: `unit` (total price), `sf` (per square foot), or `acre` (per acre).
+</ParamField>
+
+<ParamField query="min_size" type="integer">
+  Minimum size in square feet.
+</ParamField>
+
+<ParamField query="max_size" type="integer">
+  Maximum size in square feet.
+</ParamField>
+
+## Response
+
+<ResponseField name="market" type="string">The market that was searched (`us`, `ca`, `uk`, `fr`, or `es`).</ResponseField>
+<ResponseField name="country" type="string">ISO 3166-1 alpha-2 country code for the market.</ResponseField>
+<ResponseField name="currency" type="string">ISO 4217 currency code for the market.</ResponseField>
+<ResponseField name="listing_type" type="string">The listing type that was searched (`for-lease`, `for-sale`, or `auctions`).</ResponseField>
+<ResponseField name="property_type" type="string">The property-type slug that was searched (nullable).</ResponseField>
+<ResponseField name="location" type="string">The location that was searched (nullable).</ResponseField>
+<ResponseField name="results" type="array">
+  Array of matching listing cards.
+
+  <Expandable title="ListingCard object">
+    <ResponseField name="position" type="integer">1-based position of the card in the results.</ResponseField>
+    <ResponseField name="listing_id" type="string">LoopNet listing id (nullable).</ResponseField>
+    <ResponseField name="property_id" type="string">LoopNet property id (nullable).</ResponseField>
+    <ResponseField name="url" type="string">Full URL to the listing (nullable).</ResponseField>
+    <ResponseField name="listing_type" type="string">`for-lease`, `for-sale`, or `auction` (nullable).</ResponseField>
+    <ResponseField name="property_type" type="string">Property type, e.g. `Office`, `Retail`, `Industrial` (nullable).</ResponseField>
+    <ResponseField name="property_type_id" type="string">LoopNet internal property-type id (nullable).</ResponseField>
+    <ResponseField name="space_use" type="string">Space use, e.g. `Office`, `Retail` (nullable).</ResponseField>
+    <ResponseField name="status" type="string">Listing status (nullable).</ResponseField>
+    <ResponseField name="status_id" type="string">LoopNet internal status id (nullable).</ResponseField>
+    <ResponseField name="exposure_level" type="string">LoopNet ad-exposure tier, e.g. `Diamond`, `Platinum` (nullable).</ResponseField>
+    <ResponseField name="is_auction" type="boolean">Whether the listing is an auction (nullable).</ResponseField>
+    <ResponseField name="title" type="string">Branded name / headline (nullable).</ResponseField>
+    <ResponseField name="subtitle" type="string">Card subtitle (nullable).</ResponseField>
+    <ResponseField name="description" type="string">Short card description (nullable).</ResponseField>
+    <ResponseField name="building_rating" type="number">LoopNet building star rating, e.g. `4.0` (nullable).</ResponseField>
+    <ResponseField name="year_built" type="integer">Year built (nullable).</ResponseField>
+    <ResponseField name="price_text" type="string">Price as displayed, e.g. `$41.40 /SF/YR`, `$2,500,000` (nullable).</ResponseField>
+    <ResponseField name="price" type="number">Parsed numeric price (nullable — CRE pricing is often "Contact broker").</ResponseField>
+    <ResponseField name="price_currency" type="string">ISO 4217 currency code (nullable).</ResponseField>
+    <ResponseField name="price_period" type="string">Rate period, e.g. `/SF/YR`, `/SF/MO`; `null` for sale prices.</ResponseField>
+    <ResponseField name="size_text" type="string">Size as displayed, e.g. `901 - 15,746 SF` (nullable).</ResponseField>
+    <ResponseField name="size_min_sqft" type="integer">Minimum available size in square feet (nullable).</ResponseField>
+    <ResponseField name="size_max_sqft" type="integer">Maximum available size in square feet (nullable).</ResponseField>
+    <ResponseField name="address" type="string">Street address (nullable).</ResponseField>
+    <ResponseField name="city" type="string">City (nullable).</ResponseField>
+    <ResponseField name="state" type="string">State/region (nullable).</ResponseField>
+    <ResponseField name="zip" type="string">ZIP/postal code (nullable).</ResponseField>
+    <ResponseField name="county" type="string">County (nullable).</ResponseField>
+    <ResponseField name="country" type="string">ISO country code (nullable).</ResponseField>
+    <ResponseField name="market_id" type="string">LoopNet internal market id (nullable).</ResponseField>
+    <ResponseField name="latitude" type="number">Latitude (nullable).</ResponseField>
+    <ResponseField name="longitude" type="number">Longitude (nullable).</ResponseField>
+    <ResponseField name="thumbnail" type="string">Thumbnail photo URL (nullable).</ResponseField>
+    <ResponseField name="has_virtual_tour" type="boolean">Whether a 3D virtual tour is available (nullable).</ResponseField>
+    <ResponseField name="page_rank" type="integer">LoopNet page rank of the card (nullable).</ResponseField>
+    <ResponseField name="position_rank" type="integer">LoopNet position rank of the card (nullable).</ResponseField>
+    <ResponseField name="brokers" type="array">Attributed brokers with `name`, `company`, `title`, `phone`, `email`, `photo`, `url`, `broker_id`, `city`, `region` (see the [Broker object](/api-reference/endpoint/loopnet/get-broker-profile)).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="pagination" type="object">
+  Pagination info.
+
+  <Expandable title="Pagination object">
+    <ResponseField name="current_page" type="integer">Current page number.</ResponseField>
+    <ResponseField name="per_page" type="integer">Results per page, typically ~25 (nullable).</ResponseField>
+    <ResponseField name="total_pages" type="integer">Total number of pages available (nullable).</ResponseField>
+    <ResponseField name="total_results" type="integer">Total number of matching listings — LoopNet caps at ~500 (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="scraped_utc" type="number">Scrape time as a Unix timestamp (nullable).</ResponseField>
+<ResponseField name="scraped_at" type="string">Scrape time as an ISO-8601 string (nullable).</ResponseField>
+
+### Example Response
+
+```json
+{
+  "market": "us",
+  "country": "US",
+  "currency": "USD",
+  "listing_type": "for-sale",
+  "property_type": "office",
+  "location": "Houston, TX",
+  "results": [
+    {
+      "position": 1,
+      "listing_id": "12345678",
+      "property_id": "87654321",
+      "url": "https://www.loopnet.com/Listing/1000-Main-St-Houston-TX/12345678/",
+      "listing_type": "for-sale",
+      "property_type": "Office",
+      "space_use": "Office",
+      "status": "Active",
+      "exposure_level": "Diamond",
+      "is_auction": false,
+      "title": "1000 Main Street",
+      "subtitle": "Class A Office Tower",
+      "description": "Trophy office tower in Houston's CBD with panoramic skyline views.",
+      "building_rating": 4.5,
+      "year_built": 2003,
+      "price_text": "$45,000,000",
+      "price": 45000000,
+      "price_currency": "USD",
+      "price_period": null,
+      "size_text": "836,000 SF",
+      "size_min_sqft": 836000,
+      "size_max_sqft": 836000,
+      "address": "1000 Main St",
+      "city": "Houston",
+      "state": "TX",
+      "zip": "77002",
+      "county": "Harris",
+      "country": "US",
+      "latitude": 29.7539,
+      "longitude": -95.3631,
+      "thumbnail": "https://images1.loopnet.com/i2/abc/110/photo.jpg",
+      "has_virtual_tour": true,
+      "brokers": [
+        { "name": "John Smith", "company": "CBRE", "phone": "713-555-0100", "broker_id": "w7x2k9d" }
+      ]
+    }
+  ],
+  "pagination": {
+    "current_page": 1,
+    "per_page": 25,
+    "total_pages": 12,
+    "total_results": 288
+  },
+  "scraped_at": "2026-07-07T12:00:00Z"
+}
+```
+
+<Note>
+  Each search request costs **10 credits**. Failed requests are not charged.
+</Note>

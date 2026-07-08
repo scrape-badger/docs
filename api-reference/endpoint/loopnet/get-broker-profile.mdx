@@ -1,0 +1,90 @@
+---
+title: "Get Broker Profile"
+openapi: "GET /v1/loopnet/brokers/{slug}/{broker_id}"
+description: "Full LoopNet broker/professional profile — contact details, bio, specialties, and their listings."
+---
+
+## Path Parameters
+
+<ParamField path="slug" type="string" required>
+  The broker's URL name slug, e.g. `john-smith`. Take it from the broker `url` field of a [search](/api-reference/endpoint/loopnet/search-listings) or [listing detail](/api-reference/endpoint/loopnet/get-listing-detail) result.
+</ParamField>
+
+<ParamField path="broker_id" type="string" required>
+  The LoopNet broker id. Take it from the `broker_id` field of any listing's `brokers` array.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="us">
+  Which market the broker profile lives in: `us` (loopnet.com), `ca` (loopnet.ca), `uk` (loopnet.co.uk), `fr` (loopnet.fr), or `es` (loopnet.es).
+</ParamField>
+
+## Response
+
+<ResponseField name="broker" type="object">
+  The full `BrokerProfile` object.
+
+  <Expandable title="BrokerProfile object">
+    <ResponseField name="broker_id" type="string">LoopNet broker id (nullable).</ResponseField>
+    <ResponseField name="name" type="string">Full name (nullable).</ResponseField>
+    <ResponseField name="company" type="string">Brokerage/company name (nullable).</ResponseField>
+    <ResponseField name="title" type="string">Job title (nullable).</ResponseField>
+    <ResponseField name="phone" type="string">Phone number (nullable).</ResponseField>
+    <ResponseField name="email" type="string">Email (nullable).</ResponseField>
+    <ResponseField name="photo" type="string">Headshot photo URL (nullable).</ResponseField>
+    <ResponseField name="url" type="string">Broker profile URL (nullable).</ResponseField>
+    <ResponseField name="bio" type="string">Professional bio (nullable).</ResponseField>
+    <ResponseField name="address" type="string">Office street address (nullable).</ResponseField>
+    <ResponseField name="city" type="string">Office city (nullable).</ResponseField>
+    <ResponseField name="state" type="string">Office state/region (nullable).</ResponseField>
+    <ResponseField name="license_number" type="string">Real-estate license number (nullable).</ResponseField>
+    <ResponseField name="specialties" type="array">Specialty strings, e.g. `["Office", "Investment Sales"]`.</ResponseField>
+    <ResponseField name="listing_count" type="integer">Number of active listings (nullable).</ResponseField>
+    <ResponseField name="listings" type="array">The broker's listings as `ListingCard` objects (see [Search Listings](/api-reference/endpoint/loopnet/search-listings)).</ResponseField>
+    <ResponseField name="scraped_utc" type="number">Scrape time as a Unix timestamp (nullable).</ResponseField>
+    <ResponseField name="scraped_at" type="string">Scrape time as an ISO-8601 string (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "broker": {
+    "broker_id": "w7x2k9d",
+    "name": "John Smith",
+    "company": "CBRE",
+    "title": "Senior Vice President",
+    "phone": "713-555-0100",
+    "email": "john.smith@cbre.com",
+    "photo": "https://images1.loopnet.com/i2/broker/photo.jpg",
+    "url": "https://www.loopnet.com/commercial-real-estate-brokers/profile/john-smith/w7x2k9d/",
+    "bio": "20+ years advising owners and occupiers on office leasing and investment sales across the Houston metro.",
+    "address": "2800 Post Oak Blvd",
+    "city": "Houston",
+    "state": "TX",
+    "license_number": "TX 0123456",
+    "specialties": ["Office", "Investment Sales"],
+    "listing_count": 14,
+    "listings": [
+      {
+        "position": 1,
+        "listing_id": "12345678",
+        "url": "https://www.loopnet.com/Listing/1000-Main-St-Houston-TX/12345678/",
+        "listing_type": "for-lease",
+        "property_type": "Office",
+        "title": "1000 Main Street",
+        "price_text": "$41.40 /SF/YR",
+        "city": "Houston",
+        "state": "TX"
+      }
+    ],
+    "scraped_at": "2026-07-07T12:00:00Z"
+  }
+}
+```
+
+<Note>
+  Each broker-profile request costs **8 credits**. Failed requests are not charged.
+</Note>

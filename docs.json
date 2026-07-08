@@ -497,6 +497,42 @@
         ]
       },
       {
+        "tab": "LoopNet",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "loopnet/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/loopnet/search-listings"
+            ]
+          },
+          {
+            "group": "Listings",
+            "pages": [
+              "api-reference/endpoint/loopnet/get-listing-detail"
+            ]
+          },
+          {
+            "group": "Brokers",
+            "pages": [
+              "api-reference/endpoint/loopnet/get-broker-profile"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api-reference/endpoint/loopnet/list-markets",
+              "api-reference/endpoint/loopnet/list-property-types"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Realtor",
         "groups": [
           {
