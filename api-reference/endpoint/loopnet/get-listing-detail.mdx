@@ -1,0 +1,191 @@
+---
+title: "Get Listing Detail"
+openapi: "GET /v1/loopnet/listings/{listing_id}"
+description: "Full detail for a single LoopNet listing — pricing, building facts, spaces, brokers, media, and the complete facts table."
+---
+
+## Path Parameters
+
+<ParamField path="listing_id" type="string" required>
+  The LoopNet listing id. You can find this in search results (`listing_id`) or extract it from a listing URL.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="us">
+  Which market the listing lives in: `us` (loopnet.com), `ca` (loopnet.ca), `uk` (loopnet.co.uk), `fr` (loopnet.fr), or `es` (loopnet.es).
+</ParamField>
+
+## Response
+
+<ResponseField name="listing" type="object">
+  The full `ListingDetail` object.
+
+  <Expandable title="ListingDetail object">
+    <ResponseField name="listing_id" type="string">LoopNet listing id (nullable).</ResponseField>
+    <ResponseField name="property_id" type="string">LoopNet property id (nullable).</ResponseField>
+    <ResponseField name="url" type="string">Full URL to the listing (nullable).</ResponseField>
+    <ResponseField name="market" type="string">Market (`us`, `ca`, `uk`, `fr`, or `es`) (nullable).</ResponseField>
+    <ResponseField name="country" type="string">ISO country code (nullable).</ResponseField>
+    <ResponseField name="listing_type" type="string">`for-lease`, `for-sale`, or `auction` (nullable).</ResponseField>
+    <ResponseField name="transaction_type" type="string">Transaction type as displayed, e.g. `For Lease`, `For Sale` (nullable).</ResponseField>
+    <ResponseField name="name" type="string">Property name (nullable).</ResponseField>
+    <ResponseField name="title" type="string">Listing headline (nullable).</ResponseField>
+    <ResponseField name="subtitle" type="string">Listing subtitle (nullable).</ResponseField>
+    <ResponseField name="description" type="string">Full listing description (nullable).</ResponseField>
+    <ResponseField name="highlights" type="array">Bullet-point listing highlights.</ResponseField>
+    <ResponseField name="price_text" type="string">Price as displayed, e.g. `$41.40 /SF/YR`, `$2,500,000` (nullable).</ResponseField>
+    <ResponseField name="price" type="number">Parsed numeric price (nullable).</ResponseField>
+    <ResponseField name="price_currency" type="string">ISO 4217 currency code (nullable).</ResponseField>
+    <ResponseField name="price_period" type="string">Rate period, e.g. `/SF/YR`; `null` for sale prices.</ResponseField>
+    <ResponseField name="rental_rate_text" type="string">Rental rate as displayed (nullable).</ResponseField>
+    <ResponseField name="cap_rate" type="number">Cap rate percentage (nullable).</ResponseField>
+    <ResponseField name="noi" type="string">Net operating income as displayed (nullable).</ResponseField>
+    <ResponseField name="price_per_sqft" type="number">Price per square foot (nullable).</ResponseField>
+    <ResponseField name="property_type" type="string">Property type, e.g. `Office` (nullable).</ResponseField>
+    <ResponseField name="property_sub_type" type="string">Property sub-type (nullable).</ResponseField>
+    <ResponseField name="building_class" type="string">Building class (`A`, `B`, `C`) (nullable).</ResponseField>
+    <ResponseField name="building_size_sqft" type="integer">Building size in square feet (nullable).</ResponseField>
+    <ResponseField name="building_size_text" type="string">Building size as displayed (nullable).</ResponseField>
+    <ResponseField name="rentable_building_area" type="string">Rentable building area as displayed (nullable).</ResponseField>
+    <ResponseField name="total_space_available" type="string">Total space available as displayed (nullable).</ResponseField>
+    <ResponseField name="total_space_available_sqft" type="integer">Total space available in square feet (nullable).</ResponseField>
+    <ResponseField name="min_divisible" type="string">Minimum divisible space (nullable).</ResponseField>
+    <ResponseField name="max_contiguous" type="string">Maximum contiguous space (nullable).</ResponseField>
+    <ResponseField name="typical_floor_size" type="string">Typical floor size (nullable).</ResponseField>
+    <ResponseField name="building_height" type="string">Building height / number of stories as displayed (nullable).</ResponseField>
+    <ResponseField name="ceiling_height" type="string">Clear ceiling height (nullable).</ResponseField>
+    <ResponseField name="year_built" type="integer">Year built (nullable).</ResponseField>
+    <ResponseField name="year_built_renovated" type="string">Year built/renovated as displayed, e.g. `2003/2019` (nullable).</ResponseField>
+    <ResponseField name="building_rating" type="number">LoopNet building star rating (nullable).</ResponseField>
+    <ResponseField name="lot_size_text" type="string">Lot size as displayed (nullable).</ResponseField>
+    <ResponseField name="lot_size_acres" type="number">Lot size in acres (nullable).</ResponseField>
+    <ResponseField name="units" type="integer">Number of units (multifamily) (nullable).</ResponseField>
+    <ResponseField name="stories" type="integer">Number of stories (nullable).</ResponseField>
+    <ResponseField name="percent_leased" type="string">Percent leased as displayed (nullable).</ResponseField>
+    <ResponseField name="tenancy" type="string">Tenancy, e.g. `Multiple`, `Single` (nullable).</ResponseField>
+    <ResponseField name="zoning" type="string">Zoning designation (nullable).</ResponseField>
+    <ResponseField name="parcel_id" type="string">Parcel/APN id (nullable).</ResponseField>
+    <ResponseField name="parking" type="string">Parking ratio / description (nullable).</ResponseField>
+    <ResponseField name="walk_score" type="integer">Walk Score (nullable).</ResponseField>
+    <ResponseField name="amenities" type="array">List of amenity strings.</ResponseField>
+    <ResponseField name="address" type="string">Street address (nullable).</ResponseField>
+    <ResponseField name="city" type="string">City (nullable).</ResponseField>
+    <ResponseField name="state" type="string">State/region (nullable).</ResponseField>
+    <ResponseField name="zip" type="string">ZIP/postal code (nullable).</ResponseField>
+    <ResponseField name="county" type="string">County (nullable).</ResponseField>
+    <ResponseField name="latitude" type="number">Latitude (nullable).</ResponseField>
+    <ResponseField name="longitude" type="number">Longitude (nullable).</ResponseField>
+    <ResponseField name="images" type="array">Photo URLs.</ResponseField>
+    <ResponseField name="photo_count" type="integer">Total number of photos (nullable).</ResponseField>
+    <ResponseField name="videos" type="array">Video URLs.</ResponseField>
+    <ResponseField name="documents" type="array">Attached document (brochure/flyer) URLs.</ResponseField>
+    <ResponseField name="has_virtual_tour" type="boolean">Whether a 3D virtual tour is available (nullable).</ResponseField>
+    <ResponseField name="spaces" type="array">
+      Leasable spaces/units (lease listings).
+
+      <Expandable title="Space object">
+        <ResponseField name="name" type="string">Space name, e.g. `2nd Floor, Ste 210` (nullable).</ResponseField>
+        <ResponseField name="space_use" type="string">Space use, e.g. `Office` (nullable).</ResponseField>
+        <ResponseField name="size_sqft" type="integer">Space size in square feet (nullable).</ResponseField>
+        <ResponseField name="size_text" type="string">Size as displayed (nullable).</ResponseField>
+        <ResponseField name="rent_text" type="string">Rent as displayed (nullable).</ResponseField>
+        <ResponseField name="rent_per_sqft" type="number">Rent per square foot (nullable).</ResponseField>
+        <ResponseField name="rent_period" type="string">Rent period: `/SF/YR`, `/SF/MO`, or `/MO` (nullable).</ResponseField>
+        <ResponseField name="term" type="string">Lease term (nullable).</ResponseField>
+        <ResponseField name="condition" type="string">Space condition, e.g. `Full Build-Out` (nullable).</ResponseField>
+        <ResponseField name="available_date" type="string">Availability, e.g. `Now`, `Jan 2027` (nullable).</ResponseField>
+        <ResponseField name="floor" type="string">Floor (nullable).</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="brokers" type="array">Attributed brokers with `name`, `company`, `title`, `phone`, `email`, `photo`, `url`, `broker_id`, `city`, `region` (see the [Broker object](/api-reference/endpoint/loopnet/get-broker-profile)).</ResponseField>
+    <ResponseField name="additional_facts" type="array">Every LoopNet facts-table row, verbatim, as `{name, value}` pairs.</ResponseField>
+    <ResponseField name="date_posted_utc" type="number">Date posted as a Unix timestamp (nullable).</ResponseField>
+    <ResponseField name="date_posted_at" type="string">Date posted as an ISO-8601 string (nullable).</ResponseField>
+    <ResponseField name="date_updated_utc" type="number">Last update as a Unix timestamp (nullable).</ResponseField>
+    <ResponseField name="date_updated_at" type="string">Last update as an ISO-8601 string (nullable).</ResponseField>
+    <ResponseField name="scraped_utc" type="number">Scrape time as a Unix timestamp (nullable).</ResponseField>
+    <ResponseField name="scraped_at" type="string">Scrape time as an ISO-8601 string (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "listing": {
+    "listing_id": "12345678",
+    "property_id": "87654321",
+    "url": "https://www.loopnet.com/Listing/1000-Main-St-Houston-TX/12345678/",
+    "market": "us",
+    "country": "US",
+    "listing_type": "for-lease",
+    "transaction_type": "For Lease",
+    "name": "1000 Main Street",
+    "title": "1000 Main St, Houston, TX 77002",
+    "subtitle": "Class A Office Tower",
+    "description": "Trophy office tower in Houston's CBD with panoramic skyline views.",
+    "highlights": ["On-site security", "Direct tunnel access", "Recently renovated lobby"],
+    "price_text": "$41.40 /SF/YR",
+    "price": 41.4,
+    "price_currency": "USD",
+    "price_period": "/SF/YR",
+    "rental_rate_text": "$41.40 /SF/YR",
+    "property_type": "Office",
+    "building_class": "A",
+    "building_size_sqft": 836000,
+    "building_size_text": "836,000 SF",
+    "total_space_available": "45,120 SF",
+    "total_space_available_sqft": 45120,
+    "typical_floor_size": "23,500 SF",
+    "building_height": "36 Stories",
+    "year_built": 2003,
+    "year_built_renovated": "2003/2019",
+    "building_rating": 4.5,
+    "stories": 36,
+    "percent_leased": "89%",
+    "tenancy": "Multiple",
+    "parking": "1.2/1,000 SF",
+    "walk_score": 98,
+    "amenities": ["Conference Rooms", "Fitness Center", "On-Site Security"],
+    "address": "1000 Main St",
+    "city": "Houston",
+    "state": "TX",
+    "zip": "77002",
+    "county": "Harris",
+    "latitude": 29.7539,
+    "longitude": -95.3631,
+    "images": ["https://images1.loopnet.com/i2/abc/116/photo-1.jpg"],
+    "photo_count": 24,
+    "has_virtual_tour": true,
+    "spaces": [
+      {
+        "name": "2nd Floor, Ste 210",
+        "space_use": "Office",
+        "size_sqft": 4500,
+        "size_text": "4,500 SF",
+        "rent_text": "$41.40 /SF/YR",
+        "rent_per_sqft": 41.4,
+        "rent_period": "/SF/YR",
+        "term": "Negotiable",
+        "condition": "Full Build-Out",
+        "available_date": "Now",
+        "floor": "2"
+      }
+    ],
+    "brokers": [
+      { "name": "John Smith", "company": "CBRE", "title": "Senior Vice President", "phone": "713-555-0100", "broker_id": "w7x2k9d" }
+    ],
+    "additional_facts": [
+      { "name": "Building Class", "value": "A" },
+      { "name": "Parking Ratio", "value": "1.2/1,000 SF" }
+    ],
+    "date_updated_at": "2026-07-01T00:00:00Z",
+    "scraped_at": "2026-07-07T12:00:00Z"
+  }
+}
+```
+
+<Note>
+  Each listing-detail request costs **12 credits**. Failed requests are not charged.
+</Note>

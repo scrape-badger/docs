@@ -1,0 +1,154 @@
+---
+title: "LoopNet Scraper Overview"
+description: "Scrape LoopNet commercial real estate across 5 markets (US, CA, UK, FR, ES) — for-lease, for-sale, and auction listings with full detail, spaces, broker contacts, and media — as structured JSON."
+---
+
+# LoopNet Scraper API
+
+Search **for-lease**, **for-sale**, and **auction** commercial listings, pull **full listing detail** (rent/price with $/SF, building class and size, spaces, amenities, walk score, photos and 3D tours, the complete facts table), and look up **broker profiles** across **loopnet.com (US)**, **loopnet.ca (CA)**, **loopnet.co.uk (UK)**, **loopnet.fr (FR)**, and **loopnet.es (ES)** — the widest LoopNet commercial-real-estate API. Authentication, anti-bot bypass, and market routing are handled automatically.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="5-Market Coverage" icon="earth-americas">
+    One API over **loopnet.com**, **loopnet.ca**, **loopnet.co.uk**, **loopnet.fr**, and **loopnet.es**. Pick a market with the `market` parameter.
+  </Card>
+  <Card title="All Listing Types" icon="tags">
+    **For-lease**, **for-sale**, and **auction** listings across Office, Retail, Industrial, Multifamily, Land, Hospitality, Healthcare, and more.
+  </Card>
+  <Card title="Rich Listing Detail" icon="building">
+    Rent/price + $/SF, building class/size/height, year built/renovated, amenities, walk score, zoning, parking, and the full LoopNet facts table.
+  </Card>
+  <Card title="Spaces & Brokers" icon="address-book">
+    Per-space availability (size, rent, term, floor, condition) plus broker contacts — and full [broker profiles](/api-reference/endpoint/loopnet/get-broker-profile) with their listings.
+  </Card>
+  <Card title="Media" icon="camera">
+    Photo galleries, videos, documents, and **3D virtual tour** flags on every listing.
+  </Card>
+  <Card title="Anti-Bot Bypass" icon="shield-halved">
+    LoopNet sits behind Akamai Bot Manager. ScrapeBadger clears it automatically with real-browser sessions — no proxies or CAPTCHAs to manage.
+  </Card>
+</CardGroup>
+
+<Note>
+  LoopNet caps search results at roughly **500 per query** (about 25 per page, pages `1`-`20`). For dense metros, narrow by `property_type`, price, or size filters to see everything.
+</Note>
+
+## Supported Markets
+
+The API covers five national LoopNet portals. Use the `market` query parameter to target one.
+
+| Market | Portal | Country | Currency | Locale |
+|--------|--------|---------|----------|--------|
+| :us: `us` | loopnet.com | US | USD | en-US |
+| :canada: `ca` | loopnet.ca | CA | CAD | en-CA |
+| :uk: `uk` | loopnet.co.uk | GB | GBP | en-GB |
+| :fr: `fr` | loopnet.fr | FR | EUR | fr-FR |
+| :es: `es` | loopnet.es | ES | EUR | es-ES |
+
+<Tip>
+  If no `market` is specified, it defaults to `us`. Use the [`/v1/loopnet/markets`](/api-reference/endpoint/loopnet/list-markets) endpoint to get the full list (with domain, currency, and locale) programmatically.
+</Tip>
+
+## Quick Start
+
+<CodeGroup>
+
+```javascript Node.js
+import ScrapeBadger from "scrapebadger";
+
+const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" });
+
+const results = await client.loopnet.search({
+  location: "Houston, TX",
+  listingType: "for-sale",
+  propertyType: "office",
+});
+
+console.log(results.results);
+```
+
+```python Python
+from scrapebadger import ScrapeBadger
+
+client = ScrapeBadger(api_key="YOUR_API_KEY")
+
+results = client.loopnet.search(
+    location="Houston, TX",
+    listing_type="for-sale",
+    property_type="office",
+)
+
+print(results.results)
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/loopnet/search?location=Houston,+TX&listing_type=for-sale&property_type=office" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+## Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/loopnet/search`](/api-reference/endpoint/loopnet/search-listings) | GET | Search a market for commercial listings |
+| [`/v1/loopnet/listings/{listing_id}`](/api-reference/endpoint/loopnet/get-listing-detail) | GET | Full detail for a single listing |
+| [`/v1/loopnet/brokers/{slug}/{broker_id}`](/api-reference/endpoint/loopnet/get-broker-profile) | GET | Broker profile with their listings |
+| [`/v1/loopnet/markets`](/api-reference/endpoint/loopnet/list-markets) | GET | List all supported markets |
+| [`/v1/loopnet/property-types`](/api-reference/endpoint/loopnet/list-property-types) | GET | List all property-type filter slugs |
+
+## Credit Costs
+
+| Endpoint | Cost |
+|----------|------|
+| Search | 10 credits |
+| Get listing detail | 12 credits |
+| Get broker profile | 8 credits |
+| List markets | 0 credits |
+| List property types | 0 credits |
+| Failed requests | 0 credits |
+
+## Authentication
+
+All requests require your API key in the `X-API-Key` header:
+
+```bash
+curl "https://scrapebadger.com/v1/loopnet/search?location=Miami,+FL" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+## Anti-Bot Handling
+
+Every LoopNet portal is protected by Akamai Bot Manager with behavioral scoring and sensor challenges. ScrapeBadger clears these automatically using real Chrome browser sessions routed through proxies in the market's country. You never need to manage proxies, sessions, or CAPTCHAs.
+
+<Note>
+  Because requests are served through real browsers, LoopNet responses are slower than plain-HTTP scrapers — expect **~15-20 seconds** per request.
+</Note>
+
+## Rich Datapoints
+
+Every listing carries a deep set of structured fields:
+
+| Group | Fields |
+|-------|--------|
+| **Pricing** | `price`, `price_text`, `price_currency`, `price_period`, `price_per_sqft`, `rental_rate_text`, `cap_rate`, `noi` |
+| **Building** | `property_type`, `property_sub_type`, `building_class`, `building_size_sqft`, `building_height`, `ceiling_height`, `year_built`, `year_built_renovated`, `stories`, `units`, `tenancy`, `percent_leased` |
+| **Lot & Zoning** | `lot_size_acres`, `lot_size_text`, `zoning`, `parcel_id`, `parking`, `walk_score` |
+| **Location** | `address`, `city`, `state`, `zip`, `county`, `latitude`, `longitude` |
+| **Media** | `images[]`, `photo_count`, `videos[]`, `documents[]`, `has_virtual_tour` |
+| **Context** | `spaces[]` (per-unit size/rent/term/floor), `brokers[]` (name, company, phone, email), `amenities[]`, `highlights[]`, `additional_facts[]` (the full LoopNet facts table) |
+
+Search returns each result as a `ListingCard`; the [listing detail](/api-reference/endpoint/loopnet/get-listing-detail) endpoint returns a `ListingDetail` that adds spaces, amenities, media, and every fact LoopNet publishes. All datetime fields ship both as Unix timestamps (`*_utc`) and ISO-8601 strings (`*_at`).
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Search Listings" icon="magnifying-glass" href="/api-reference/endpoint/loopnet/search-listings">
+    Full API reference for searching the LoopNet catalogs
+  </Card>
+  <Card title="Listing Detail" icon="building" href="/api-reference/endpoint/loopnet/get-listing-detail">
+    Retrieve full detail, spaces, brokers, media, and the facts table for a listing
+  </Card>
+</CardGroup>

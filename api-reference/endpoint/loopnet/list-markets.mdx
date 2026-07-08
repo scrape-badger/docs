@@ -1,0 +1,38 @@
+---
+title: "List Markets"
+openapi: "GET /v1/loopnet/markets"
+description: "List all supported LoopNet markets with their portals, currencies, and locales."
+---
+
+## Response
+
+<ResponseField name="markets" type="array">
+  Array of supported markets.
+
+  <Expandable title="Market object">
+    <ResponseField name="code" type="string">Market code to use in the `market` query parameter (`us`, `ca`, `uk`, `fr`, or `es`).</ResponseField>
+    <ResponseField name="domain" type="string">Portal domain (e.g. `www.loopnet.com`).</ResponseField>
+    <ResponseField name="country" type="string">ISO 3166-1 alpha-2 country code.</ResponseField>
+    <ResponseField name="currency" type="string">ISO 4217 currency code used in this market.</ResponseField>
+    <ResponseField name="locale" type="string">BCP-47 locale (e.g. `en-US`).</ResponseField>
+    <ResponseField name="name" type="string">Market country name.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "markets": [
+    { "code": "us", "domain": "www.loopnet.com", "country": "US", "currency": "USD", "locale": "en-US", "name": "United States" },
+    { "code": "ca", "domain": "www.loopnet.ca", "country": "CA", "currency": "CAD", "locale": "en-CA", "name": "Canada" },
+    { "code": "uk", "domain": "www.loopnet.co.uk", "country": "GB", "currency": "GBP", "locale": "en-GB", "name": "United Kingdom" },
+    { "code": "fr", "domain": "www.loopnet.fr", "country": "FR", "currency": "EUR", "locale": "fr-FR", "name": "France" },
+    { "code": "es", "domain": "www.loopnet.es", "country": "ES", "currency": "EUR", "locale": "es-ES", "name": "Spain" }
+  ]
+}
+```
+
+<Note>
+  Listing markets is a **free** reference endpoint (0 credits).
+</Note>
