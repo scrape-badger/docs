@@ -17,7 +17,15 @@ pip install scrapebadger-cli
 ```bash uv
 uv tool install scrapebadger-cli
 ```
+
+```bash uvx (no install)
+uvx --from scrapebadger-cli scrapebadger --help
+```
 </CodeGroup>
+
+<Note>
+The package is `scrapebadger-cli`, but the installed command is `scrapebadger`. With `uvx`, always pass `--from scrapebadger-cli` — plain `uvx scrapebadger-cli` fails because no executable matches the package name.
+</Note>
 
 ## Quick Start
 
