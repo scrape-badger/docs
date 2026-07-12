@@ -1,0 +1,41 @@
+---
+title: "List Markets"
+openapi: "GET /v1/depop/markets"
+description: "List all supported Depop markets with their country codes and currencies."
+---
+
+## Response
+
+<ResponseField name="markets" type="array">
+  Array of supported markets.
+
+  <Expandable title="Market object">
+    <ResponseField name="code" type="string">Market code to use in the `market` query parameter (e.g. `us`, `gb`, `au`).</ResponseField>
+    <ResponseField name="country_code" type="string">ISO 3166-1 alpha-2 country code.</ResponseField>
+    <ResponseField name="currency" type="string">ISO 4217 currency code used in this market.</ResponseField>
+    <ResponseField name="name" type="string">Market country name.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+### Example Response
+
+```json
+{
+  "markets": [
+    { "code": "us", "country_code": "US", "currency": "USD", "name": "United States" },
+    { "code": "gb", "country_code": "GB", "currency": "GBP", "name": "United Kingdom" },
+    { "code": "au", "country_code": "AU", "currency": "AUD", "name": "Australia" },
+    { "code": "ie", "country_code": "IE", "currency": "EUR", "name": "Ireland" },
+    { "code": "it", "country_code": "IT", "currency": "EUR", "name": "Italy" },
+    { "code": "fr", "country_code": "FR", "currency": "EUR", "name": "France" },
+    { "code": "de", "country_code": "DE", "currency": "EUR", "name": "Germany" },
+    { "code": "es", "country_code": "ES", "currency": "EUR", "name": "Spain" },
+    { "code": "nl", "country_code": "NL", "currency": "EUR", "name": "Netherlands" },
+    { "code": "nz", "country_code": "NZ", "currency": "NZD", "name": "New Zealand" }
+  ]
+}
+```
+
+<Note>
+  Listing markets is a **free** reference endpoint (0 credits).
+</Note>

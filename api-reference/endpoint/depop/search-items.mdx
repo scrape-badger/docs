@@ -1,0 +1,117 @@
+---
+title: "Search Items"
+openapi: "GET /v1/depop/search"
+description: "Search Depop for second-hand fashion items — filter by price, brand, size, colour, condition, and gender."
+---
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Free-text search query, e.g. `nike air max`, `vintage levis`, `carhartt jacket`.
+</ParamField>
+
+<ParamField query="market" type="string" default="us">
+  Which market to search. Depop runs on a single global host (`www.depop.com`) localised by market — this selects the country and currency of the results. See [`/v1/depop/markets`](/api-reference/endpoint/depop/list-markets) for the full list.
+</ParamField>
+
+<ParamField query="per_page" type="integer" default={24}>
+  Number of items per page. Range: `1` - `24`.
+</ParamField>
+
+<ParamField query="page" type="integer" default={1}>
+  Page number for paginated results (page-based pagination).
+</ParamField>
+
+<ParamField query="price_min" type="number">
+  Minimum price in the market's local currency.
+</ParamField>
+
+<ParamField query="price_max" type="number">
+  Maximum price in the market's local currency.
+</ParamField>
+
+<ParamField query="brands" type="string">
+  Comma-separated brand filters, e.g. `nike,adidas`.
+</ParamField>
+
+<ParamField query="sizes" type="string">
+  Comma-separated size filters, e.g. `m,l` or `uk-10`.
+</ParamField>
+
+<ParamField query="colours" type="string">
+  Comma-separated colour filters, e.g. `black,green`.
+</ParamField>
+
+<ParamField query="conditions" type="string">
+  Comma-separated condition filters, e.g. `brand_new,used_excellent`.
+</ParamField>
+
+<ParamField query="gender" type="string">
+  Gender department filter, e.g. `menswear`, `womenswear`.
+</ParamField>
+
+<ParamField query="sort" type="string">
+  Result ordering, e.g. `relevance` (default), `newlyListed`, `priceAscending`, `priceDescending`.
+</ParamField>
+
+## Response
+
+<ResponseField name="products" type="array">
+  Array of matching item cards.
+
+  <Expandable title="DepopCard object">
+    <ResponseField name="slug" type="string">Item slug (the path segment used by [`/v1/depop/products/{slug}`](/api-reference/endpoint/depop/get-product)) (nullable).</ResponseField>
+    <ResponseField name="url" type="string">Full URL to the item (nullable).</ResponseField>
+    <ResponseField name="seller_username" type="string">Username of the seller (nullable).</ResponseField>
+    <ResponseField name="brand" type="string">Brand name (nullable).</ResponseField>
+    <ResponseField name="size" type="string">Item size as displayed (nullable).</ResponseField>
+    <ResponseField name="price" type="number">Current price in the market's currency (nullable).</ResponseField>
+    <ResponseField name="original_price" type="number">Original price before markdown; `null` if not discounted.</ResponseField>
+    <ResponseField name="currency" type="string">ISO 4217 currency code (nullable).</ResponseField>
+    <ResponseField name="is_sold" type="boolean">Whether the item has been sold (nullable).</ResponseField>
+    <ResponseField name="image" type="string">Primary item photo URL (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="meta" type="object">
+  Pagination info.
+
+  <Expandable title="Meta object">
+    <ResponseField name="result_count" type="integer">Number of items returned on this page.</ResponseField>
+    <ResponseField name="page" type="integer">Current page number.</ResponseField>
+    <ResponseField name="has_more" type="boolean">Whether more pages are available.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="market" type="string">The market that was searched.</ResponseField>
+<ResponseField name="query" type="string">The query that was searched.</ResponseField>
+
+### Example Response
+
+```json
+{
+  "products": [
+    {
+      "slug": "seller123-nike-air-max-90-uk-9",
+      "url": "https://www.depop.com/products/seller123-nike-air-max-90-uk-9/",
+      "seller_username": "seller123",
+      "brand": "Nike",
+      "size": "UK 9",
+      "price": 65.0,
+      "original_price": 90.0,
+      "currency": "USD",
+      "is_sold": false,
+      "image": "https://media-photos.depop.com/b1/12345/photo.jpg"
+    }
+  ],
+  "meta": {
+    "result_count": 24,
+    "page": 1,
+    "has_more": true
+  },
+  "market": "us",
+  "query": "nike air max"
+}
+```
+
+<Note>
+  Each search request costs **10 credits**. Failed requests are not charged.
+</Note>

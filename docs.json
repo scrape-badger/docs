@@ -316,6 +316,42 @@
         ]
       },
       {
+        "tab": "Depop",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "depop/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/depop/search-items"
+            ]
+          },
+          {
+            "group": "Products",
+            "pages": [
+              "api-reference/endpoint/depop/get-product"
+            ]
+          },
+          {
+            "group": "Users",
+            "pages": [
+              "api-reference/endpoint/depop/get-user",
+              "api-reference/endpoint/depop/get-user-products"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api-reference/endpoint/depop/list-markets"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Amazon",
         "groups": [
           {

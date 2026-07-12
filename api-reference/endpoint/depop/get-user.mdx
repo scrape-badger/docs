@@ -1,0 +1,45 @@
+---
+title: "Get User"
+openapi: "GET /v1/depop/users/{username}"
+description: "Full Depop shop profile — display name, bio, rating, and follower count."
+---
+
+## Path Parameters
+
+<ParamField path="username" type="string" required>
+  The seller's Depop username, e.g. `seller123`. Take it from the `seller_username` field of any item card or product detail.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="us">
+  Which market to render the profile in — selects the country and currency context. See [`/v1/depop/markets`](/api-reference/endpoint/depop/list-markets) for the full list.
+</ParamField>
+
+## Response
+
+<ResponseField name="username" type="string">The seller's username (nullable).</ResponseField>
+<ResponseField name="name" type="string">Display name (nullable).</ResponseField>
+<ResponseField name="description" type="string">Shop bio / description (nullable).</ResponseField>
+<ResponseField name="rating_value" type="number">Average seller rating, e.g. `4.8` (nullable).</ResponseField>
+<ResponseField name="rating_count" type="integer">Number of ratings the seller has received (nullable).</ResponseField>
+<ResponseField name="follower_count" type="integer">Number of followers (nullable).</ResponseField>
+<ResponseField name="url" type="string">Full URL to the shop profile (nullable).</ResponseField>
+
+### Example Response
+
+```json
+{
+  "username": "seller123",
+  "name": "Vintage Finds",
+  "description": "Curated vintage streetwear. Ships worldwide. UK based.",
+  "rating_value": 4.8,
+  "rating_count": 312,
+  "follower_count": 5400,
+  "url": "https://www.depop.com/seller123/"
+}
+```
+
+<Note>
+  Each user-profile request costs **10 credits**. Failed requests are not charged.
+</Note>
