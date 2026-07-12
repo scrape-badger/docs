@@ -1,0 +1,138 @@
+---
+title: "Depop Scraper Overview"
+description: "Scrape Depop second-hand fashion across 10 markets — search items, pull full product detail, and look up seller shops and their listings — as structured JSON."
+---
+
+# Depop Scraper API
+
+Search **second-hand fashion** items, pull **full product detail** (title, description, brand, condition, price, and photos), and look up **seller shops** and their listings across Depop's **10 localised markets** — US, UK, Australia, Ireland, Italy, France, Germany, Spain, Netherlands, and New Zealand. Authentication, anti-bot bypass, and market localisation are handled automatically.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="10 Markets" icon="earth-americas">
+    One API localised to **US**, **UK**, **AU**, **IE**, **IT**, **FR**, **DE**, **ES**, **NL**, and **NZ**. Pick one with the `market` parameter.
+  </Card>
+  <Card title="Item Search" icon="magnifying-glass">
+    Search the Depop catalog and filter by **price**, **brand**, **size**, **colour**, **condition**, and **gender**.
+  </Card>
+  <Card title="Rich Product Detail" icon="shirt">
+    Title, description, brand, condition, price, availability, image gallery, and seller — for any item.
+  </Card>
+  <Card title="Seller Shops" icon="store">
+    Full [shop profiles](/api-reference/endpoint/depop/get-user) — name, bio, rating, follower count — plus every item a seller has listed.
+  </Card>
+  <Card title="Structured Data" icon="database">
+    Clean JSON responses with prices, currencies, sizes, brands, conditions, and seller info.
+  </Card>
+  <Card title="Anti-Bot Bypass" icon="shield-halved">
+    Depop is fully browser-rendered. ScrapeBadger renders each page with real-browser sessions — no proxies or CAPTCHAs to manage.
+  </Card>
+</CardGroup>
+
+## Market Localisation
+
+Depop runs on a **single global host** — `www.depop.com` — localised by a `market` query parameter. The market selects the **country and currency** the catalog and prices are rendered in; the domain never changes.
+
+| Market | Country | Currency |
+|--------|---------|----------|
+| :us: `us` | United States | USD |
+| :uk: `gb` / `uk` | United Kingdom | GBP |
+| :australia: `au` | Australia | AUD |
+| :ireland: `ie` | Ireland | EUR |
+| :it: `it` | Italy | EUR |
+| :fr: `fr` | France | EUR |
+| :de: `de` | Germany | EUR |
+| :es: `es` | Spain | EUR |
+| :netherlands: `nl` | Netherlands | EUR |
+| :new_zealand: `nz` | New Zealand | NZD |
+
+<Tip>
+  If no `market` is specified, it defaults to `us` (USD). Use the [`/v1/depop/markets`](/api-reference/endpoint/depop/list-markets) endpoint to get the full list (with country code and currency) programmatically.
+</Tip>
+
+## Quick Start
+
+<CodeGroup>
+
+```javascript Node.js
+import ScrapeBadger from "scrapebadger";
+
+const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" });
+
+const results = await client.depop.search({
+  query: "nike air max",
+  market: "us",
+});
+
+console.log(results.products);
+```
+
+```python Python
+from scrapebadger import ScrapeBadger
+
+client = ScrapeBadger(api_key="YOUR_API_KEY")
+
+results = client.depop.search(
+    query="nike air max",
+    market="us",
+)
+
+print(results.products)
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/depop/search?query=nike+air+max&market=us" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+## Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/depop/search`](/api-reference/endpoint/depop/search-items) | GET | Search a market for fashion items |
+| [`/v1/depop/products/{slug}`](/api-reference/endpoint/depop/get-product) | GET | Full detail for a single item |
+| [`/v1/depop/users/{username}`](/api-reference/endpoint/depop/get-user) | GET | Seller shop profile |
+| [`/v1/depop/users/{username}/products`](/api-reference/endpoint/depop/get-user-products) | GET | Items listed by a seller |
+| [`/v1/depop/markets`](/api-reference/endpoint/depop/list-markets) | GET | List all supported markets |
+
+## Credit Costs
+
+| Endpoint | Cost |
+|----------|------|
+| Search items | 10 credits |
+| Get product | 10 credits |
+| Get user | 10 credits |
+| Get user products | 10 credits |
+| List markets | 0 credits |
+| Failed requests | 0 credits |
+
+## Authentication
+
+All requests require your API key in the `X-API-Key` header:
+
+```bash
+curl "https://scrapebadger.com/v1/depop/search?query=vintage+levis" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+## Anti-Bot Handling
+
+Depop serves all of its data through a browser-rendered front end. ScrapeBadger renders each page with real Chrome browser sessions routed through proxies, clearing anti-bot checks automatically. You never need to manage proxies, sessions, or CAPTCHAs.
+
+<Note>
+  Because every response is served through a real browser, Depop requests take a **few seconds** each — slower than plain-HTTP scrapers.
+</Note>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Search Items" icon="magnifying-glass" href="/api-reference/endpoint/depop/search-items">
+    Full API reference for searching the Depop catalog
+  </Card>
+  <Card title="Get Product" icon="shirt" href="/api-reference/endpoint/depop/get-product">
+    Retrieve full detail, images, and seller for a specific item
+  </Card>
+</CardGroup>

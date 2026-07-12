@@ -1,0 +1,58 @@
+---
+title: "Get Product"
+openapi: "GET /v1/depop/products/{slug}"
+description: "Full detail for a single Depop item — title, description, brand, condition, price, images, and seller."
+---
+
+## Path Parameters
+
+<ParamField path="slug" type="string" required>
+  The Depop item slug. You can find this in search results (`slug`) or extract it from a product URL (`https://www.depop.com/products/{slug}/`).
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="us">
+  Which market to render the item in — selects the country and currency. See [`/v1/depop/markets`](/api-reference/endpoint/depop/list-markets) for the full list.
+</ParamField>
+
+## Response
+
+<ResponseField name="id" type="string">Depop item id (nullable).</ResponseField>
+<ResponseField name="slug" type="string">Item slug (nullable).</ResponseField>
+<ResponseField name="title" type="string">Item title (nullable).</ResponseField>
+<ResponseField name="description" type="string">Full item description (nullable).</ResponseField>
+<ResponseField name="brand" type="string">Brand name (nullable).</ResponseField>
+<ResponseField name="condition" type="string">Item condition, e.g. `Brand new`, `Used - excellent` (nullable).</ResponseField>
+<ResponseField name="price" type="number">Current price in the market's currency (nullable).</ResponseField>
+<ResponseField name="currency" type="string">ISO 4217 currency code (nullable).</ResponseField>
+<ResponseField name="availability" type="string">Availability status, e.g. `in_stock`, `sold` (nullable).</ResponseField>
+<ResponseField name="seller_username" type="string">Username of the seller (nullable).</ResponseField>
+<ResponseField name="images" type="array">Item photo URLs.</ResponseField>
+<ResponseField name="url" type="string">Full URL to the item (nullable).</ResponseField>
+
+### Example Response
+
+```json
+{
+  "id": "123456789",
+  "slug": "seller123-nike-air-max-90-uk-9",
+  "title": "Nike Air Max 90 — UK 9",
+  "description": "Worn a handful of times, great condition. No box.",
+  "brand": "Nike",
+  "condition": "Used - excellent",
+  "price": 65.0,
+  "currency": "USD",
+  "availability": "in_stock",
+  "seller_username": "seller123",
+  "images": [
+    "https://media-photos.depop.com/b1/12345/photo-1.jpg",
+    "https://media-photos.depop.com/b1/12345/photo-2.jpg"
+  ],
+  "url": "https://www.depop.com/products/seller123-nike-air-max-90-uk-9/"
+}
+```
+
+<Note>
+  Each product-detail request costs **10 credits**. Failed requests are not charged.
+</Note>
