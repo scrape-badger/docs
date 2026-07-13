@@ -1,0 +1,14 @@
+---
+title: "Google Flights Booking Options"
+description: "List the providers (airline and OTAs) that can book a selected itinerary, with per-provider prices."
+openapi: "GET /v1/google/flights/booking_options"
+---
+
+Pass a `selection_token` from a [Flights Search](/api-reference/google/google-flights/flights-search)
+offer — either a one-way offer, or a round-trip offer returned by the
+`departure_token` step (i.e. with both legs selected). Prices include mandatory
+taxes and fees for the whole party, same as search results.
+
+An incomplete round-trip selection (outbound only, no return chosen yet)
+returns an empty `booking_options` list — follow that offer's `departure_token`
+first.
