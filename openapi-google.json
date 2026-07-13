@@ -4438,8 +4438,8 @@
           "Google Flights"
         ],
         "summary": "Google Flights search",
-        "description": "Search Google Flights for available itineraries.\n\nReturns `best_flights` (Google's top recommendations) and `other_flights`\n(the rest of the result set), plus `price_insights` when Google shows\nits typical-price range / high-low-typical indicator.\n\nParser is best-effort against the rendered DOM — Google's internal\nbatchexecute protobuf would give richer data (seat maps, booking tokens,\nper-leg aircraft) but requires reverse-engineering that changes\nfrequently. The DOM route is more stable for daily-use scraping.",
-        "operationId": "flights_search_api_v1_flights_search_get",
+        "description": "Search Google Flights.\n\nReturns ``best_flights`` (Google's top 4 picks) and ``other_flights``\n(the rest of the SSR-rendered result set), plus ``price_insights``\nwhen Google flags a typical-price range. Each offer carries a\n``booking_url`` deep link (built from the ``tfs`` token) that pre-selects\nthat flight, and the response carries a ``search_url`` for the whole\nsearch.\n\nFor round-trips, follow an outbound offer's ``departure_token`` back into\nthis endpoint to list the **return-leg** flights; each returned offer then\ncarries a fully-selected ``selection_token`` / ``booking_url`` for the\ncomplete itinerary.\n\nNote: Google Flights renders a \"best picks\" preview in SSR (~6-8\nflights per direction for round-trips, 3-4 for one-way).",
+        "operationId": "googleFlightsSearch",
         "parameters": [
           {
             "name": "departure_id",
@@ -4447,10 +4447,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "Departure airport IATA code (e.g. JFK) or location ID",
+              "description": "Departure IATA (e.g. `JFK`) or airport ID.",
               "title": "Departure Id"
             },
-            "description": "Departure airport IATA code (e.g. JFK) or location ID"
+            "description": "Departure IATA (e.g. `JFK`) or airport ID."
           },
           {
             "name": "arrival_id",
@@ -4458,10 +4458,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "Arrival airport IATA code (e.g. LHR) or location ID",
+              "description": "Arrival IATA (e.g. `LHR`) or airport ID.",
               "title": "Arrival Id"
             },
-            "description": "Arrival airport IATA code (e.g. LHR) or location ID"
+            "description": "Arrival IATA (e.g. `LHR`) or airport ID."
           },
           {
             "name": "outbound_date",
@@ -4469,10 +4469,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "Outbound date (YYYY-MM-DD)",
+              "description": "Outbound date — `YYYY-MM-DD`.",
               "title": "Outbound Date"
             },
-            "description": "Outbound date (YYYY-MM-DD)"
+            "description": "Outbound date — `YYYY-MM-DD`."
           },
           {
             "name": "return_date",
@@ -4487,10 +4487,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Return date (YYYY-MM-DD, round-trip only)",
+              "description": "Return date (`YYYY-MM-DD`) — required for `trip_type=round_trip`.",
               "title": "Return Date"
             },
-            "description": "Return date (YYYY-MM-DD, round-trip only)"
+            "description": "Return date (`YYYY-MM-DD`) — required for `trip_type=round_trip`."
           },
           {
             "name": "trip_type",
@@ -4503,11 +4503,11 @@
                 "multi_city"
               ],
               "type": "string",
-              "description": "Trip type: round_trip | one_way | multi_city",
+              "description": "`round_trip` / `one_way` / `multi_city`.",
               "default": "round_trip",
               "title": "Trip Type"
             },
-            "description": "Trip type: round_trip | one_way | multi_city"
+            "description": "`round_trip` / `one_way` / `multi_city`."
           },
           {
             "name": "adults",
@@ -4517,11 +4517,11 @@
               "type": "integer",
               "maximum": 9,
               "minimum": 1,
-              "description": "Adult passengers",
+              "description": "Adult passengers.",
               "default": 1,
               "title": "Adults"
             },
-            "description": "Adult passengers"
+            "description": "Adult passengers."
           },
           {
             "name": "children",
@@ -4531,11 +4531,11 @@
               "type": "integer",
               "maximum": 8,
               "minimum": 0,
-              "description": "Children passengers",
+              "description": "Children passengers.",
               "default": 0,
               "title": "Children"
             },
-            "description": "Children passengers"
+            "description": "Children passengers."
           },
           {
             "name": "infants_in_seat",
@@ -4573,11 +4573,11 @@
                 "first"
               ],
               "type": "string",
-              "description": "Cabin class",
+              "description": "Cabin class.",
               "default": "economy",
               "title": "Travel Class"
             },
-            "description": "Cabin class"
+            "description": "Cabin class."
           },
           {
             "name": "currency",
@@ -4585,11 +4585,11 @@
             "required": false,
             "schema": {
               "type": "string",
-              "description": "ISO-4217 currency code",
+              "description": "ISO-4217 currency code.",
               "default": "USD",
               "title": "Currency"
             },
-            "description": "ISO-4217 currency code"
+            "description": "ISO-4217 currency code."
           },
           {
             "name": "gl",
@@ -4597,11 +4597,11 @@
             "required": false,
             "schema": {
               "type": "string",
-              "description": "Country code",
+              "description": "Country code.",
               "default": "us",
               "title": "Gl"
             },
-            "description": "Country code"
+            "description": "Country code."
           },
           {
             "name": "hl",
@@ -4609,11 +4609,11 @@
             "required": false,
             "schema": {
               "type": "string",
-              "description": "Language code",
+              "description": "Language code.",
               "default": "en",
               "title": "Hl"
             },
-            "description": "Language code"
+            "description": "Language code."
           },
           {
             "name": "stops",
@@ -4627,11 +4627,11 @@
                 "two_stops"
               ],
               "type": "string",
-              "description": "Max stops filter",
+              "description": "Max stops filter — applied client-side.",
               "default": "any",
               "title": "Stops"
             },
-            "description": "Max stops filter"
+            "description": "Max stops filter — applied client-side."
           },
           {
             "name": "max_price",
@@ -4647,10 +4647,28 @@
                   "type": "null"
                 }
               ],
-              "description": "Max price filter",
+              "description": "Max price filter — applied client-side.",
               "title": "Max Price"
             },
-            "description": "Max price filter"
+            "description": "Max price filter — applied client-side."
+          },
+          {
+            "name": "departure_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A `departure_token` from a round-trip offer. When set, the search returns the **return-leg** flights for that selected outbound (pass the same `departure_id`/`arrival_id`/dates as the original search). Round-trip only.",
+              "title": "Departure Token"
+            },
+            "description": "A `departure_token` from a round-trip offer. When set, the search returns the **return-leg** flights for that selected outbound (pass the same `departure_id`/`arrival_id`/dates as the original search). Round-trip only."
           }
         ],
         "responses": {
@@ -4705,6 +4723,87 @@
             "content": {
               "application/json": {
                 "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/google/flights/booking_options": {
+      "get": {
+        "tags": [
+          "Google Flights"
+        ],
+        "summary": "Google Flights booking options for a selected itinerary",
+        "description": "Return the provider booking list (airline + OTAs) for a selected flight.\n\nThe provider list is rendered client-side, so this does a JS render of the\nGoogle Flights ``/booking`` page (slower/pricier than search). Each option\nhas the provider name and price; the actual per-provider booking links open\nfrom the returned ``booking_url`` (Google exposes them only as JS actions,\nnot stable URLs).\n\nReturns an empty ``booking_options`` for an incomplete round-trip selection\n(one that has not chosen a return leg) — follow that offer's ``booking_url``\nto pick a return first.",
+        "operationId": "googleFlightsBookingOptions",
+        "parameters": [
+          {
+            "name": "selection_token",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "`selection_token` from a `/flights/search` offer (one-way or fully-selected itinerary).",
+              "title": "Selection Token"
+            },
+            "description": "`selection_token` from a `/flights/search` offer (one-way or fully-selected itinerary)."
+          },
+          {
+            "name": "currency",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "ISO-4217 currency code.",
+              "default": "USD",
+              "title": "Currency"
+            },
+            "description": "ISO-4217 currency code."
+          },
+          {
+            "name": "gl",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Country code.",
+              "default": "us",
+              "title": "Gl"
+            },
+            "description": "Country code."
+          },
+          {
+            "name": "hl",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Language for the returned `booking_url`.",
+              "default": "en",
+              "title": "Hl"
+            },
+            "description": "Language for the returned `booking_url`."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FlightBookingOptionsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }
@@ -5687,7 +5786,8 @@
               "$ref": "#/components/schemas/FlightLeg"
             },
             "type": "array",
-            "title": "Legs"
+            "title": "Legs",
+            "description": "Flight segments. On a round-trip search these are the **outbound** segments only (Google Flights picks the return in a second step) — pass the offer's `departure_token` back to `/flights/search` to list the return-leg options."
           },
           "layovers": {
             "items": {
@@ -5716,7 +5816,8 @@
                 "type": "null"
               }
             ],
-            "title": "Price"
+            "title": "Price",
+            "description": "Price exactly as Google Flights displays it: the total for the **entire party** (all passengers), **including mandatory taxes and fees** (optional extras like bags/seats excluded). On a round-trip search this is the lowest complete round-trip total available with this outbound (paired with the cheapest compatible return); the `departure_token` follow-up returns the exact final total per return choice."
           },
           "currency": {
             "anyOf": [
@@ -5742,7 +5843,8 @@
                 "type": "null"
               }
             ],
-            "title": "Price Type"
+            "title": "Price Type",
+            "description": "`total` — `price` covers the full itinerary (both legs of a round trip) for all travelers combined."
           },
           "booking_token": {
             "anyOf": [
@@ -5755,6 +5857,30 @@
             ],
             "title": "Booking Token"
           },
+          "booking_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Booking Url",
+            "description": "Deep link that pre-selects this exact flight on Google Flights. For one-way it opens the booking-options page (airline/OTA links); for round-trip it opens the return-flight selection for this outbound. Built from the `tfs` token, language-independent."
+          },
+          "selection_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Selection Token",
+            "description": "Opaque `tfs` token for this selection. Pass to `GET /flights/booking_options` to retrieve the provider booking list (works for one-way / fully-selected itineraries)."
+          },
           "departure_token": {
             "anyOf": [
               {
@@ -5764,7 +5890,8 @@
                 "type": "null"
               }
             ],
-            "title": "Departure Token"
+            "title": "Departure Token",
+            "description": "Round-trip outbound-selection token (same value as `selection_token`); pre-selects this outbound and advances to the return-flight picker. `None` for one-way searches."
           },
           "carbon_emissions_grams": {
             "anyOf": [
@@ -5949,6 +6076,18 @@
             ],
             "title": "Trip Type",
             "default": "round_trip"
+          },
+          "search_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Search Url",
+            "description": "Canonical Google Flights `tfs` URL for this search (in the requested language; market and prices follow `gl`/`currency`) — open to view and book the listed flights."
           }
         },
         "type": "object",
@@ -12094,6 +12233,90 @@
         "type": "object",
         "title": "AiTableRow",
         "description": "One row of a table text_block (ordered cell values)."
+      },
+      "FlightBookingOptionsResponse": {
+        "properties": {
+          "booking_options": {
+            "items": {
+              "$ref": "#/components/schemas/BookingOption"
+            },
+            "type": "array",
+            "title": "Booking Options"
+          },
+          "booking_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Booking Url",
+            "description": "Google Flights booking page for this selection (the actual per-provider booking links open from here)."
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency",
+            "default": "USD"
+          }
+        },
+        "type": "object",
+        "title": "FlightBookingOptionsResponse",
+        "description": "Response for GET /api/v1/flights/booking_options."
+      },
+      "BookingOption": {
+        "properties": {
+          "book_with": {
+            "type": "string",
+            "title": "Book With",
+            "description": "Provider name, e.g. `LATAM`, `maxmilhas`."
+          },
+          "price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "airline",
+                  "agency"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type",
+            "description": "`airline` for the carrier itself, else `agency`."
+          }
+        },
+        "type": "object",
+        "required": [
+          "book_with"
+        ],
+        "title": "BookingOption",
+        "description": "One provider (airline or OTA) that can book the selected itinerary."
       }
     },
     "securitySchemes": {

@@ -3,3 +3,32 @@ title: "Google Flights Search"
 description: "Search Google Flights for one-way, round-trip, or multi-city itineraries with prices, emissions, and price insights."
 openapi: "GET /v1/google/flights/search"
 ---
+
+## Prices
+
+`price` is the price exactly as Google Flights displays it: the **total for the
+entire party** (all passengers combined), **including mandatory taxes and
+fees**. Optional extras such as checked bags or seat selection are not
+included. `price_type` is always `total`.
+
+## Round trips: the two-step flow
+
+Google Flights selects a round trip in two steps — first the outbound, then the
+return — and this API mirrors that:
+
+1. **Search** with `trip_type=round_trip`, `outbound_date`, and `return_date`.
+   Each offer's `legs` contain the **outbound segments only**, and its `price`
+   is the lowest complete round-trip total available with that outbound (Google
+   pairs it with the cheapest compatible return).
+2. **Pick the return**: call this endpoint again with the same parameters plus
+   the chosen offer's `departure_token`. The response lists the return-leg
+   options; each offer's `price` is the exact final round-trip total for that
+   outbound + return pairing, and its `booking_url` opens the Google Flights
+   booking page for the fully selected itinerary. Use its `selection_token`
+   with [Booking Options](/api-reference/google/google-flights/flights-booking-options)
+   to list per-provider prices.
+
+Each call is billed as a regular Flights search.
+
+For **one-way** searches the offer is already fully selected: `booking_url`
+opens the booking page directly and `departure_token` is `null`.
