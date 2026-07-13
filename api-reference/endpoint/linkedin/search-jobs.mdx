@@ -1,0 +1,144 @@
+---
+title: "Search Jobs"
+api: "GET https://api.scrapebadger.com/v1/linkedin/jobs/search"
+description: "Search LinkedIn's public jobs guest API by keyword and location, with date, experience, job-type and workplace filters."
+---
+
+Search `linkedin.com`'s public jobs surface by keyword and location, with
+filters for date posted, experience level, job type and workplace. Paginates
+in blocks of 25 via `start` (`0`, `25`, `50`). Returns lightweight
+`JobCard`s — hydrate a single card with
+[`/jobs/{job_id}`](/api-reference/endpoint/linkedin/get-job).
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="keywords" type="string">
+  Free-text query — e.g. `software engineer`.
+</ParamField>
+<ParamField query="location" type="string">
+  Free-text place — e.g. `New York`. Resolved server-side, or pass `geo_id`
+  directly for an exact match.
+</ParamField>
+<ParamField query="geo_id" type="string">
+  Numeric LinkedIn geo id (from
+  [`/geo/suggest`](/api-reference/endpoint/linkedin/geo-suggest)). Overrides
+  `location`.
+</ParamField>
+<ParamField query="company_id" type="string">
+  Restrict to a numeric company id.
+</ParamField>
+<ParamField query="date_posted" type="string">
+  One of `past_24h`, `past_week`, `past_month`, `any` (default `any`).
+</ParamField>
+<ParamField query="experience" type="string">
+  Experience level, CSV. One or more of `internship`, `entry`, `associate`,
+  `mid_senior`, `director`, `executive`.
+</ParamField>
+<ParamField query="job_type" type="string">
+  Employment type, CSV. One or more of `full_time`, `part_time`, `contract`,
+  `temporary`, `internship`, `volunteer`, `other`.
+</ParamField>
+<ParamField query="workplace" type="string">
+  Workplace, CSV. One or more of `onsite`, `remote`, `hybrid`.
+</ParamField>
+<ParamField query="sort" type="string" default="relevant">
+  One of `relevant`, `recent`.
+</ParamField>
+<ParamField query="start" type="integer" default="0">
+  Pagination offset — `0`, `25`, `50`, … (page size is 25).
+</ParamField>
+<ParamField query="country" type="string" default="us">
+  Country/locale for the request.
+</ParamField>
+
+## Response
+
+<ResponseField name="jobs" type="JobCard[]">
+  Result cards. Each `JobCard` includes `job_id`, `title`, `job_url`,
+  `company`, `company_url`, `company_logo`, `location`, `posted_at`,
+  `posted_relative`, `is_new` and `benefits[]`.
+</ResponseField>
+<ResponseField name="meta" type="object">
+  `result_count`, `start`, and `has_more` (whether another `start` page exists).
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.scrapebadger.com/v1/linkedin/jobs/search?keywords=software%20engineer&location=New%20York&date_posted=past_week&workplace=remote,hybrid&sort=recent" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.scrapebadger.com/v1/linkedin/jobs/search?" +
+    new URLSearchParams({
+      keywords: "software engineer",
+      location: "New York",
+      date_posted: "past_week",
+      workplace: "remote,hybrid",
+      sort: "recent",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://api.scrapebadger.com/v1/linkedin/jobs/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "keywords": "software engineer",
+        "location": "New York",
+        "date_posted": "past_week",
+        "workplace": "remote,hybrid",
+        "sort": "recent",
+    },
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "jobs": [
+    {
+      "job_id": "3801234567",
+      "title": "Senior Software Engineer",
+      "job_url": "https://www.linkedin.com/jobs/view/3801234567",
+      "company": "Acme Corp",
+      "company_url": "https://www.linkedin.com/company/acme-corp",
+      "company_logo": "https://media.licdn.com/dms/image/acme-logo.png",
+      "location": "New York, NY",
+      "posted_at": "2026-07-09T14:02:00Z",
+      "posted_relative": "4 days ago",
+      "is_new": false,
+      "benefits": ["401(k)", "Medical insurance"]
+    }
+  ],
+  "meta": {
+    "result_count": 25,
+    "start": 0,
+    "has_more": true
+  }
+}
+```
+
+<Note>
+  `start` pages in increments of 25. Keep requesting the next page while
+  `meta.has_more` is `true`.
+</Note>

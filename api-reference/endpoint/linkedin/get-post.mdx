@@ -1,0 +1,104 @@
+---
+title: "Get Post"
+api: "GET https://api.scrapebadger.com/v1/linkedin/posts/{post_slug}"
+description: "A public LinkedIn post by its slug — author, body, reactions and top-level comments."
+---
+
+Fetch a public LinkedIn post by its `post_slug` (the activity slug from the
+post URL). Returns the author, body text, reaction and comment counts, and
+top-level comments.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="post_slug" type="string" required>
+  Post slug, e.g. `activity-7212345678901234567`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="country" type="string" default="us">
+  Country/locale for the request.
+</ParamField>
+
+## Response
+
+<ResponseField name="post" type="object">
+  The `Post`.
+
+  <Expandable title="post">
+    <ResponseField name="post_id" type="string" />
+    <ResponseField name="url" type="string" />
+    <ResponseField name="type" type="string">`social` for a feed post, `article` for a Pulse article.</ResponseField>
+    <ResponseField name="author_name" type="string" />
+    <ResponseField name="author_url" type="string" />
+    <ResponseField name="title" type="string">Present for articles; usually null for social posts.</ResponseField>
+    <ResponseField name="text" type="string" />
+    <ResponseField name="published_at" type="string" />
+    <ResponseField name="like_count" type="integer" />
+    <ResponseField name="comment_count" type="integer" />
+    <ResponseField name="comments" type="Comment[]">Each: `author`, `author_url`, `text`, `published_at`, `like_count`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.scrapebadger.com/v1/linkedin/posts/activity-7212345678901234567" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.scrapebadger.com/v1/linkedin/posts/activity-7212345678901234567",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { post } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://api.scrapebadger.com/v1/linkedin/posts/activity-7212345678901234567",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+post = res.json()["post"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "post": {
+    "post_id": "7212345678901234567",
+    "url": "https://www.linkedin.com/posts/activity-7212345678901234567",
+    "type": "social",
+    "author_name": "Satya Nadella",
+    "author_url": "https://www.linkedin.com/in/satyanadella",
+    "title": null,
+    "text": "Thrilled to share what our teams have been building this quarter…",
+    "published_at": "2026-07-08T15:30:00Z",
+    "like_count": 48200,
+    "comment_count": 1320,
+    "comments": [
+      {
+        "author": "Jane Doe",
+        "author_url": "https://www.linkedin.com/in/jane-doe",
+        "text": "Congratulations to the whole team!",
+        "published_at": "2026-07-08T16:02:00Z",
+        "like_count": 84
+      }
+    ]
+  }
+}
+```

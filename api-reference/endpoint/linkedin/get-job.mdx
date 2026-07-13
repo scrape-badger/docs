@@ -1,0 +1,118 @@
+---
+title: "Get Job"
+api: "GET https://api.scrapebadger.com/v1/linkedin/jobs/{job_id}"
+description: "Full LinkedIn job detail by numeric job_id — description, salary, seniority, functions, industries, applicants and apply URL."
+---
+
+Fetch a single LinkedIn job's complete detail by its numeric `job_id` (from
+[`/jobs/search`](/api-reference/endpoint/linkedin/search-jobs)). Extends the
+`JobCard` with the full description (HTML + text), salary, seniority,
+employment type, job functions, industries, applicant counts and the apply
+URL.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="job_id" type="string" required>
+  Numeric LinkedIn job id, e.g. `3801234567`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="country" type="string" default="us">
+  Country/locale for the request.
+</ParamField>
+
+## Response
+
+<ResponseField name="job" type="object">
+  The full `JobDetail`. Includes every `JobCard` field plus:
+
+  <Expandable title="job">
+    <ResponseField name="job_id" type="string" />
+    <ResponseField name="title" type="string" />
+    <ResponseField name="job_url" type="string" />
+    <ResponseField name="company" type="string" />
+    <ResponseField name="company_url" type="string" />
+    <ResponseField name="company_logo" type="string" />
+    <ResponseField name="location" type="string" />
+    <ResponseField name="posted_at" type="string" />
+    <ResponseField name="posted_relative" type="string" />
+    <ResponseField name="is_new" type="boolean" />
+    <ResponseField name="benefits" type="string[]" />
+    <ResponseField name="description_html" type="string">Job description as sanitized HTML.</ResponseField>
+    <ResponseField name="description_text" type="string">Plain-text description.</ResponseField>
+    <ResponseField name="salary" type="string">Advertised salary/range, when present.</ResponseField>
+    <ResponseField name="seniority_level" type="string" />
+    <ResponseField name="employment_type" type="string" />
+    <ResponseField name="job_functions" type="string[]" />
+    <ResponseField name="industries" type="string[]" />
+    <ResponseField name="applicants" type="string">Human-readable applicant label, e.g. `Over 200 applicants`.</ResponseField>
+    <ResponseField name="applicants_count" type="integer" />
+    <ResponseField name="apply_url" type="string" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.scrapebadger.com/v1/linkedin/jobs/3801234567" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.scrapebadger.com/v1/linkedin/jobs/3801234567",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { job } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://api.scrapebadger.com/v1/linkedin/jobs/3801234567",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+job = res.json()["job"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "job": {
+    "job_id": "3801234567",
+    "title": "Senior Software Engineer",
+    "job_url": "https://www.linkedin.com/jobs/view/3801234567",
+    "company": "Acme Corp",
+    "company_url": "https://www.linkedin.com/company/acme-corp",
+    "company_logo": "https://media.licdn.com/dms/image/acme-logo.png",
+    "location": "New York, NY",
+    "posted_at": "2026-07-09T14:02:00Z",
+    "posted_relative": "4 days ago",
+    "is_new": false,
+    "benefits": ["401(k)", "Medical insurance"],
+    "description_html": "<p>We are looking for a Senior Software Engineer to join our platform team…</p>",
+    "description_text": "We are looking for a Senior Software Engineer to join our platform team…",
+    "salary": "$160,000 - $210,000",
+    "seniority_level": "Mid-Senior level",
+    "employment_type": "Full-time",
+    "job_functions": ["Engineering", "Information Technology"],
+    "industries": ["Software Development"],
+    "applicants": "Over 200 applicants",
+    "applicants_count": 214,
+    "apply_url": "https://www.linkedin.com/jobs/view/3801234567/apply"
+  }
+}
+```

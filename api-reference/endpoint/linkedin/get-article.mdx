@@ -1,0 +1,106 @@
+---
+title: "Get Article"
+api: "GET https://api.scrapebadger.com/v1/linkedin/articles/{article_slug}"
+description: "A public LinkedIn Pulse article by its slug — author, title, body, reactions and top-level comments."
+---
+
+Fetch a public LinkedIn **Pulse** article by its `article_slug` (the
+`/pulse/<slug>` segment of the URL). Returns the same `Post` shape as
+[`/posts/{post_slug}`](/api-reference/endpoint/linkedin/get-post), with
+`type` set to `article` and the article headline in `title`.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="article_slug" type="string" required>
+  Pulse article slug, e.g. `the-future-of-cloud-jane-smith`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="country" type="string" default="us">
+  Country/locale for the request.
+</ParamField>
+
+## Response
+
+<ResponseField name="post" type="object">
+  The `Post` (same shape as
+  [`/posts`](/api-reference/endpoint/linkedin/get-post)).
+
+  <Expandable title="post">
+    <ResponseField name="post_id" type="string" />
+    <ResponseField name="url" type="string" />
+    <ResponseField name="type" type="string">Always `article` here.</ResponseField>
+    <ResponseField name="author_name" type="string" />
+    <ResponseField name="author_url" type="string" />
+    <ResponseField name="title" type="string">The article headline.</ResponseField>
+    <ResponseField name="text" type="string">Article body text.</ResponseField>
+    <ResponseField name="published_at" type="string" />
+    <ResponseField name="like_count" type="integer" />
+    <ResponseField name="comment_count" type="integer" />
+    <ResponseField name="comments" type="Comment[]">Each: `author`, `author_url`, `text`, `published_at`, `like_count`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.scrapebadger.com/v1/linkedin/articles/the-future-of-cloud-jane-smith" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.scrapebadger.com/v1/linkedin/articles/the-future-of-cloud-jane-smith",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { post } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://api.scrapebadger.com/v1/linkedin/articles/the-future-of-cloud-jane-smith",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+post = res.json()["post"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "post": {
+    "post_id": "7209988776655443322",
+    "url": "https://www.linkedin.com/pulse/the-future-of-cloud-jane-smith",
+    "type": "article",
+    "author_name": "Jane Smith",
+    "author_url": "https://www.linkedin.com/in/jane-smith",
+    "title": "The Future of Cloud Infrastructure",
+    "text": "Over the last decade the cloud has moved from a cost-saving story to a platform for innovation…",
+    "published_at": "2026-06-30T11:00:00Z",
+    "like_count": 5400,
+    "comment_count": 210,
+    "comments": [
+      {
+        "author": "Alex Kim",
+        "author_url": "https://www.linkedin.com/in/alex-kim",
+        "text": "Great overview — thanks for writing this up.",
+        "published_at": "2026-06-30T12:15:00Z",
+        "like_count": 32
+      }
+    ]
+  }
+}
+```

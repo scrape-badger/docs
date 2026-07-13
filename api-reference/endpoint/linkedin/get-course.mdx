@@ -1,0 +1,98 @@
+---
+title: "Get Course"
+api: "GET https://api.scrapebadger.com/v1/linkedin/learning/{course_slug}"
+description: "A LinkedIn Learning course by its slug — title, description, provider, workload, rating and instructors."
+---
+
+Fetch a LinkedIn Learning course by its `course_slug` (the `/learning/<slug>`
+segment of the URL). Returns the course's title, description, provider,
+workload, rating and instructors.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="course_slug" type="string" required>
+  Course slug, e.g. `learning-python`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="country" type="string" default="us">
+  Country/locale for the request.
+</ParamField>
+
+## Response
+
+<ResponseField name="course" type="object">
+  The `LearningCourse`.
+
+  <Expandable title="course">
+    <ResponseField name="slug" type="string" />
+    <ResponseField name="url" type="string" />
+    <ResponseField name="name" type="string" />
+    <ResponseField name="description" type="string" />
+    <ResponseField name="provider" type="string" />
+    <ResponseField name="workload" type="string">e.g. `2h 15m`.</ResponseField>
+    <ResponseField name="rating_value" type="number" />
+    <ResponseField name="rating_count" type="integer" />
+    <ResponseField name="instructors" type="Instructor[]">Each: `name`, `job_title`, `url`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.scrapebadger.com/v1/linkedin/learning/learning-python" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.scrapebadger.com/v1/linkedin/learning/learning-python",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { course } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://api.scrapebadger.com/v1/linkedin/learning/learning-python",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+course = res.json()["course"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "course": {
+    "slug": "learning-python",
+    "url": "https://www.linkedin.com/learning/learning-python",
+    "name": "Learning Python",
+    "description": "Get started with Python, the popular general-purpose programming language.",
+    "provider": "LinkedIn Learning",
+    "workload": "2h 15m",
+    "rating_value": 4.7,
+    "rating_count": 18400,
+    "instructors": [
+      {
+        "name": "Joe Marini",
+        "job_title": "Product & Engineering Leader",
+        "url": "https://www.linkedin.com/in/joemarini"
+      }
+    ]
+  }
+}
+```

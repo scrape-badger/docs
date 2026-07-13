@@ -1,0 +1,111 @@
+---
+title: "Get Company"
+api: "GET https://api.scrapebadger.com/v1/linkedin/companies/{universal_name}"
+description: "A public LinkedIn company page by its universal_name slug — about, website, industry, size, headquarters, specialties and follower/employee counts."
+---
+
+Fetch a company's public LinkedIn page by its `universal_name` slug (the
+`/company/<slug>` segment of the URL, e.g. `microsoft`). Returns the
+logged-out company card: about, website, industry, size, headquarters,
+specialties, and follower / employee counts.
+
+**Credits:** 6
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="universal_name" type="string" required>
+  Company slug, e.g. `microsoft`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="country" type="string" default="us">
+  Country/locale for the request.
+</ParamField>
+
+## Response
+
+<ResponseField name="company" type="object">
+  The `Company`.
+
+  <Expandable title="company">
+    <ResponseField name="universal_name" type="string" />
+    <ResponseField name="linkedin_url" type="string" />
+    <ResponseField name="name" type="string" />
+    <ResponseField name="description" type="string" />
+    <ResponseField name="website" type="string" />
+    <ResponseField name="industry" type="string" />
+    <ResponseField name="company_size" type="string">e.g. `10,001+ employees`.</ResponseField>
+    <ResponseField name="company_type" type="string">e.g. `Public Company`.</ResponseField>
+    <ResponseField name="headquarters" type="string" />
+    <ResponseField name="founded" type="integer" />
+    <ResponseField name="specialties" type="string[]" />
+    <ResponseField name="employee_count" type="integer" />
+    <ResponseField name="follower_count" type="integer" />
+    <ResponseField name="logo" type="string" />
+    <ResponseField name="address" type="object">`street`, `city`, `region`, `postal_code`, `country`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.scrapebadger.com/v1/linkedin/companies/microsoft" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.scrapebadger.com/v1/linkedin/companies/microsoft",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { company } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://api.scrapebadger.com/v1/linkedin/companies/microsoft",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+company = res.json()["company"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "company": {
+    "universal_name": "microsoft",
+    "linkedin_url": "https://www.linkedin.com/company/microsoft",
+    "name": "Microsoft",
+    "description": "Every person and every organization on the planet to achieve more.",
+    "website": "https://news.microsoft.com/",
+    "industry": "Software Development",
+    "company_size": "10,001+ employees",
+    "company_type": "Public Company",
+    "headquarters": "Redmond, Washington",
+    "founded": 1975,
+    "specialties": ["Business Software", "Cloud Computing", "Developer Tools"],
+    "employee_count": 238000,
+    "follower_count": 24500000,
+    "logo": "https://media.licdn.com/dms/image/microsoft-logo.png",
+    "address": {
+      "street": "1 Microsoft Way",
+      "city": "Redmond",
+      "region": "Washington",
+      "postal_code": "98052",
+      "country": "US"
+    }
+  }
+}
+```

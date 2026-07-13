@@ -352,6 +352,52 @@
         ]
       },
       {
+        "tab": "LinkedIn",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "linkedin/overview"
+            ]
+          },
+          {
+            "group": "Jobs",
+            "pages": [
+              "api-reference/endpoint/linkedin/search-jobs",
+              "api-reference/endpoint/linkedin/get-job",
+              "api-reference/endpoint/linkedin/company-jobs"
+            ]
+          },
+          {
+            "group": "Companies & Schools",
+            "pages": [
+              "api-reference/endpoint/linkedin/get-company",
+              "api-reference/endpoint/linkedin/get-school"
+            ]
+          },
+          {
+            "group": "Profiles",
+            "pages": [
+              "api-reference/endpoint/linkedin/get-profile"
+            ]
+          },
+          {
+            "group": "Content",
+            "pages": [
+              "api-reference/endpoint/linkedin/get-post",
+              "api-reference/endpoint/linkedin/get-article",
+              "api-reference/endpoint/linkedin/get-course"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api-reference/endpoint/linkedin/geo-suggest"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Amazon",
         "groups": [
           {

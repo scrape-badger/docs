@@ -1,0 +1,99 @@
+---
+title: "Get School"
+api: "GET https://api.scrapebadger.com/v1/linkedin/schools/{universal_name}"
+description: "A public LinkedIn university/school page by its universal_name slug — about, website, follower and student/alumni counts."
+---
+
+Fetch a university or school's public LinkedIn page by its `universal_name`
+slug (the `/school/<slug>` segment of the URL, e.g. `stanford-university`).
+Returns the logged-out school card: about, website, follower count, and
+student/alumni count.
+
+**Credits:** 6
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="universal_name" type="string" required>
+  School slug, e.g. `stanford-university`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="country" type="string" default="us">
+  Country/locale for the request.
+</ParamField>
+
+## Response
+
+<ResponseField name="school" type="object">
+  The `School`.
+
+  <Expandable title="school">
+    <ResponseField name="universal_name" type="string" />
+    <ResponseField name="linkedin_url" type="string" />
+    <ResponseField name="name" type="string" />
+    <ResponseField name="description" type="string" />
+    <ResponseField name="website" type="string" />
+    <ResponseField name="follower_count" type="integer" />
+    <ResponseField name="student_alumni_count" type="integer" />
+    <ResponseField name="logo" type="string" />
+    <ResponseField name="address" type="object">`street`, `city`, `region`, `postal_code`, `country`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.scrapebadger.com/v1/linkedin/schools/stanford-university" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.scrapebadger.com/v1/linkedin/schools/stanford-university",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { school } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://api.scrapebadger.com/v1/linkedin/schools/stanford-university",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+school = res.json()["school"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "school": {
+    "universal_name": "stanford-university",
+    "linkedin_url": "https://www.linkedin.com/school/stanford-university",
+    "name": "Stanford University",
+    "description": "Stanford University is one of the world's leading teaching and research institutions.",
+    "website": "http://www.stanford.edu",
+    "follower_count": 3120000,
+    "student_alumni_count": 512000,
+    "logo": "https://media.licdn.com/dms/image/stanford-logo.png",
+    "address": {
+      "street": "450 Serra Mall",
+      "city": "Stanford",
+      "region": "California",
+      "postal_code": "94305",
+      "country": "US"
+    }
+  }
+}
+```

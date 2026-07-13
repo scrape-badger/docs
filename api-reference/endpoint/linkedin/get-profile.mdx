@@ -1,0 +1,132 @@
+---
+title: "Get Profile"
+api: "GET https://api.scrapebadger.com/v1/linkedin/profiles/{public_id}"
+description: "A public LinkedIn member profile by vanity public_id — headline, location, about, experience, education, languages and awards."
+---
+
+Fetch a member's public LinkedIn profile by their vanity `public_id` (the
+`/in/<slug>` segment of the URL, e.g. `williamhgates`).
+
+<Warning>
+  This is the **logged-out JSON-LD subset** LinkedIn exposes to signed-out
+  visitors — **not** the full logged-in record. There is no contact info, no
+  connection graph, and no full skills list. Experience and education are the
+  coarse entries LinkedIn renders publicly.
+</Warning>
+
+**Credits:** 8
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="public_id" type="string" required>
+  Member vanity slug, e.g. `williamhgates`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="country" type="string" default="us">
+  Country/locale for the request.
+</ParamField>
+
+## Response
+
+<ResponseField name="profile" type="object">
+  The `Profile`.
+
+  <Expandable title="profile">
+    <ResponseField name="public_id" type="string" />
+    <ResponseField name="linkedin_url" type="string" />
+    <ResponseField name="name" type="string" />
+    <ResponseField name="headline" type="string" />
+    <ResponseField name="location" type="string" />
+    <ResponseField name="country" type="string" />
+    <ResponseField name="about" type="string" />
+    <ResponseField name="image" type="string" />
+    <ResponseField name="follower_count" type="integer" />
+    <ResponseField name="job_titles" type="string[]" />
+    <ResponseField name="current_company" type="string" />
+    <ResponseField name="current_company_url" type="string" />
+    <ResponseField name="experience" type="Experience[]">Each: `company`, `company_url`, `start_year`, `end_year`.</ResponseField>
+    <ResponseField name="education" type="Education[]">Each: `school`, `school_url`, `start_year`, `end_year`.</ResponseField>
+    <ResponseField name="languages" type="string[]" />
+    <ResponseField name="awards" type="string[]" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.scrapebadger.com/v1/linkedin/profiles/williamhgates" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.scrapebadger.com/v1/linkedin/profiles/williamhgates",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { profile } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://api.scrapebadger.com/v1/linkedin/profiles/williamhgates",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+profile = res.json()["profile"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "profile": {
+    "public_id": "williamhgates",
+    "linkedin_url": "https://www.linkedin.com/in/williamhgates",
+    "name": "Bill Gates",
+    "headline": "Co-chair, Bill & Melinda Gates Foundation",
+    "location": "Seattle, Washington, United States",
+    "country": "US",
+    "about": "Co-chair of the Bill & Melinda Gates Foundation. Founder of Breakthrough Energy. Co-founder of Microsoft.",
+    "image": "https://media.licdn.com/dms/image/williamhgates.jpg",
+    "follower_count": 36200000,
+    "job_titles": ["Co-chair"],
+    "current_company": "Bill & Melinda Gates Foundation",
+    "current_company_url": "https://www.linkedin.com/company/bill-&-melinda-gates-foundation",
+    "experience": [
+      {
+        "company": "Bill & Melinda Gates Foundation",
+        "company_url": "https://www.linkedin.com/company/bill-&-melinda-gates-foundation",
+        "start_year": 2000,
+        "end_year": null
+      },
+      {
+        "company": "Microsoft",
+        "company_url": "https://www.linkedin.com/company/microsoft",
+        "start_year": 1975,
+        "end_year": 2020
+      }
+    ],
+    "education": [
+      {
+        "school": "Harvard University",
+        "school_url": "https://www.linkedin.com/school/harvard-university",
+        "start_year": 1973,
+        "end_year": 1975
+      }
+    ],
+    "languages": ["English"],
+    "awards": []
+  }
+}
+```

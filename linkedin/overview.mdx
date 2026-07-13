@@ -1,0 +1,122 @@
+---
+title: "LinkedIn API Overview"
+description: "Pull public LinkedIn data — job listings, companies, schools, profiles, posts and courses — as clean JSON, with no LinkedIn login or API key required."
+---
+
+## Overview
+
+The ScrapeBadger **LinkedIn API** turns `linkedin.com`'s public, logged-out
+surface into a clean JSON feed: job search and job detail, company and school
+pages, public member profiles, posts and Pulse articles, LinkedIn Learning
+courses, and a geo/company typeahead for resolving filter ids.
+
+<Info>
+  All endpoints are `GET`, live under `https://api.scrapebadger.com/v1/linkedin/*`,
+  and authenticate with the `X-API-Key` header. Credits are charged per request
+  (see the table below) and reported on the `X-Credits-Used` response header.
+  Every endpoint accepts an optional `country` param (default `us`).
+</Info>
+
+## Features
+
+- **Job search** — keyword + location search over LinkedIn's public jobs
+  guest API, with filters for date posted, experience level, job type,
+  workplace (onsite/remote/hybrid), company and sort order. Paginates in
+  blocks of 25 via `start`.
+- **Job detail** — full description (HTML + text), salary, seniority,
+  employment type, job functions, industries, applicant counts and the apply
+  URL, by numeric `job_id`.
+- **Company jobs** — every public opening for a company, by numeric
+  `company_id`.
+- **Company & school pages** — the public company / university page: about,
+  website, industry, size, headquarters, specialties, follower and employee
+  counts, by `universal_name` slug.
+- **Member profiles** — a public member's logged-out profile: headline,
+  location, about, experience, education, languages and awards, by vanity
+  `public_id`.
+- **Posts & articles** — a public post or Pulse article with author, body,
+  reactions and top-level comments.
+- **LinkedIn Learning** — a course's title, description, provider, workload,
+  rating and instructors.
+- **Geo / company typeahead** — resolve a free-text place or company name to
+  the numeric `geo_id` / `company_id` the job-search filters expect.
+
+## Honesty caveat
+
+<Warning>
+  These endpoints read LinkedIn's **public, logged-out** surface only. A
+  member profile is the JSON-LD subset LinkedIn exposes to signed-out visitors
+  — **not** the full logged-in record: no contact info, no connection graph,
+  and only the coarse skills/experience LinkedIn chooses to render publicly.
+  **People search, employee search and full skill lists are out of scope** —
+  they are auth-gated and not available here.
+</Warning>
+
+## Coverage
+
+| Code | Country | Locale | Domain |
+| ---- | ------- | ------ | ---------- |
+| `us` | United States | en-US | linkedin.com |
+
+<Info>
+  `country` (default `us`) sets the locale LinkedIn renders for jobs and
+  place resolution. All data is drawn from the global `linkedin.com` domain.
+</Info>
+
+## Credits
+
+| Endpoint | Path | Credits |
+| -------- | ---- | ------- |
+| Search jobs | `GET /v1/linkedin/jobs/search` | 5 |
+| Get job | `GET /v1/linkedin/jobs/{job_id}` | 5 |
+| Company jobs | `GET /v1/linkedin/companies/{company_id}/jobs` | 5 |
+| Get company | `GET /v1/linkedin/companies/{universal_name}` | 6 |
+| Get school | `GET /v1/linkedin/schools/{universal_name}` | 6 |
+| Get profile | `GET /v1/linkedin/profiles/{public_id}` | 8 |
+| Get post | `GET /v1/linkedin/posts/{post_slug}` | 5 |
+| Get article | `GET /v1/linkedin/articles/{article_slug}` | 5 |
+| Get course | `GET /v1/linkedin/learning/{course_slug}` | 5 |
+| Geo / company suggest | `GET /v1/linkedin/geo/suggest` | 2 |
+
+## Quickstart
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.scrapebadger.com/v1/linkedin/jobs/search?keywords=software%20engineer&location=New%20York" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.scrapebadger.com/v1/linkedin/jobs/search?" +
+    new URLSearchParams({
+      keywords: "software engineer",
+      location: "New York",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+console.log(data.jobs.length, "jobs");
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://api.scrapebadger.com/v1/linkedin/jobs/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"keywords": "software engineer", "location": "New York"},
+)
+print(len(res.json()["jobs"]), "jobs")
+```
+
+</CodeGroup>
+
+<Tip>
+  Start from [`/geo/suggest`](/api-reference/endpoint/linkedin/geo-suggest) to
+  turn a free-text place or company name into the numeric `geo_id` /
+  `company_id` that
+  [`/jobs/search`](/api-reference/endpoint/linkedin/search-jobs) filters on,
+  then page results in blocks of 25 with `start`.
+</Tip>

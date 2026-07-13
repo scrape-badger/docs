@@ -1,0 +1,100 @@
+---
+title: "Company Jobs"
+api: "GET https://api.scrapebadger.com/v1/linkedin/companies/{company_id}/jobs"
+description: "Every public LinkedIn job opening for a company, by numeric company_id."
+---
+
+List a company's public LinkedIn job openings by its numeric `company_id`
+(resolve a company name to its id with
+[`/geo/suggest`](/api-reference/endpoint/linkedin/geo-suggest) using
+`type=company`). Returns the same `JobCard` shape as
+[`/jobs/search`](/api-reference/endpoint/linkedin/search-jobs), paginated in
+blocks of 25 via `start`.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="company_id" type="string" required>
+  Numeric LinkedIn company id, e.g. `1035` (Microsoft).
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="start" type="integer" default="0">
+  Pagination offset — `0`, `25`, `50`, … (page size is 25).
+</ParamField>
+<ParamField query="country" type="string" default="us">
+  Country/locale for the request.
+</ParamField>
+
+## Response
+
+<ResponseField name="jobs" type="JobCard[]">
+  Result cards — same shape as job search: `job_id`, `title`, `job_url`,
+  `company`, `company_url`, `company_logo`, `location`, `posted_at`,
+  `posted_relative`, `is_new`, `benefits[]`.
+</ResponseField>
+<ResponseField name="meta" type="object">
+  `result_count`, `start`, `has_more`.
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://api.scrapebadger.com/v1/linkedin/companies/1035/jobs" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.scrapebadger.com/v1/linkedin/companies/1035/jobs",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://api.scrapebadger.com/v1/linkedin/companies/1035/jobs",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "jobs": [
+    {
+      "job_id": "3809988776",
+      "title": "Software Engineer II",
+      "job_url": "https://www.linkedin.com/jobs/view/3809988776",
+      "company": "Microsoft",
+      "company_url": "https://www.linkedin.com/company/microsoft",
+      "company_logo": "https://media.licdn.com/dms/image/microsoft-logo.png",
+      "location": "Redmond, WA",
+      "posted_at": "2026-07-11T09:20:00Z",
+      "posted_relative": "2 days ago",
+      "is_new": true,
+      "benefits": ["401(k)", "Medical insurance", "Vision insurance"]
+    }
+  ],
+  "meta": {
+    "result_count": 25,
+    "start": 0,
+    "has_more": true
+  }
+}
+```

@@ -1,0 +1,104 @@
+---
+title: "Geo / Company Suggest"
+api: "GET https://api.scrapebadger.com/v1/linkedin/geo/suggest"
+description: "Resolve a free-text place or company name to the numeric geo_id / company_id that job-search filters expect."
+---
+
+Typeahead that turns a free-text place or company name into the numeric id
+LinkedIn's job filters use. Set `type=geo` to resolve a location to a
+`geo_id`, or `type=company` to resolve a company name to a `company_id`. Feed
+the returned id into
+[`/jobs/search`](/api-reference/endpoint/linkedin/search-jobs) (`geo_id` /
+`company_id`) or
+[`/companies/{company_id}/jobs`](/api-reference/endpoint/linkedin/company-jobs).
+
+**Credits:** 2
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Free-text place or company name, e.g. `London` or `Microsoft`.
+</ParamField>
+<ParamField query="type" type="string" required>
+  What to resolve — `geo` (locations) or `company` (companies).
+</ParamField>
+<ParamField query="country" type="string" default="us">
+  Country/locale for the request.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="type" type="string">Echo of the requested type (`geo` or `company`).</ResponseField>
+<ResponseField name="suggestions" type="GeoSuggestion[]">
+  Suggestions.
+
+  <Expandable title="GeoSuggestion">
+    <ResponseField name="id" type="string">Numeric id — use as `geo_id` or `company_id`.</ResponseField>
+    <ResponseField name="display_name" type="string">Human-readable label.</ResponseField>
+    <ResponseField name="type" type="string">`geo` or `company`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+# Resolve a location
+curl "https://api.scrapebadger.com/v1/linkedin/geo/suggest?query=London&type=geo" \
+  -H "X-API-Key: YOUR_API_KEY"
+
+# Resolve a company
+curl "https://api.scrapebadger.com/v1/linkedin/geo/suggest?query=Microsoft&type=company" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.scrapebadger.com/v1/linkedin/geo/suggest?" +
+    new URLSearchParams({ query: "London", type: "geo" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://api.scrapebadger.com/v1/linkedin/geo/suggest",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "London", "type": "geo"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "London",
+  "type": "geo",
+  "suggestions": [
+    {
+      "id": "102571732",
+      "display_name": "London, England, United Kingdom",
+      "type": "geo"
+    }
+  ]
+}
+```
+
+<Tip>
+  A `type=company` query for `Microsoft` returns `{ "id": "1035",
+  "display_name": "Microsoft", "type": "company" }` — feed `1035` straight
+  into [`/companies/1035/jobs`](/api-reference/endpoint/linkedin/company-jobs)
+  or the `company_id` job-search filter.
+</Tip>
