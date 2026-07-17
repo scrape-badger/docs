@@ -79,6 +79,8 @@ Identical shape to [`/v1/ebay/search`](/api-reference/endpoint/ebay/search), exc
     <ResponseField name="current_bid" type="object">Current high bid for auction listings with `value`, `currency`, `symbol`, `raw`; mirrors `price`. Null for non-auction (fixed-price) listings.</ResponseField>
     <ResponseField name="shipping" type="string">Shipping text.</ResponseField>
     <ResponseField name="location" type="string">Item location text.</ResponseField>
+    <ResponseField name="sold_date" type="string">Sale date text as rendered by eBay, e.g. `2 Jul 2026`. Localized on non-English marketplaces (e.g. `Verkauft 5. Okt. 2024`), nullable.</ResponseField>
+    <ResponseField name="sold_date_at" type="string">Best-effort ISO date parsed from `sold_date`, e.g. `2026-07-02`. Null when the marketplace's date format is not English.</ResponseField>
     <ResponseField name="seller_name" type="string">Seller username (nullable).</ResponseField>
     <ResponseField name="is_sponsored" type="boolean">Whether the result was a sponsored placement.</ResponseField>
   </Expandable>
@@ -110,6 +112,8 @@ Identical shape to [`/v1/ebay/search`](/api-reference/endpoint/ebay/search), exc
       "current_bid": { "value": 215.5, "currency": "USD", "symbol": "$", "raw": "$215.50" },
       "shipping": "Free shipping",
       "location": "United States",
+      "sold_date": "18 Jun 2026",
+      "sold_date_at": "2026-06-18",
       "seller_name": "gamerdeals99",
       "is_sponsored": false
     }
