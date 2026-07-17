@@ -47,8 +47,9 @@ description: "Full detail for a single eBay listing (price, condition, specifics
     <ResponseField name="bids" type="integer">Number of bids (auctions only, nullable).</ResponseField>
     <ResponseField name="time_left" type="string">Relative time remaining for auctions, e.g. `12h 16m` (auctions only, nullable).</ResponseField>
     <ResponseField name="current_bid" type="object">Current high bid for auction listings with `value`, `currency`, `symbol`, `raw`; mirrors `price`. Null for non-auction (fixed-price) listings.</ResponseField>
-    <ResponseField name="end_time_utc" type="number">Absolute auction end time as a Unix timestamp (float seconds). Null for non-auction listings.</ResponseField>
-    <ResponseField name="end_time_at" type="string">Absolute auction end time as an ISO-8601 UTC string, e.g. `2026-06-22T19:50:51Z` (nullable).</ResponseField>
+    <ResponseField name="is_ended" type="boolean">`true` when the listing has closed (sold or ended), any buying format. Defaults to `false`.</ResponseField>
+    <ResponseField name="end_time_utc" type="number">Listing end time as a Unix timestamp (float seconds): the auction close time, or the exact sold/ended time for ended listings of any format. Null for active fixed-price listings.</ResponseField>
+    <ResponseField name="end_time_at" type="string">Listing end time as an ISO-8601 UTC string, e.g. `2026-06-22T19:50:51Z`: the auction close time, or the exact sold/ended time for ended listings of any format (nullable).</ResponseField>
     <ResponseField name="buy_it_now_price" type="object">Buy It Now price for fixed-price listings (mirrors `price`) or auction-with-Buy-It-Now listings, with `value`, `currency`, `symbol`, `raw`. Null for pure auctions.</ResponseField>
     <ResponseField name="best_offer_enabled" type="boolean">Whether the seller accepts best offers (nullable).</ResponseField>
     <ResponseField name="brand" type="string">Brand name (nullable).</ResponseField>
@@ -101,6 +102,7 @@ description: "Full detail for a single eBay listing (price, condition, specifics
     "bids": null,
     "time_left": null,
     "current_bid": null,
+    "is_ended": false,
     "end_time_utc": null,
     "end_time_at": null,
     "buy_it_now_price": { "value": 299.99, "currency": "USD", "symbol": "$", "raw": "$299.99" },
@@ -129,6 +131,8 @@ description: "Full detail for a single eBay listing (price, condition, specifics
 
 Auction listings are fully supported. For auctions, `is_auction` is `true` and the auction-specific fields are populated: `bids` (bid count), `time_left` (relative remaining time), `current_bid` (the current high bid, mirroring `price`), and the absolute end time as both `end_time_utc` (Unix timestamp) and `end_time_at` (ISO-8601 Z string). For pure auctions `buy_it_now_price` is `null`; for fixed-price or auction-with-Buy-It-Now listings it carries the BIN price.
 
+For listings that have closed (sold or ended) — any buying format, not just auctions — `is_ended` is `true` and `end_time_utc` / `end_time_at` carry the exact sold/ended time. For active fixed-price listings all three stay at their defaults (`false` / `null` / `null`).
+
 ```json
 {
   "domain": "com",
@@ -144,6 +148,7 @@ Auction listings are fully supported. For auctions, `is_auction` is `true` and t
     "bids": 23,
     "time_left": "12h 16m",
     "current_bid": { "value": 412.0, "currency": "USD", "symbol": "$", "raw": "$412.00" },
+    "is_ended": false,
     "end_time_utc": 1781034651.0,
     "end_time_at": "2026-06-22T19:50:51Z",
     "buy_it_now_price": null,

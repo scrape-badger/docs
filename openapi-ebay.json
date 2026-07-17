@@ -1268,19 +1268,24 @@
                             }
                           }
                         },
+                        "is_ended": {
+                          "type": "boolean",
+                          "description": "True when the listing has closed (sold or ended), any buying format. Defaults to false.",
+                          "default": false
+                        },
                         "end_time_utc": {
                           "type": [
                             "number",
                             "null"
                           ],
-                          "description": "Absolute auction end time as a Unix timestamp (float seconds). Null for non-auction listings."
+                          "description": "Listing end time as a Unix timestamp (float seconds): the auction close time, or the exact sold/ended time for ended listings of any format. Null for active fixed-price listings."
                         },
                         "end_time_at": {
                           "type": [
                             "string",
                             "null"
                           ],
-                          "description": "Absolute auction end time as an ISO-8601 UTC string (e.g. \"2026-06-22T19:50:51Z\"). Null for non-auction listings."
+                          "description": "Listing end time as an ISO-8601 UTC string (e.g. \"2026-06-22T19:50:51Z\"): the auction close time, or the exact sold/ended time for ended listings of any format. Null for active fixed-price listings."
                         },
                         "buy_it_now_price": {
                           "type": [
