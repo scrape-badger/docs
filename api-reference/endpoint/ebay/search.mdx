@@ -106,6 +106,8 @@ description: "Search an eBay marketplace for active listings."
     <ResponseField name="location" type="string">Item location text.</ResponseField>
     <ResponseField name="returns" type="string">Returns text (nullable).</ResponseField>
     <ResponseField name="sold_count" type="integer">Number sold (nullable).</ResponseField>
+    <ResponseField name="sold_date" type="string">Sale date text as rendered by eBay, e.g. `2 Jul 2026` (completed/sold cards only; localized on non-English marketplaces, nullable).</ResponseField>
+    <ResponseField name="sold_date_at" type="string">Best-effort ISO date parsed from `sold_date`, e.g. `2026-07-02` (null when the marketplace's date format is not English).</ResponseField>
     <ResponseField name="watchers" type="integer">Number of watchers (nullable).</ResponseField>
     <ResponseField name="coupon" type="string">Coupon/promo text (nullable).</ResponseField>
     <ResponseField name="rating" type="number">Average catalog rating, if shown (nullable).</ResponseField>

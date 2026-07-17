@@ -404,6 +404,26 @@
                               "null"
                             ]
                           },
+                          "sold_date": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "description": "Sale date text as rendered by eBay on the sold card, e.g. \"2 Jul 2026\". Localized on non-English marketplaces (e.g. \"Verkauft 5. Okt. 2024\"). Null on active listings.",
+                            "examples": [
+                              "2 Jul 2026"
+                            ]
+                          },
+                          "sold_date_at": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "description": "Best-effort ISO 8601 date parsed from sold_date, e.g. \"2026-07-02\". Null when the marketplace's date format is not English.",
+                            "examples": [
+                              "2026-07-02"
+                            ]
+                          },
                           "watchers": {
                             "type": [
                               "integer",
@@ -876,6 +896,26 @@
                             "type": [
                               "integer",
                               "null"
+                            ]
+                          },
+                          "sold_date": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "description": "Sale date text as rendered by eBay on the sold card, e.g. \"2 Jul 2026\". Localized on non-English marketplaces (e.g. \"Verkauft 5. Okt. 2024\"). Null on active listings.",
+                            "examples": [
+                              "2 Jul 2026"
+                            ]
+                          },
+                          "sold_date_at": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "description": "Best-effort ISO 8601 date parsed from sold_date, e.g. \"2026-07-02\". Null when the marketplace's date format is not English.",
+                            "examples": [
+                              "2026-07-02"
                             ]
                           },
                           "watchers": {
