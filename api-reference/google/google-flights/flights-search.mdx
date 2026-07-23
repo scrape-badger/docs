@@ -11,6 +11,21 @@ entire party** (all passengers combined), **including mandatory taxes and
 fees**. Optional extras such as checked bags or seat selection are not
 included. `price_type` is always `total`.
 
+## Full inventory: `sort_by=price`
+
+By default (`sort_by=top`) the endpoint returns Google's **"Top departing
+flights"** — the ~6-8 recommended picks, fast. That set demotes cheap-but-long-
+layover itineraries, so for price monitoring pass **`sort_by=price`** to get the
+**full price-sorted inventory**: every carrier and the cheap long-layover fares,
+cheapest first, plus a richer `price_insights` — Google's own `lowest_price`,
+`typical_price_range`, and `price_history`.
+
+`sort_by=price` runs a heavier render, so it is slower than the default and, if
+Google is slow to respond, falls back to the `top` set for that call. It applies
+to the round-trip / one-way initial search (not the `departure_token` return-leg
+step). A few extreme self-transfer fares Google labels "price unavailable" are
+included with a `null` `price`.
+
 ## Round trips: the two-step flow
 
 Google Flights selects a round trip in two steps — first the outbound, then the
