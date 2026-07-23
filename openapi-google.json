@@ -4653,6 +4653,22 @@
             "description": "Max price filter — applied client-side."
           },
           {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "top",
+                "price"
+              ],
+              "type": "string",
+              "description": "`top` (default) returns Google's ~6-8 'best' picks — fast. `price` returns the full price-sorted inventory (every carrier, the cheap long-layover fares) plus Google's own price floor / typical range / history. `price` is slower (a heavier render) and falls back to the 'top' set under load. Round-trip initial search only.",
+              "default": "top",
+              "title": "Sort By"
+            },
+            "description": "`top` (default) returns Google's ~6-8 'best' picks — fast. `price` returns the full price-sorted inventory (every carrier, the cheap long-layover fares) plus Google's own price floor / typical range / history. `price` is slower (a heavier render) and falls back to the 'top' set under load. Round-trip initial search only."
+          },
+          {
             "name": "departure_token",
             "in": "query",
             "required": false,
