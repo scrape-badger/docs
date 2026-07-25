@@ -23,7 +23,7 @@ The completed-listings endpoint returns **sold** items — the closing prices bu
 </ParamField>
 
 <ParamField query="page" type="integer" default={1}>
-  Page number for paginated results. Range: `1` - `100`.
+  Page number for paginated results. Range: `1` - `1000`.
 </ParamField>
 
 <ParamField query="per_page" type="integer">
@@ -87,13 +87,13 @@ Identical shape to [`/v1/ebay/search`](/api-reference/endpoint/ebay/search), exc
     <ResponseField name="sold_date" type="string">Sale date text as rendered by eBay, e.g. `2 Jul 2026`. Localized on non-English marketplaces (e.g. `Verkauft 5. Okt. 2024`), nullable.</ResponseField>
     <ResponseField name="sold_date_at" type="string">Best-effort ISO date parsed from `sold_date`, e.g. `2026-07-02`. Null when the marketplace's date format is not English.</ResponseField>
     <ResponseField name="seller_name" type="string">Seller username (nullable).</ResponseField>
-    <ResponseField name="is_sponsored" type="boolean">Whether the result was a sponsored placement.</ResponseField>
+    <ResponseField name="is_sponsored" type="boolean">Always `null`. eBay renders its "Sponsored" badge into every card as anti-scraping bait, so promoted placements cannot be distinguished from organic results.</ResponseField>
   </Expandable>
 </ResponseField>
 <ResponseField name="facets" type="object">Available filter facets keyed by name.</ResponseField>
-<ResponseField name="pagination" type="object">Pagination metadata with `current_page`, `per_page`, `total_pages`, `total_results`.
+<ResponseField name="pagination" type="object">Pagination metadata with `current_page`, `per_page`, `total_pages`, `total_results`, `has_more`.
 
-On this endpoint `total_pages` and `total_results` are always `null` — eBay's completed-listings grid reports neither a result count nor a true page total. Page through by incrementing `page` until `results` comes back empty.</ResponseField>
+`total_pages` and `total_results` are always `null` on this endpoint — eBay's completed-listings grid reports neither a result count nor a true page total. Use `has_more` to page instead (see below).</ResponseField>
 <ResponseField name="scraped_at" type="string">ISO 8601 timestamp when the results were scraped.</ResponseField>
 
 ### Example Response
@@ -122,7 +122,7 @@ On this endpoint `total_pages` and `total_results` are always `null` — eBay's 
       "sold_date": "18 Jun 2026",
       "sold_date_at": "2026-06-18",
       "seller_name": "gamerdeals99",
-      "is_sponsored": false
+      "is_sponsored": null
     }
   ],
   "facets": {},
@@ -130,6 +130,42 @@ On this endpoint `total_pages` and `total_results` are always `null` — eBay's 
   "scraped_at": "2026-06-21T12:00:00Z"
 }
 ```
+
+## Fetching every sold listing
+
+`has_more` is the stop signal for bulk extraction. Increment `page` while it is `true`:
+
+```python
+page, all_sold = 1, []
+while True:
+    r = requests.get(
+        "https://api.scrapebadger.com/v1/ebay/completed",
+        params={"query": "iphone 13", "per_page": 240, "page": page},
+        headers={"X-API-Key": API_KEY},
+    ).json()
+
+    all_sold += r["results"]
+    if not r["results"] or not r["pagination"]["has_more"]:
+        break
+    page += 1
+```
+
+<Warning>
+  Do not loop on "until the response is empty" alone. Past its last page eBay
+  **clamps** — asking for page 200 of a 133-page result set re-serves page 133.
+  This API detects that and returns an empty page with `has_more: false`, but a
+  client that ignores `has_more` and retries forever will keep spending credits.
+</Warning>
+
+A broad sold search runs roughly 130 pages deep at `per_page=240` (~26,000 listings).
+Use the largest `per_page` you can: each request costs 5 credits regardless of page
+size, so `per_page=240` is about 8x cheaper per listing than the default.
+
+<Note>
+  `per_page` is an upper bound. eBay's sold grid returns about 5/6 of the requested
+  value (≈200 for `240`, ≈50 for `60`) and ≈25 when omitted. Pages are contiguous —
+  no listings are skipped between them.
+</Note>
 
 <Note>
   Each completed-listings request costs **5 credits**. Failed requests are not charged.

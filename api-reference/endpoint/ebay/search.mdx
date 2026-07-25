@@ -116,7 +116,7 @@ description: "Search an eBay marketplace for active listings."
     <ResponseField name="seller_feedback_percent" type="number">Seller positive-feedback percent (nullable).</ResponseField>
     <ResponseField name="seller_feedback_score" type="integer">Seller feedback score (nullable).</ResponseField>
     <ResponseField name="program_badge" type="string">Program badge, e.g. `eBay Refurbished` (nullable).</ResponseField>
-    <ResponseField name="is_sponsored" type="boolean">Whether the result is a sponsored placement.</ResponseField>
+    <ResponseField name="is_sponsored" type="boolean">Always `null`. eBay renders its "Sponsored" badge into every card as anti-scraping bait, so promoted placements cannot be distinguished from organic results.</ResponseField>
   </Expandable>
 </ResponseField>
 <ResponseField name="facets" type="object">Available filter facets keyed by name, each a list of string values.</ResponseField>
@@ -159,7 +159,7 @@ description: "Search an eBay marketplace for active listings."
       "seller_name": "topgames_us",
       "seller_feedback_percent": 99.4,
       "seller_feedback_score": 18452,
-      "is_sponsored": false
+      "is_sponsored": null
     },
     {
       "position": 2,
@@ -178,7 +178,7 @@ description: "Search an eBay marketplace for active listings."
       "free_shipping": true,
       "location": "United States",
       "seller_name": "retro_deals",
-      "is_sponsored": false
+      "is_sponsored": null
     }
   ],
   "facets": { "condition": ["New", "Used"], "buying_format": ["Buy It Now", "Auction"] },
