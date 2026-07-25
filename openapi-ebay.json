@@ -59,7 +59,7 @@
               "type": "integer",
               "default": 1,
               "minimum": 1,
-              "maximum": 100
+              "maximum": 1000
             },
             "description": "Page number for paginated results."
           },
@@ -473,7 +473,11 @@
                             ]
                           },
                           "is_sponsored": {
-                            "type": "boolean"
+                            "type": [
+                              "boolean",
+                              "null"
+                            ],
+                            "description": "Always null — eBay renders its Sponsored badge into every card as anti-scraping bait, so promoted placements cannot be distinguished from organic results."
                           }
                         }
                       }
@@ -510,6 +514,13 @@
                             "integer",
                             "null"
                           ]
+                        },
+                        "has_more": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "description": "True while eBay still offers a next page — the stop signal for bulk extraction. total_pages/total_results are null on the completed/sold grid, and past the last page eBay re-serves that page, so looping until the results are empty never terminates."
                         }
                       }
                     },
@@ -575,7 +586,7 @@
               "type": "integer",
               "default": 1,
               "minimum": 1,
-              "maximum": 100
+              "maximum": 1000
             },
             "description": "Page number for paginated results."
           },
@@ -967,7 +978,11 @@
                             ]
                           },
                           "is_sponsored": {
-                            "type": "boolean"
+                            "type": [
+                              "boolean",
+                              "null"
+                            ],
+                            "description": "Always null — eBay renders its Sponsored badge into every card as anti-scraping bait, so promoted placements cannot be distinguished from organic results."
                           }
                         }
                       }
@@ -1004,6 +1019,13 @@
                             "integer",
                             "null"
                           ]
+                        },
+                        "has_more": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "description": "True while eBay still offers a next page — the stop signal for bulk extraction. total_pages/total_results are null on the completed/sold grid, and past the last page eBay re-serves that page, so looping until the results are empty never terminates."
                         }
                       }
                     },
@@ -1833,6 +1855,13 @@
                             "integer",
                             "null"
                           ]
+                        },
+                        "has_more": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "description": "True while eBay still offers a next page — the stop signal for bulk extraction. total_pages/total_results are null on the completed/sold grid, and past the last page eBay re-serves that page, so looping until the results are empty never terminates."
                         }
                       }
                     },
@@ -2353,7 +2382,11 @@
                             ]
                           },
                           "is_sponsored": {
-                            "type": "boolean"
+                            "type": [
+                              "boolean",
+                              "null"
+                            ],
+                            "description": "Always null — eBay renders its Sponsored badge into every card as anti-scraping bait, so promoted placements cannot be distinguished from organic results."
                           }
                         }
                       }
@@ -2381,6 +2414,13 @@
                             "integer",
                             "null"
                           ]
+                        },
+                        "has_more": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "description": "True while eBay still offers a next page — the stop signal for bulk extraction. total_pages/total_results are null on the completed/sold grid, and past the last page eBay re-serves that page, so looping until the results are empty never terminates."
                         }
                       }
                     },
@@ -2530,6 +2570,13 @@
                             "integer",
                             "null"
                           ]
+                        },
+                        "has_more": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "description": "True while eBay still offers a next page — the stop signal for bulk extraction. total_pages/total_results are null on the completed/sold grid, and past the last page eBay re-serves that page, so looping until the results are empty never terminates."
                         }
                       }
                     },
@@ -2932,7 +2979,11 @@
                             ]
                           },
                           "is_sponsored": {
-                            "type": "boolean"
+                            "type": [
+                              "boolean",
+                              "null"
+                            ],
+                            "description": "Always null — eBay renders its Sponsored badge into every card as anti-scraping bait, so promoted placements cannot be distinguished from organic results."
                           }
                         }
                       }
@@ -2969,6 +3020,13 @@
                             "integer",
                             "null"
                           ]
+                        },
+                        "has_more": {
+                          "type": [
+                            "boolean",
+                            "null"
+                          ],
+                          "description": "True while eBay still offers a next page — the stop signal for bulk extraction. total_pages/total_results are null on the completed/sold grid, and past the last page eBay re-serves that page, so looping until the results are empty never terminates."
                         }
                       }
                     },
