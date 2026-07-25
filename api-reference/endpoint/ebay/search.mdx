@@ -21,7 +21,10 @@ description: "Search an eBay marketplace for active listings."
 </ParamField>
 
 <ParamField query="page" type="integer" default={1}>
-  Page number for paginated results. Range: `1` - `100`.
+  Page number for paginated results. Range: `1` - `1000`.
+
+  Use `pagination.has_more` to know when to stop — eBay re-serves its last
+  page if you ask past the end, so this API returns an empty page there.
 </ParamField>
 
 <ParamField query="per_page" type="integer">
