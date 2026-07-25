@@ -68,7 +68,7 @@ description: "List active listings within an eBay category."
     <ResponseField name="current_bid" type="object">Current high bid for auction listings with `value`, `currency`, `symbol`, `raw`; mirrors `price`. Null for non-auction (fixed-price) listings.</ResponseField>
     <ResponseField name="shipping" type="string">Shipping text.</ResponseField>
     <ResponseField name="seller_name" type="string">Seller username (nullable).</ResponseField>
-    <ResponseField name="is_sponsored" type="boolean">Whether the result is a sponsored placement.</ResponseField>
+    <ResponseField name="is_sponsored" type="boolean">Always `null`. eBay renders its "Sponsored" badge into every card as anti-scraping bait, so promoted placements cannot be distinguished from organic results.</ResponseField>
   </Expandable>
 </ResponseField>
 <ResponseField name="facets" type="object">Available filter facets keyed by name.</ResponseField>
@@ -94,7 +94,7 @@ description: "List active listings within an eBay category."
       "is_auction": false,
       "shipping": "Free shipping",
       "seller_name": "topgames_us",
-      "is_sponsored": false
+      "is_sponsored": null
     }
   ],
   "facets": { "condition": ["New", "Used"] },
