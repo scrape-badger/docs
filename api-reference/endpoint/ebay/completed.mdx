@@ -28,6 +28,11 @@ The completed-listings endpoint returns **sold** items — the closing prices bu
 
 <ParamField query="per_page" type="integer">
   Results per page. Clamped to one of `60`, `120`, or `240`.
+
+  Completed/sold results are served from eBay's mobile listing grid, which
+  returns fewer cards per page than the requested value — roughly `25` when
+  `per_page` is omitted, and about 5/6 of the requested value otherwise. Treat
+  it as an upper bound and read the actual count from `results`.
 </ParamField>
 
 <ParamField query="sort_by" type="string" default="best_match">
@@ -86,7 +91,9 @@ Identical shape to [`/v1/ebay/search`](/api-reference/endpoint/ebay/search), exc
   </Expandable>
 </ResponseField>
 <ResponseField name="facets" type="object">Available filter facets keyed by name.</ResponseField>
-<ResponseField name="pagination" type="object">Pagination metadata with `current_page`, `per_page`, `total_pages`, `total_results`.</ResponseField>
+<ResponseField name="pagination" type="object">Pagination metadata with `current_page`, `per_page`, `total_pages`, `total_results`.
+
+On this endpoint `total_pages` and `total_results` are always `null` — eBay's completed-listings grid reports neither a result count nor a true page total. Page through by incrementing `page` until `results` comes back empty.</ResponseField>
 <ResponseField name="scraped_at" type="string">ISO 8601 timestamp when the results were scraped.</ResponseField>
 
 ### Example Response
@@ -119,7 +126,7 @@ Identical shape to [`/v1/ebay/search`](/api-reference/endpoint/ebay/search), exc
     }
   ],
   "facets": {},
-  "pagination": { "current_page": 1, "per_page": 60, "total_pages": 100, "total_results": 6000 },
+  "pagination": { "current_page": 1, "per_page": 60, "total_pages": null, "total_results": null },
   "scraped_at": "2026-06-21T12:00:00Z"
 }
 ```
