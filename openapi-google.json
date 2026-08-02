@@ -3983,7 +3983,7 @@
           "Google Lens"
         ],
         "summary": "Google Lens visual search",
-        "description": "Search Google Lens by image URL for visually similar results.",
+        "description": "Search Google Lens by image URL for visually similar results.\n\nAccepts Scrapingdog-parity ``country`` / ``language`` aliases on top\nof the native ``gl`` / ``hl``; the aliases take precedence when\nsupplied. Toggling ``product`` / ``visual_matches`` / ``exact_matches``\npasses Google's matching hints through to the upstream Lens page so\nGoogle biases the result mix appropriately.",
         "operationId": "search_lens_api_v1_lens_search_get",
         "parameters": [
           {
@@ -3996,6 +3996,60 @@
               "title": "Url"
             },
             "description": "Public URL of the image to search visually"
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Optional text refinement — e.g. 'pizza' to focus Lens on food matches.",
+              "title": "Query"
+            },
+            "description": "Optional text refinement — e.g. 'pizza' to focus Lens on food matches."
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO country code (alias for ``gl``).",
+              "title": "Country"
+            },
+            "description": "ISO country code (alias for ``gl``)."
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Language code (alias for ``hl``).",
+              "title": "Language"
+            },
+            "description": "Language code (alias for ``hl``)."
           },
           {
             "name": "gl",
@@ -4020,6 +4074,42 @@
               "title": "Hl"
             },
             "description": "Language code"
+          },
+          {
+            "name": "product",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "When True, bias towards shoppable product matches.",
+              "default": false,
+              "title": "Product"
+            },
+            "description": "When True, bias towards shoppable product matches."
+          },
+          {
+            "name": "visual_matches",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Include the visual-matches carousel (Scrapingdog parity).",
+              "default": true,
+              "title": "Visual Matches"
+            },
+            "description": "Include the visual-matches carousel (Scrapingdog parity)."
+          },
+          {
+            "name": "exact_matches",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Restrict to exact-match results only.",
+              "default": false,
+              "title": "Exact Matches"
+            },
+            "description": "Restrict to exact-match results only."
           }
         ],
         "responses": {
@@ -7318,6 +7408,17 @@
             ],
             "title": "Source"
           },
+          "source_favicon": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Favicon"
+          },
           "thumbnail": {
             "anyOf": [
               {
@@ -7328,6 +7429,71 @@
               }
             ],
             "title": "Thumbnail"
+          },
+          "original_thumbnail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Original Thumbnail"
+          },
+          "tag": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tag"
+          },
+          "price": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProductPrice"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "in_stock": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "In Stock"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "reviews": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviews"
           }
         },
         "type": "object",
@@ -7336,12 +7502,26 @@
       },
       "LensSearchResponse": {
         "properties": {
+          "lens_results": {
+            "items": {
+              "$ref": "#/components/schemas/LensResult"
+            },
+            "type": "array",
+            "title": "Lens Results"
+          },
           "results": {
             "items": {
               "$ref": "#/components/schemas/LensResult"
             },
             "type": "array",
             "title": "Results"
+          },
+          "related_searches": {
+            "items": {
+              "$ref": "#/components/schemas/LensRelatedSearch"
+            },
+            "type": "array",
+            "title": "Related Searches"
           },
           "image_url": {
             "type": "string",
@@ -7354,6 +7534,46 @@
         ],
         "title": "LensSearchResponse",
         "description": "Response for GET /api/v1/lens/search."
+      },
+      "ProductPrice": {
+        "properties": {
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "extracted": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Extracted"
+          }
+        },
+        "type": "object",
+        "title": "ProductPrice",
+        "description": "A price expressed both as the raw display string and a numeric value."
       },
       "LocalResult": {
         "properties": {
@@ -12333,6 +12553,42 @@
         ],
         "title": "BookingOption",
         "description": "One provider (airline or OTA) that can book the selected itinerary."
+      },
+      "LensRelatedSearch": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link"
+          },
+          "thumbnail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thumbnail"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "title": "LensRelatedSearch",
+        "description": "A related-searches chip from the Lens results page."
       }
     },
     "securitySchemes": {
