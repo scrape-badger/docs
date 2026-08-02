@@ -195,10 +195,10 @@ curl "https://scrapebadger.com/v1/google/shopping/product/click?title=Lenovo+Ide
 
 ## Credit Costs
 
-Per-endpoint credit pricing is configured by ScrapeBadger admins and returned live from `GET https://api.scrapebadger.com/public/pricing` (uncached, updates immediately). The public pricing page and each product landing page at [scrapebadger.com](https://scrapebadger.com) show the authoritative current rate. See [Credits & Pricing](/credits-and-pricing) for plan-level rates.
+Per-endpoint credit pricing is configured by ScrapeBadger admins and returned live from `GET https://scrapebadger.com/api/public/pricing` (uncached, updates immediately). The public pricing page and each product landing page at [scrapebadger.com](https://scrapebadger.com) show the authoritative current rate. See [Credits & Pricing](/credits-and-pricing) for plan-level rates.
 
 <Tip>
-  Query `GET /public/pricing` in your integration to cache the current per-endpoint cost — don't hardcode credit numbers, they can be adjusted.
+  Query `GET /api/public/pricing` in your integration to cache the current per-endpoint cost — don't hardcode credit numbers, they can be adjusted.
 </Tip>
 
 ## Legal & Compliance

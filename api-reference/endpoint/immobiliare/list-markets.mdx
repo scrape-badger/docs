@@ -24,7 +24,7 @@ A JSON array of `Market` objects:
 <CodeGroup>
 
 ```javascript Node.js
-const res = await fetch("https://api.scrapebadger.com/v1/immobiliare/markets", {
+const res = await fetch("https://scrapebadger.com/v1/immobiliare/markets", {
   headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
 });
 const markets = await res.json();
@@ -34,14 +34,14 @@ const markets = await res.json();
 import requests
 
 res = requests.get(
-    "https://api.scrapebadger.com/v1/immobiliare/markets",
+    "https://scrapebadger.com/v1/immobiliare/markets",
     headers={"X-API-Key": "YOUR_API_KEY"},
 )
 markets = res.json()
 ```
 
 ```bash cURL
-curl "https://api.scrapebadger.com/v1/immobiliare/markets" \
+curl "https://scrapebadger.com/v1/immobiliare/markets" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 

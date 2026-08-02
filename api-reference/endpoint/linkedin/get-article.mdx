@@ -1,6 +1,6 @@
 ---
 title: "Get Article"
-api: "GET https://api.scrapebadger.com/v1/linkedin/articles/{article_slug}"
+api: "GET https://scrapebadger.com/v1/linkedin/articles/{article_slug}"
 description: "A public LinkedIn Pulse article by its slug — author, title, body, reactions and top-level comments."
 ---
 
@@ -55,13 +55,13 @@ Fetch a public LinkedIn **Pulse** article by its `article_slug` (the
 <CodeGroup>
 
 ```bash cURL
-curl "https://api.scrapebadger.com/v1/linkedin/articles/the-future-of-cloud-jane-smith" \
+curl "https://scrapebadger.com/v1/linkedin/articles/the-future-of-cloud-jane-smith" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ```javascript Node.js
 const res = await fetch(
-  "https://api.scrapebadger.com/v1/linkedin/articles/the-future-of-cloud-jane-smith",
+  "https://scrapebadger.com/v1/linkedin/articles/the-future-of-cloud-jane-smith",
   { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
 );
 const { post } = await res.json();
@@ -71,7 +71,7 @@ const { post } = await res.json();
 import requests
 
 res = requests.get(
-    "https://api.scrapebadger.com/v1/linkedin/articles/the-future-of-cloud-jane-smith",
+    "https://scrapebadger.com/v1/linkedin/articles/the-future-of-cloud-jane-smith",
     headers={"X-API-Key": "YOUR_API_KEY"},
 )
 post = res.json()["post"]

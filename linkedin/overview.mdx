@@ -11,7 +11,7 @@ pages, public member profiles, posts and Pulse articles, LinkedIn Learning
 courses, and a geo/company typeahead for resolving filter ids.
 
 <Info>
-  All endpoints are `GET`, live under `https://api.scrapebadger.com/v1/linkedin/*`,
+  All endpoints are `GET`, live under `https://scrapebadger.com/v1/linkedin/*`,
   and authenticate with the `X-API-Key` header. Credits are charged per request
   (see the table below) and reported on the `X-Credits-Used` response header.
   Every endpoint accepts an optional `country` param (default `us`).
@@ -83,13 +83,13 @@ courses, and a geo/company typeahead for resolving filter ids.
 <CodeGroup>
 
 ```bash cURL
-curl "https://api.scrapebadger.com/v1/linkedin/jobs/search?keywords=software%20engineer&location=New%20York" \
+curl "https://scrapebadger.com/v1/linkedin/jobs/search?keywords=software%20engineer&location=New%20York" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ```javascript Node.js
 const res = await fetch(
-  "https://api.scrapebadger.com/v1/linkedin/jobs/search?" +
+  "https://scrapebadger.com/v1/linkedin/jobs/search?" +
     new URLSearchParams({
       keywords: "software engineer",
       location: "New York",
@@ -104,7 +104,7 @@ console.log(data.jobs.length, "jobs");
 import requests
 
 res = requests.get(
-    "https://api.scrapebadger.com/v1/linkedin/jobs/search",
+    "https://scrapebadger.com/v1/linkedin/jobs/search",
     headers={"X-API-Key": "YOUR_API_KEY"},
     params={"keywords": "software engineer", "location": "New York"},
 )

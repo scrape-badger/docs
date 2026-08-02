@@ -1,6 +1,6 @@
 ---
 title: "Geo / Company Suggest"
-api: "GET https://api.scrapebadger.com/v1/linkedin/geo/suggest"
+api: "GET https://scrapebadger.com/v1/linkedin/geo/suggest"
 description: "Resolve a free-text place or company name to the numeric geo_id / company_id that job-search filters expect."
 ---
 
@@ -52,17 +52,17 @@ the returned id into
 
 ```bash cURL
 # Resolve a location
-curl "https://api.scrapebadger.com/v1/linkedin/geo/suggest?query=London&type=geo" \
+curl "https://scrapebadger.com/v1/linkedin/geo/suggest?query=London&type=geo" \
   -H "X-API-Key: YOUR_API_KEY"
 
 # Resolve a company
-curl "https://api.scrapebadger.com/v1/linkedin/geo/suggest?query=Microsoft&type=company" \
+curl "https://scrapebadger.com/v1/linkedin/geo/suggest?query=Microsoft&type=company" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ```javascript Node.js
 const res = await fetch(
-  "https://api.scrapebadger.com/v1/linkedin/geo/suggest?" +
+  "https://scrapebadger.com/v1/linkedin/geo/suggest?" +
     new URLSearchParams({ query: "London", type: "geo" }),
   { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
 );
@@ -73,7 +73,7 @@ const data = await res.json();
 import requests
 
 res = requests.get(
-    "https://api.scrapebadger.com/v1/linkedin/geo/suggest",
+    "https://scrapebadger.com/v1/linkedin/geo/suggest",
     headers={"X-API-Key": "YOUR_API_KEY"},
     params={"query": "London", "type": "geo"},
 )

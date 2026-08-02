@@ -1,6 +1,6 @@
 ---
 title: "Get Company"
-api: "GET https://api.scrapebadger.com/v1/linkedin/companies/{universal_name}"
+api: "GET https://scrapebadger.com/v1/linkedin/companies/{universal_name}"
 description: "A public LinkedIn company page by its universal_name slug — about, website, industry, size, headquarters, specialties and follower/employee counts."
 ---
 
@@ -58,13 +58,13 @@ specialties, and follower / employee counts.
 <CodeGroup>
 
 ```bash cURL
-curl "https://api.scrapebadger.com/v1/linkedin/companies/microsoft" \
+curl "https://scrapebadger.com/v1/linkedin/companies/microsoft" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ```javascript Node.js
 const res = await fetch(
-  "https://api.scrapebadger.com/v1/linkedin/companies/microsoft",
+  "https://scrapebadger.com/v1/linkedin/companies/microsoft",
   { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
 );
 const { company } = await res.json();
@@ -74,7 +74,7 @@ const { company } = await res.json();
 import requests
 
 res = requests.get(
-    "https://api.scrapebadger.com/v1/linkedin/companies/microsoft",
+    "https://scrapebadger.com/v1/linkedin/companies/microsoft",
     headers={"X-API-Key": "YOUR_API_KEY"},
 )
 company = res.json()["company"]

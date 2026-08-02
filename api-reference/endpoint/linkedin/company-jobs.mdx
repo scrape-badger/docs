@@ -1,6 +1,6 @@
 ---
 title: "Company Jobs"
-api: "GET https://api.scrapebadger.com/v1/linkedin/companies/{company_id}/jobs"
+api: "GET https://scrapebadger.com/v1/linkedin/companies/{company_id}/jobs"
 description: "Every public LinkedIn job opening for a company, by numeric company_id."
 ---
 
@@ -50,13 +50,13 @@ blocks of 25 via `start`.
 <CodeGroup>
 
 ```bash cURL
-curl "https://api.scrapebadger.com/v1/linkedin/companies/1035/jobs" \
+curl "https://scrapebadger.com/v1/linkedin/companies/1035/jobs" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ```javascript Node.js
 const res = await fetch(
-  "https://api.scrapebadger.com/v1/linkedin/companies/1035/jobs",
+  "https://scrapebadger.com/v1/linkedin/companies/1035/jobs",
   { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
 );
 const data = await res.json();
@@ -66,7 +66,7 @@ const data = await res.json();
 import requests
 
 res = requests.get(
-    "https://api.scrapebadger.com/v1/linkedin/companies/1035/jobs",
+    "https://scrapebadger.com/v1/linkedin/companies/1035/jobs",
     headers={"X-API-Key": "YOUR_API_KEY"},
 )
 data = res.json()

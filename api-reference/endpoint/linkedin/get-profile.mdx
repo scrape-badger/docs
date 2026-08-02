@@ -1,6 +1,6 @@
 ---
 title: "Get Profile"
-api: "GET https://api.scrapebadger.com/v1/linkedin/profiles/{public_id}"
+api: "GET https://scrapebadger.com/v1/linkedin/profiles/{public_id}"
 description: "A public LinkedIn member profile by vanity public_id — headline, location, about, experience, education, languages and awards."
 ---
 
@@ -64,13 +64,13 @@ Fetch a member's public LinkedIn profile by their vanity `public_id` (the
 <CodeGroup>
 
 ```bash cURL
-curl "https://api.scrapebadger.com/v1/linkedin/profiles/williamhgates" \
+curl "https://scrapebadger.com/v1/linkedin/profiles/williamhgates" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ```javascript Node.js
 const res = await fetch(
-  "https://api.scrapebadger.com/v1/linkedin/profiles/williamhgates",
+  "https://scrapebadger.com/v1/linkedin/profiles/williamhgates",
   { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
 );
 const { profile } = await res.json();
@@ -80,7 +80,7 @@ const { profile } = await res.json();
 import requests
 
 res = requests.get(
-    "https://api.scrapebadger.com/v1/linkedin/profiles/williamhgates",
+    "https://scrapebadger.com/v1/linkedin/profiles/williamhgates",
     headers={"X-API-Key": "YOUR_API_KEY"},
 )
 profile = res.json()["profile"]
