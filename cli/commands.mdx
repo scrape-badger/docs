@@ -99,7 +99,12 @@ scrapebadger vinted markets # List all markets
 | `--page` | `-p` | Page number |
 | `--per-page` | | Results per page (max 96) |
 | `--price-from` | | Min price filter |
-| `--price-to` | | Max price filter | --- ## Web Scraping Commands All web commands are under `scrapebadger web`. ```bash
+| `--price-to` | | Max price filter |
+| `--brands` | | Comma-separated brand IDs |
+| `--catalogs` | | Comma-separated catalog (category) IDs — the `catalog[]` value in a Vinted category URL |
+| `--colors` | | Comma-separated color IDs |
+| `--statuses` | | Comma-separated condition IDs |
+| `--order` | | Sort order: relevance, newest_first, price_low_to_high, price_high_to_low | --- ## Web Scraping Commands All web commands are under `scrapebadger web`. ```bash
 scrapebadger web scrape <url> # Scrape a URL
 scrapebadger web detect <url> # Detect anti-bot protection
 scrapebadger web screenshot <url> # Take screenshot

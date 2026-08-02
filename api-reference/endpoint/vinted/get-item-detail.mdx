@@ -20,61 +20,118 @@ description: "Get detailed information about a Vinted item."
 
 ## Response
 
-<ResponseField name="id" type="integer">Item ID.</ResponseField>
-<ResponseField name="title" type="string">Item title.</ResponseField>
-<ResponseField name="description" type="string">Full item description text.</ResponseField>
-<ResponseField name="price" type="string">Price in local currency.</ResponseField>
-<ResponseField name="currency" type="string">ISO 4217 currency code.</ResponseField>
-<ResponseField name="brand_title" type="string">Brand name.</ResponseField>
-<ResponseField name="size_title" type="string">Size label.</ResponseField>
-<ResponseField name="status" type="string">Item condition (e.g. `"New with tags"`, `"Good"`).</ResponseField>
-<ResponseField name="color1" type="string">Primary color.</ResponseField>
-<ResponseField name="color2" type="string">Secondary color (nullable).</ResponseField>
-<ResponseField name="photos" type="array">Array of photo objects with `url`, `width`, `height`.</ResponseField>
-<ResponseField name="url" type="string">Full URL to the Vinted listing.</ResponseField>
-<ResponseField name="view_count" type="integer">Number of views.</ResponseField>
-<ResponseField name="favourite_count" type="integer">Number of favourites.</ResponseField>
-<ResponseField name="created_at" type="string">ISO 8601 timestamp when the item was listed.</ResponseField>
-<ResponseField name="updated_at" type="string">ISO 8601 timestamp of the last update.</ResponseField>
-<ResponseField name="user" type="object">Seller information with `id`, `login`, `photo`, `feedback_reputation`.</ResponseField>
+The payload is wrapped in an envelope: `item` holds the listing, `market` echoes
+the market it was read from.
+
+<ResponseField name="market" type="string">Echo of the requested market.</ResponseField>
+
+<ResponseField name="item" type="object">
+  <Expandable title="Item object">
+    <ResponseField name="id" type="integer">Item ID.</ResponseField>
+    <ResponseField name="title" type="string">Item title.</ResponseField>
+    <ResponseField name="description" type="string">Full item description text.</ResponseField>
+    <ResponseField name="price" type="object">
+      Price object: `amount` (decimal string, e.g. `"45.0"`) and `currency_code` (ISO 4217, e.g. `"EUR"`).
+    </ResponseField>
+    <ResponseField name="service_fee" type="string">Buyer-protection fee as a decimal string, in `price.currency_code`. `null` when the listing page doesn't quote one.</ResponseField>
+    <ResponseField name="total_item_price" type="string">Price + buyer protection as a decimal string, in `price.currency_code`.</ResponseField>
+    <ResponseField name="brand_title" type="string">Brand name.</ResponseField>
+    <ResponseField name="brand_id" type="integer">Vinted brand ID — the value you pass to `brand_ids` on [search](/api-reference/endpoint/vinted/search-items).</ResponseField>
+    <ResponseField name="catalog_id" type="integer">Vinted catalog (category) ID of the leaf category — the value you pass to `catalog_ids` on [search](/api-reference/endpoint/vinted/search-items).</ResponseField>
+    <ResponseField name="category" type="array">Category breadcrumb, root first (e.g. `["Femmes", "Vêtements", "Hauts et t-shirts", "T-shirts"]`). Localized to the market.</ResponseField>
+    <ResponseField name="size_title" type="string">Size label.</ResponseField>
+    <ResponseField name="size_id" type="integer">Vinted size ID.</ResponseField>
+    <ResponseField name="status" type="string">Item condition, localized to the market (e.g. `"Très bon état"`).</ResponseField>
+    <ResponseField name="status_id" type="integer">Vinted condition ID — see [`/v1/vinted/statuses`](/api-reference/endpoint/vinted/list-statuses).</ResponseField>
+    <ResponseField name="color1" type="string">Primary color, localized. May list several, comma-separated.</ResponseField>
+    <ResponseField name="color2" type="string">Secondary color (nullable).</ResponseField>
+    <ResponseField name="photo" type="object">Primary photo (`id`, `url`, `full_size_url`, `width`, `height`, `dominant_color`, `is_main`).</ResponseField>
+    <ResponseField name="photos" type="array">All photos, same object shape as `photo`.</ResponseField>
+    <ResponseField name="url" type="string">Full URL to the Vinted listing.</ResponseField>
+    <ResponseField name="view_count" type="integer">Number of views.</ResponseField>
+    <ResponseField name="favourite_count" type="integer">Number of favourites.</ResponseField>
+    <ResponseField name="upload_date" type="string">Vinted's own relative "listed" label, localized (e.g. `"Il y a une semaine"`) — not an ISO timestamp.</ResponseField>
+    <ResponseField name="can_buy" type="boolean">Whether the item can be bought right now.</ResponseField>
+    <ResponseField name="instant_buy" type="boolean">Whether Buy Now is available.</ResponseField>
+    <ResponseField name="can_bundle" type="boolean">Whether the seller accepts bundles.</ResponseField>
+    <ResponseField name="can_reserve" type="boolean">Whether the item can be reserved.</ResponseField>
+    <ResponseField name="is_reserved" type="boolean">Whether the item is currently reserved.</ResponseField>
+    <ResponseField name="is_closed" type="boolean">Whether the listing is closed (sold or withdrawn).</ResponseField>
+    <ResponseField name="is_hidden" type="boolean">Whether the listing is hidden by the seller.</ResponseField>
+    <ResponseField name="is_visible" type="boolean">Whether the listing is publicly visible.</ResponseField>
+    <ResponseField name="user" type="object">Seller summary (`id`, `login`, `photo_url`, `business`).</ResponseField>
+    <ResponseField name="seller" type="object">
+      Richer seller record: `id`, `login`, `photo_url`, `business`, `feedback_count`, `feedback_reputation`, `item_count`, `location`, `last_seen`, `badges`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
 
 ### Example Response
 
 ```json
 {
-  "id": 4856231890,
-  "title": "Nike Air Force 1 '07 White",
-  "description": "Worn only twice, excellent condition. Size 42 EU. Original box included.",
-  "price": "45.00",
-  "currency": "EUR",
-  "brand_title": "Nike",
-  "size_title": "42",
-  "status": "Very good",
-  "color1": "White",
-  "color2": null,
-  "photos": [
-    {
-      "url": "https://images1.vinted.net/t/...",
-      "width": 1200,
-      "height": 900
-    }
-  ],
-  "url": "https://www.vinted.fr/items/4856231890",
-  "view_count": 234,
-  "favourite_count": 12,
-  "created_at": "2026-03-15T14:30:00Z",
-  "updated_at": "2026-03-20T09:15:00Z",
-  "user": {
-    "id": 12345678,
-    "login": "seller_username",
-    "photo": {
-      "url": "https://images1.vinted.net/t/..."
+  "item": {
+    "id": 9492962028,
+    "title": "Tee shirt",
+    "description": "Tee shirt Nike noir",
+    "price": { "amount": "1.0", "currency_code": "EUR" },
+    "service_fee": "0.75",
+    "total_item_price": "1.75",
+    "brand_title": "Nike Air",
+    "brand_id": 5977,
+    "catalog_id": 221,
+    "category": ["Femmes", "Vêtements", "Hauts et t-shirts", "T-shirts", "Nike Air T-shirts"],
+    "size_title": "S / 36 / 8",
+    "size_id": 506,
+    "status": "Très bon état",
+    "status_id": 50,
+    "color1": "Noir, Blanc",
+    "color2": null,
+    "photos": [
+      {
+        "id": 40179825222,
+        "url": "https://images1.vinted.net/t/...",
+        "full_size_url": "https://images1.vinted.net/tc/...",
+        "width": 600,
+        "height": 800,
+        "dominant_color": "#36363D",
+        "is_main": true
+      }
+    ],
+    "url": "https://www.vinted.fr/items/9492962028-tee-shirt",
+    "view_count": 0,
+    "favourite_count": 4,
+    "upload_date": "Il y a une semaine",
+    "can_buy": true,
+    "instant_buy": true,
+    "is_closed": false,
+    "user": {
+      "id": 20298345,
+      "login": "majy.p",
+      "photo_url": "https://images1.vinted.net/t/...",
+      "business": false
     },
-    "feedback_reputation": 0.98
-  }
+    "seller": {
+      "id": 20298345,
+      "login": "majy.p",
+      "business": false,
+      "feedback_count": 356,
+      "feedback_reputation": 1.0,
+      "last_seen": "Vu la dernière fois : il y a une heure",
+      "badges": ["ACTIVE_LISTER", "SPEEDY_SHIPPING"]
+    }
+  },
+  "market": "fr"
 }
 ```
 
 <Note>
-  Each item detail request costs **1 credit**. Failed requests are not charged.
+  Search results do **not** carry `catalog_id` or `brand_id` — Vinted's catalog
+  endpoint doesn't return them, so they're only available here, one call per item.
+  To narrow results by category or brand, filter at search time with
+  `catalog_ids` / `brand_ids` instead.
+</Note>
+
+<Note>
+  Each item detail request costs **10 credits**. Failed requests are not charged. The exact charge for any call is returned in the `X-Credits-Used` response header.
 </Note>
