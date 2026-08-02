@@ -20,7 +20,7 @@ description: "Search Vinted catalog items with filters."
   Page number for paginated results. Starts at `1`.
 </ParamField>
 
-<ParamField query="per_page" type="integer" default={24}>
+<ParamField query="per_page" type="integer" default={20}>
   Number of items per page. Range: `1` - `96`.
 </ParamField>
 
@@ -30,6 +30,27 @@ description: "Search Vinted catalog items with filters."
 
 <ParamField query="price_to" type="number">
   Maximum price filter in the market's local currency.
+</ParamField>
+
+<ParamField query="catalog_ids" type="string">
+  Comma-separated list of Vinted catalog (category) IDs. Vinted applies this
+  **before** the search runs, so you get whole pages of in-category results
+  instead of filtering them out afterwards.
+
+  A catalog ID is the `catalog[]` value in a Vinted category URL — browse to the
+  category on the Vinted site and read it off the address bar:
+  `vinted.fr/catalog?catalog[]=221` → `catalog_ids=221`.
+
+  Sub-categories are included: `catalog_ids=221` (Women's T-shirts) also matches
+  the brand-specific leaves beneath it.
+
+  Example: `221`, `221,1242`
+
+  <Note>
+    Catalog IDs are **per market**. An ID read off `vinted.fr` is not guaranteed
+    to mean the same category on `vinted.de` — take the ID from the same market
+    you pass as `market`.
+  </Note>
 </ParamField>
 
 <ParamField query="brand_ids" type="string">
@@ -85,30 +106,41 @@ description: "Search Vinted catalog items with filters."
   <Expandable title="Item object">
     <ResponseField name="id" type="integer">Item ID.</ResponseField>
     <ResponseField name="title" type="string">Item title.</ResponseField>
-    <ResponseField name="price" type="string">Price in local currency (e.g. `"15.00"`).</ResponseField>
-    <ResponseField name="currency" type="string">ISO 4217 currency code (e.g. `"EUR"`).</ResponseField>
+    <ResponseField name="price" type="object">
+      Price object: `amount` (decimal string, e.g. `"45.0"`) and `currency_code` (ISO 4217, e.g. `"EUR"`).
+    </ResponseField>
+    <ResponseField name="service_fee" type="string">Buyer-protection fee as a decimal string, in `price.currency_code`. `null` when Vinted doesn't quote one.</ResponseField>
+    <ResponseField name="total_item_price" type="string">Price + buyer protection as a decimal string, in `price.currency_code`.</ResponseField>
     <ResponseField name="brand_title" type="string">Brand name.</ResponseField>
     <ResponseField name="size_title" type="string">Size label.</ResponseField>
-    <ResponseField name="photo" type="object">Primary photo with `url`, `width`, `height`.</ResponseField>
+    <ResponseField name="status" type="string">Item condition, localized to the market (e.g. `"Très bon état"`).</ResponseField>
     <ResponseField name="url" type="string">Full URL to the Vinted listing.</ResponseField>
-    <ResponseField name="user" type="object">Seller summary with `id`, `login`, `photo`.</ResponseField>
+    <ResponseField name="path" type="string">Path portion of the listing URL.</ResponseField>
+    <ResponseField name="photo" type="object">Primary photo (`id`, `url`, `full_size_url`, `width`, `height`, `dominant_color`, `is_main`).</ResponseField>
+    <ResponseField name="photos" type="array">All photos, same object shape as `photo`.</ResponseField>
+    <ResponseField name="user" type="object">Seller summary (`id`, `login`, `photo_url`, `business`).</ResponseField>
     <ResponseField name="favourite_count" type="integer">Number of users who favourited this item.</ResponseField>
+    <ResponseField name="view_count" type="integer">Number of views.</ResponseField>
+    <ResponseField name="is_visible" type="boolean">Whether the listing is publicly visible.</ResponseField>
+    <ResponseField name="promoted" type="boolean">Whether the listing is a promoted/bumped placement.</ResponseField>
+    <ResponseField name="content_source" type="string">Vinted's own label for where the result came from (e.g. `"search"`).</ResponseField>
     <ResponseField name="seller_country_code" type="string">
-      ISO 3166-1 alpha-2 code of the seller's physical country (e.g. `"IT"`), or `null` if it could not be resolved. Always present on each item; populated whether or not `seller_country` filtering was requested.
+      ISO 3166-1 alpha-2 code of the seller's physical country (e.g. `"IT"`). Populated only when `seller_country` filtering was requested; `null` otherwise.
     </ResponseField>
   </Expandable>
 </ResponseField>
 
-<ResponseField name="total_entries" type="integer">
-  Total number of matching items across all pages.
+<ResponseField name="pagination" type="object">
+  <Expandable title="Pagination object">
+    <ResponseField name="current_page" type="integer">Current page number.</ResponseField>
+    <ResponseField name="per_page" type="integer">Number of items per page.</ResponseField>
+    <ResponseField name="total_pages" type="integer">Total number of pages.</ResponseField>
+    <ResponseField name="total_entries" type="integer">Total number of matching items. Vinted caps this at 960 on deep result sets, so treat it as an upper bound rather than an exact count.</ResponseField>
+  </Expandable>
 </ResponseField>
 
-<ResponseField name="current_page" type="integer">
-  Current page number.
-</ResponseField>
-
-<ResponseField name="per_page" type="integer">
-  Number of items per page.
+<ResponseField name="market" type="string">
+  Echo of the market that was searched.
 </ResponseField>
 
 <ResponseField name="seller_country" type="string">
@@ -121,35 +153,81 @@ description: "Search Vinted catalog items with filters."
 {
   "items": [
     {
-      "id": 4856231890,
+      "id": 9492962028,
       "title": "Nike Air Force 1 '07 White",
-      "price": "45.00",
-      "currency": "EUR",
+      "price": { "amount": "45.0", "currency_code": "EUR" },
+      "service_fee": "3.05",
+      "total_item_price": "48.05",
       "brand_title": "Nike",
       "size_title": "42",
-      "photo": {
-        "url": "https://images1.vinted.net/t/...",
-        "width": 800,
-        "height": 600
-      },
-      "url": "https://www.vinted.fr/items/4856231890",
+      "status": "Très bon état",
+      "url": "https://www.vinted.fr/items/9492962028-nike-air-force-1",
+      "path": "/items/9492962028-nike-air-force-1",
+      "is_visible": true,
+      "promoted": false,
+      "favourite_count": 12,
+      "view_count": 234,
+      "content_source": "search",
+      "seller_country_code": null,
       "user": {
         "id": 12345678,
         "login": "seller_username",
-        "photo": {
-          "url": "https://images1.vinted.net/t/..."
-        }
+        "photo_url": "https://images1.vinted.net/t/...",
+        "business": false
       },
-      "favourite_count": 12,
-      "seller_country_code": "FR"
+      "photo": {
+        "id": 40179825222,
+        "url": "https://images1.vinted.net/t/...",
+        "full_size_url": "https://images1.vinted.net/tc/...",
+        "width": 600,
+        "height": 800,
+        "dominant_color": "#36363D",
+        "is_main": true
+      },
+      "photos": []
     }
   ],
-  "total_entries": 2847,
-  "current_page": 1,
-  "per_page": 24,
-  "seller_country": "FR"
+  "pagination": {
+    "current_page": 1,
+    "per_page": 20,
+    "total_pages": 48,
+    "total_entries": 960
+  },
+  "market": "fr",
+  "seller_country": null
 }
 ```
+
+### Example Request — filter by category
+
+Only women's T-shirts (`catalog[]=221` on vinted.fr):
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/vinted/search?query=nike&market=fr&catalog_ids=221&per_page=20" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const results = await client.vinted.search({
+  query: "nike",
+  market: "fr",
+  catalog_ids: "221",
+  per_page: 20,
+});
+```
+
+```python Python
+results = client.vinted.search(
+    query="nike",
+    market="fr",
+    catalog_ids="221",
+    per_page=20,
+)
+```
+
+</CodeGroup>
 
 ### Example Request — filter by seller country
 
@@ -183,5 +261,5 @@ results = client.vinted.search(
 </CodeGroup>
 
 <Note>
-  A search costs **1 base credit + 1 credit per uncached seller** looked up to resolve seller country. Seller countries are cached for 7 days, so cache hits are free: a fresh page of 20 distinct sellers costs ≈ 21 credits, while repeated or overlapping searches are far cheaper. When `seller_country` is omitted, no seller lookups are performed and the request costs **1 credit**. Failed requests are not charged.
+  A search costs **5 credits**, whatever filters you pass — including `seller_country`, whose seller lookups are not billed on top. Failed requests are not charged. The exact charge for any call is returned in the `X-Credits-Used` response header.
 </Note>

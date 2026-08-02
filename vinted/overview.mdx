@@ -58,7 +58,7 @@ Vinted operates across 26 country domains. Use the `market` query parameter to t
 
 Vinted markets **federate listings across borders**. A search on `vinted.fr` does not only return items from French sellers — it surfaces items from sellers physically located in IT, DE, NL, ES, and elsewhere. Vinted localizes the rendering (EUR prices, French labels), but the seller may be abroad.
 
-Vinted exposes **no native country facet** — its catalog filters cover only size, brand, status, color, price, and material, and the undocumented `country_ids` parameter is ignored. To solve this, [`/v1/vinted/search`](/api-reference/endpoint/vinted/search-items) accepts an optional `seller_country` parameter:
+Vinted exposes **no native country facet** — its catalog filters cover only category, brand, status, color, price, size, and material, and the undocumented `country_ids` parameter is ignored. To solve this, [`/v1/vinted/search`](/api-reference/endpoint/vinted/search-items) accepts an optional `seller_country` parameter:
 
 ```bash
 curl "https://scrapebadger.com/v1/vinted/search?query=nike+air+force+1&market=fr&seller_country=fr,be" \
@@ -78,7 +78,34 @@ curl "https://scrapebadger.com/v1/vinted/search?query=nike+air+force+1&market=fr
 </Warning>
 
 <Note>
-  Filtering adds **1 credit per uncached seller** looked up, on top of the 1 base credit. Seller countries are cached for 7 days, so cache hits are free — a fresh page of 20 distinct sellers costs ≈ 21 credits, while repeated or overlapping searches are far cheaper. Omitting `seller_country` keeps the search at 1 credit.
+  Seller-country filtering costs nothing extra: a search is a flat **5 credits** whatever filters you pass. The exact charge for any call is returned in the `X-Credits-Used` response header.
+</Note>
+
+## Filtering by category (`catalog_ids`)
+
+[`/v1/vinted/search`](/api-reference/endpoint/vinted/search-items) accepts `catalog_ids` to
+restrict a search to one or more Vinted categories. Unlike `seller_country`, this is a
+**native Vinted filter** applied before the search runs — you get whole pages of
+in-category results rather than filtering them out client-side.
+
+```bash
+curl "https://scrapebadger.com/v1/vinted/search?query=nike&market=fr&catalog_ids=221" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+- **Value:** comma-separated catalog IDs (e.g. `221` or `221,1242`).
+- **Where to find an ID:** browse to the category on the Vinted site and read the
+  `catalog[]` value off the URL — `vinted.fr/catalog?catalog[]=221` → `catalog_ids=221`.
+  A listing's own ID is also on [`/v1/vinted/items/{item_id}`](/api-reference/endpoint/vinted/get-item-detail)
+  as `catalog_id`, alongside a `category` breadcrumb.
+- **Sub-categories are included:** `catalog_ids=221` (Women's T-shirts) also matches the
+  brand-specific leaves beneath it.
+
+<Note>
+  Catalog IDs are **per market** — take the ID from the same market you pass as `market`.
+  Search results themselves do not carry `catalog_id` (Vinted's catalog endpoint doesn't
+  return it); use `catalog_ids` to narrow at search time, or the item endpoint to read the
+  exact category of a single listing.
 </Note>
 
 ## Quick Start
