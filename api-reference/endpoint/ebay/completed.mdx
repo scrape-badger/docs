@@ -139,7 +139,7 @@ Identical shape to [`/v1/ebay/search`](/api-reference/endpoint/ebay/search), exc
 page, all_sold = 1, []
 while True:
     r = requests.get(
-        "https://api.scrapebadger.com/v1/ebay/completed",
+        "https://scrapebadger.com/v1/ebay/completed",
         params={"query": "iphone 13", "per_page": 240, "page": page},
         headers={"X-API-Key": API_KEY},
     ).json()

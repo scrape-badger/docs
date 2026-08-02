@@ -1,6 +1,6 @@
 ---
 title: "Get School"
-api: "GET https://api.scrapebadger.com/v1/linkedin/schools/{universal_name}"
+api: "GET https://scrapebadger.com/v1/linkedin/schools/{universal_name}"
 description: "A public LinkedIn university/school page by its universal_name slug — about, website, follower and student/alumni counts."
 ---
 
@@ -52,13 +52,13 @@ student/alumni count.
 <CodeGroup>
 
 ```bash cURL
-curl "https://api.scrapebadger.com/v1/linkedin/schools/stanford-university" \
+curl "https://scrapebadger.com/v1/linkedin/schools/stanford-university" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ```javascript Node.js
 const res = await fetch(
-  "https://api.scrapebadger.com/v1/linkedin/schools/stanford-university",
+  "https://scrapebadger.com/v1/linkedin/schools/stanford-university",
   { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
 );
 const { school } = await res.json();
@@ -68,7 +68,7 @@ const { school } = await res.json();
 import requests
 
 res = requests.get(
-    "https://api.scrapebadger.com/v1/linkedin/schools/stanford-university",
+    "https://scrapebadger.com/v1/linkedin/schools/stanford-university",
     headers={"X-API-Key": "YOUR_API_KEY"},
 )
 school = res.json()["school"]

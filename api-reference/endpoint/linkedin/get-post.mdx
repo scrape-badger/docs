@@ -1,6 +1,6 @@
 ---
 title: "Get Post"
-api: "GET https://api.scrapebadger.com/v1/linkedin/posts/{post_slug}"
+api: "GET https://scrapebadger.com/v1/linkedin/posts/{post_slug}"
 description: "A public LinkedIn post by its slug — author, body, reactions and top-level comments."
 ---
 
@@ -53,13 +53,13 @@ top-level comments.
 <CodeGroup>
 
 ```bash cURL
-curl "https://api.scrapebadger.com/v1/linkedin/posts/activity-7212345678901234567" \
+curl "https://scrapebadger.com/v1/linkedin/posts/activity-7212345678901234567" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ```javascript Node.js
 const res = await fetch(
-  "https://api.scrapebadger.com/v1/linkedin/posts/activity-7212345678901234567",
+  "https://scrapebadger.com/v1/linkedin/posts/activity-7212345678901234567",
   { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
 );
 const { post } = await res.json();
@@ -69,7 +69,7 @@ const { post } = await res.json();
 import requests
 
 res = requests.get(
-    "https://api.scrapebadger.com/v1/linkedin/posts/activity-7212345678901234567",
+    "https://scrapebadger.com/v1/linkedin/posts/activity-7212345678901234567",
     headers={"X-API-Key": "YOUR_API_KEY"},
 )
 post = res.json()["post"]

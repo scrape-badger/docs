@@ -1,6 +1,6 @@
 ---
 title: "Get Course"
-api: "GET https://api.scrapebadger.com/v1/linkedin/learning/{course_slug}"
+api: "GET https://scrapebadger.com/v1/linkedin/learning/{course_slug}"
 description: "A LinkedIn Learning course by its slug — title, description, provider, workload, rating and instructors."
 ---
 
@@ -51,13 +51,13 @@ workload, rating and instructors.
 <CodeGroup>
 
 ```bash cURL
-curl "https://api.scrapebadger.com/v1/linkedin/learning/learning-python" \
+curl "https://scrapebadger.com/v1/linkedin/learning/learning-python" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ```javascript Node.js
 const res = await fetch(
-  "https://api.scrapebadger.com/v1/linkedin/learning/learning-python",
+  "https://scrapebadger.com/v1/linkedin/learning/learning-python",
   { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
 );
 const { course } = await res.json();
@@ -67,7 +67,7 @@ const { course } = await res.json();
 import requests
 
 res = requests.get(
-    "https://api.scrapebadger.com/v1/linkedin/learning/learning-python",
+    "https://scrapebadger.com/v1/linkedin/learning/learning-python",
     headers={"X-API-Key": "YOUR_API_KEY"},
 )
 course = res.json()["course"]

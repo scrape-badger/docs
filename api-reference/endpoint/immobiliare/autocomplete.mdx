@@ -45,7 +45,7 @@ queries.
 
 ```javascript Node.js
 const res = await fetch(
-  "https://api.scrapebadger.com/v1/immobiliare/autocomplete?" +
+  "https://scrapebadger.com/v1/immobiliare/autocomplete?" +
     new URLSearchParams({ query: "Milano", market: "it" }),
   { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
 );
@@ -56,7 +56,7 @@ const data = await res.json();
 import requests
 
 res = requests.get(
-    "https://api.scrapebadger.com/v1/immobiliare/autocomplete",
+    "https://scrapebadger.com/v1/immobiliare/autocomplete",
     headers={"X-API-Key": "YOUR_API_KEY"},
     params={"query": "Milano", "market": "it"},
 )
@@ -64,7 +64,7 @@ data = res.json()
 ```
 
 ```bash cURL
-curl "https://api.scrapebadger.com/v1/immobiliare/autocomplete?query=Milano&market=it" \
+curl "https://scrapebadger.com/v1/immobiliare/autocomplete?query=Milano&market=it" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 

@@ -155,7 +155,7 @@ The full `Listing`:
 
 ```javascript Node.js
 const res = await fetch(
-  "https://api.scrapebadger.com/v1/immobiliare/listings/121584766?market=it",
+  "https://scrapebadger.com/v1/immobiliare/listings/121584766?market=it",
   { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
 );
 const listing = await res.json();
@@ -165,7 +165,7 @@ const listing = await res.json();
 import requests
 
 res = requests.get(
-    "https://api.scrapebadger.com/v1/immobiliare/listings/121584766",
+    "https://scrapebadger.com/v1/immobiliare/listings/121584766",
     headers={"X-API-Key": "YOUR_API_KEY"},
     params={"market": "it"},
 )
@@ -173,7 +173,7 @@ listing = res.json()
 ```
 
 ```bash cURL
-curl "https://api.scrapebadger.com/v1/immobiliare/listings/121584766?market=it" \
+curl "https://scrapebadger.com/v1/immobiliare/listings/121584766?market=it" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 

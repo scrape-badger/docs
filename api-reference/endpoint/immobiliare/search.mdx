@@ -206,7 +206,7 @@ Search a market's portal for listings. Target an area either with free-text
 
 ```javascript Node.js
 const res = await fetch(
-  "https://api.scrapebadger.com/v1/immobiliare/search?" +
+  "https://scrapebadger.com/v1/immobiliare/search?" +
     new URLSearchParams({
       location: "Milano",
       contract: "sale",
@@ -224,7 +224,7 @@ const data = await res.json();
 import requests
 
 res = requests.get(
-    "https://api.scrapebadger.com/v1/immobiliare/search",
+    "https://scrapebadger.com/v1/immobiliare/search",
     headers={"X-API-Key": "YOUR_API_KEY"},
     params={
         "location": "Milano",
@@ -239,7 +239,7 @@ data = res.json()
 ```
 
 ```bash cURL
-curl "https://api.scrapebadger.com/v1/immobiliare/search?location=Milano&contract=sale&category=residential&price_max=300000&rooms_min=3&sort=newest" \
+curl "https://scrapebadger.com/v1/immobiliare/search?location=Milano&contract=sale&category=residential&price_max=300000&rooms_min=3&sort=newest" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 

@@ -1,6 +1,6 @@
 ---
 title: "Search Jobs"
-api: "GET https://api.scrapebadger.com/v1/linkedin/jobs/search"
+api: "GET https://scrapebadger.com/v1/linkedin/jobs/search"
 description: "Search LinkedIn's public jobs guest API by keyword and location, with date, experience, job-type and workplace filters."
 ---
 
@@ -75,13 +75,13 @@ in blocks of 25 via `start` (`0`, `25`, `50`). Returns lightweight
 <CodeGroup>
 
 ```bash cURL
-curl "https://api.scrapebadger.com/v1/linkedin/jobs/search?keywords=software%20engineer&location=New%20York&date_posted=past_week&workplace=remote,hybrid&sort=recent" \
+curl "https://scrapebadger.com/v1/linkedin/jobs/search?keywords=software%20engineer&location=New%20York&date_posted=past_week&workplace=remote,hybrid&sort=recent" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ```javascript Node.js
 const res = await fetch(
-  "https://api.scrapebadger.com/v1/linkedin/jobs/search?" +
+  "https://scrapebadger.com/v1/linkedin/jobs/search?" +
     new URLSearchParams({
       keywords: "software engineer",
       location: "New York",
@@ -98,7 +98,7 @@ const data = await res.json();
 import requests
 
 res = requests.get(
-    "https://api.scrapebadger.com/v1/linkedin/jobs/search",
+    "https://scrapebadger.com/v1/linkedin/jobs/search",
     headers={"X-API-Key": "YOUR_API_KEY"},
     params={
         "keywords": "software engineer",

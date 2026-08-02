@@ -51,7 +51,7 @@ Query at region, province or city granularity (most-specific id wins) and pick
 
 ```javascript Node.js
 const res = await fetch(
-  "https://api.scrapebadger.com/v1/immobiliare/market-insights/prices?" +
+  "https://scrapebadger.com/v1/immobiliare/market-insights/prices?" +
     new URLSearchParams({
       market: "it",
       region_id: "10",
@@ -68,7 +68,7 @@ const data = await res.json();
 import requests
 
 res = requests.get(
-    "https://api.scrapebadger.com/v1/immobiliare/market-insights/prices",
+    "https://scrapebadger.com/v1/immobiliare/market-insights/prices",
     headers={"X-API-Key": "YOUR_API_KEY"},
     params={
         "market": "it",
@@ -82,7 +82,7 @@ data = res.json()
 ```
 
 ```bash cURL
-curl "https://api.scrapebadger.com/v1/immobiliare/market-insights/prices?market=it&region_id=10&province_id=MI&city_id=8042&contract=sale" \
+curl "https://scrapebadger.com/v1/immobiliare/market-insights/prices?market=it&region_id=10&province_id=MI&city_id=8042&contract=sale" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 

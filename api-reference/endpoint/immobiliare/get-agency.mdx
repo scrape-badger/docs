@@ -64,7 +64,7 @@ The full `AgencyProfile`:
 
 ```javascript Node.js
 const res = await fetch(
-  "https://api.scrapebadger.com/v1/immobiliare/agencies/41235?market=it",
+  "https://scrapebadger.com/v1/immobiliare/agencies/41235?market=it",
   { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
 );
 const agency = await res.json();
@@ -74,7 +74,7 @@ const agency = await res.json();
 import requests
 
 res = requests.get(
-    "https://api.scrapebadger.com/v1/immobiliare/agencies/41235",
+    "https://scrapebadger.com/v1/immobiliare/agencies/41235",
     headers={"X-API-Key": "YOUR_API_KEY"},
     params={"market": "it"},
 )
@@ -82,7 +82,7 @@ agency = res.json()
 ```
 
 ```bash cURL
-curl "https://api.scrapebadger.com/v1/immobiliare/agencies/41235?market=it" \
+curl "https://scrapebadger.com/v1/immobiliare/agencies/41235?market=it" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 

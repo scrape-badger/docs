@@ -53,7 +53,7 @@ Search listings, pull full property detail, fetch agency profiles and their acti
 
 ```javascript Node.js
 const res = await fetch(
-  "https://api.scrapebadger.com/v1/immobiliare/search?" +
+  "https://scrapebadger.com/v1/immobiliare/search?" +
     new URLSearchParams({
       location: "Milano",
       contract: "sale",
@@ -71,7 +71,7 @@ console.log(data.count, "of", data.total_ads, "listings");
 import requests
 
 res = requests.get(
-    "https://api.scrapebadger.com/v1/immobiliare/search",
+    "https://scrapebadger.com/v1/immobiliare/search",
     headers={"X-API-Key": "YOUR_API_KEY"},
     params={
         "location": "Milano",
@@ -86,7 +86,7 @@ print(data["count"], "of", data["total_ads"], "listings")
 ```
 
 ```bash cURL
-curl "https://api.scrapebadger.com/v1/immobiliare/search?location=Milano&contract=sale&category=residential&price_max=300000&rooms_min=3" \
+curl "https://scrapebadger.com/v1/immobiliare/search?location=Milano&contract=sale&category=residential&price_max=300000&rooms_min=3" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
@@ -122,7 +122,7 @@ curl "https://api.scrapebadger.com/v1/immobiliare/search?location=Milano&contrac
 All requests require your API key in the `X-API-Key` header:
 
 ```bash
-curl "https://api.scrapebadger.com/v1/immobiliare/search?location=Milano" \
+curl "https://scrapebadger.com/v1/immobiliare/search?location=Milano" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
