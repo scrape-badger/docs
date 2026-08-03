@@ -22,11 +22,15 @@ openapi: POST /v1/web/scrape
 </ParamField>
 
 <ParamField body="format" type="string" default="html">
-  Output format for the scraped content.
+  Output format for the scraped content. Applies to **text** responses only —
+  a binary target (image, PDF, archive) ignores it and is returned untouched.
 
   - `html` — Raw HTML of the page
   - `markdown` — Converted to clean Markdown
   - `text` — Plain text with HTML tags stripped
+
+  These are the only three values. There is no `raw` format — to get an
+  unwrapped body, use [`raw_content`](#binary-files-and-raw-bodies).
 </ParamField>
 
 <ParamField body="render_js" type="boolean" default={false}>
@@ -138,6 +142,19 @@ openapi: POST /v1/web/scrape
   Maximum credits to spend on this request. The request fails with a `400` error if the estimated cost would exceed this budget. Useful for controlling costs when using `escalate` or `anti_bot`. Minimum: `1`.
 </ParamField>
 
+<ParamField body="raw_content" type="boolean" default={false}>
+  Return the body directly as the HTTP response instead of wrapping it in JSON.
+  Metadata comes back in `X-Scrape-*` response headers.
+
+  Use it for two things: skipping the JSON encode/decode on large HTML payloads
+  (saves 300–1000 ms on 1 MB+ responses), and downloading **binary** files
+  without the ~33% base64 overhead. See
+  [Binary files and raw bodies](#binary-files-and-raw-bodies).
+
+  Cannot be combined with `ai_extract`, `screenshot` or `video` — those need the
+  JSON envelope, so the request falls back to it automatically.
+</ParamField>
+
 <ParamField body="ai_extract" type="boolean" default={false}>
   Run AI-powered extraction on the scraped content using the instruction in `ai_prompt`. Adds **+2 credits** to the request cost. The scrape result is still returned even if AI extraction fails.
 </ParamField>
@@ -168,7 +185,23 @@ openapi: POST /v1/web/scrape
 </ResponseField>
 
 <ResponseField name="content" type="string">
-  The scraped content in the requested format. `null` when `success` is `false`.
+  The scraped content in the requested format. `null` when `success` is `false`,
+  and `null` for binary targets — those come back in `content_base64`.
+</ResponseField>
+
+<ResponseField name="content_base64" type="string">
+  Base64-encoded response body, returned instead of `content` when the target
+  serves a binary payload. Only present when `is_binary` is `true`. Bodies above
+  25 MB are not base64-encoded — re-request those with `raw_content: true`.
+</ResponseField>
+
+<ResponseField name="is_binary" type="boolean">
+  Whether the target returned a binary (non-text) body.
+</ResponseField>
+
+<ResponseField name="content_type" type="string">
+  The target's response `Content-Type`, normalised to the bare media type
+  (e.g. `image/jpeg`).
 </ResponseField>
 
 <ResponseField name="format" type="string">
@@ -281,6 +314,115 @@ openapi: POST /v1/web/scrape
 <ResponseField name="ai_error" type="string">
   Error message if AI extraction failed. The scrape result is still returned. `null` on success.
 </ResponseField>
+
+## Binary files and raw bodies
+
+`/v1/web/scrape` handles binary targets — images, PDFs, archives, fonts, audio
+and video — as well as HTML. The bytes are returned exactly as the origin sent
+them; nothing is decoded, parsed or re-encoded on the way through.
+
+This works through the same anti-bot machinery as a page scrape, so a file
+behind Cloudflare, DataDome or Imperva is fetched with the same engine, proxy
+tier and session you would use for its parent page. Pass the same `session_id`
+you used to scrape the page the file was linked from and the file download
+reuses that session's cookies and fingerprint.
+
+There are two ways to get the bytes.
+
+**`raw_content: true` — the body itself.** No base64 overhead. Best for large
+files and for piping straight to disk.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://scrapebadger.com/v1/web/scrape" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://example.com/photos/item.jpg",
+    "raw_content": true,
+    "session_id": "gallery-session"
+  }' \
+  --output item.jpg
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://scrapebadger.com/v1/web/scrape",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    json={
+        "url": "https://example.com/photos/item.jpg",
+        "raw_content": True,
+        "session_id": "gallery-session",
+    },
+)
+
+with open("item.jpg", "wb") as f:
+    f.write(response.content)          # exact bytes — do NOT use response.text
+
+print(response.headers["Content-Type"])
+print(response.headers["X-Credits-Used"])
+```
+
+```javascript JavaScript
+const response = await fetch("https://scrapebadger.com/v1/web/scrape", {
+  method: "POST",
+  headers: {
+    "X-API-Key": "YOUR_API_KEY",
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    url: "https://example.com/photos/item.jpg",
+    raw_content: true,
+    session_id: "gallery-session",
+  }),
+});
+
+const buffer = Buffer.from(await response.arrayBuffer());
+```
+
+</CodeGroup>
+
+<Warning>
+  Read the response as **bytes**, not text. `response.text` in Python or
+  `response.text()` in JavaScript will decode the payload as a string and
+  corrupt it. Use `response.content` / `response.arrayBuffer()`.
+</Warning>
+
+**JSON with `content_base64` — one request, metadata included.** Use this when
+you also want `credits_used`, `engine_used` or the protection detections
+alongside the file.
+
+```python Python
+import base64
+import requests
+
+data = requests.post(
+    "https://scrapebadger.com/v1/web/scrape",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    json={"url": "https://example.com/report.pdf"},
+).json()
+
+if data["is_binary"]:
+    with open("report.pdf", "wb") as f:
+        f.write(base64.b64decode(data["content_base64"]))
+    print(data["content_type"])   # application/pdf
+else:
+    print(data["content"])        # a text target — HTML/markdown/text
+```
+
+Binary responses served with `raw_content` always carry
+`Content-Disposition: attachment` and `X-Content-Type-Options: nosniff`, and
+their `Content-Type` is restricted to a known-safe set — scraped bytes are
+never labelled in a way that would let a browser execute them.
+
+Bodies larger than 25 MB are not base64-encoded into JSON. Those return
+`content_base64: null` with a `detail` telling you to re-request using
+`raw_content: true`, which returns them without the base64 expansion. Very
+large files are still held in memory end to end, so treat a few hundred MB as
+the practical ceiling for a single request.
 
 ## Examples
 
