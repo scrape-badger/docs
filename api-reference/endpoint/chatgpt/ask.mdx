@@ -1,0 +1,245 @@
+---
+title: "Ask ChatGPT"
+api: "GET https://scrapebadger.com/v1/chatgpt/ask"
+description: "Send a prompt to the real chatgpt.com and get the answer as structured JSON, with citations anchored to character offsets in the answer text."
+---
+
+Ask **the real `chatgpt.com`** a question anonymously and get the answer back as
+JSON — plus every web source ChatGPT retrieved, which of those it cited, and
+exactly which span of the answer each citation supports.
+
+Accepts `GET` (query params) or `POST` (JSON body) with identical fields.
+
+**Credits:** 20
+
+<Warning>
+  Typical latency is **21–30 seconds** — this is a live answer, not a cache. Set
+  your client timeout to at least 60 s.
+</Warning>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="prompt" type="string" required>
+  The question to ask. Maximum **4,096 characters**. Each request is standalone
+  — there is no conversation memory, so include all the context you need here.
+</ParamField>
+
+<ParamField query="country" type="string" default="US">
+  ISO-3166 alpha-2 egress country, e.g. `US`, `GB`, `DE`. Changes the localised
+  results ChatGPT retrieves.
+</ParamField>
+
+<ParamField query="web_search" type="string" default="auto">
+  Whether ChatGPT should browse the web. One of:
+
+  - `auto` — let ChatGPT decide (default).
+  - `force` — instruct it to search the web.
+  - `off` — answer from the model's own knowledge only.
+
+  Check `web_search_triggered` in the response for what actually happened.
+</ParamField>
+
+## Response
+
+<ResponseField name="prompt" type="string">Echo of the prompt you sent.</ResponseField>
+<ResponseField name="answer" type="string">The answer as plain text. Citation offsets index into this string.</ResponseField>
+<ResponseField name="answer_markdown" type="string | null">The answer with its original Markdown formatting, when available.</ResponseField>
+
+<ResponseField name="citations" type="Citation[]">
+  The sources ChatGPT actually referenced in the answer.
+
+  <Expandable title="Citation">
+    <ResponseField name="url" type="string | null">Source URL.</ResponseField>
+    <ResponseField name="title" type="string | null">Page title.</ResponseField>
+    <ResponseField name="snippet" type="string | null">Snippet ChatGPT retrieved from the page.</ResponseField>
+    <ResponseField name="domain" type="string | null">Hostname, e.g. `techcrunch.com`.</ResponseField>
+    <ResponseField name="attribution" type="string | null">Publisher/attribution label as shown by ChatGPT.</ResponseField>
+    <ResponseField name="pub_date_utc" type="number | null">Publication date as a Unix timestamp.</ResponseField>
+    <ResponseField name="published_at" type="string | null">Publication date as an ISO-8601 UTC string.</ResponseField>
+    <ResponseField name="start_index" type="integer | null">Character offset in `answer` where the supported span begins.</ResponseField>
+    <ResponseField name="end_index" type="integer | null">Character offset in `answer` where the supported span ends.</ResponseField>
+    <ResponseField name="matched_text" type="string | null">The substring of `answer` this source supports.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="search_results" type="SearchResult[]">
+  The **full** set ChatGPT retrieved — including results it looked at but did
+  not cite. Empty when `web_search_triggered` is `false`.
+
+  <Expandable title="SearchResult">
+    <ResponseField name="url" type="string | null">Result URL.</ResponseField>
+    <ResponseField name="title" type="string | null">Result title.</ResponseField>
+    <ResponseField name="snippet" type="string | null">Retrieved snippet.</ResponseField>
+    <ResponseField name="domain" type="string | null">Hostname.</ResponseField>
+    <ResponseField name="attribution" type="string | null">Publisher/attribution label.</ResponseField>
+    <ResponseField name="pub_date_utc" type="number | null">Publication date as a Unix timestamp.</ResponseField>
+    <ResponseField name="published_at" type="string | null">Publication date as an ISO-8601 UTC string.</ResponseField>
+    <ResponseField name="ref_index" type="integer | null">Index of this result in ChatGPT's own reference list.</ResponseField>
+    <ResponseField name="cited" type="boolean">Whether this result made it into `citations`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="source_domains" type="string[]">Distinct hostnames across the cited sources — a quick view of who ChatGPT trusted.</ResponseField>
+<ResponseField name="web_search_triggered" type="boolean">Whether ChatGPT **actually** browsed the web for this answer.</ResponseField>
+<ResponseField name="reference_tokens" type="string[]">ChatGPT's internal reference markers, e.g. `turn0search1`, `turn0news20`.</ResponseField>
+<ResponseField name="model" type="string | null">Which model answered, e.g. `gpt-5-5`. Reported, not requestable.</ResponseField>
+<ResponseField name="conversation_id" type="string | null">Identifier of the one-shot exchange. Not a handle you can continue from.</ResponseField>
+<ResponseField name="message_id" type="string | null">Identifier of the answer message.</ResponseField>
+<ResponseField name="country" type="string">Echo of the egress country used.</ResponseField>
+<ResponseField name="answer_length" type="integer">Length of `answer` in characters.</ResponseField>
+<ResponseField name="citation_count" type="integer">Number of entries in `citations`.</ResponseField>
+<ResponseField name="latency_ms" type="integer">End-to-end time to produce the answer, in milliseconds.</ResponseField>
+<ResponseField name="created_utc" type="number | null">Answer creation time as a Unix timestamp.</ResponseField>
+<ResponseField name="created_at" type="string | null">Answer creation time as an ISO-8601 UTC string.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/chatgpt/ask?prompt=Which%20companies%20lead%20the%20web%20scraping%20API%20market%3F&country=US&web_search=force" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  --max-time 60
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/chatgpt/ask", {
+  method: "POST",
+  headers: {
+    "X-API-Key": process.env.SCRAPEBADGER_API_KEY,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    prompt: "Which companies lead the web scraping API market?",
+    country: "US",
+    web_search: "force",
+  }),
+  signal: AbortSignal.timeout(60_000),
+});
+const data = await res.json();
+
+for (const c of data.citations) {
+  console.log(`${c.domain} → "${c.matched_text}"`);
+}
+```
+
+```python Python
+import requests
+
+res = requests.post(
+    "https://scrapebadger.com/v1/chatgpt/ask",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    json={
+        "prompt": "Which companies lead the web scraping API market?",
+        "country": "US",
+        "web_search": "force",
+    },
+    timeout=60,
+)
+data = res.json()
+
+for c in data["citations"]:
+    print(c["domain"], "→", data["answer"][c["start_index"]:c["end_index"]])
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "prompt": "Which companies lead the web scraping API market?",
+  "answer": "The web scraping API market in 2026 is led by a handful of infrastructure providers. Bright Data remains the largest by revenue, with a proxy network spanning residential and mobile exits. Oxylabs and Zyte compete directly on enterprise contracts, while newer entrants such as ScrapeBadger and ScrapingBee focus on per-endpoint APIs with predictable credit pricing.",
+  "answer_markdown": "The web scraping API market in 2026 is led by a handful of infrastructure providers. **Bright Data** remains the largest by revenue, with a proxy network spanning residential and mobile exits. **Oxylabs** and **Zyte** compete directly on enterprise contracts, while newer entrants such as **ScrapeBadger** and **ScrapingBee** focus on per-endpoint APIs with predictable credit pricing.",
+  "citations": [
+    {
+      "url": "https://research.example.com/web-scraping-market-2026",
+      "title": "Web Scraping Market Report 2026",
+      "snippet": "Bright Data continues to hold the largest share of the commercial web data market...",
+      "domain": "research.example.com",
+      "attribution": "Example Research",
+      "pub_date_utc": 1751328000.0,
+      "published_at": "2026-07-01T00:00:00Z",
+      "start_index": 103,
+      "end_index": 213,
+      "matched_text": "Bright Data remains the largest by revenue, with a proxy network spanning residential and mobile exits."
+    },
+    {
+      "url": "https://news.example.org/scraping-api-pricing-shakeup",
+      "title": "The scraping API pricing shakeup",
+      "snippet": "Credit-based per-endpoint pricing has become the default for newer vendors...",
+      "domain": "news.example.org",
+      "attribution": "Example News",
+      "pub_date_utc": 1753747200.0,
+      "published_at": "2026-07-29T00:00:00Z",
+      "start_index": 214,
+      "end_index": 366,
+      "matched_text": "Oxylabs and Zyte compete directly on enterprise contracts, while newer entrants such as ScrapeBadger and ScrapingBee focus on per-endpoint APIs with predictable credit pricing."
+    }
+  ],
+  "search_results": [
+    {
+      "url": "https://research.example.com/web-scraping-market-2026",
+      "title": "Web Scraping Market Report 2026",
+      "snippet": "Bright Data continues to hold the largest share of the commercial web data market...",
+      "domain": "research.example.com",
+      "attribution": "Example Research",
+      "pub_date_utc": 1751328000.0,
+      "published_at": "2026-07-01T00:00:00Z",
+      "ref_index": 0,
+      "cited": true
+    },
+    {
+      "url": "https://news.example.org/scraping-api-pricing-shakeup",
+      "title": "The scraping API pricing shakeup",
+      "snippet": "Credit-based per-endpoint pricing has become the default for newer vendors...",
+      "domain": "news.example.org",
+      "attribution": "Example News",
+      "pub_date_utc": 1753747200.0,
+      "published_at": "2026-07-29T00:00:00Z",
+      "ref_index": 1,
+      "cited": true
+    },
+    {
+      "url": "https://forum.example.net/thread/best-scraping-api",
+      "title": "Best scraping API in 2026? — discussion",
+      "snippet": "Long thread comparing per-request costs across eight vendors...",
+      "domain": "forum.example.net",
+      "attribution": null,
+      "pub_date_utc": null,
+      "published_at": null,
+      "ref_index": 2,
+      "cited": false
+    }
+  ],
+  "source_domains": ["research.example.com", "news.example.org"],
+  "web_search_triggered": true,
+  "reference_tokens": ["turn0search0", "turn0news1"],
+  "model": "gpt-5-5",
+  "conversation_id": "6a1f2c9e-3d54-4b17-9f0a-2c7de51b8a44",
+  "message_id": "b03d7f18-5c2a-49e6-8f31-77d1c0a9e512",
+  "country": "US",
+  "answer_length": 366,
+  "citation_count": 2,
+  "latency_ms": 24817,
+  "created_utc": 1754323200.0,
+  "created_at": "2026-08-04T16:00:00Z"
+}
+```
+
+<Note>
+  `search_results` is the full retrieved set; `citations` is the subset that made
+  it into the answer. When `web_search_triggered` is `false`, both are empty and
+  ChatGPT answered from its own knowledge — that is a valid response, not an
+  error.
+</Note>
+
+<Warning>
+  ChatGPT is non-deterministic. The same prompt can return different wording and
+  different sources on each call. For tracking, sample on a schedule and
+  aggregate.
+</Warning>

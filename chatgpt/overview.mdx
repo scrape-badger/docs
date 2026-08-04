@@ -1,0 +1,229 @@
+---
+title: "ChatGPT API Overview"
+description: "Ask the real chatgpt.com a question and get the answer back as structured JSON — with the web sources it cited, anchored to the exact text they support. No OpenAI account or API key required."
+---
+
+## Overview
+
+The ScrapeBadger **ChatGPT API** sends a prompt to **the real `chatgpt.com`** —
+not the OpenAI API — and returns the answer as structured JSON, including the
+web sources ChatGPT actually browsed and cited.
+
+Requests are **anonymous**: no OpenAI account, no OpenAI API key, no billing
+relationship with OpenAI. You see what a logged-out user in your chosen country
+sees.
+
+<Info>
+  All endpoints live under `https://scrapebadger.com/v1/chatgpt/*` and
+  authenticate with the `X-API-Key` header. `/ask` and `/brand-visibility`
+  accept both `GET` (query params) and `POST` (JSON body). Credits are charged
+  per request and reported on the `X-Credits-Used` response header.
+</Info>
+
+<Warning>
+  **Answers take 21–30 seconds.** This is a live browse of chatgpt.com, not a
+  cached lookup — the clock includes ChatGPT composing the answer and, when it
+  browses, running its own web search. Set your HTTP client timeout to **60 s
+  or more**; the default 5–10 s timeout in most SDKs will abort the call.
+</Warning>
+
+## Features
+
+- **Real ChatGPT answers** — the full text as rendered on chatgpt.com, plus a
+  Markdown variant when one is available.
+- **Anchored citations** — every citation carries `start_index` / `end_index`
+  character offsets into `answer` and the `matched_text` it supports, so you can
+  highlight exactly which sentence a source backs.
+- **The full search trail** — `search_results` is everything ChatGPT retrieved,
+  each flagged `cited: true/false`. `citations` is the subset it actually
+  referenced. Most APIs only give you the second list.
+- **Did it really browse?** — `web_search_triggered` tells you whether ChatGPT
+  ran a web search or answered from its own weights. Force it with
+  `web_search=force`, or suppress it with `web_search=off`.
+- **Brand visibility (AEO/GEO) built in** — one call returns mention counts,
+  position score, share of voice against named competitors, and whether your
+  domain was cited. No separate subscription.
+- **Country control** — `country` picks the egress country, so you can compare
+  the answer a user in `DE` gets against the one in `US`.
+
+## Honesty caveat
+
+<Warning>
+  Each request is a **single, fresh, anonymous question**. There is no
+  conversation memory, no multi-turn follow-up, no model selection, no
+  streaming, and no image input — `conversation_id` and `message_id` identify
+  the one-shot exchange, they are not handles you can continue from. The
+  `model` field reports which model answered; it is **not** a request
+  parameter, and `/models` is a read-only catalogue of what chatgpt.com
+  currently offers.
+
+  ChatGPT is non-deterministic: the same prompt asked twice can produce
+  different wording and different sources. For monitoring use cases, sample
+  repeatedly and aggregate rather than trusting a single call.
+</Warning>
+
+## Credits
+
+| Endpoint | Path | Credits |
+| -------- | ---- | ------- |
+| Ask | `GET`/`POST` `/v1/chatgpt/ask` | 20 |
+| Brand visibility | `GET`/`POST` `/v1/chatgpt/brand-visibility` | 25 |
+| List models | `GET /v1/chatgpt/models` | 1 |
+| Health | `GET`/`HEAD` `/v1/chatgpt/health` | 0 |
+
+<Note>
+  At the PAYG rate of $0.15 per 1K credits, an `/ask` call is **$0.003** —
+  **$3.00 per 1,000 answers**. Subscription tiers cut that substantially. Non-2xx
+  responses are never billed.
+</Note>
+
+## Quickstart
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/chatgpt/ask?prompt=What%20are%20the%20best%20web%20scraping%20APIs%20in%202026%3F" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  --max-time 60
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/chatgpt/ask", {
+  method: "POST",
+  headers: {
+    "X-API-Key": process.env.SCRAPEBADGER_API_KEY,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    prompt: "What are the best web scraping APIs in 2026?",
+    country: "US",
+    web_search: "force",
+  }),
+  signal: AbortSignal.timeout(60_000),
+});
+const data = await res.json();
+console.log(data.answer);
+console.log(data.source_domains);
+```
+
+```python Python
+import requests
+
+res = requests.post(
+    "https://scrapebadger.com/v1/chatgpt/ask",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    json={
+        "prompt": "What are the best web scraping APIs in 2026?",
+        "country": "US",
+        "web_search": "force",
+    },
+    timeout=60,
+)
+data = res.json()
+print(data["answer"])
+print(data["source_domains"])
+```
+
+</CodeGroup>
+
+## What you can build
+
+<CardGroup cols={2}>
+  <Card title="AEO / GEO monitoring" icon="chart-line">
+    Track whether ChatGPT names your brand for the prompts your buyers ask, how
+    early it names you, and how you rank against competitors — with
+    [`/brand-visibility`](/api-reference/endpoint/chatgpt/brand-visibility).
+  </Card>
+  <Card title="Citation-source auditing" icon="link">
+    Find which domains ChatGPT trusts for a topic. `search_results` shows
+    everything it retrieved; `cited` shows what survived into the answer.
+  </Card>
+  <Card title="Answer-quality research" icon="magnifying-glass">
+    Compare answers across countries, or with `web_search` forced on and off, to
+    separate what ChatGPT knows from what it looked up.
+  </Card>
+  <Card title="Grounded content pipelines" icon="quote-left">
+    Use `start_index` / `end_index` to attach a real source to each claim before
+    republishing anything ChatGPT wrote.
+  </Card>
+</CardGroup>
+
+## How we compare
+
+| Vendor | Price / 1K | Citations | Full search trail | Brand analysis |
+| ------ | ---------- | --------- | ----------------- | -------------- |
+| Bright Data | $1.50 | Yes | No | No |
+| Apify `chatgpt-search` | $3.00 | Yes | No | No |
+| DataForSEO LLM Scraper | $1.20–4.00 | Yes | Yes | Separate product |
+| Scrapingdog | ~30 credits/req | **No** | No | No |
+| ScrapingBee | Credits | **No** | No | No |
+| **ScrapeBadger** | **$3.00** (20 cr) | **Yes + text offsets** | **Yes** | **Bundled** |
+
+Five things that are genuinely ours:
+
+1. **Citations anchored to the answer.** `start_index` / `end_index` /
+   `matched_text` tell you *which sentence* a source supports. No other vendor
+   returns text offsets.
+2. **`web_search_triggered`.** Only Bright Data otherwise tells you whether
+   ChatGPT really browsed — everyone else leaves you guessing whether a
+   citation-free answer came from memory or a failed search.
+3. **`search_results` vs `citations`.** The retrieved set *and* the referenced
+   subset. Only DataForSEO separates these.
+4. **Brand visibility in the same API.** Profound, Otterly, Peec and AthenaHQ
+   sell this as a $99–989/month subscription. Here it is a 25-credit call.
+5. **Published sub-30 s live latency.** DataForSEO's live tier quotes a 90 s
+   SLA.
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is this the OpenAI API?">
+    No. This drives the public `chatgpt.com` web interface as an anonymous
+    visitor. You do not need an OpenAI account, an OpenAI API key, or an OpenAI
+    subscription — and answers include web citations, which the OpenAI
+    completions API does not return.
+  </Accordion>
+  <Accordion title="Why does a call take 21–30 seconds?">
+    Because a real answer is being generated, and when ChatGPT browses it runs
+    its own web search first. Budget a 60 s client timeout and run calls
+    concurrently rather than in a tight sequence.
+  </Accordion>
+  <Accordion title="Can I continue a conversation or ask a follow-up?">
+    No. Every request is a fresh, standalone question with no memory of previous
+    calls. Put all necessary context in the single `prompt` (up to 4,096
+    characters).
+  </Accordion>
+  <Accordion title="Can I choose which model answers?">
+    No. `/models` lists the model slugs chatgpt.com currently exposes, and the
+    `model` field in a response reports which one answered — but you cannot
+    request a specific one.
+  </Accordion>
+  <Accordion title="I got an answer with no citations. Is that a bug?">
+    Check `web_search_triggered`. If it is `false`, ChatGPT answered from its
+    training data and there were no sources to cite — that is normal for
+    general-knowledge prompts. Set `web_search=force` if you always want it to
+    browse.
+  </Accordion>
+  <Accordion title="Will the same prompt always give the same answer?">
+    No. ChatGPT is non-deterministic, and the live web changes. For tracking,
+    sample the same prompt on a schedule and look at the trend, not a single
+    result.
+  </Accordion>
+  <Accordion title="Does country change the answer?">
+    It changes the egress country of the request, which affects the localised
+    results ChatGPT retrieves and can change the answer's emphasis and language.
+    Pass any ISO-3166 alpha-2 code; the default is `US`.
+  </Accordion>
+  <Accordion title="What happens if a request fails?">
+    You get `{"detail": {"code": ..., "message": ...}}` with an HTTP status of
+    422, 429 or 502 depending on the cause. **Non-2xx responses are never
+    billed**, so a retry costs you nothing extra beyond the successful call.
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+  Start with [`/ask`](/api-reference/endpoint/chatgpt/ask) to see the shape of a
+  real answer, then move to
+  [`/brand-visibility`](/api-reference/endpoint/chatgpt/brand-visibility) once
+  you know which prompts matter for your market.
+</Tip>

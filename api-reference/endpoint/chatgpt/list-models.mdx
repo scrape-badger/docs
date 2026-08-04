@@ -1,0 +1,127 @@
+---
+title: "List Models"
+api: "GET https://scrapebadger.com/v1/chatgpt/models"
+description: "Read the catalogue of models chatgpt.com currently exposes, with slugs, descriptions, token limits and tags."
+---
+
+Return the model catalogue `chatgpt.com` currently advertises. Useful for
+interpreting the `model` field on an
+[`/ask`](/api-reference/endpoint/chatgpt/ask) response and for tracking when
+OpenAI rotates its lineup.
+
+**Credits:** 1
+
+<Warning>
+  This is a **read-only catalogue**. You cannot select a model for `/ask` or
+  `/brand-visibility` — the `model` field in those responses reports which model
+  answered, it is not a request parameter.
+</Warning>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="country" type="string" default="US">
+  ISO-3166 alpha-2 egress country. The advertised lineup can differ by market.
+</ParamField>
+
+## Response
+
+<ResponseField name="models" type="Model[]">
+  The models chatgpt.com currently lists.
+
+  <Expandable title="Model">
+    <ResponseField name="slug" type="string">Model identifier, e.g. `gpt-5-5`. Matches the `model` field on an answer.</ResponseField>
+    <ResponseField name="title" type="string">Human-readable name as shown in the ChatGPT model picker.</ResponseField>
+    <ResponseField name="description" type="string">Short description of what the model is for.</ResponseField>
+    <ResponseField name="max_tokens" type="integer">Context limit advertised for the model.</ResponseField>
+    <ResponseField name="tags" type="string[]">Labels ChatGPT attaches to the model, e.g. `default`, `reasoning`.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="count" type="integer">Number of entries in `models`.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/chatgpt/models?country=US" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/chatgpt/models?" +
+    new URLSearchParams({ country: "US" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+console.log(data.models.map((m) => m.slug));
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/chatgpt/models",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"country": "US"},
+)
+data = res.json()
+print([m["slug"] for m in data["models"]])
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "models": [
+    {
+      "slug": "auto",
+      "title": "Auto",
+      "description": "Picks the best model for the question.",
+      "max_tokens": 32000,
+      "tags": ["default"]
+    },
+    {
+      "slug": "gpt-5-5",
+      "title": "GPT-5.5",
+      "description": "Great for most questions.",
+      "max_tokens": 32000,
+      "tags": []
+    },
+    {
+      "slug": "gpt-5-5-mini",
+      "title": "GPT-5.5 mini",
+      "description": "Faster responses for everyday tasks.",
+      "max_tokens": 32000,
+      "tags": []
+    },
+    {
+      "slug": "gpt-5-3",
+      "title": "GPT-5.3",
+      "description": "Previous generation model.",
+      "max_tokens": 32000,
+      "tags": ["legacy"]
+    },
+    {
+      "slug": "gpt-5-3-mini",
+      "title": "GPT-5.3 mini",
+      "description": "Previous generation, faster variant.",
+      "max_tokens": 32000,
+      "tags": ["legacy"]
+    }
+  ],
+  "count": 5
+}
+```
+
+<Note>
+  The lineup changes whenever OpenAI ships or retires a model. Slugs seen live
+  at the time of writing: `auto`, `gpt-5-5`, `gpt-5-5-mini`, `gpt-5-3`,
+  `gpt-5-3-mini`. Read the catalogue rather than hard-coding slugs.
+</Note>

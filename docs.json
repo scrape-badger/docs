@@ -956,6 +956,35 @@
         ]
       },
       {
+        "tab": "ChatGPT",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "chatgpt/overview"
+            ]
+          },
+          {
+            "group": "Ask",
+            "pages": [
+              "api-reference/endpoint/chatgpt/ask"
+            ]
+          },
+          {
+            "group": "Brand Visibility",
+            "pages": [
+              "api-reference/endpoint/chatgpt/brand-visibility"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api-reference/endpoint/chatgpt/list-models"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "MCP Server",
         "groups": [
           {
