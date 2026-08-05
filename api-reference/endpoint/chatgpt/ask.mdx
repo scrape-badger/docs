@@ -87,7 +87,7 @@ Accepts `GET` (query params) or `POST` (JSON body) with identical fields.
 
 <ResponseField name="source_domains" type="string[]">Distinct hostnames across the cited sources — a quick view of who ChatGPT trusted.</ResponseField>
 <ResponseField name="web_search_triggered" type="boolean">Whether ChatGPT **actually** browsed the web for this answer.</ResponseField>
-<ResponseField name="reference_tokens" type="string[]">ChatGPT's internal reference markers, e.g. `turn0search1`, `turn0news20`.</ResponseField>
+<ResponseField name="search_queries" type="string[]">ChatGPT's internal reference markers, e.g. `turn0search1`, `turn0news20`.</ResponseField>
 <ResponseField name="model" type="string | null">Which model answered, e.g. `gpt-5-5`. Reported, not requestable.</ResponseField>
 <ResponseField name="conversation_id" type="string | null">Identifier of the one-shot exchange. Not a handle you can continue from.</ResponseField>
 <ResponseField name="message_id" type="string | null">Identifier of the answer message.</ResponseField>
@@ -218,7 +218,7 @@ for c in data["citations"]:
   ],
   "source_domains": ["research.example.com", "news.example.org"],
   "web_search_triggered": true,
-  "reference_tokens": ["turn0search0", "turn0news1"],
+  "search_queries": ["turn0search0", "turn0news1"],
   "model": "gpt-5-5",
   "conversation_id": "6a1f2c9e-3d54-4b17-9f0a-2c7de51b8a44",
   "message_id": "b03d7f18-5c2a-49e6-8f31-77d1c0a9e512",
