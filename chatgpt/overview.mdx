@@ -21,7 +21,7 @@ sees.
 </Info>
 
 <Warning>
-  **Answers take 21–30 seconds.** This is a live browse of chatgpt.com, not a
+  **Answers take 20-25s ungrounded, 30-70s with web search.** This is a live browse of chatgpt.com, not a
   cached lookup — the clock includes ChatGPT composing the answer and, when it
   browses, running its own web search. Set your HTTP client timeout to **60 s
   or more**; the default 5–10 s timeout in most SDKs will abort the call.
@@ -171,7 +171,7 @@ Five things that are genuinely ours:
    subset. Only DataForSEO separates these.
 4. **Brand visibility in the same API.** Profound, Otterly, Peec and AthenaHQ
    sell this as a $99–989/month subscription. Here it is a 25-credit call.
-5. **Published sub-30 s live latency.** DataForSEO's live tier quotes a 90 s
+5. **Published typically under 30s ungrounded live latency.** DataForSEO's live tier quotes a 90 s
    SLA.
 
 ## FAQ
@@ -183,7 +183,7 @@ Five things that are genuinely ours:
     subscription — and answers include web citations, which the OpenAI
     completions API does not return.
   </Accordion>
-  <Accordion title="Why does a call take 21–30 seconds?">
+  <Accordion title="Why does a call take 20-25s ungrounded, 30-70s with web search?">
     Because a real answer is being generated, and when ChatGPT browses it runs
     its own web search first. Budget a 60 s client timeout and run calls
     concurrently rather than in a tight sequence.
