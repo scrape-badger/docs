@@ -616,6 +616,29 @@
         ]
       },
       {
+        "tab": "Apartments.com",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "apartments/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/apartments/search-listings"
+            ]
+          },
+          {
+            "group": "Properties",
+            "pages": [
+              "api-reference/endpoint/apartments/get-property"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Realtor",
         "groups": [
           {

@@ -1,0 +1,136 @@
+---
+title: "Apartments.com Scraper Overview"
+description: "Scrape apartments.com US rental listings as structured JSON — search by location with bed and price filters, plus unit-level pricing: every rentable unit's rent, beds, baths, square footage and availability date."
+---
+
+# Apartments.com Scraper API
+
+Search **US rental listings** and pull **unit-level inventory** — not just a property's advertised range, but every individual rentable unit with its own rent, beds, baths, square footage and availability date. Authentication and anti-bot bypass are handled automatically.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="Unit-Level Pricing" icon="key">
+    Every rentable unit with its **own rent**, beds, baths, sqft and availability date — not just the property's advertised range.
+  </Card>
+  <Card title="Floor Plans" icon="ruler-combined">
+    Each floor-plan model with its price range, bed/bath count, square footage and the units belonging to it.
+  </Card>
+  <Card title="Location Search" icon="magnifying-glass">
+    40 property cards a page, filterable by bedroom count and price. Pages `1`-`28`.
+  </Card>
+  <Card title="Property Detail" icon="building">
+    Name, full address with city/state/ZIP, geo coordinates, phone, amenities, office hours and photo gallery.
+  </Card>
+  <Card title="No JS Rendering" icon="bolt">
+    apartments.com is fully server-rendered, so responses come back in **~2 seconds** with no browser in the path.
+  </Card>
+  <Card title="Anti-Bot Bypass" icon="shield-halved">
+    apartments.com sits behind Akamai Bot Manager. ScrapeBadger clears it automatically — no proxies or CAPTCHAs to manage.
+  </Card>
+</CardGroup>
+
+<Warning>
+  **Use `rent`, not `max_term_rent`.** Each unit carries both. `rent` is the advertised price the site shows a renter. `max_term_rent` is apartments.com's raw `data-maxrent` attribute, which measures roughly **twice** the advertised rent and appears to be an upper bound across lease terms. It is exposed unparsed for completeness — do not treat it as the rent.
+</Warning>
+
+## Coverage
+
+Single market: **apartments.com** (US, USD, en-US).
+
+## Endpoints
+
+| Endpoint | Description | Credits |
+|---|---|---|
+| [`GET /v1/apartments/search`](/api-reference/endpoint/apartments/search-listings) | Search rentals by location, 40 cards a page | 5 |
+| [`GET /v1/apartments/property`](/api-reference/endpoint/apartments/get-property) | One property with floor plans and per-unit inventory | 5 |
+| `GET /v1/apartments/properties/{slug}/{property_id}` | The same detail, addressed by parts | 5 |
+
+## Search Filters
+
+Every filter below was verified against live result counts. Measured on `kansas-city-mo` (700 properties unfiltered):
+
+| Filter | Result count |
+|---|---|
+| *(none)* | 700 |
+| `beds=0` (studios) | 145 |
+| `beds=1` | 374 |
+| `beds=2` | 490 |
+| `max_price=1500` | 646 |
+| `min_price=1000&max_price=1500` | 546 |
+| `beds=1&max_price=1500` | 320 |
+
+<Note>
+  apartments.com also renders a pet filter, but it returns the **unfiltered** total, so it is deliberately not exposed — a filter that silently does nothing is worse than no filter.
+</Note>
+
+## Quickstart
+
+<CodeGroup>
+```bash cURL
+# Search
+curl -H "X-API-Key: YOUR_KEY" \
+  "https://scrapebadger.com/v1/apartments/search?location=kansas-city-mo&beds=1"
+
+# Property detail with per-unit pricing
+curl -H "X-API-Key: YOUR_KEY" \
+  "https://scrapebadger.com/v1/apartments/property?url=https%3A%2F%2Fwww.apartments.com%2Furbane-kansas-city-mo%2Fwcd6e5k%2F"
+```
+
+```python Python
+from scrapebadger import ScrapeBadger
+
+async with ScrapeBadger(api_key="YOUR_KEY") as client:
+    page = await client.apartments.search("kansas-city-mo", beds=1, max_price=1500)
+    print(f"{page.total_results} rentals")
+
+    prop = await client.apartments.get_property(page.results[0].url)
+    for unit in prop.units:
+        print(unit.unit_number, unit.rent, unit.beds, unit.sqft, unit.available_text)
+```
+
+```typescript Node.js
+import { ScrapeBadger } from "@scrapebadger/sdk";
+
+const client = new ScrapeBadger({ apiKey: "YOUR_KEY" });
+
+const page = await client.apartments.search("kansas-city-mo", { beds: 1, maxPrice: 1500 });
+const prop = await client.apartments.getProperty(page.results[0].url!);
+for (const unit of prop.units) {
+  console.log(unit.unit_number, unit.rent, unit.available_text);
+}
+```
+
+```bash CLI
+scrapebadger apartments search kansas-city-mo --beds 1 --max-price 1500 -o table
+scrapebadger apartments units "https://www.apartments.com/urbane-kansas-city-mo/wcd6e5k/" -o table
+```
+</CodeGroup>
+
+## Finding a location slug
+
+`location` is the slug apartments.com uses in its own URLs — the segment right after the domain.
+
+| Place | Slug |
+|---|---|
+| Kansas City, MO | `kansas-city-mo` |
+| New York, NY | `new-york-ny` |
+| Austin, TX | `austin-tx` |
+| A ZIP code | `64108` |
+
+## Notes on the data
+
+<AccordionGroup>
+  <Accordion title="Availability is text, not a date">
+    `available_text` is verbatim as rendered — `"Now"`, `"Sep 3"`. The site prints no year, so converting it to a timestamp would mean guessing the rollover. It is left as text deliberately.
+  </Accordion>
+  <Accordion title="Some properties list plans without units">
+    A floor plan with `units_available: 0` and valid beds/baths/rent/sqft is the site's own layout for that property, not missing data. Those properties advertise plans rather than individual units.
+  </Accordion>
+  <Accordion title="Search cards are summaries">
+    A search card carries a rent/bed **rollup** (`"1 Bed"`, `"$1,559+"`), not per-unit inventory. Pass the card's `url` to the property endpoint for units.
+  </Accordion>
+  <Accordion title="Do not use render_js on apartments.com">
+    If you scrape apartments.com through the general [Web Scraping API](/web-scraping/overview) instead of this one, do **not** pass `render_js: true`. The whole page is server-rendered, so JS rendering only forces the slow browser path — 100+ seconds per page, which can exceed the CDN timeout and return a `524`.
+  </Accordion>
+</AccordionGroup>

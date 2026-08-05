@@ -1,0 +1,84 @@
+---
+title: "Search Listings"
+openapi: "GET /v1/apartments/search"
+description: "Search apartments.com rental listings by location, with bedroom and price filters. Returns up to 40 property cards per page."
+---
+
+## Query Parameters
+
+<ParamField query="location" type="string" required>
+  The apartments.com location slug — the segment right after the domain in the site's own URLs. E.g. `kansas-city-mo`, `new-york-ny`, `austin-tx`, or a ZIP like `64108`.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  Page number, `1`-`28`. Each page holds up to 40 property cards.
+</ParamField>
+
+<ParamField query="beds" type="integer">
+  Bedroom count: `0` for studios, `1` to `4` for bedroom counts.
+</ParamField>
+
+<ParamField query="min_price" type="integer">
+  Minimum monthly rent in USD (`100`-`20000`). Combine with `max_price` for a range.
+</ParamField>
+
+<ParamField query="max_price" type="integer">
+  Maximum monthly rent in USD (`100`-`20000`).
+</ParamField>
+
+## Response
+
+<ResponseField name="location" type="string">The location slug that was searched.</ResponseField>
+<ResponseField name="url" type="string">The apartments.com URL that was fetched.</ResponseField>
+<ResponseField name="page" type="integer">Current page number.</ResponseField>
+<ResponseField name="total_pages" type="integer">Total pages available for this query (nullable).</ResponseField>
+<ResponseField name="total_results" type="integer">Total matching properties as apartments.com reports them (nullable).</ResponseField>
+<ResponseField name="results_on_page" type="integer">Number of cards on this page (up to 40).</ResponseField>
+
+<ResponseField name="results" type="array">
+  The property cards.
+
+  <Expandable title="SearchResult object">
+    <ResponseField name="property_id" type="string">apartments.com listing key, e.g. `tbnk7t8` (nullable).</ResponseField>
+    <ResponseField name="url" type="string">Full property URL — pass this to the property endpoint for per-unit pricing (nullable).</ResponseField>
+    <ResponseField name="name" type="string">Property name (nullable).</ResponseField>
+    <ResponseField name="address" type="string">Full address as displayed (nullable).</ResponseField>
+    <ResponseField name="street_address" type="string">Street line only (nullable).</ResponseField>
+    <ResponseField name="country_code" type="string">ISO country code, always `US` (nullable).</ResponseField>
+    <ResponseField name="phone" type="string">Leasing phone number (nullable).</ResponseField>
+    <ResponseField name="pricing" type="array">Rent/bed rollup rows as rendered, e.g. `[{"beds": "1 Bed", "price": "$1,559+"}]`. Kept as text because a card shows ranges and `+` qualifiers, not a single resolvable number.</ResponseField>
+    <ResponseField name="rent_min" type="integer">Lowest price parsed out of the rollup (nullable).</ResponseField>
+    <ResponseField name="beds_text" type="string">First rollup row's bed label (nullable).</ResponseField>
+    <ResponseField name="amenities" type="array">Amenity labels shown on the card.</ResponseField>
+    <ResponseField name="is_featured" type="boolean">Whether apartments.com flagged the card as a featured/promoted unit.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<Note>
+  A card is a **summary**. For per-unit rent, beds, baths, square footage and availability, pass its `url` to [Get Property](/api-reference/endpoint/apartments/get-property).
+</Note>
+
+## Filter behaviour
+
+Filters are applied by apartments.com itself. Measured against live result counts on `kansas-city-mo` (700 unfiltered): `beds=1` → 374, `beds=2` → 490, `beds=0` → 145, `max_price=1500` → 646, `beds=1&max_price=1500` → 320.
+
+## Example
+
+<CodeGroup>
+```bash cURL
+curl -H "X-API-Key: YOUR_KEY" \
+  "https://scrapebadger.com/v1/apartments/search?location=kansas-city-mo&beds=1&max_price=1500"
+```
+
+```python Python
+page = await client.apartments.search("kansas-city-mo", beds=1, max_price=1500)
+for card in page.results:
+    print(card.name, card.address, card.pricing)
+```
+
+```typescript Node.js
+const page = await client.apartments.search("kansas-city-mo", { beds: 1, maxPrice: 1500 });
+```
+</CodeGroup>
+
+**Cost:** 5 credits per page.

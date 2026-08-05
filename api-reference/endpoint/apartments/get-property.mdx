@@ -1,0 +1,112 @@
+---
+title: "Get Property"
+openapi: "GET /v1/apartments/property"
+description: "Full detail for one apartments.com property — floor plans, per-unit rent, beds, baths, square footage, availability, amenities, photos and office hours."
+---
+
+## Query Parameters
+
+<ParamField query="url" type="string" required>
+  Full apartments.com property URL, e.g. `https://www.apartments.com/urbane-kansas-city-mo/wcd6e5k/`. You can take this straight from a search result's `url`.
+</ParamField>
+
+<Tip>
+  There is also `GET /v1/apartments/properties/{slug}/{property_id}` if you would rather address the property by its parts — `slug` being the SEO segment (`urbane-kansas-city-mo`) and `property_id` the 7-character listing key (`wcd6e5k`).
+</Tip>
+
+## Response
+
+<ResponseField name="property_id" type="string">apartments.com listing key (nullable).</ResponseField>
+<ResponseField name="url" type="string">The property URL that was fetched.</ResponseField>
+<ResponseField name="name" type="string">Property name (nullable).</ResponseField>
+<ResponseField name="address_line" type="string">Full address as rendered (nullable).</ResponseField>
+<ResponseField name="city" type="string">City (nullable).</ResponseField>
+<ResponseField name="state" type="string">Two-letter state code (nullable).</ResponseField>
+<ResponseField name="postal_code" type="string">ZIP code (nullable).</ResponseField>
+<ResponseField name="neighborhood" type="string">Neighborhood, when the property lists one (nullable).</ResponseField>
+<ResponseField name="latitude" type="number">Latitude (nullable).</ResponseField>
+<ResponseField name="longitude" type="number">Longitude (nullable).</ResponseField>
+<ResponseField name="phone" type="string">Leasing phone number (nullable).</ResponseField>
+<ResponseField name="rent_range_text" type="string">Advertised range as rendered, e.g. `$1,288 - $5,412` (nullable).</ResponseField>
+<ResponseField name="rent_min" type="integer">Low end of the advertised range (nullable).</ResponseField>
+<ResponseField name="rent_max" type="integer">High end of the advertised range (nullable).</ResponseField>
+<ResponseField name="beds_text" type="string">Advertised bed range, e.g. `1 - 3 bd` (nullable).</ResponseField>
+<ResponseField name="description" type="string">Property description (nullable).</ResponseField>
+<ResponseField name="amenities" type="array">Amenity labels, deduplicated.</ResponseField>
+<ResponseField name="office_hours" type="array">Leasing-office hours as rendered.</ResponseField>
+<ResponseField name="photos" type="array">Gallery image URLs.</ResponseField>
+<ResponseField name="total_units_available" type="integer">Count of individually-listed units across all floor plans.</ResponseField>
+
+<ResponseField name="floor_plans" type="array">
+  Floor-plan models.
+
+  <Expandable title="FloorPlan object">
+    <ResponseField name="name" type="string">Plan name, e.g. `Axis` (nullable).</ResponseField>
+    <ResponseField name="model_key" type="string">Site-internal model key (nullable).</ResponseField>
+    <ResponseField name="rental_key" type="string">Site-internal rental key (nullable).</ResponseField>
+    <ResponseField name="beds" type="number">Bedrooms — `0.0` for a studio (nullable).</ResponseField>
+    <ResponseField name="baths" type="number">Bathrooms (nullable).</ResponseField>
+    <ResponseField name="price_text" type="string">Price as rendered, e.g. `Starting at $1,288` (nullable).</ResponseField>
+    <ResponseField name="rent_min" type="integer">Low end for this plan (nullable).</ResponseField>
+    <ResponseField name="rent_max" type="integer">High end for this plan (nullable).</ResponseField>
+    <ResponseField name="summary_text" type="string">The plan header verbatim — mixed content, not just size (nullable).</ResponseField>
+    <ResponseField name="sqft_min" type="integer">Smallest square footage for this plan (nullable).</ResponseField>
+    <ResponseField name="sqft_max" type="integer">Largest square footage for this plan (nullable).</ResponseField>
+    <ResponseField name="units" type="array">The individually-listed units for this plan.</ResponseField>
+    <ResponseField name="units_available" type="integer">Count of units on this plan. `0` is normal on properties that advertise plans rather than individual units.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="units" type="array">
+  Every unit across every floor plan, flattened — usually the shape you want.
+
+  <Expandable title="Unit object">
+    <ResponseField name="unit_number" type="string">Unit label, e.g. `8625-2231` (nullable).</ResponseField>
+    <ResponseField name="unit_key" type="string">Site-internal unit key (nullable).</ResponseField>
+    <ResponseField name="rental_key" type="string">Site-internal rental key (nullable).</ResponseField>
+    <ResponseField name="model_key" type="string">The floor plan this unit belongs to (nullable).</ResponseField>
+    <ResponseField name="beds" type="number">Bedrooms — `0.0` for a studio (nullable).</ResponseField>
+    <ResponseField name="baths" type="number">Bathrooms (nullable).</ResponseField>
+    <ResponseField name="rent" type="integer">**The advertised monthly rent.** Use this one (nullable).</ResponseField>
+    <ResponseField name="rent_price_text" type="string">The price column verbatim, so you can see qualifiers we did not parse (nullable).</ResponseField>
+    <ResponseField name="max_term_rent" type="integer">Raw `data-maxrent` from the site — roughly **2x** the advertised rent, apparently an upper bound across lease terms. Exposed unparsed; **do not use it as the rent** (nullable).</ResponseField>
+    <ResponseField name="currency" type="string">Always `USD`.</ResponseField>
+    <ResponseField name="sqft" type="integer">Square footage (nullable).</ResponseField>
+    <ResponseField name="available_text" type="string">Availability verbatim — `Now`, `Sep 3`. No year is rendered, so this is deliberately not a date (nullable).</ResponseField>
+    <ResponseField name="model_name" type="string">Floor-plan name for this unit (nullable).</ResponseField>
+    <ResponseField name="photo_count" type="integer">Photos attached to this unit.</ResponseField>
+    <ResponseField name="video_count" type="integer">Videos attached to this unit.</ResponseField>
+    <ResponseField name="floorplan_count" type="integer">Floor-plan images attached to this unit.</ResponseField>
+    <ResponseField name="virtual_tour_count" type="integer">Virtual tours attached to this unit.</ResponseField>
+    <ResponseField name="apply_now_url" type="string">Direct application URL, when the property offers one (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<Warning>
+  **`rent` vs `max_term_rent`.** Both are on every unit. On a model advertised "Starting at $1,288", the units rendered `$1,298` while `data-maxrent` read `2876` — roughly double. `rent` is the advertised price; `max_term_rent` is the raw attribute, exposed for completeness only.
+</Warning>
+
+## Example
+
+<CodeGroup>
+```bash cURL
+curl -H "X-API-Key: YOUR_KEY" \
+  "https://scrapebadger.com/v1/apartments/property?url=https%3A%2F%2Fwww.apartments.com%2Furbane-kansas-city-mo%2Fwcd6e5k%2F"
+```
+
+```python Python
+prop = await client.apartments.get_property(
+    "https://www.apartments.com/urbane-kansas-city-mo/wcd6e5k/"
+)
+for unit in prop.units:
+    print(unit.unit_number, unit.rent, unit.beds, unit.sqft, unit.available_text)
+```
+
+```typescript Node.js
+const prop = await client.apartments.getProperty(
+  "https://www.apartments.com/urbane-kansas-city-mo/wcd6e5k/",
+);
+```
+</CodeGroup>
+
+**Cost:** 5 credits.
