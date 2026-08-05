@@ -25,6 +25,9 @@ Search **US rental listings** and pull **unit-level inventory** — not just a p
   <Card title="No JS Rendering" icon="bolt">
     apartments.com is fully server-rendered, so responses come back in **~2 seconds** with no browser in the path.
   </Card>
+  <Card title="School Data" icon="graduation-cap">
+    GreatSchools ratings, grade ranges, enrollment and whether the property is in each school's **attendance zone**.
+  </Card>
   <Card title="Anti-Bot Bypass" icon="shield-halved">
     apartments.com sits behind Akamai Bot Manager. ScrapeBadger clears it automatically — no proxies or CAPTCHAs to manage.
   </Card>
@@ -126,6 +129,9 @@ scrapebadger apartments units "https://www.apartments.com/urbane-kansas-city-mo/
   </Accordion>
   <Accordion title="Some properties list plans without units">
     A floor plan with `units_available: 0` and valid beds/baths/rent/sqft is the site's own layout for that property, not missing data. Those properties advertise plans rather than individual units.
+  </Accordion>
+  <Accordion title="A school rating of null means unrated, not zero">
+    `rating` is the GreatSchools score out of 10. apartments.com renders **no badge** for schools it has no rating for, so those come back as `null`. They are never `0` — a 0 would mean "rated zero", which is a different and much worse claim about a school.
   </Accordion>
   <Accordion title="Search cards are summaries">
     A search card carries a rent/bed **rollup** (`"1 Bed"`, `"$1,559+"`), not per-unit inventory. Pass the card's `url` to the property endpoint for units.

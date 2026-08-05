@@ -37,6 +37,26 @@ description: "Full detail for one apartments.com property — floor plans, per-u
 <ResponseField name="photos" type="array">Gallery image URLs.</ResponseField>
 <ResponseField name="total_units_available" type="integer">Count of individually-listed units across all floor plans.</ResponseField>
 
+<ResponseField name="schools" type="array">
+  Schools from the property's Schools section, as provided by GreatSchools.
+
+  <Expandable title="School object">
+    <ResponseField name="name" type="string">School name (nullable).</ResponseField>
+    <ResponseField name="type_text" type="string">Type as rendered, e.g. `Public Elementary School` (nullable).</ResponseField>
+    <ResponseField name="is_private" type="boolean">Whether the school sits under the page's Private Schools tab.</ResponseField>
+    <ResponseField name="grades" type="string">Grade range, e.g. `PK-5`, `9-12` (nullable).</ResponseField>
+    <ResponseField name="student_count" type="integer">Enrolled students (nullable).</ResponseField>
+    <ResponseField name="proximity" type="string">`Attendance Zone` (the property is zoned for this school) or `Nearby` (nullable).</ResponseField>
+    <ResponseField name="rating" type="integer">GreatSchools rating out of 10. **`null` means the school is unrated** — apartments.com renders no badge for those. It is never `0`.</ResponseField>
+    <ResponseField name="rating_scale" type="integer">Always `10`.</ResponseField>
+    <ResponseField name="url" type="string">apartments.com's page for the school (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<Note>
+  The Schools section also lists nearby colleges and universities. Those are **not** returned as schools — they carry a drive time rather than a grade range.
+</Note>
+
 <ResponseField name="floor_plans" type="array">
   Floor-plan models.
 
