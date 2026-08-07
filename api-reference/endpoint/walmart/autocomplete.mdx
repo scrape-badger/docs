@@ -1,0 +1,111 @@
+---
+title: "Autocomplete"
+api: "GET https://scrapebadger.com/v1/walmart/autocomplete"
+description: "Walmart search-box suggestions for a partial term, with the department each one belongs to."
+---
+
+Expand a partial search term into Walmart's own search-box suggestions, each
+tagged with the department it belongs to. Backed by Walmart's typeahead
+service — the cheapest call in this API.
+
+**Credits:** 1
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Partial search term, e.g. `lapt`.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="result_count" type="integer">Number of suggestions.</ResponseField>
+<ResponseField name="suggestions" type="Suggestion[]">
+  Suggestions.
+
+  <Expandable title="Suggestion">
+    <ResponseField name="query" type="string">The suggested search term — feed straight into `/search`.</ResponseField>
+    <ResponseField name="type" type="string">e.g. `QUERY`.</ResponseField>
+    <ResponseField name="image_url" type="string" />
+    <ResponseField name="url" type="string">Full walmart.com search URL for the suggestion.</ResponseField>
+    <ResponseField name="department_id" type="string">e.g. `3944` — usable as a `/category` path segment.</ResponseField>
+    <ResponseField name="department_name" type="string">e.g. `Electronics`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/walmart/autocomplete?query=lapt" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/walmart/autocomplete?" +
+    new URLSearchParams({ query: "lapt" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/walmart/autocomplete",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "lapt"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "lapt",
+  "result_count": 8,
+  "suggestions": [
+    {
+      "query": "laptop",
+      "type": "QUERY",
+      "image_url": "https://i5.walmartimages.com/asr/82b98986-afdd-40c3-a2d5-b0355110c65d.jpeg",
+      "url": "https://www.walmart.com/search?query=laptop&typeahead=laptop",
+      "department_id": "3944",
+      "department_name": "Electronics"
+    },
+    {
+      "query": "laptop computers under $200",
+      "type": "QUERY",
+      "image_url": "https://i5.walmartimages.com/asr/043886ec-7727-46d0-aa46-432fb2e614b3.jpeg",
+      "url": "https://www.walmart.com/search?query=laptop%20computers%20under%20%24200&typeahead=laptop",
+      "department_id": "3944",
+      "department_name": "Electronics"
+    },
+    {
+      "query": "laptop resold",
+      "type": "QUERY",
+      "image_url": "https://i5.walmartimages.com/dfw/63fd9f59-d78b/glass_icon.png",
+      "url": "https://www.walmart.com/search?query=laptop%20resold&typeahead=laptop",
+      "department_id": null,
+      "department_name": null
+    }
+  ]
+}
+```
+
+<Tip>
+  Because [`/search`](/api-reference/endpoint/walmart/search) hits a hard
+  page-10 wall, fanning one term out into several suggested queries and merging
+  the results on `us_item_id` buys wider coverage than paging deeper — at 1
+  credit per expansion.
+</Tip>

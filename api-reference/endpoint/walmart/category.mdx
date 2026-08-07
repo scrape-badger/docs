@@ -1,0 +1,125 @@
+---
+title: "Browse a Category"
+api: "GET https://scrapebadger.com/v1/walmart/category"
+description: "Browse any walmart.com category or department path — same result shape as search."
+---
+
+Browse a Walmart category by its browse path. Returns the same
+`SearchResponse` shape as
+[`/search`](/api-reference/endpoint/walmart/search).
+
+**Credits:** 5
+
+<Warning>
+  **No `sort` parameter.** Walmart's browse pages ignore it — sorted and
+  unsorted requests returned 34/38 identical item ids with identical leading
+  results, and Walmart does not echo the parameter back. Sort on
+  [`/search`](/api-reference/endpoint/walmart/search) instead.
+</Warning>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="path" type="string" required>
+  Walmart browse path, e.g. `electronics/3944` (taken from a
+  `walmart.com/browse/...` URL), or a `/cp/...` department path.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  Result page, `1`–`11`. Browse dries up after page 11.
+</ParamField>
+
+<ParamField query="min_price" type="number">Minimum price in USD.</ParamField>
+<ParamField query="max_price" type="number">Maximum price in USD.</ParamField>
+
+<ParamField query="facet" type="string">
+  Walmart facet filter, e.g. `brand:HP`. Facets can be applied but not
+  enumerated.
+</ParamField>
+
+## Response
+
+Identical to [`/search`](/api-reference/endpoint/walmart/search#response):
+`query` (null here), `url`, `page`, `total_results_reported`, `max_page`
+(`11`), `result_count`, `has_more_pages`, `title`, `breadcrumbs`,
+`related_searches`, and `items[]` of `SearchItem`.
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/walmart/category?path=electronics/3944&min_price=100" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/walmart/category?" +
+    new URLSearchParams({ path: "electronics/3944", min_price: "100" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/walmart/category",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"path": "electronics/3944", "min_price": 100},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": null,
+  "url": "https://www.walmart.com/browse/electronics/3944",
+  "page": 1,
+  "total_results_reported": 900010,
+  "max_page": 11,
+  "result_count": 49,
+  "has_more_pages": true,
+  "sort": null,
+  "title": "Results for \"Electronics\"",
+  "breadcrumbs": [
+    { "name": "Electronics", "url": "https://www.walmart.com/cp/3944" }
+  ],
+  "related_searches": [],
+  "items": [
+    {
+      "us_item_id": "5689919121",
+      "name": "AirPods Pro (2nd generation) with MagSafe Case (USB-C)",
+      "brand": "Apple",
+      "url": "https://www.walmart.com/ip/AirPods-Pro-2nd-generation.../5689919121",
+      "price": 199.0,
+      "price_string": "$199.00",
+      "rating": 4.4,
+      "review_count": 44427,
+      "in_stock": true,
+      "availability_status": "IN_STOCK",
+      "fulfillment_type": "FC",
+      "seller_name": "Walmart.com",
+      "is_sponsored": false,
+      "position": 1
+    }
+  ]
+}
+```
+
+<Warning>
+  `total_results_reported` is Walmart's own claim (900,010 above) and is **not
+  reachable** — browse stops returning products after page 11, roughly 500
+  products. Page on `has_more_pages`, and deduplicate on `us_item_id`:
+  consecutive pages overlap by about 20% because Walmart re-ranks between
+  requests. Segment by `facet` or price band to go deeper.
+</Warning>

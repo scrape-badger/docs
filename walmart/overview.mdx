@@ -1,0 +1,191 @@
+---
+title: "Walmart API Overview"
+description: "Search walmart.com, pull full product detail with UPC and specifications, paginate reviews with the complete star histogram, browse deals, and read marketplace sellers and physical stores — no Walmart API key required."
+---
+
+## Overview
+
+The ScrapeBadger **Walmart API** turns `walmart.com` into a clean JSON feed:
+keyword search, category browse, a deals/rollback feed, full product detail
+(UPC/GTIN, structured specifications, per-fulfilment promised delivery dates,
+condition offers), paginated reviews with the complete star histogram,
+marketplace seller profiles and catalogues, and physical-store detail with
+per-department hours.
+
+<Info>
+  All endpoints are `GET`, live under `https://scrapebadger.com/v1/walmart/*`,
+  and authenticate with the `X-API-Key` header. Credits are charged per request
+  (see the table below) and reported on the `X-Credits-Used` response header.
+</Info>
+
+## Features
+
+- **Product search** — keywords with `sort`, price band and facet filters.
+  ~40–60 organic products per page. Sponsored ad tiles are dropped; sponsored
+  *products* are returned and flagged `is_sponsored`.
+- **Category browse** — any `walmart.com/browse/...` or `/cp/...` path, same
+  result shape as search.
+- **Deals feed** — Walmart's live rollbacks and clearance as a paginated
+  product feed, not a boolean on a product row.
+- **Full product detail** — `upc`/`gtin`, `model`, grouped
+  `specification_groups[]`, `variants[]`, `condition_offers[]` (new vs
+  pre-owned on the same item), `fulfillment_summary[]` with promised delivery
+  dates per method, `return_policy`, `nutrition_facts` for grocery, plus a
+  reviews sample so shallow use cases need only one call.
+- **Full review histogram** — `distribution` carries per-star **counts and
+  percentages** (`five_star`, `five_star_percent`, …), `recommended_percentage`
+  and `total_media_count`, alongside paginated review text.
+- **Marketplace sellers** — profile (contact, address, rating, policies) and a
+  searchable catalogue of that seller's inventory.
+- **Physical stores** — a store's address, geo, phone, opening hours,
+  **per-department services each with their own hours and phone**, fuel prices
+  where present, and ~30 nearby stores in the same response.
+- **Walmart's generative-AI product content** — `ai_description_html` and
+  `ai_highlights[]`, surfaced rather than trimmed.
+
+<Note>
+  No competing Walmart API offers a store-detail, deals, or seller-catalogue
+  endpoint — seller endpoints elsewhere return profile metadata only.
+</Note>
+
+## Coverage
+
+**US only.** Only `walmart.com` is supported.
+
+| Code | Country | Currency | Language | Domain |
+| ---- | ------- | -------- | -------- | ----------- |
+| `US` | United States | USD | en-US | walmart.com |
+
+<Warning>
+  `walmart.ca` and `walmart.com.mx` are **not supported**. They are different
+  platforms with different payload shapes, not a locale switch on
+  `walmart.com`, and are deliberately not claimed here rather than shipped
+  broken.
+</Warning>
+
+## Credits
+
+| Endpoint | Path | Credits |
+| -------- | ---- | ------- |
+| Search products | `GET /v1/walmart/search` | 5 |
+| Browse a category | `GET /v1/walmart/category` | 5 |
+| Deals | `GET /v1/walmart/deals` | 5 |
+| Autocomplete | `GET /v1/walmart/autocomplete` | 1 |
+| Get product detail | `GET /v1/walmart/products/{item_id}` | 10 |
+| Get product reviews | `GET /v1/walmart/products/{item_id}/reviews` | 10 |
+| Get seller profile | `GET /v1/walmart/sellers/{seller_id}` | 5 |
+| Get seller products | `GET /v1/walmart/sellers/{seller_id}/products` | 5 |
+| Get store detail | `GET /v1/walmart/stores/{store_id}` | 5 |
+| List markets | `GET /v1/walmart/markets` | 0 |
+
+## Quickstart
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/walmart/search?query=laptop&sort=price_low&max_price=500" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/walmart/search?" +
+    new URLSearchParams({
+      query: "laptop",
+      sort: "price_low",
+      max_price: "500",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+console.log(data.items.length, "products");
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/walmart/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "query": "laptop",
+        "sort": "price_low",
+        "max_price": 500,
+    },
+)
+print(len(res.json()["items"]), "products")
+```
+
+</CodeGroup>
+
+## Pagination limits
+
+`total_results_reported` is **Walmart's own claim**, not a reachable count. A
+query reporting ~14,000 results stops returning products after **page 10**
+(`/search`, `/sellers/{id}/products`) or **page 11** (`/category`, `/deals`) —
+pages beyond that return HTTP 200 with an empty payload. That is roughly **500
+products per query**.
+
+- Always page on **`has_more_pages`**, never on `total_results_reported`.
+- `max_page` in every result set is the measured ceiling for that surface.
+- To go deeper than 500, **segment the query**: repeat it per brand facet
+  (`facet=brand:HP`) or across price bands (`min_price` / `max_price`).
+
+<Warning>
+  Consecutive pages **overlap by roughly 20%** — Walmart re-ranks between
+  requests, so a product on page 2 may reappear on page 3. **Deduplicate on
+  `us_item_id`** when collecting across pages.
+</Warning>
+
+## Store-specific prices
+
+Walmart resolves the assortment store from the **request IP**. It cannot be
+pinned by a parameter or cookie — the server overwrites any store id back to
+the IP default. Prices and availability are therefore store-specific whether
+you asked for it or not.
+
+Every product response carries a `location` block naming the store that was
+resolved, so the answer is always attributable:
+
+```json
+"location": {
+  "postal_code": "95519",
+  "city": "Mckinleyville",
+  "state": "CA",
+  "store_id": "5629",
+  "intent": "SHIPPING"
+}
+```
+
+## Other measured limits
+
+- **`/category` has no `sort`.** Walmart's browse pages ignore it (34/38
+  identical ids with and without it, and the param is not echoed back). Sort on
+  `/search` instead.
+- **Facets can be applied but not enumerated.** Pass `facet=brand:HP` and it
+  filters; there is no endpoint listing available facets, because Walmart
+  renders the filter rail client-side.
+- **The seller id is the numeric `catalog_seller_id`** found on a product —
+  *not* the 32-char hex `seller_id`, which 404s as a storefront URL.
+- **`/sellers/{id}` returns no product list.** The storefront grid is rendered
+  client-side. Use
+  [`/sellers/{id}/products`](/api-reference/endpoint/walmart/get-seller-products),
+  which goes through search and therefore **requires a `query`**.
+- **Searching by UPC does not work.** Walmart returns zero results for a bare
+  UPC — resolve UPCs by keyword and read `upc` off the product detail instead.
+- **Reviews are 10 per page.** That is Walmart's page size and is not
+  adjustable.
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | Item, seller or store does not exist (or has been removed). |
+| `422` | Anti-bot challenge — **not billed**. Retry; it succeeds. |
+
+<Tip>
+  Start from [`/autocomplete`](/api-reference/endpoint/walmart/autocomplete) (1
+  credit) to expand a partial term into real Walmart queries, then run
+  [`/search`](/api-reference/endpoint/walmart/search) on each one and merge on
+  `us_item_id` — cheaper coverage than paging one query into its page-10 wall.
+</Tip>

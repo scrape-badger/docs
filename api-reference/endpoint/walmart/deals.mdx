@@ -1,0 +1,116 @@
+---
+title: "Deals"
+api: "GET https://scrapebadger.com/v1/walmart/deals"
+description: "Walmart's current deals, rollbacks and clearance as a paginated product feed."
+---
+
+Walmart's live deals, rollbacks and clearance. Same result shape as
+[`/search`](/api-reference/endpoint/walmart/search).
+
+**Credits:** 5
+
+<Note>
+  No surveyed competitor offers a Walmart deals feed — every one of them
+  exposes `rollback` only as a boolean on a product row.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="page" type="integer" default="1">
+  Result page, `1`–`11`. The feed dries up after page 11.
+</ParamField>
+
+<ParamField query="min_price" type="number">Minimum price in USD.</ParamField>
+<ParamField query="max_price" type="number">Maximum price in USD.</ParamField>
+
+## Response
+
+Identical to [`/search`](/api-reference/endpoint/walmart/search#response):
+`url`, `page`, `total_results_reported`, `max_page` (`11`), `result_count`,
+`has_more_pages`, `title`, and `items[]` of `SearchItem`. Discounted items
+carry `was_price` and a populated `price_info.savings_amount`.
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/walmart/deals?min_price=25&max_price=100" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/walmart/deals?" +
+    new URLSearchParams({ min_price: "25", max_price: "100" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/walmart/deals",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"min_price": 25, "max_price": 100},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": null,
+  "url": "https://www.walmart.com/shop/deals",
+  "page": 1,
+  "total_results_reported": 2054,
+  "max_page": 11,
+  "result_count": 50,
+  "has_more_pages": true,
+  "title": "Savings",
+  "items": [
+    {
+      "us_item_id": "43786351",
+      "item_id": "43786351",
+      "product_id": "39714L09OKKY",
+      "offer_id": "14EFE996F12E4C8B950E542CDDBB24D0",
+      "name": "Allegra Adult 24-Hour Allergy Relief Tablets, 180 mg Fexofenadine HCI, 40-Count",
+      "brand": "Allegra",
+      "url": "https://www.walmart.com/ip/Allegra-24-Hour-Allergy-Tablets-40-Ct/43786351",
+      "image_url": "https://i5.walmartimages.com/seo/Allegra-24-Hour-Allergy-Tablets-40-Ct....jpeg",
+      "price": 29.97,
+      "price_string": "$29.97",
+      "was_price": 41.98,
+      "price_info": {
+        "current_price": { "price": 29.97, "price_string": "$29.97", "price_display": "Now $29.97" },
+        "was_price": { "price": 41.98, "price_string": "$41.98" },
+        "savings_amount": 12.01,
+        "is_price_reduced": true
+      },
+      "rating": 4.7,
+      "review_count": 1893,
+      "in_stock": true,
+      "availability_status": "IN_STOCK",
+      "seller_name": "Walmart.com",
+      "badges": [{ "id": "L1600", "text": "Rollback", "type": "flag", "key": "PRICE_FLAG" }],
+      "position": 1
+    }
+  ]
+}
+```
+
+<Warning>
+  `total_results_reported` is Walmart's own claim and is **not reachable** — the
+  feed stops after page 11. Page on `has_more_pages`, and deduplicate on
+  `us_item_id`: consecutive pages overlap by about 20%. Narrow with `min_price`
+  / `max_price` bands to pull more of the feed.
+</Warning>

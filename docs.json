@@ -496,6 +496,52 @@
         ]
       },
       {
+        "tab": "Walmart",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "walmart/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/walmart/search",
+              "api-reference/endpoint/walmart/category",
+              "api-reference/endpoint/walmart/deals",
+              "api-reference/endpoint/walmart/autocomplete"
+            ]
+          },
+          {
+            "group": "Products",
+            "pages": [
+              "api-reference/endpoint/walmart/get-product",
+              "api-reference/endpoint/walmart/get-reviews"
+            ]
+          },
+          {
+            "group": "Sellers",
+            "pages": [
+              "api-reference/endpoint/walmart/get-seller",
+              "api-reference/endpoint/walmart/get-seller-products"
+            ]
+          },
+          {
+            "group": "Stores",
+            "pages": [
+              "api-reference/endpoint/walmart/get-store"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api-reference/endpoint/walmart/list-markets"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Leboncoin",
         "groups": [
           {

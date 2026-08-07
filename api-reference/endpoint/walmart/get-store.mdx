@@ -1,0 +1,177 @@
+---
+title: "Get Store Detail"
+api: "GET https://scrapebadger.com/v1/walmart/stores/{store_id}"
+description: "A physical Walmart store — address, geo, hours, per-department services with their own hours and phone, fuel prices, and ~30 nearby stores."
+---
+
+Fetch a physical Walmart store by its store number. One call returns the
+store's address, geo, phone and opening hours, its **per-department services —
+each with its own phone and hours** — fuel prices where the store has a
+station, and roughly **30 nearby stores** in the same shape.
+
+**Credits:** 5
+
+<Note>
+  No surveyed competitor offers a Walmart store-detail endpoint at all.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="store_id" type="string" required>
+  Walmart store number, e.g. `100`.
+</ParamField>
+
+## Response
+
+<ResponseField name="store" type="object">
+  The store.
+
+  <Expandable title="Store">
+    <ResponseField name="store_id" type="string" />
+    <ResponseField name="name" type="string">e.g. `Walmart Supercenter`.</ResponseField>
+    <ResponseField name="display_name" type="string">e.g. `Bentonville S Walton Blvd Supercenter`.</ResponseField>
+    <ResponseField name="store_type" type="string" />
+    <ResponseField name="phone" type="string" />
+    <ResponseField name="address1" type="string" />
+    <ResponseField name="address2" type="string" />
+    <ResponseField name="city" type="string" />
+    <ResponseField name="state" type="string" />
+    <ResponseField name="postal_code" type="string" />
+    <ResponseField name="country" type="string" />
+    <ResponseField name="latitude" type="number" />
+    <ResponseField name="longitude" type="number" />
+    <ResponseField name="distance_miles" type="number">Populated on `nearby_stores`.</ResponseField>
+    <ResponseField name="timezone" type="string" />
+    <ResponseField name="open_24_hours" type="boolean" />
+    <ResponseField name="is_spark_store" type="boolean" />
+    <ResponseField name="is_glass_eligible" type="boolean" />
+    <ResponseField name="hours" type="StoreHours[]">`day`, `start`, `end`, `closed`.</ResponseField>
+    <ResponseField name="services" type="StoreService[]">
+      In-store departments — `name`, `display_name`, **`phone`**,
+      `open_24_hours`, and their **own** `hours[]`, which differ from the
+      store's.
+    </ResponseField>
+    <ResponseField name="access_types" type="string[]" />
+  </Expandable>
+</ResponseField>
+<ResponseField name="departments" type="string[]">Department names carried by this store.</ResponseField>
+<ResponseField name="fuel_prices" type="object[]">Populated only for stores with a fuel station.</ResponseField>
+<ResponseField name="nearby_count" type="integer">Number of nearby stores returned (~30).</ResponseField>
+<ResponseField name="nearby_stores" type="Store[]">Nearby stores, same `Store` shape, each with `distance_miles`.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/walmart/stores/100" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/walmart/stores/100", {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+});
+const { store, nearby_stores } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/walmart/stores/100",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+store = res.json()["store"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "store": {
+    "store_id": "100",
+    "name": "Walmart Supercenter",
+    "display_name": "Bentonville S Walton Blvd Supercenter",
+    "store_type": "STORE",
+    "phone": "479-273-0060",
+    "address1": "406 S Walton Blvd",
+    "address2": null,
+    "city": "Bentonville",
+    "state": "AR",
+    "postal_code": "72712",
+    "country": "US",
+    "latitude": 36.368173,
+    "longitude": -94.224844,
+    "open_24_hours": false,
+    "is_spark_store": false,
+    "is_glass_eligible": true,
+    "hours": [
+      { "day": "Sunday", "start": "06:00", "end": "23:00", "closed": false },
+      { "day": "Monday", "start": "06:00", "end": "23:00", "closed": false }
+    ],
+    "services": [
+      {
+        "name": "DELI",
+        "display_name": "Deli",
+        "phone": "479-273-5780",
+        "open_24_hours": false,
+        "hours": [{ "day": "Sunday", "start": "08:00", "end": "21:00", "closed": false }]
+      },
+      {
+        "name": "PHARMACY",
+        "display_name": "Pharmacy",
+        "phone": "479-273-5080",
+        "open_24_hours": false,
+        "hours": [{ "day": "Sunday", "start": "10:00", "end": "18:00", "closed": false }]
+      }
+    ],
+    "access_types": ["PICKUP", "DELIVERY"]
+  },
+  "departments": [
+    "Furniture",
+    "Hardware",
+    "Fashion",
+    "Electronics",
+    "Toys",
+    "Patio & Garden",
+    "Video Game Store",
+    "Computer Store"
+  ],
+  "fuel_prices": [],
+  "nearby_count": 33,
+  "nearby_stores": [
+    {
+      "store_id": "5260",
+      "name": "Walmart Neighborhood Market",
+      "display_name": "Bentonville Neighborhood Market",
+      "city": "Bentonville",
+      "state": "AR",
+      "postal_code": "72712",
+      "latitude": 36.3492,
+      "longitude": -94.2035,
+      "distance_miles": 1.8,
+      "phone": "479-464-9273"
+    }
+  ]
+}
+```
+
+<Tip>
+  Each department in `services[]` carries its **own** phone and hours — the
+  pharmacy above opens four hours after the store does. Read department hours
+  from `services[]`, never from the store's `hours[]`.
+</Tip>
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | Store does not exist or has closed. |
+| `422` | Anti-bot challenge — **not billed**. Retry; it succeeds. |

@@ -1,0 +1,303 @@
+---
+title: "Get Product Detail"
+api: "GET https://scrapebadger.com/v1/walmart/products/{item_id}"
+description: "Full Walmart product detail — UPC/GTIN, structured specifications, variants, condition offers, per-fulfilment delivery dates, seller and a reviews sample."
+---
+
+Fetch a single Walmart product by its `usItemId`. Returns everything Walmart's
+page carries: identifiers (`upc`, `gtin`, `model`), the full price block,
+per-fulfilment promised delivery dates, grouped specifications, variants,
+alternative condition offers, the marketplace seller, return policy, and a
+reviews sample with the complete star histogram.
+
+**Credits:** 10
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="item_id" type="string" required>
+  Walmart `usItemId`, e.g. `5689919121`. Take it from `us_item_id` on a search
+  result, or from a `walmart.com/ip/.../{item_id}` URL — the SEO slug is
+  decorative and only the numeric id is needed.
+</ParamField>
+
+## Response
+
+<ResponseField name="product" type="object">
+  The full `Product`. Key fields:
+
+  <Expandable title="Identity">
+    <ResponseField name="us_item_id" type="string" />
+    <ResponseField name="item_id" type="string" />
+    <ResponseField name="product_id" type="string" />
+    <ResponseField name="offer_id" type="string" />
+    <ResponseField name="upc" type="string">e.g. `195949704529`.</ResponseField>
+    <ResponseField name="gtin" type="string" />
+    <ResponseField name="model" type="string">Manufacturer model, e.g. `MTJV3AM/A`.</ResponseField>
+    <ResponseField name="manufacturer_product_id" type="string" />
+    <ResponseField name="sku" type="string" />
+  </Expandable>
+
+  <Expandable title="Descriptive & taxonomy">
+    <ResponseField name="name" type="string" />
+    <ResponseField name="brand" type="string" />
+    <ResponseField name="brand_url" type="string" />
+    <ResponseField name="short_description" type="string" />
+    <ResponseField name="long_description" type="string" />
+    <ResponseField name="ai_description_html" type="string">Walmart's own generative-AI product description, an HTML `<ul>`.</ResponseField>
+    <ResponseField name="ai_highlights" type="NameValue[]">Walmart's AI concise summary — `name`, `value`, `icon_url`.</ResponseField>
+    <ResponseField name="url" type="string" />
+    <ResponseField name="canonical_url" type="string" />
+    <ResponseField name="category_path" type="string" />
+    <ResponseField name="category_path_id" type="string" />
+    <ResponseField name="breadcrumbs" type="Breadcrumb[]">`name`, `url`.</ResponseField>
+    <ResponseField name="department_name" type="string" />
+    <ResponseField name="item_type" type="string" />
+    <ResponseField name="sales_unit" type="string" />
+  </Expandable>
+
+  <Expandable title="Media">
+    <ResponseField name="image_url" type="string" />
+    <ResponseField name="images" type="Image[]">`id`, `url`, `zoomable`.</ResponseField>
+    <ResponseField name="videos" type="Video[]">`title`, `poster`, `versions`, `captions`.</ResponseField>
+  </Expandable>
+
+  <Expandable title="Pricing">
+    <ResponseField name="price" type="number" />
+    <ResponseField name="currency" type="string" />
+    <ResponseField name="price_info" type="object">
+      `current_price`, `was_price`, `list_price`, `unit_price`,
+      `comparison_price`, `subscription_price`, `shipping_price`,
+      `price_range`, `savings_amount`, `savings_string`, `is_price_reduced`,
+      `additional_fees[]`, `volume_price_tiers[]`.
+    </ResponseField>
+    <ResponseField name="promotions" type="Promotion[]">`id`, `type`, `description`, `terms`.</ResponseField>
+    <ResponseField name="promo_text" type="string" />
+  </Expandable>
+
+  <Expandable title="Availability & fulfilment">
+    <ResponseField name="availability_status" type="string">e.g. `IN_STOCK`.</ResponseField>
+    <ResponseField name="in_stock" type="boolean" />
+    <ResponseField name="fulfillment_type" type="string">e.g. `FC`, `MARKETPLACE`.</ResponseField>
+    <ResponseField name="fulfillment_options" type="FulfillmentOption[]">Live availability per method — `type`, `availability_status`, `available_quantity`, `is_low_in_stock`, `location_text`, `max_order_quantity`.</ResponseField>
+    <ResponseField name="fulfillment_summary" type="FulfillmentSummary[]">Per-method SLA and **promised delivery dates** — `fulfillment`, `fulfillment_price`, `delivery_date`, `max_delivery_date`, `store_delivery_date`, `store_id`, `store_timezone`, `sla`, `calculated_sla_days`, `is_express`, `is_free_for_wplus`. `sla` is a structured object (`unitOfMeasure`, `minimumValue`, `maximumValue`, `rank`), not a string.</ResponseField>
+    <ResponseField name="aisle" type="string" />
+    <ResponseField name="location" type="object">Which store Walmart resolved this response against — `postal_code`, `city`, `state`, `store_id`, `intent`.</ResponseField>
+    <ResponseField name="order_limit" type="integer" />
+    <ResponseField name="is_preorder" type="boolean" />
+  </Expandable>
+
+  <Expandable title="Seller, condition & variants">
+    <ResponseField name="seller" type="object">`seller_id` (32-char hex), **`catalog_seller_id`** (the numeric id the seller endpoints take), `seller_name`, `seller_display_name`, `seller_type`, `seller_storefront_url`, `seller_average_rating`, `seller_review_count`, `is_pro_seller`, `wfs_enabled`.</ResponseField>
+    <ResponseField name="additional_offer_count" type="integer" />
+    <ResponseField name="transactable_offer_count" type="integer" />
+    <ResponseField name="condition_offers" type="ConditionOffer[]">New / refurbished / pre-owned offers on the same product — `offer_id`, `condition`, `is_condition_new`, `availability_status`, `price`, `price_string`.</ResponseField>
+    <ResponseField name="condition" type="string" />
+    <ResponseField name="is_preowned" type="boolean" />
+    <ResponseField name="variants" type="Variant[]">`us_item_id`, `name`, `variant_type`, `value`, `url`, `price`, `in_stock`, `selected`, `image_url`, `swatch_image_url`.</ResponseField>
+    <ResponseField name="variant_criteria" type="object[]" />
+  </Expandable>
+
+  <Expandable title="Rich content">
+    <ResponseField name="specifications" type="NameValue[]">Flat spec rows — `name`, `value`.</ResponseField>
+    <ResponseField name="specification_groups" type="SpecificationGroup[]">`group_name`, `specifications[]`.</ResponseField>
+    <ResponseField name="highlights" type="NameValue[]" />
+    <ResponseField name="warnings" type="NameValue[]" />
+    <ResponseField name="warranty" type="object">`information`, `length`, `url`.</ResponseField>
+    <ResponseField name="nutrition_facts" type="object">Grocery only — `calorie_info`, `key_nutrients`, `vitamin_minerals`, `serving_info`.</ResponseField>
+    <ResponseField name="ingredients" type="string" />
+    <ResponseField name="badges" type="Badge[]">`id`, `text`, `type`, `key`.</ResponseField>
+    <ResponseField name="return_policy" type="object">`returnable`, `returnable_to_store`, `free_returns`, `return_window`, `return_policy_type`, `return_policy_text`, `return_location`.</ResponseField>
+    <ResponseField name="snap_eligible" type="boolean" />
+    <ResponseField name="fsa_eligible" type="boolean" />
+    <ResponseField name="subscription_eligible" type="boolean" />
+    <ResponseField name="free_shipping" type="boolean" />
+  </Expandable>
+
+  <Expandable title="Reviews sample">
+    <ResponseField name="rating" type="number" />
+    <ResponseField name="review_count" type="integer" />
+    <ResponseField name="rating_distribution" type="object">The full star histogram — counts **and** percentages. See [Get Reviews](/api-reference/endpoint/walmart/get-reviews).</ResponseField>
+    <ResponseField name="top_reviews" type="Review[]">Saves a second call for shallow use cases.</ResponseField>
+    <ResponseField name="review_aspects" type="object[]" />
+    <ResponseField name="review_summary" type="string" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/walmart/products/5689919121" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/walmart/products/5689919121",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const product = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/walmart/products/5689919121",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+product = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "us_item_id": "5689919121",
+  "item_id": "5689919121",
+  "product_id": "3RZ5BTN0KR6U",
+  "offer_id": "452655F40DF73F6BA4D060C9B1C4C70A",
+  "upc": "195949704529",
+  "gtin": "195949704529",
+  "model": "MTJV3AM/A",
+  "name": "Apple AirPods Pro, Wireless Earbuds with MagSafe Case (USB-C), (2nd Generation), White",
+  "brand": "Apple",
+  "url": "https://www.walmart.com/ip/AirPods-Pro-2nd-generation-with-MagSafe-Case-USB-C/5689919121",
+  "category_path": "0:6163033:2795380:4874644",
+  "breadcrumbs": [
+    { "name": "Electronics", "url": "https://www.walmart.com/cp/3944" },
+    { "name": "Headphones", "url": "https://www.walmart.com/browse/3944/1095199" }
+  ],
+  "image_url": "https://i5.walmartimages.com/asr/f90de61f-f25c-4f57-89ef-3fd9ce4c9ed5.jpeg",
+  "price": 82.8,
+  "currency": "USD",
+  "price_info": {
+    "current_price": {
+      "price": 82.8,
+      "currency": "USD",
+      "price_string": "$82.80",
+      "price_display": "Now $82.80"
+    },
+    "was_price": { "price": 184.79, "currency": "USD", "price_string": "$184.79" },
+    "savings_amount": 101.99,
+    "is_price_reduced": true
+  },
+  "availability_status": "IN_STOCK",
+  "in_stock": true,
+  "fulfillment_type": "MARKETPLACE",
+  "fulfillment_summary": [
+    {
+      "fulfillment": "DELIVERY",
+      "fulfillment_price": 0.0,
+      "fulfillment_methods": ["UNSCHEDULED"],
+      "delivery_date": "2026-08-13T21:59:00.000Z",
+      "max_delivery_date": "2026-08-13T21:59:00.000Z",
+      "store_delivery_date": "2026-08-13T14:59:00.000-07:00",
+      "store_timezone": "America/Los_Angeles",
+      "sla": { "unitOfMeasure": "DAYS", "minimumValue": 3, "maximumValue": 5, "rank": 2 },
+      "calculated_sla_days": 5,
+      "is_express": false
+    }
+  ],
+  "location": {
+    "postal_code": "95519",
+    "city": "Mckinleyville",
+    "state": "CA",
+    "store_id": "5629",
+    "intent": "SHIPPING"
+  },
+  "rating": 4.4,
+  "review_count": 44427,
+  "seller": {
+    "seller_id": "66656029CC6541CBADDFA17547A98DE0",
+    "catalog_seller_id": "152",
+    "seller_name": "VIPOUTLET",
+    "seller_type": "EXTERNAL",
+    "seller_storefront_url": "https://www.walmart.com/global/seller/152",
+    "seller_average_rating": 3.97,
+    "seller_review_count": 12043,
+    "is_pro_seller": true
+  },
+  "condition": "Pre-Owned: Fair",
+  "condition_offers": [
+    {
+      "offer_id": "9DF22736171B3DCD8FAC29C7E1D80EDA",
+      "condition": "New",
+      "is_condition_new": true,
+      "availability_status": "OUT_OF_STOCK",
+      "price": 199.0,
+      "price_string": "$199.00"
+    },
+    {
+      "offer_id": "452655F40DF73F6BA4D060C9B1C4C70A",
+      "condition": "Pre-Owned: Fair",
+      "is_condition_new": false,
+      "availability_status": "IN_STOCK",
+      "price": 82.8,
+      "price_string": "$82.80"
+    }
+  ],
+  "specifications": [
+    { "name": "Noise control technology", "value": "Active Noise Cancellation" },
+    { "name": "Battery life", "value": "6 h" },
+    { "name": "Works with", "value": "iPhone, iPad, Mac" },
+    { "name": "Ip code", "value": "IPX4" }
+  ],
+  "ai_description_html": "<ul><li><strong>Product Identity</strong>: White Apple AirPods Pro (2nd Generation) in-ear wireless earbuds…</li></ul>",
+  "ai_highlights": [
+    {
+      "name": "Adaptive Noise Control",
+      "value": "Adaptive Audio that tailors noise control.",
+      "icon_url": "https://i5.walmartimages.com/dfw/84bce68-1bf3/adaptive.png"
+    }
+  ],
+  "badges": [
+    { "id": "L1095", "text": "Pre-Owned: Fair", "type": "product_condition", "key": "PREOWNED" },
+    { "id": "L1071", "text": null, "type": "urgency", "key": "LOW_INVENTORY" }
+  ],
+  "return_policy": {
+    "returnable": true,
+    "returnable_to_store": true,
+    "free_returns": true,
+    "return_policy_type": "seamless",
+    "return_policy_text": "Free 30-day returns",
+    "return_location": "store"
+  },
+  "rating_distribution": {
+    "average_rating": 4.4,
+    "total_review_count": 44427,
+    "five_star": 34522,
+    "five_star_percent": 78,
+    "one_star": 4312,
+    "one_star_percent": 10
+  }
+}
+```
+
+<Note>
+  Prices and availability are **store-specific**. Walmart resolves the
+  assortment store from the request IP and overwrites any store id you try to
+  set, so it cannot be pinned by a parameter. The `location` block names the
+  store that actually answered — always read it before comparing prices across
+  calls.
+</Note>
+
+<Tip>
+  To reach the seller endpoints, use **`seller.catalog_seller_id`** (numeric,
+  `152` above) — not `seller.seller_id`, which is a 32-char hex value and 404s
+  as a storefront URL.
+</Tip>
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | Item does not exist or has been removed. |
+| `422` | Anti-bot challenge — **not billed**. Retry; it succeeds. |

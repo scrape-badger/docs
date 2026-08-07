@@ -1,0 +1,140 @@
+---
+title: "Get Seller Profile"
+api: "GET https://scrapebadger.com/v1/walmart/sellers/{seller_id}"
+description: "A Walmart marketplace seller's profile — contact details, address, rating and policies."
+---
+
+Fetch a Walmart marketplace seller's profile: display name, business contact
+details and address, rating, badges and policies.
+
+**Credits:** 5
+
+<Warning>
+  **This endpoint returns no product list.** Walmart renders storefront grids
+  client-side (`searchResult` comes back as `{isEmptySearchResult: true}` for
+  every seller tested), and adding `?page=` makes Walmart's own server-side
+  render throw. Use
+  [`/sellers/{seller_id}/products`](/api-reference/endpoint/walmart/get-seller-products)
+  for the catalogue.
+</Warning>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="seller_id" type="string" required>
+  **Numeric catalog seller id**, e.g. `6907`. This is `seller.catalog_seller_id`
+  on a [product](/api-reference/endpoint/walmart/get-product) — **not** the
+  32-char hex `seller.seller_id`, which 404s as a storefront URL.
+</ParamField>
+
+## Response
+
+<ResponseField name="seller" type="object">
+  The seller profile.
+
+  <Expandable title="Seller">
+    <ResponseField name="seller_id" type="string">Walmart's 32-char hex seller id.</ResponseField>
+    <ResponseField name="catalog_seller_id" type="string">The numeric id this endpoint takes.</ResponseField>
+    <ResponseField name="name" type="string" />
+    <ResponseField name="display_name" type="string" />
+    <ResponseField name="seller_type" type="string">e.g. `EXTERNAL` for marketplace sellers.</ResponseField>
+    <ResponseField name="url" type="string" />
+    <ResponseField name="logo_url" type="string" />
+    <ResponseField name="banner_url" type="string" />
+    <ResponseField name="about" type="string" />
+    <ResponseField name="email" type="string" />
+    <ResponseField name="phone" type="string" />
+    <ResponseField name="address1" type="string" />
+    <ResponseField name="address2" type="string" />
+    <ResponseField name="city" type="string" />
+    <ResponseField name="state" type="string" />
+    <ResponseField name="postal_code" type="string" />
+    <ResponseField name="country" type="string" />
+    <ResponseField name="country_code" type="string" />
+    <ResponseField name="rating" type="number" />
+    <ResponseField name="review_count" type="integer" />
+    <ResponseField name="has_seller_badge" type="boolean" />
+    <ResponseField name="is_pro_seller" type="boolean" />
+    <ResponseField name="is_alcohol_seller" type="boolean" />
+    <ResponseField name="deactivation_status" type="string">e.g. `ACTIVE`.</ResponseField>
+    <ResponseField name="tax_policy" type="string" />
+  </Expandable>
+</ResponseField>
+<ResponseField name="featured_items" type="SearchItem[]">
+  Any items Walmart server-rendered on the storefront. Usually empty — the grid
+  is client-side.
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/walmart/sellers/101040442" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/walmart/sellers/101040442",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { seller } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/walmart/sellers/101040442",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+seller = res.json()["seller"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "seller": {
+    "seller_id": "8828868EF163431A961A65A6F76FA620",
+    "catalog_seller_id": "101040442",
+    "name": "4th Quarter Collectibles",
+    "display_name": "4th Quarter Collectibles & Toys",
+    "seller_type": "EXTERNAL",
+    "url": "https://www.walmart.com/seller/8828868EF163431A961A65A6F76FA620",
+    "logo_url": null,
+    "banner_url": null,
+    "about": "Toys and collectibles store.",
+    "email": "4thqtrcollectibles@gmail.com",
+    "phone": "8594468261",
+    "address1": "Stella Ave",
+    "address2": "",
+    "city": "Cincinnati",
+    "state": "OH",
+    "postal_code": "45224",
+    "country": "US",
+    "country_code": "+1",
+    "rating": 0.0,
+    "review_count": 0,
+    "has_seller_badge": false,
+    "is_pro_seller": false,
+    "is_alcohol_seller": false,
+    "deactivation_status": "ACTIVE",
+    "tax_policy": null
+  },
+  "featured_items": []
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | Seller does not exist — most often because a hex `seller_id` was passed instead of the numeric `catalog_seller_id`. |
+| `422` | Anti-bot challenge — **not billed**. Retry; it succeeds. |

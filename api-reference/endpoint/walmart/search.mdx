@@ -1,0 +1,219 @@
+---
+title: "Search Products"
+api: "GET https://scrapebadger.com/v1/walmart/search"
+description: "Search walmart.com by keyword with sort, price band and facet filters."
+---
+
+Search `walmart.com` for products. Returns ~40–60 organic products per page.
+Sponsored ad tiles are dropped; sponsored *products* are returned and flagged
+`is_sponsored`.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords, e.g. `laptop`.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  Result page, `1`–`10`. Results dry up after page 10 — see
+  [Pagination](#pagination).
+</ParamField>
+
+<ParamField query="sort" type="string">
+  Result ordering. One of `best_match`, `best_seller`, `price_low`,
+  `price_high`, `rating_high`, `new`.
+</ParamField>
+
+<ParamField query="min_price" type="number">Minimum price in USD.</ParamField>
+<ParamField query="max_price" type="number">Maximum price in USD.</ParamField>
+
+<ParamField query="facet" type="string">
+  Walmart facet filter, e.g. `brand:HP`. Facets can be **applied but not
+  enumerated** — Walmart renders the filter rail client-side, so there is no
+  endpoint that lists them.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="url" type="string">The walmart.com URL that was fetched.</ResponseField>
+<ResponseField name="page" type="integer">The page returned.</ResponseField>
+<ResponseField name="total_results_reported" type="integer">
+  **Walmart's own claim**, not a reachable count — it reports ~14,700 for a
+  query that stops returning products after page 10. It moves correctly when a
+  filter is applied, so it is a useful *relative* signal only.
+</ResponseField>
+<ResponseField name="max_page" type="integer">Measured page ceiling for this surface (`10` for search).</ResponseField>
+<ResponseField name="result_count" type="integer">Products on this page.</ResponseField>
+<ResponseField name="has_more_pages" type="boolean">Page on this, not on `total_results_reported`.</ResponseField>
+<ResponseField name="sort" type="string">The sort that was applied.</ResponseField>
+<ResponseField name="title" type="string">Walmart's result heading, e.g. `Results for "laptop"`.</ResponseField>
+<ResponseField name="breadcrumbs" type="Breadcrumb[]">`name`, `url`.</ResponseField>
+<ResponseField name="related_searches" type="string[]">Walmart's related query suggestions.</ResponseField>
+<ResponseField name="spelling_correction" type="string">Set when Walmart corrected the query.</ResponseField>
+<ResponseField name="items" type="SearchItem[]">
+  Product cards.
+
+  <Expandable title="SearchItem">
+    <ResponseField name="us_item_id" type="string">Walmart's item id — use it for `/products/{item_id}` and to deduplicate.</ResponseField>
+    <ResponseField name="item_id" type="string" />
+    <ResponseField name="product_id" type="string" />
+    <ResponseField name="offer_id" type="string" />
+    <ResponseField name="name" type="string" />
+    <ResponseField name="brand" type="string" />
+    <ResponseField name="manufacturer_name" type="string" />
+    <ResponseField name="url" type="string" />
+    <ResponseField name="canonical_url" type="string" />
+    <ResponseField name="image_url" type="string" />
+    <ResponseField name="images" type="string[]" />
+    <ResponseField name="description" type="string" />
+    <ResponseField name="price" type="number" />
+    <ResponseField name="price_string" type="string" />
+    <ResponseField name="was_price" type="number" />
+    <ResponseField name="price_info" type="object">Full price block — `current_price`, `was_price`, `price_range`, `savings_amount`.</ResponseField>
+    <ResponseField name="price_per_unit" type="string" />
+    <ResponseField name="rating" type="number" />
+    <ResponseField name="review_count" type="integer" />
+    <ResponseField name="in_stock" type="boolean" />
+    <ResponseField name="availability_status" type="string">e.g. `IN_STOCK`, `OUT_OF_STOCK`.</ResponseField>
+    <ResponseField name="fulfillment_type" type="string">e.g. `FC`, `MARKETPLACE`.</ResponseField>
+    <ResponseField name="fulfillment_badges" type="string[]" />
+    <ResponseField name="fulfillment_speed" type="string[]" />
+    <ResponseField name="seller_id" type="string" />
+    <ResponseField name="seller_name" type="string" />
+    <ResponseField name="seller_type" type="string" />
+    <ResponseField name="is_sponsored" type="boolean" />
+    <ResponseField name="is_two_day_shipping" type="boolean" />
+    <ResponseField name="badges" type="Badge[]">`id`, `text`, `type`, `key`.</ResponseField>
+    <ResponseField name="variants" type="Variant[]" />
+    <ResponseField name="condition" type="string" />
+    <ResponseField name="is_preowned" type="boolean" />
+    <ResponseField name="snap_eligible" type="boolean" />
+    <ResponseField name="position" type="integer" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/walmart/search?query=laptop&sort=price_low&max_price=500" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/walmart/search?" +
+    new URLSearchParams({
+      query: "laptop",
+      sort: "price_low",
+      max_price: "500",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/walmart/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "query": "laptop",
+        "sort": "price_low",
+        "max_price": 500,
+    },
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "laptop",
+  "url": "https://www.walmart.com/search?q=laptop",
+  "page": 1,
+  "total_results_reported": 14714,
+  "max_page": 10,
+  "result_count": 52,
+  "has_more_pages": true,
+  "sort": null,
+  "title": "Results for \"laptop\"",
+  "breadcrumbs": [{ "name": "laptop", "url": null }],
+  "related_searches": ["hp laptop", "macbook", "gaming laptop", "chromebook"],
+  "spelling_correction": null,
+  "items": [
+    {
+      "us_item_id": "20353606354",
+      "item_id": "20353606354",
+      "product_id": "4W9K25QVD1IR",
+      "offer_id": "CFD877430F6D3E37B5678F4880EC10C8",
+      "name": "HP Essential 14\" Laptop, Intel N150, 8GB RAM, 128GB eMMC, Windows 11 Home, Pink",
+      "brand": "HP",
+      "url": "https://www.walmart.com/ip/HP-Essential-14-Laptop.../20353606354",
+      "image_url": "https://i5.walmartimages.com/seo/HP-Essential-14-Laptop....jpeg",
+      "price": 298.96,
+      "price_string": "$298.96",
+      "price_info": {
+        "current_price": { "price": 298.96, "price_string": "$298.96", "price_display": "$298.96" },
+        "price_range": { "min_price": 269.0, "price_string": "Options from $269.00" },
+        "savings_amount": 0.0
+      },
+      "rating": 4.0,
+      "review_count": 4,
+      "in_stock": true,
+      "is_out_of_stock": false,
+      "availability_status": "IN_STOCK",
+      "fulfillment_type": "FC",
+      "fulfillment_badges": ["Free shipping, arrives in 3+ days"],
+      "seller_id": "E3AC3CCD80E94D77A876ADE3B17D7B89",
+      "seller_name": "PCOnline US",
+      "is_sponsored": true,
+      "is_two_day_shipping": false,
+      "badges": [{ "id": "L1600", "text": "Best seller", "type": "flag", "key": "BEST_SELLER" }],
+      "position": 1
+    }
+  ]
+}
+```
+
+## Pagination
+
+<Warning>
+  `total_results_reported` is not reachable. Search dries up after **page 10** —
+  roughly **500 products per query**. Page on `has_more_pages`; page 11 returns
+  HTTP 200 with `result_count: 0`.
+</Warning>
+
+<Warning>
+  Consecutive pages **overlap by roughly 20%** — Walmart re-ranks between
+  requests. **Deduplicate on `us_item_id`.**
+</Warning>
+
+To collect more than ~500 products for a term, segment the query rather than
+paging deeper: repeat it per brand (`facet=brand:HP`) or across price bands
+(`min_price` / `max_price`).
+
+<Note>
+  **Searching by UPC does not work** — Walmart returns zero results for a bare
+  UPC. Search by keyword and read `upc` off
+  [`/products/{item_id}`](/api-reference/endpoint/walmart/get-product) instead.
+</Note>
+
+<Note>
+  Prices and availability are **store-specific**, resolved from the request IP
+  and not pinnable by parameter. Fetch a product to see which store answered
+  (its `location` block).
+</Note>

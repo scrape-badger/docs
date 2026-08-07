@@ -1,0 +1,137 @@
+---
+title: "Get Seller Products"
+api: "GET https://scrapebadger.com/v1/walmart/sellers/{seller_id}/products"
+description: "A Walmart marketplace seller's catalogue, scoped by a required search term."
+---
+
+List a marketplace seller's inventory. Returns the same `SearchResponse` shape
+as [`/search`](/api-reference/endpoint/walmart/search).
+
+**Credits:** 5
+
+<Warning>
+  **`query` is required.** The seller storefront renders its grid client-side,
+  so this endpoint goes through Walmart search with a `retailer_id` facet — and
+  that facet returns zero results with no query term. Scope the catalogue with
+  a term (`camera`, `laptop`, a brand …) and repeat across terms to enumerate a
+  seller.
+</Warning>
+
+<Note>
+  No surveyed competitor offers Walmart seller inventory at all — the seller
+  endpoints elsewhere are profile metadata only.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="seller_id" type="string" required>
+  **Numeric catalog seller id**, e.g. `6907` (Adorama). This is
+  `seller.catalog_seller_id` on a
+  [product](/api-reference/endpoint/walmart/get-product) — **not** the 32-char
+  hex `seller.seller_id`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search term scoping the seller's catalogue, e.g. `camera`.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  Result page, `1`–`10`.
+</ParamField>
+
+<ParamField query="sort" type="string">
+  Result ordering. One of `best_match`, `best_seller`, `price_low`,
+  `price_high`, `rating_high`, `new`.
+</ParamField>
+
+## Response
+
+Identical to [`/search`](/api-reference/endpoint/walmart/search#response):
+`query`, `url`, `page`, `total_results_reported`, `max_page` (`10`),
+`result_count`, `has_more_pages`, `sort`, `title`, and `items[]` of
+`SearchItem`. Every item carries the seller's `seller_id` / `seller_name`.
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/walmart/sellers/6907/products?query=camera&sort=price_high" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/walmart/sellers/6907/products?" +
+    new URLSearchParams({ query: "camera", sort: "price_high" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/walmart/sellers/6907/products",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "camera", "sort": "price_high"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "camera",
+  "url": "https://www.walmart.com/search?q=camera&facet=retailer_id%3A6907",
+  "page": 1,
+  "total_results_reported": 658,
+  "max_page": 10,
+  "result_count": 42,
+  "has_more_pages": true,
+  "sort": "price_high",
+  "title": "Results for \"camera\"",
+  "items": [
+    {
+      "us_item_id": "3988246008",
+      "name": "Sony Alpha a7R V 61.0MP Full Frame Mirrorless Digital Camera Body - Bundle with 128GB SDXC Card, Backpack, Extra Battery",
+      "brand": "Sony",
+      "url": "https://www.walmart.com/ip/Sony-Alpha-a7R-V.../3988246008",
+      "price": 3498.0,
+      "price_string": "$3,498.00",
+      "rating": 5.0,
+      "review_count": 5,
+      "in_stock": true,
+      "availability_status": "IN_STOCK",
+      "fulfillment_type": "MARKETPLACE",
+      "seller_id": "1F94731C2621441B90812CB343D18B39",
+      "seller_name": "Adorama",
+      "is_sponsored": false,
+      "position": 1
+    }
+  ]
+}
+```
+
+<Warning>
+  Same page ceiling as search: results stop after **page 10**, and consecutive
+  pages **overlap by roughly 20%** — deduplicate on `us_item_id`. To enumerate a
+  large seller, run several query terms rather than paging one term deeper.
+</Warning>
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | Seller does not exist — check you passed the numeric `catalog_seller_id`. |
+| `422` | Anti-bot challenge — **not billed**. Retry; it succeeds. |

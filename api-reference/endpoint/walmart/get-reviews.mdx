@@ -1,0 +1,194 @@
+---
+title: "Get Product Reviews"
+api: "GET https://scrapebadger.com/v1/walmart/products/{item_id}/reviews"
+description: "Paginated Walmart customer reviews with the complete star histogram — counts and percentages."
+---
+
+Paginated customer reviews for a product, plus the **full rating
+distribution**: per-star counts *and* percentages, recommended percentage,
+media count, review aspects, and the most-helpful positive and negative
+reviews.
+
+**Credits:** 10
+
+<Note>
+  **10 reviews per page.** That is Walmart's page size and is not adjustable.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="item_id" type="string" required>
+  Walmart `usItemId`, e.g. `5689919121`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="page" type="integer" default="1">
+  Review page, `1`–`100`. 10 reviews per page.
+</ParamField>
+
+<ParamField query="sort" type="string">
+  Review ordering. One of `relevancy`, `submission-desc`, `submission-asc`,
+  `rating-desc`, `rating-asc`, `helpful`.
+</ParamField>
+
+## Response
+
+<ResponseField name="item_id" type="string">Echo of the requested item id.</ResponseField>
+<ResponseField name="url" type="string">The walmart.com URL that was fetched.</ResponseField>
+<ResponseField name="page" type="integer" />
+<ResponseField name="sort" type="string" />
+<ResponseField name="result_count" type="integer">Reviews on this page (10 on a full page).</ResponseField>
+<ResponseField name="distribution" type="object">
+  The complete star histogram.
+
+  <Expandable title="RatingDistribution">
+    <ResponseField name="average_rating" type="number" />
+    <ResponseField name="rounded_average_rating" type="number" />
+    <ResponseField name="total_review_count" type="integer" />
+    <ResponseField name="reviews_with_text_count" type="integer">Reviews carrying written text — the rest are ratings only.</ResponseField>
+    <ResponseField name="recommended_percentage" type="integer" />
+    <ResponseField name="total_media_count" type="integer" />
+    <ResponseField name="one_star" type="integer" />
+    <ResponseField name="two_star" type="integer" />
+    <ResponseField name="three_star" type="integer" />
+    <ResponseField name="four_star" type="integer" />
+    <ResponseField name="five_star" type="integer" />
+    <ResponseField name="one_star_percent" type="integer" />
+    <ResponseField name="two_star_percent" type="integer" />
+    <ResponseField name="three_star_percent" type="integer" />
+    <ResponseField name="four_star_percent" type="integer" />
+    <ResponseField name="five_star_percent" type="integer" />
+  </Expandable>
+</ResponseField>
+<ResponseField name="aspects" type="object[]">Walmart's per-aspect sentiment breakdown, where present.</ResponseField>
+<ResponseField name="review_summary" type="string">Walmart's AI review summary, where present.</ResponseField>
+<ResponseField name="top_positive_review" type="Review">Most-helpful positive review.</ResponseField>
+<ResponseField name="top_negative_review" type="Review">Most-helpful negative review.</ResponseField>
+<ResponseField name="reviews" type="Review[]">
+  Reviews on this page.
+
+  <Expandable title="Review">
+    <ResponseField name="review_id" type="string" />
+    <ResponseField name="rating" type="integer" />
+    <ResponseField name="title" type="string" />
+    <ResponseField name="text" type="string" />
+    <ResponseField name="author" type="string" />
+    <ResponseField name="submitted_at" type="string">ISO 8601 UTC.</ResponseField>
+    <ResponseField name="submitted_utc" type="number">Unix seconds.</ResponseField>
+    <ResponseField name="verified_purchase" type="boolean" />
+    <ResponseField name="helpful_count" type="integer" />
+    <ResponseField name="not_helpful_count" type="integer" />
+    <ResponseField name="photos" type="string[]" />
+    <ResponseField name="media" type="object[]" />
+    <ResponseField name="badges" type="Badge[]">e.g. `Verified Purchase`, `Incentivized Review`.</ResponseField>
+    <ResponseField name="seller_name" type="string" />
+    <ResponseField name="fulfilled_by" type="string" />
+    <ResponseField name="condition" type="string" />
+    <ResponseField name="syndication_source" type="string" />
+    <ResponseField name="original_language" type="string" />
+    <ResponseField name="aspects" type="object[]" />
+    <ResponseField name="client_responses" type="object[]">Seller/brand replies.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/walmart/products/5689919121/reviews?sort=helpful" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/walmart/products/5689919121/reviews?" +
+    new URLSearchParams({ sort: "helpful" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/walmart/products/5689919121/reviews",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"sort": "helpful"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "item_id": "5689919121",
+  "url": "https://www.walmart.com/reviews/product/5689919121?sort=helpful",
+  "page": 1,
+  "sort": "helpful",
+  "result_count": 10,
+  "distribution": {
+    "average_rating": 4.4,
+    "rounded_average_rating": 4.4,
+    "total_review_count": 44427,
+    "reviews_with_text_count": 7540,
+    "recommended_percentage": 86,
+    "total_media_count": 564,
+    "one_star": 4312,
+    "two_star": 950,
+    "three_star": 1399,
+    "four_star": 3244,
+    "five_star": 34522,
+    "one_star_percent": 10,
+    "two_star_percent": 2,
+    "three_star_percent": 3,
+    "four_star_percent": 7,
+    "five_star_percent": 78
+  },
+  "aspects": [],
+  "review_summary": null,
+  "reviews": [
+    {
+      "review_id": "393133004",
+      "rating": 5,
+      "title": null,
+      "text": "The air pods are air pods. When I first went to the website a discount of $70 was indicated…",
+      "author": "WalmartCustomer",
+      "submitted_at": "2025-07-24T00:00:00Z",
+      "submitted_utc": 1753315200.0,
+      "verified_purchase": true,
+      "helpful_count": 4,
+      "not_helpful_count": 0,
+      "badges": [
+        { "id": "VerifiedPurchaser", "text": "Verified Purchase", "type": "Custom", "key": "REVIEW" },
+        { "id": "PrizeIncentive", "text": "Incentivized Review", "type": "Custom", "key": "REVIEW" }
+      ],
+      "seller_name": "Walmart.com",
+      "original_language": "English"
+    }
+  ]
+}
+```
+
+<Tip>
+  `total_review_count` counts every rating, while `reviews_with_text_count`
+  counts only reviews with written text — in the example above, 44,427 ratings
+  but 7,540 with prose. Size a full crawl off `reviews_with_text_count / 10`
+  pages, not the headline count.
+</Tip>
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | Item does not exist or has been removed. |
+| `422` | Anti-bot challenge — **not billed**. Retry; it succeeds. |

@@ -1,0 +1,80 @@
+---
+title: "List Markets"
+api: "GET https://scrapebadger.com/v1/walmart/markets"
+description: "List the supported Walmart markets. US only."
+---
+
+List the supported Walmart markets. This endpoint is **free**.
+
+**Credits:** 0
+
+<Warning>
+  **Only `walmart.com` (US) is supported.** `walmart.ca` and `walmart.com.mx`
+  run on different platforms with different payload shapes — they are not a
+  locale switch on walmart.com, and are deliberately not claimed here rather
+  than shipped broken.
+</Warning>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Response
+
+<ResponseField name="result_count" type="integer">Number of markets.</ResponseField>
+<ResponseField name="markets" type="Market[]">
+  Supported markets.
+
+  <Expandable title="Market">
+    <ResponseField name="code" type="string">e.g. `US`.</ResponseField>
+    <ResponseField name="name" type="string" />
+    <ResponseField name="domain" type="string" />
+    <ResponseField name="currency" type="string" />
+    <ResponseField name="language" type="string" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/walmart/markets" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/walmart/markets", {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+});
+const { markets } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/walmart/markets",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+markets = res.json()["markets"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "result_count": 1,
+  "markets": [
+    {
+      "code": "US",
+      "name": "United States",
+      "domain": "walmart.com",
+      "currency": "USD",
+      "language": "en-US"
+    }
+  ]
+}
+```
