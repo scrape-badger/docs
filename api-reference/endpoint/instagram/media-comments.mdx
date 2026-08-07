@@ -1,0 +1,94 @@
+---
+title: "Comments & Likers"
+api: "GET https://scrapebadger.com/v1/instagram/media/{code}/comments"
+description: "Paginated comments on a media, plus the likers of a comment."
+---
+
+Page through a media's `comments`, or list the `likers` of a comment.
+
+**Credits:** 8 (`comments`, `comments/{comment_id}/likers`)
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="code" type="string" required>
+  Media shortcode.
+</ParamField>
+
+<ParamField path="comment_id" type="string">
+  **Comment-liker path only** — the parent comment's `pk`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="amount" type="integer" default="20">Page size.</ParamField>
+<ParamField query="cursor" type="string">Opaque next-page token from a previous `next_cursor`.</ParamField>
+
+## Paths
+
+- `GET /v1/instagram/media/{code}/comments` — top-level comments.
+- `GET /v1/instagram/media/{code}/comments/{comment_id}/likers` — likers of a comment.
+
+## Response
+
+<ResponseField name="items" type="Comment[] | UserShort[]">
+  For the comments path a `Comment`: `pk`, `text`, `user`, `created_at`,
+  `created_at_utc`, `like_count`, `has_liked`. For the comment-liker path a `UserShort`.
+</ResponseField>
+<ResponseField name="count" type="integer" />
+<ResponseField name="next_cursor" type="string">Null when exhausted.</ResponseField>
+<ResponseField name="has_more" type="boolean" />
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/instagram/media/C8xYzAbCdE1/comments?amount=20" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/instagram/media/C8xYzAbCdE1/comments?amount=20",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { items, next_cursor } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/instagram/media/C8xYzAbCdE1/comments",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"amount": 20},
+)
+page = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "items": [
+    {
+      "pk": "17900000000000000",
+      "text": "This is amazing!",
+      "user": { "pk": "998877", "username": "fan_account", "is_verified": false },
+      "created_at": "2026-07-30T18:10:00Z",
+      "created_at_utc": 1785434600,
+      "like_count": 412,
+      "has_liked": false
+    }
+  ],
+  "count": 1,
+  "next_cursor": "QVFE...==",
+  "has_more": true
+}
+```

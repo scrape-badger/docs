@@ -1,0 +1,110 @@
+---
+title: "Instagram API Overview"
+description: "Pull public Instagram data — profiles, posts, media, comments, hashtags and search — as clean JSON, with no Instagram login or API key required."
+---
+
+## Overview
+
+The ScrapeBadger **Instagram API** turns `instagram.com`'s public surface into a
+clean JSON feed: user profiles and their `related` accounts and `posts`, media
+detail with `oembed`, comments and comment-likers, hashtag info and `recent`
+feeds, and search (hashtags + blended top).
+
+<Note>
+  Authenticated (account-pool) endpoints — stories, highlights,
+  followers/following, locations, audio, and the user about/videos/reels/tagged/pinned,
+  hashtag top/reels, media likers, comment replies and search
+  users/places/reels/music/autocomplete variants — are **temporarily
+  unavailable** and not documented while offline.
+</Note>
+
+<Info>
+  All endpoints are `GET`, live under `https://scrapebadger.com/v1/instagram/*`,
+  and authenticate with the `X-API-Key` header. **No Instagram account or
+  upstream API key is required** — ScrapeBadger handles authentication, rate
+  limiting, TLS fingerprinting and proxy rotation transparently. Credits are
+  charged per request (see the table below) and reported on the
+  `X-Credits-Used` response header.
+</Info>
+
+## Features
+
+- **Profiles** — full public profile by `username`: bio, links, counts,
+  verification, business/professional metadata, plus `related` accounts and
+  paginated `posts`.
+- **Media** — media detail by shortcode `code`, oEmbed, paginated `comments`,
+  and per-comment `likers`.
+- **Hashtags** — hashtag info by `tag`, plus a paginated `recent` feed.
+- **Search** — `hashtags` and blended `top` results.
+
+## Honesty caveat
+
+<Warning>
+  These endpoints read Instagram's **public** surface only. Private accounts
+  expose profile metadata but not their posts or media. Fields
+  reflect what Instagram serves to an unauthenticated client; some
+  professional/business fields are only present when the account has opted into
+  them.
+</Warning>
+
+## Conventions
+
+- **Pagination.** List endpoints take `amount` (page size) and a `cursor`
+  (opaque next-page token). Every list response is wrapped in
+  `{ items, count, next_cursor, has_more }` —
+  pass `next_cursor` back as `cursor` to walk forward until `has_more` is
+  `false`.
+- **Datetimes.** Every datetime ships in **both** a Unix form (`*_utc`) and an
+  ISO 8601 UTC string (`*_at`), e.g. `taken_at` + `taken_at_utc`.
+
+## Credits
+
+| Endpoint group | Example path | Credits |
+| -------------- | ------------ | ------- |
+| Health / reference | `GET /v1/instagram/health` | 0 |
+| oEmbed / search hashtags | `GET /v1/instagram/media/{code}/oembed` | 2 |
+| Standard read | `GET /v1/instagram/users/{username}` | 5 |
+| Paginated listings | `GET /v1/instagram/users/{username}/posts` | 8 |
+
+<Info>
+  Standard read (5) covers profile, `related`, media detail, hashtag info and
+  search `top`. Paginated listings (8) cover `posts`, hashtag `recent`,
+  comments and comment-likers.
+</Info>
+
+## Quickstart
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/instagram/users/instagram" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/instagram/users/instagram",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { user } = await res.json();
+console.log(user.follower_count, "followers");
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/instagram/users/instagram",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+print(res.json()["user"]["follower_count"], "followers")
+```
+
+</CodeGroup>
+
+<Tip>
+  Resolve a handle with [`/users/{username}`](/api-reference/endpoint/instagram/get-user),
+  then page their media with
+  [`/users/{username}/posts`](/api-reference/endpoint/instagram/user-posts) by
+  passing the returned `next_cursor` back as `cursor` until `has_more` is false.
+</Tip>

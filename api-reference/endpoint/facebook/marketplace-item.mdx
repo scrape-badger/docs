@@ -1,0 +1,142 @@
+---
+title: "Get Marketplace Item"
+api: "GET https://scrapebadger.com/v1/facebook/marketplace/item/{item_id}"
+description: "Full Facebook Marketplace listing detail — description body, complete photo gallery, vertical attributes and the seller profile."
+---
+
+Fetch one Marketplace listing in full. Unlike the truncated feed cards
+returned by search and category browse, this endpoint populates the
+`description` body, the complete `photos[]` gallery and the vertical-specific
+`attributes` map.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="item_id" type="string" required>
+  Marketplace listing id — the numeric segment of
+  `facebook.com/marketplace/item/<item_id>/`, and the `id` field on every
+  search or category result.
+</ParamField>
+
+## Response
+
+Returns a single `MarketplaceListing` object (not wrapped in an envelope).
+
+<ResponseField name="id" type="string">Marketplace listing id.</ResponseField>
+<ResponseField name="title" type="string">Listing title.</ResponseField>
+<ResponseField name="custom_title" type="string">Seller-authored display title, when Facebook renders a different one.</ResponseField>
+<ResponseField name="url" type="string">Canonical listing permalink.</ResponseField>
+<ResponseField name="price_formatted" type="string">Localized display price, e.g. `$1,150`.</ResponseField>
+<ResponseField name="price_amount" type="string">Numeric price as a string.</ResponseField>
+<ResponseField name="amount_with_offset" type="string">Facebook's minor-unit representation of the price.</ResponseField>
+<ResponseField name="strikethrough_price" type="string">Previous price, when the listing is discounted.</ResponseField>
+<ResponseField name="min_price" type="string">Lower bound for range listings (e.g. rentals).</ResponseField>
+<ResponseField name="max_price" type="string">Upper bound for range listings.</ResponseField>
+<ResponseField name="currency" type="string">ISO currency code.</ResponseField>
+<ResponseField name="primary_photo" type="string">Cover image URL.</ResponseField>
+<ResponseField name="photos" type="string[]">Full gallery of image URLs.</ResponseField>
+<ResponseField name="creation_time_utc" type="number">Listing creation time, Unix seconds.</ResponseField>
+<ResponseField name="created_at" type="string">Listing creation time, ISO 8601 UTC.</ResponseField>
+<ResponseField name="location_text" type="string">Display location string.</ResponseField>
+<ResponseField name="city" type="string">City.</ResponseField>
+<ResponseField name="state" type="string">State / region.</ResponseField>
+<ResponseField name="latitude" type="number">Approximate latitude.</ResponseField>
+<ResponseField name="longitude" type="number">Approximate longitude.</ResponseField>
+<ResponseField name="category_id" type="string">Marketplace category the listing sits in.</ResponseField>
+<ResponseField name="subtitles" type="string[]">Facebook's own metadata bullets — condition, mileage, beds/baths.</ResponseField>
+<ResponseField name="delivery_types" type="string[]">`local_pick_up` and/or `shipping`.</ResponseField>
+<ResponseField name="attributes" type="object">Vertical-specific key/values — vehicle `make`/`model`/`mileage`, property `beds`/`baths`.</ResponseField>
+<ResponseField name="is_sold" type="boolean">Listing has sold. Sold listings stay retrievable.</ResponseField>
+<ResponseField name="is_pending" type="boolean">Sale pending.</ResponseField>
+<ResponseField name="is_live" type="boolean">Listing is currently live.</ResponseField>
+<ResponseField name="is_hidden" type="boolean">Listing is hidden from browse.</ResponseField>
+<ResponseField name="seller" type="Actor">`id`, `name`, `url`, `profile_picture`, `is_verified`, `typename`.</ResponseField>
+<ResponseField name="description" type="string">Full listing body.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/facebook/marketplace/item/1284419203847561" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/facebook/marketplace/item/1284419203847561",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const listing = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/facebook/marketplace/item/1284419203847561",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+listing = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "id": "1284419203847561",
+  "title": "MacBook Pro 14\" M3 Pro 18GB/512GB",
+  "custom_title": null,
+  "url": "https://www.facebook.com/marketplace/item/1284419203847561/",
+  "price_formatted": "$1,150",
+  "price_amount": "1150",
+  "amount_with_offset": "115000",
+  "strikethrough_price": "$1,399",
+  "min_price": null,
+  "max_price": null,
+  "currency": "USD",
+  "primary_photo": "https://scontent.xx.fbcdn.net/v/t45.5328-4/478213_n.jpg",
+  "photos": [
+    "https://scontent.xx.fbcdn.net/v/t45.5328-4/478213_n.jpg",
+    "https://scontent.xx.fbcdn.net/v/t45.5328-4/478214_n.jpg",
+    "https://scontent.xx.fbcdn.net/v/t45.5328-4/478215_n.jpg"
+  ],
+  "creation_time_utc": 1785312840.0,
+  "created_at": "2026-07-27T14:54:00Z",
+  "location_text": "Brooklyn, NY",
+  "city": "Brooklyn",
+  "state": "NY",
+  "latitude": 40.6782,
+  "longitude": -73.9442,
+  "category_id": "electronics",
+  "subtitles": ["Used - Like New"],
+  "delivery_types": ["local_pick_up", "shipping"],
+  "attributes": { "condition": "used_like_new" },
+  "is_sold": false,
+  "is_pending": false,
+  "is_live": true,
+  "is_hidden": false,
+  "seller": {
+    "id": "100004421887301",
+    "name": "Daniel Ortiz",
+    "url": "https://www.facebook.com/profile.php?id=100004421887301",
+    "profile_picture": "https://scontent.xx.fbcdn.net/v/t1.30497-1/84628_n.jpg",
+    "is_verified": false,
+    "typename": "User"
+  },
+  "description": "Selling my 14\" MacBook Pro (M3 Pro, 18GB RAM, 512GB SSD). AppleCare until March 2027, 61 battery cycles, no scratches. Comes with the original box and 96W charger. Cash or Zelle, pickup in Park Slope."
+}
+```
+
+<Note>
+  A listing that has been deleted or is region-restricted returns `404`. Sold
+  listings remain retrievable with `is_sold: true` — use that instead of
+  treating disappearance as a sale signal.
+</Note>

@@ -1,0 +1,133 @@
+---
+title: "Get Post Comments"
+api: "GET https://scrapebadger.com/v1/facebook/posts/{post_id}/comments"
+description: "The comment thread on a Facebook post — author, message, reactions and reply counts, cursor-paginated."
+---
+
+Fetch the comment thread on a post. The first page comes from the post's own
+server-rendered shell; deeper pages replay Facebook's comment-list GraphQL
+query — which is why this endpoint costs double.
+
+**Credits:** 10
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="post_id" type="string" required>
+  Post id — numeric or `pfbid`. Ignored when `url` is supplied, but still
+  required as a path segment (pass any placeholder, e.g. `0`).
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="url" type="string">
+  Full post permalink or reel URL. **Overrides `post_id`.**
+</ParamField>
+
+<ParamField query="after" type="string">
+  Pagination cursor — the `end_cursor` from a previous response.
+</ParamField>
+
+<ParamField query="sort" type="string" default="relevance">
+  One of `relevance`, `newest`, `most_relevant`.
+</ParamField>
+
+## Response
+
+<ResponseField name="comments" type="Comment[]">
+  Each `Comment` includes `id`, `message`, `author` (Actor — `id`, `name`,
+  `url`, `profile_picture`, `is_verified`, `typename`), `creation_time_utc`,
+  `created_at`, `reaction_count` and `reply_count`.
+</ResponseField>
+<ResponseField name="count" type="integer">Number of comments in this page.</ResponseField>
+<ResponseField name="total_count" type="integer">
+  Facebook's own reported comment total for the post. It can exceed the number
+  of comments actually reachable through pagination.
+</ResponseField>
+<ResponseField name="end_cursor" type="string">Pass as `after` for the next page.</ResponseField>
+<ResponseField name="has_next_page" type="boolean">Whether more comments are reachable.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/facebook/posts/1094832771620487/comments?sort=newest" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/facebook/posts/1094832771620487/comments?" +
+    new URLSearchParams({ sort: "newest" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/facebook/posts/1094832771620487/comments",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"sort": "newest"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "comments": [
+    {
+      "id": "Y29tbWVudDoxMDk0ODMyNzcxNjIwNDg3XzQ0MjE5",
+      "message": "The resolution on this is unreal. What filter set was used?",
+      "author": {
+        "id": "100001874420913",
+        "name": "Priya Raman",
+        "url": "https://www.facebook.com/profile.php?id=100001874420913",
+        "profile_picture": "https://scontent.xx.fbcdn.net/v/t1.30497-1/22841_n.jpg",
+        "is_verified": false,
+        "typename": "User"
+      },
+      "creation_time_utc": 1785399720.0,
+      "created_at": "2026-07-28T15:02:00Z",
+      "reaction_count": 412,
+      "reply_count": 7
+    },
+    {
+      "id": "Y29tbWVudDoxMDk0ODMyNzcxNjIwNDg3XzQ0MjIx",
+      "message": "Planets forming in real time. What a era to be alive.",
+      "author": {
+        "id": "100009338271604",
+        "name": "Tomás Lindqvist",
+        "url": "https://www.facebook.com/profile.php?id=100009338271604",
+        "profile_picture": "https://scontent.xx.fbcdn.net/v/t1.30497-1/91038_n.jpg",
+        "is_verified": false,
+        "typename": "User"
+      },
+      "creation_time_utc": 1785400380.0,
+      "created_at": "2026-07-28T15:13:00Z",
+      "reaction_count": 88,
+      "reply_count": 0
+    }
+  ],
+  "count": 2,
+  "total_count": 1844,
+  "end_cursor": "AQHNvbW1lbnRzX2N1cnNvcl8wMDE=",
+  "has_next_page": true
+}
+```
+
+<Warning>
+  `total_count` is what Facebook advertises, not what it will serve. Treat
+  `has_next_page: false` as the real end of the thread — deep comment
+  traversal is silently capped.
+</Warning>

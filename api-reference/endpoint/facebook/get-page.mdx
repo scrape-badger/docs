@@ -1,0 +1,124 @@
+---
+title: "Get Page or Profile"
+api: "GET https://scrapebadger.com/v1/facebook/pages/{identifier}"
+description: "A Facebook Page or public profile — category, verification, follower and like counts, and the About tile (website, phone, email, address, rating)."
+---
+
+Fetch a Facebook Page or public profile by vanity slug or numeric id. Both
+endpoints share one `Profile` model; the `type` field distinguishes them.
+
+| Endpoint | Use for |
+| -------- | ------- |
+| `GET /v1/facebook/pages/{identifier}` | business / organization Pages |
+| `GET /v1/facebook/profiles/{identifier}` | personal and public profiles |
+
+Both fetch the **About** tile as a second hop, so `website`, `phone`, `email`,
+`address` and `rating` are populated where the entity publishes them.
+
+**Credits:** 5 (each)
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="identifier" type="string" required>
+  Vanity slug (the `facebook.com/<slug>` segment, e.g. `nasa`) or the numeric
+  entity id.
+</ParamField>
+
+## Response
+
+Returns a single `Profile` object.
+
+<ResponseField name="id" type="string">Numeric entity id.</ResponseField>
+<ResponseField name="name" type="string">Display name.</ResponseField>
+<ResponseField name="url" type="string">Canonical facebook.com URL.</ResponseField>
+<ResponseField name="username" type="string">Vanity slug, when the entity has one.</ResponseField>
+<ResponseField name="type" type="string">`profile` or `page`.</ResponseField>
+<ResponseField name="is_verified" type="boolean">Blue-check verification.</ResponseField>
+<ResponseField name="profile_picture" type="string">Avatar URL.</ResponseField>
+<ResponseField name="cover_photo" type="string">Cover image URL.</ResponseField>
+<ResponseField name="category" type="string">Page category, e.g. `Government Organization`.</ResponseField>
+<ResponseField name="description" type="string">Bio / Page intro.</ResponseField>
+<ResponseField name="followers_count" type="integer">Follower count. `null` when Facebook renders only an abbreviated string or the entity hides it.</ResponseField>
+<ResponseField name="likes_count" type="integer">Page like count.</ResponseField>
+<ResponseField name="friends_count" type="integer">Friend count (profiles).</ResponseField>
+<ResponseField name="is_business_page" type="boolean">Whether the entity is a business Page.</ResponseField>
+<ResponseField name="website" type="string">Website from the About tile.</ResponseField>
+<ResponseField name="phone" type="string">Public phone number.</ResponseField>
+<ResponseField name="email" type="string">Public email address.</ResponseField>
+<ResponseField name="address" type="string">Public street address.</ResponseField>
+<ResponseField name="rating" type="number">Average rating, `0`–`5`.</ResponseField>
+<ResponseField name="rating_count" type="integer">Number of ratings.</ResponseField>
+<ResponseField name="about" type="object">
+  Remaining raw About-tile key/values that have no first-class field — hours,
+  price range, founding date, mission, awards and other Page-type-specific
+  entries.
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/facebook/pages/nasa" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/facebook/pages/nasa", {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+});
+const page = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/facebook/pages/nasa",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+page = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "id": "54971236771",
+  "name": "NASA",
+  "url": "https://www.facebook.com/NASA",
+  "username": "NASA",
+  "type": "page",
+  "is_verified": true,
+  "profile_picture": "https://scontent.xx.fbcdn.net/v/t39.30808-1/32118_n.jpg",
+  "cover_photo": "https://scontent.xx.fbcdn.net/v/t39.30808-6/91224_n.jpg",
+  "category": "Government Organization",
+  "description": "Explore the universe and discover our home planet with NASA.",
+  "followers_count": 22140883,
+  "likes_count": 21876204,
+  "friends_count": null,
+  "is_business_page": true,
+  "website": "http://www.nasa.gov",
+  "phone": null,
+  "email": null,
+  "address": "300 E Street SW, Washington, DC 20546",
+  "rating": null,
+  "rating_count": null,
+  "about": {
+    "mission": "To explore the secrets of the universe for the benefit of all.",
+    "founded": "July 29, 1958"
+  }
+}
+```
+
+<Note>
+  Personal profiles expose far less than Pages: most fields on a locked-down
+  profile come back `null`. `404` means the slug or id does not resolve, or the
+  entity is region-restricted.
+</Note>

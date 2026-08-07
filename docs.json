@@ -833,6 +833,53 @@
         ]
       },
       {
+        "tab": "Instagram",
+        "groups": [
+          {
+            "group": "Instagram API",
+            "pages": [
+              "instagram/overview"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api-reference/endpoint/instagram/get-user",
+              "api-reference/endpoint/instagram/user-posts",
+              "api-reference/endpoint/instagram/get-media",
+              "api-reference/endpoint/instagram/media-comments",
+              "api-reference/endpoint/instagram/get-hashtag",
+              "api-reference/endpoint/instagram/search"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Facebook",
+        "groups": [
+          {
+            "group": "Facebook API",
+            "pages": [
+              "facebook/overview"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api-reference/endpoint/facebook/marketplace-search",
+              "api-reference/endpoint/facebook/marketplace-category",
+              "api-reference/endpoint/facebook/marketplace-item",
+              "api-reference/endpoint/facebook/get-page",
+              "api-reference/endpoint/facebook/get-page-posts",
+              "api-reference/endpoint/facebook/get-group",
+              "api-reference/endpoint/facebook/get-post",
+              "api-reference/endpoint/facebook/get-post-comments",
+              "api-reference/endpoint/facebook/ads-search"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "TikTok",
         "groups": [
           {

@@ -1,0 +1,111 @@
+---
+title: "User Posts"
+api: "GET https://scrapebadger.com/v1/instagram/users/{username}/posts"
+description: "Paginated posts for a user, wrapped in the standard list envelope."
+---
+
+Page through a public user's `posts`.
+
+**Credits:** 8 per request
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="username" type="string" required>
+  Instagram handle without the `@`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="amount" type="integer" default="12">
+  Page size — how many media items to return this page.
+</ParamField>
+
+<ParamField query="cursor" type="string">
+  Opaque next-page token from a previous response's `next_cursor`. Omit for the
+  first page.
+</ParamField>
+
+## Response
+
+<ResponseField name="items" type="Media[]">
+  Media cards — see the [Get Media](/api-reference/endpoint/instagram/get-media)
+  field reference (`pk`, `id`, `code`, `taken_at`/`_utc`, `media_type`,
+  `product_type`, `caption_text`, `like_count`, `comment_count`, `play_count`,
+  `thumbnail_url`, `video_url`, `url`, `user`, `resources`, …).
+</ResponseField>
+<ResponseField name="count" type="integer">Items in this page.</ResponseField>
+<ResponseField name="next_cursor" type="string">Pass back as `cursor` for the next page (null when exhausted).</ResponseField>
+<ResponseField name="has_more" type="boolean">Whether more pages remain.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/instagram/users/instagram/posts?amount=12" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+let cursor, all = [];
+do {
+  const res = await fetch(
+    "https://scrapebadger.com/v1/instagram/users/instagram/posts?" +
+      new URLSearchParams({ amount: "12", ...(cursor && { cursor }) }),
+    { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+  );
+  const page = await res.json();
+  all.push(...page.items);
+  cursor = page.has_more ? page.next_cursor : null;
+} while (cursor);
+```
+
+```python Python
+import requests
+
+cursor, items = None, []
+while True:
+    res = requests.get(
+        "https://scrapebadger.com/v1/instagram/users/instagram/posts",
+        headers={"X-API-Key": "YOUR_API_KEY"},
+        params={"amount": 12, **({"cursor": cursor} if cursor else {})},
+    )
+    page = res.json()
+    items += page["items"]
+    if not page["has_more"]:
+        break
+    cursor = page["next_cursor"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "items": [
+    {
+      "pk": "3401234567890123456",
+      "id": "3401234567890123456_25025320",
+      "code": "C8xYzAbCdE1",
+      "taken_at": "2026-07-30T18:04:11Z",
+      "taken_at_utc": 1785434651,
+      "media_type": 8,
+      "product_type": "carousel_container",
+      "caption_text": "Summer on Instagram.",
+      "like_count": 1240553,
+      "comment_count": 8842,
+      "play_count": null,
+      "thumbnail_url": "https://scontent.cdninstagram.com/v/thumb.jpg",
+      "url": "https://www.instagram.com/p/C8xYzAbCdE1/"
+    }
+  ],
+  "count": 1,
+  "next_cursor": "QVFE...==",
+  "has_more": true
+}
+```

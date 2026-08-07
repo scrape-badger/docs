@@ -1,0 +1,84 @@
+---
+title: "Hashtag Info & Feeds"
+api: "GET https://scrapebadger.com/v1/instagram/hashtags/{tag}"
+description: "Hashtag metadata by name, plus a paginated recent feed for the tag."
+---
+
+Fetch a hashtag's metadata by `tag` (no `#`), then page its `recent` media feed.
+
+**Credits:** 5 (hashtag info) · 8 (`recent` feed)
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="tag" type="string" required>
+  Hashtag without the `#`, e.g. `travel`.
+</ParamField>
+
+## Query Parameters (feed paths)
+
+<ParamField query="amount" type="integer" default="20">Page size.</ParamField>
+<ParamField query="cursor" type="string">Opaque next-page token from a previous `next_cursor`.</ParamField>
+
+## Paths
+
+- `GET /v1/instagram/hashtags/{tag}` — hashtag info. **5 credits.**
+- `GET /v1/instagram/hashtags/{tag}/recent` — most recent media. **8 credits.**
+
+## Response
+
+<ResponseField name="hashtag" type="object">
+  For the info path — a `Hashtag`: `id`, `name`, `media_count`, `profile_pic_url`.
+</ResponseField>
+<ResponseField name="items" type="Media[]">
+  For feed paths — see the [Get Media](/api-reference/endpoint/instagram/get-media)
+  field reference. Wrapped in `{ items, count, next_cursor, has_more }`.
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/instagram/hashtags/travel" \
+  -H "X-API-Key: YOUR_API_KEY"
+
+curl "https://scrapebadger.com/v1/instagram/hashtags/travel/recent?amount=20" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/instagram/hashtags/travel/recent?amount=20",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { items, next_cursor } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/instagram/hashtags/travel",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+hashtag = res.json()["hashtag"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "hashtag": {
+    "id": "17843712345678901",
+    "name": "travel",
+    "media_count": 712345678,
+    "profile_pic_url": "https://scontent.cdninstagram.com/v/tag.jpg"
+  }
+}
+```

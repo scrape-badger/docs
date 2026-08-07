@@ -1,0 +1,83 @@
+---
+title: "Search"
+api: "GET https://scrapebadger.com/v1/instagram/search/top"
+description: "Search Instagram across hashtags and blended top results."
+---
+
+Search Instagram by keyword. Both typed endpoints share one query shape.
+
+**Credits:** 5 (`top`) · 2 (`hashtags`)
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  The search term.
+</ParamField>
+
+## Paths
+
+- `GET /v1/instagram/search/hashtags` — matching hashtags (`Hashtag[]`). **2 credits.**
+- `GET /v1/instagram/search/top` — blended top results. **5 credits.**
+
+## Response
+
+<ResponseField name="items" type="object[]">
+  Typed results per path — `Hashtag` (hashtags) or a blended list (top).
+  Wrapped in `{ items, count, next_cursor, has_more }`.
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/instagram/search/hashtags?query=travel" \
+  -H "X-API-Key: YOUR_API_KEY"
+
+curl "https://scrapebadger.com/v1/instagram/search/top?query=nasa" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/instagram/search/hashtags?" +
+    new URLSearchParams({ query: "travel" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { items } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/instagram/search/hashtags",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "travel"},
+)
+items = res.json()["items"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "items": [
+    {
+      "id": "17843712345678901",
+      "name": "travel",
+      "media_count": 712345678,
+      "profile_pic_url": "https://scontent.cdninstagram.com/v/tag.jpg"
+    }
+  ],
+  "count": 1,
+  "next_cursor": null,
+  "has_more": false
+}
+```

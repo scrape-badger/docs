@@ -1,0 +1,178 @@
+---
+title: "Marketplace Search"
+api: "GET https://scrapebadger.com/v1/facebook/marketplace/search"
+description: "Keyword-search Facebook Marketplace with price, age, condition, delivery and sort filters."
+---
+
+Search Facebook Marketplace by keyword in one location. Returns structured
+listings with price and currency, photos, geo coordinates, condition
+subtitles, delivery types, sold/pending state and the seller actor.
+
+Marketplace has **no public Facebook API** — this endpoint is the only
+structured access to that inventory.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords, e.g. `macbook pro`.
+</ParamField>
+
+<ParamField query="location" type="string" default="nyc">
+  Marketplace location slug, e.g. `nyc`, `la`, `london`, `sydney`. Any city
+  slug Facebook accepts works — see
+  [`/marketplace/locations`](/api-reference/endpoint/facebook/marketplace-category)
+  for the common set.
+</ParamField>
+
+<ParamField query="min_price" type="integer">Minimum price, in the location's currency.</ParamField>
+<ParamField query="max_price" type="integer">Maximum price, in the location's currency.</ParamField>
+
+<ParamField query="days_since_listed" type="integer">
+  Only listings posted within the last N days, `1`–`30`.
+</ParamField>
+
+<ParamField query="sort_by" type="string">
+  One of `best_match`, `price_ascend`, `price_descend`, `distance_ascend`,
+  `creation_time_descend`.
+</ParamField>
+
+<ParamField query="item_condition" type="string">
+  Comma-separated. One or more of `new`, `used_like_new`, `used_good`,
+  `used_fair`.
+</ParamField>
+
+<ParamField query="delivery_method" type="string">
+  One of `local_pick_up`, `shipping`.
+</ParamField>
+
+<ParamField query="after" type="string">
+  Pagination cursor — the `end_cursor` from a previous response.
+</ParamField>
+
+## Response
+
+<ResponseField name="listings" type="MarketplaceListing[]">
+  Each `MarketplaceListing` includes `id`, `title`, `custom_title`, `url`,
+  `price_formatted`, `price_amount`, `amount_with_offset`,
+  `strikethrough_price`, `min_price`, `max_price`, `currency`,
+  `primary_photo`, `photos[]`, `creation_time_utc`, `created_at`,
+  `location_text`, `city`, `state`, `latitude`, `longitude`, `category_id`,
+  `subtitles[]`, `delivery_types[]`, `attributes`, `is_sold`, `is_pending`,
+  `is_live`, `is_hidden`, `seller` and `description`.
+</ResponseField>
+<ResponseField name="count" type="integer">Number of listings in this page.</ResponseField>
+<ResponseField name="end_cursor" type="string">Pass as `after` for the next page.</ResponseField>
+<ResponseField name="has_next_page" type="boolean">Whether more listings are reachable.</ResponseField>
+<ResponseField name="query" type="string">The query that was searched.</ResponseField>
+<ResponseField name="location" type="string">The location slug that was searched.</ResponseField>
+
+<Note>
+  Feed cards are truncated by Facebook: `description`, the full `photos[]`
+  gallery and `attributes` are reliably populated only on
+  [`/marketplace/item/{item_id}`](/api-reference/endpoint/facebook/marketplace-item).
+</Note>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/facebook/marketplace/search?query=macbook%20pro&location=nyc&max_price=1200&sort_by=creation_time_descend" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/facebook/marketplace/search?" +
+    new URLSearchParams({
+      query: "macbook pro",
+      location: "nyc",
+      max_price: "1200",
+      sort_by: "creation_time_descend",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/facebook/marketplace/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "query": "macbook pro",
+        "location": "nyc",
+        "max_price": 1200,
+        "sort_by": "creation_time_descend",
+    },
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "listings": [
+    {
+      "id": "1284419203847561",
+      "title": "MacBook Pro 14\" M3 Pro 18GB/512GB",
+      "custom_title": null,
+      "url": "https://www.facebook.com/marketplace/item/1284419203847561/",
+      "price_formatted": "$1,150",
+      "price_amount": "1150",
+      "amount_with_offset": "115000",
+      "strikethrough_price": "$1,399",
+      "min_price": null,
+      "max_price": null,
+      "currency": "USD",
+      "primary_photo": "https://scontent.xx.fbcdn.net/v/t45.5328-4/478213_n.jpg",
+      "photos": [],
+      "creation_time_utc": 1785312840.0,
+      "created_at": "2026-07-27T14:54:00Z",
+      "location_text": "Brooklyn, NY",
+      "city": "Brooklyn",
+      "state": "NY",
+      "latitude": 40.6782,
+      "longitude": -73.9442,
+      "category_id": "electronics",
+      "subtitles": ["Used - Like New"],
+      "delivery_types": ["local_pick_up", "shipping"],
+      "attributes": {},
+      "is_sold": false,
+      "is_pending": false,
+      "is_live": true,
+      "is_hidden": false,
+      "seller": {
+        "id": "100004421887301",
+        "name": "Daniel Ortiz",
+        "url": "https://www.facebook.com/profile.php?id=100004421887301",
+        "profile_picture": "https://scontent.xx.fbcdn.net/v/t1.30497-1/84628_n.jpg",
+        "is_verified": false,
+        "typename": "User"
+      },
+      "description": null
+    }
+  ],
+  "count": 1,
+  "end_cursor": "AQHRb2xkX2N1cnNvcl9leGFtcGxlXzAwMQ==",
+  "has_next_page": true,
+  "query": "macbook pro",
+  "location": "nyc"
+}
+```
+
+<Tip>
+  Combine `days_since_listed=1` with `sort_by=creation_time_descend` to poll a
+  location for fresh inventory without re-reading the whole feed.
+</Tip>

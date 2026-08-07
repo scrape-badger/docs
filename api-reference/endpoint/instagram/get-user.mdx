@@ -1,0 +1,109 @@
+---
+title: "Get User Profile"
+api: "GET https://scrapebadger.com/v1/instagram/users/{username}"
+description: "Full public Instagram profile by username — bio, links, counts, verification and business metadata. Plus /related."
+---
+
+Fetch a single public Instagram profile by its `username` (handle). The same
+path also exposes a `/related` similar-accounts list.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="username" type="string" required>
+  Instagram handle without the `@`, e.g. `instagram`.
+</ParamField>
+
+## Related paths
+
+- `GET /v1/instagram/users/{username}/related` — similar / suggested accounts.
+  **5 credits.**
+
+## Response
+
+<ResponseField name="user" type="object">
+  The full `User`. Key fields:
+
+  <Expandable title="user">
+    <ResponseField name="pk" type="string">Numeric account id.</ResponseField>
+    <ResponseField name="username" type="string" />
+    <ResponseField name="full_name" type="string" />
+    <ResponseField name="is_private" type="boolean" />
+    <ResponseField name="is_verified" type="boolean" />
+    <ResponseField name="profile_pic_url" type="string" />
+    <ResponseField name="profile_pic_url_hd" type="string" />
+    <ResponseField name="media_count" type="integer" />
+    <ResponseField name="follower_count" type="integer" />
+    <ResponseField name="following_count" type="integer" />
+    <ResponseField name="biography" type="string" />
+    <ResponseField name="bio_links" type="object[]">`title`, `url`.</ResponseField>
+    <ResponseField name="external_url" type="string" />
+    <ResponseField name="account_type" type="integer" />
+    <ResponseField name="is_business" type="boolean" />
+    <ResponseField name="public_email" type="string" />
+    <ResponseField name="category" type="string" />
+    <ResponseField name="city_name" type="string" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/instagram/users/instagram" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/instagram/users/instagram",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { user } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/instagram/users/instagram",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+user = res.json()["user"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "user": {
+    "pk": "25025320",
+    "username": "instagram",
+    "full_name": "Instagram",
+    "is_private": false,
+    "is_verified": true,
+    "profile_pic_url": "https://scontent.cdninstagram.com/v/pfp.jpg",
+    "profile_pic_url_hd": "https://scontent.cdninstagram.com/v/pfp_hd.jpg",
+    "media_count": 8123,
+    "follower_count": 682000000,
+    "following_count": 245,
+    "biography": "Discover what's next on Instagram.",
+    "bio_links": [{ "title": "Help Center", "url": "https://help.instagram.com" }],
+    "external_url": "https://about.instagram.com",
+    "account_type": 3,
+    "is_business": true,
+    "public_email": null,
+    "category": "Internet company",
+    "city_name": "Menlo Park",
+    "scraped_at": "2026-08-05T12:00:00Z"
+  }
+}
+```

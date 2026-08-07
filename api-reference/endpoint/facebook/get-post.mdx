@@ -1,0 +1,128 @@
+---
+title: "Get Post"
+api: "GET https://scrapebadger.com/v1/facebook/posts/{post_id}"
+description: "A single Facebook post by numeric id, pfbid, permalink.php form or reel URL — with attachments, reaction breakdown, share and comment counts."
+---
+
+Fetch one post. Facebook post ids come in several shapes — bare numeric ids,
+`pfbid` strings, `permalink.php` query forms and `reel/` URLs. When you have a
+full URL, pass it as `url`; it overrides the path id.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="post_id" type="string" required>
+  Post id — numeric or `pfbid`. Ignored when `url` is supplied, but still
+  required as a path segment (pass any placeholder, e.g. `0`).
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="url" type="string">
+  Full post permalink or reel URL. **Overrides `post_id`.** Use this for
+  `permalink.php?story_fbid=…&id=…` and `{page}/posts/{pfbid}` forms that a
+  bare id cannot resolve.
+</ParamField>
+
+## Response
+
+Returns a single `Post` object.
+
+<ResponseField name="id" type="string">Story id.</ResponseField>
+<ResponseField name="post_id" type="string">Post id.</ResponseField>
+<ResponseField name="url" type="string">Canonical post URL.</ResponseField>
+<ResponseField name="permalink_url" type="string">Permalink URL.</ResponseField>
+<ResponseField name="message" type="string">Post text.</ResponseField>
+<ResponseField name="story_type" type="string">Facebook's story classification, e.g. a shared-link or life-event story.</ResponseField>
+<ResponseField name="creation_time_utc" type="number">Post time, Unix seconds.</ResponseField>
+<ResponseField name="created_at" type="string">Post time, ISO 8601 UTC.</ResponseField>
+<ResponseField name="author" type="Actor">`id`, `name`, `url`, `profile_picture`, `is_verified`, `typename`.</ResponseField>
+<ResponseField name="attachments" type="Media[]">`type` (`Photo` · `Video`), `id`, `uri`, `width`, `height`, `url`, `playable_url`.</ResponseField>
+<ResponseField name="reaction_count" type="integer">Total reactions.</ResponseField>
+<ResponseField name="reaction_count_text" type="string">Facebook's abbreviated display string, e.g. `48K`.</ResponseField>
+<ResponseField name="top_reactions" type="object[]">`{ name, count }` — `like`, `love`, `haha`, `wow`, `sad`, `angry`, `care`.</ResponseField>
+<ResponseField name="comment_count" type="integer">Number of comments.</ResponseField>
+<ResponseField name="share_count" type="integer">Number of shares.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/facebook/posts/0?url=https://www.facebook.com/NASA/posts/pfbid02Kx9YqLmN4vT7wJ3hR8sQ2fZ1nB6cD5" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/facebook/posts/1094832771620487",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const post = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/facebook/posts/1094832771620487",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+post = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "id": "pfbid02Kx9YqLmN4vT7wJ3hR8sQ2fZ1nB6cD5",
+  "post_id": "1094832771620487",
+  "url": "https://www.facebook.com/NASA/posts/pfbid02Kx9YqLmN4vT7wJ3hR8sQ2fZ1nB6cD5",
+  "permalink_url": "https://www.facebook.com/NASA/posts/pfbid02Kx9YqLmN4vT7wJ3hR8sQ2fZ1nB6cD5",
+  "message": "Webb just resolved the disk around a star 1,300 light-years away. Those rings? Planets, forming right now.",
+  "creation_time_utc": 1785398400.0,
+  "created_at": "2026-07-28T14:40:00Z",
+  "author": {
+    "id": "54971236771",
+    "name": "NASA",
+    "url": "https://www.facebook.com/NASA",
+    "profile_picture": "https://scontent.xx.fbcdn.net/v/t39.30808-1/32118_n.jpg",
+    "is_verified": true,
+    "typename": "Page"
+  },
+  "attachments": [
+    {
+      "type": "Photo",
+      "id": "1094832768287154",
+      "uri": "https://scontent.xx.fbcdn.net/v/t39.30808-6/558921_n.jpg",
+      "width": 2048,
+      "height": 2048,
+      "url": "https://www.facebook.com/photo/?fbid=1094832768287154",
+      "playable_url": null
+    }
+  ],
+  "reaction_count": 48213,
+  "reaction_count_text": "48K",
+  "top_reactions": [
+    { "name": "like", "count": 31204 },
+    { "name": "love", "count": 14882 },
+    { "name": "wow", "count": 2127 }
+  ],
+  "comment_count": 1844,
+  "share_count": 6721,
+  "story_type": null
+}
+```
+
+<Note>
+  A deleted or region-restricted post returns `404`. Comments are a separate,
+  heavier call —
+  [`/posts/{post_id}/comments`](/api-reference/endpoint/facebook/get-post-comments).
+</Note>

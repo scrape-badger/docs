@@ -1,0 +1,167 @@
+---
+title: "Facebook API Overview"
+description: "Facebook Marketplace listings, search, Pages, profiles, Groups, posts, comments and the Ad Library as clean JSON — no Meta developer app, App Review or access token required."
+---
+
+## Overview
+
+The ScrapeBadger **Facebook API** turns `facebook.com` into a clean JSON feed:
+**Marketplace** listings, global search across seven tabs, Page and profile
+detail, Group metadata and feeds, post and comment threads, and the public
+**Ad Library**.
+
+<Info>
+  All endpoints are `GET`, live under `https://scrapebadger.com/v1/facebook/*`,
+  and authenticate with the `X-API-Key` header. Credits are charged per request
+  (see the table below) and reported on the `X-Credits-Used` response header.
+</Info>
+
+<Warning>
+  **Global keyword Search** (`/search`, `/search/pages`, `/search/people`,
+  `/search/groups`, `/search/posts`, `/search/places`, `/search/events`) is
+  **temporarily unavailable** while we expand capacity and currently returns
+  `503 {"error": "temporarily_unavailable"}`. Everything else — Marketplace,
+  Pages, profiles, Groups, posts, comments and the Ad Library — is live.
+</Warning>
+
+<Note>
+  Facebook's own Graph API exposes **no Marketplace inventory at any price**,
+  and reading Pages, Groups or posts through Graph requires an owned asset plus
+  an approved permission. This API needs none of that — no Meta developer app,
+  no App Review, no OAuth tokens.
+</Note>
+
+## Features
+
+- **Marketplace search** — the headline surface. Keyword search across the
+  largest classifieds inventory in the world, with filters for price range,
+  age of listing, condition, delivery method and sort order. Returns
+  `price_amount` + `currency`, geo coordinates, photo galleries, condition
+  subtitles, `is_sold` / `is_pending` state and the seller actor.
+- **Marketplace category browse** — walk a whole vertical (`vehicles`,
+  `propertyrentals`, `electronics`, `apparel`, …) in one location, with the
+  same price and sort filters.
+- **Marketplace item detail** — the full listing: description body, complete
+  `photos[]` gallery, vertical-specific `attributes` (vehicle make/model/
+  mileage, property beds/baths) and seller profile.
+- **Search across seven tabs** — one mixed `all` tab plus `pages`, `people`,
+  `groups`, `posts`, `places` and `events`. Every result carries a `type`, an
+  id and a canonical URL you can hand straight to a detail endpoint.
+- **Pages & profiles** — name, category, verification, cover photo, follower /
+  like counts, and the About tile (website, phone, email, address, rating),
+  plus paginated timelines.
+- **Groups** — privacy, member count, description, creation date, and the
+  group feed with full post objects.
+- **Posts & comments** — a single post by numeric id, `pfbid` string,
+  `permalink.php` form or reel URL, with attachments, reaction breakdown
+  (`top_reactions[]`), share and comment counts — and the comment thread with
+  author, reactions and reply counts.
+- **Ad Library** — competitive-intelligence search over Facebook's public ad
+  archive: creative copy, snapshot URL, flight dates, `publisher_platforms[]`,
+  images/videos and the CTA.
+
+## Markets
+
+Marketplace is **location-scoped** by slug and the Ad Library is
+**country-scoped** by ISO code. Search, Pages, Groups and posts are global and
+need no market parameter.
+
+| Surface | Parameter | Default | Catalog |
+| ------- | --------- | ------- | ------- |
+| Marketplace | `location` | `nyc` | [`/marketplace/locations`](/api-reference/endpoint/facebook/marketplace-category) — `nyc`, `la`, `chicago`, `houston`, `seattle`, `sanfrancisco`, `miami`, `atlanta`, `london`, `toronto`, `sydney` (any city slug works) |
+| Ad Library | `country` | `US` | Any ISO 3166-1 alpha-2 code |
+| Search / Pages / Groups / Posts | — | global | — |
+
+## Credits
+
+| Endpoint | Path | Credits |
+| -------- | ---- | ------- |
+| Marketplace search | `GET /v1/facebook/marketplace/search` | 5 |
+| Marketplace category | `GET /v1/facebook/marketplace/category/{category}` | 5 |
+| Marketplace item | `GET /v1/facebook/marketplace/item/{item_id}` | 5 |
+| Marketplace locations | `GET /v1/facebook/marketplace/locations` | 0 |
+| Marketplace categories | `GET /v1/facebook/marketplace/categories` | 0 |
+| Search (all tabs) | `GET /v1/facebook/search` · `/search/{tab}` | 5 |
+| Get Page / profile | `GET /v1/facebook/pages/{identifier}` · `/profiles/{identifier}` | 5 |
+| Page / profile posts | `GET /v1/facebook/pages/{identifier}/posts` · `/profiles/{identifier}/posts` | 5 |
+| Get group | `GET /v1/facebook/groups/{group_id}` | 5 |
+| Group posts | `GET /v1/facebook/groups/{group_id}/posts` | 5 |
+| Get post | `GET /v1/facebook/posts/{post_id}` | 5 |
+| Post comments | `GET /v1/facebook/posts/{post_id}/comments` | 10 |
+| Ad Library search | `GET /v1/facebook/ads/search` | 5 |
+| Get ad | `GET /v1/facebook/ads/{ad_archive_id}` | 5 |
+
+## Quickstart
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/facebook/marketplace/search?query=macbook%20pro&location=nyc&max_price=1200" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/facebook/marketplace/search?" +
+    new URLSearchParams({
+      query: "macbook pro",
+      location: "nyc",
+      max_price: "1200",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+console.log(data.listings.length, "listings");
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/facebook/marketplace/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "query": "macbook pro",
+        "location": "nyc",
+        "max_price": 1200,
+    },
+)
+print(len(res.json()["listings"]), "listings")
+```
+
+</CodeGroup>
+
+## Pagination
+
+Every list endpoint uses Facebook's Relay **cursor** pagination — there are no
+page numbers. Read `end_cursor` from the response and pass it back as the
+`after` query parameter while `has_next_page` is `true`.
+
+```python Python
+cursor, page = None, 0
+while True:
+    res = requests.get(
+        "https://scrapebadger.com/v1/facebook/marketplace/search",
+        headers={"X-API-Key": "YOUR_API_KEY"},
+        params={"query": "macbook pro", "location": "nyc", "after": cursor},
+    ).json()
+    print(page, len(res["listings"]))
+    if not res["has_next_page"]:
+        break
+    cursor, page = res["end_cursor"], page + 1
+```
+
+## Timestamps
+
+Every datetime ships in **both** forms: `*_utc` (Unix seconds, e.g.
+`creation_time_utc`) and `*_at` (ISO 8601 UTC string, e.g. `created_at`).
+
+<Tip>
+  Start from [`/marketplace/search`](/api-reference/endpoint/facebook/marketplace-search)
+  or [`/search`](/api-reference/endpoint/facebook/search) to discover entities,
+  then take the returned `id` / `url` into
+  [`/marketplace/item/{item_id}`](/api-reference/endpoint/facebook/marketplace-item),
+  [`/pages/{identifier}`](/api-reference/endpoint/facebook/get-page) or
+  [`/groups/{group_id}`](/api-reference/endpoint/facebook/get-group) for full
+  detail — search results are deliberately shallow discovery records.
+</Tip>

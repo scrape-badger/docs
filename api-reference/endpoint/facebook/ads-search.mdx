@@ -1,0 +1,144 @@
+---
+title: "Ad Library Search & Get Ad"
+api: "GET https://scrapebadger.com/v1/facebook/ads/search"
+description: "Search Facebook's public Ad Library by advertiser or keyword — creative copy, snapshot URL, flight dates, platforms, media and CTA."
+---
+
+Search Facebook's public **Ad Library**, the transparency archive of ads
+running across Facebook, Instagram, Messenger and the Audience Network — or
+look one up directly by its archive id.
+
+| Endpoint | Returns |
+| -------- | ------- |
+| `GET /v1/facebook/ads/search` | keyword / advertiser search, cursor-paginated |
+| `GET /v1/facebook/ads/{ad_archive_id}` | one ad by its archive id |
+
+**Credits:** 5 (each)
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters — `/ads/search`
+
+<ParamField query="query" type="string" required>
+  Advertiser name or keyword.
+</ParamField>
+
+<ParamField query="country" type="string" default="US">
+  ISO 3166-1 alpha-2 country code. The Ad Library is partitioned by country —
+  the same advertiser returns different ads per market.
+</ParamField>
+
+<ParamField query="ad_type" type="string" default="all">
+  One of `all`, `political_and_issue_ads`. Political and issue ads carry extra
+  disclaimers in the archive.
+</ParamField>
+
+<ParamField query="active_status" type="string" default="active">
+  One of `active`, `inactive`, `all`.
+</ParamField>
+
+<ParamField query="after" type="string">
+  Pagination cursor — the `end_cursor` from a previous response.
+</ParamField>
+
+## Path Parameters — `/ads/{ad_archive_id}`
+
+<ParamField path="ad_archive_id" type="string" required>
+  The Ad Library archive id, as returned in `ad_archive_id` on any search
+  result.
+</ParamField>
+
+## Response
+
+<ResponseField name="ads" type="AdLibraryAd[]">
+  Each `AdLibraryAd` includes `ad_archive_id`, `page_id`, `page_name`,
+  `ad_creative_body`, `ad_creative_link_title`, `ad_creative_link_caption`,
+  `ad_creative_link_description`, `ad_snapshot_url` (Facebook-hosted rendered
+  preview), `start_date_utc`, `start_date`, `end_date_utc`, `end_date` (`null`
+  while the ad is still running), `is_active`, `publisher_platforms[]`
+  (`FACEBOOK`, `INSTAGRAM`, `MESSENGER`, `AUDIENCE_NETWORK`), `images[]`,
+  `videos[]`, `cta_text` (button label) and `cta_type` (Facebook's CTA enum,
+  e.g. `SHOP_NOW`, `LEARN_MORE`, `SIGN_UP`).
+</ResponseField>
+<ResponseField name="count" type="integer">Number of ads in this page.</ResponseField>
+<ResponseField name="end_cursor" type="string">Pass as `after` for the next page. Search only.</ResponseField>
+<ResponseField name="has_next_page" type="boolean">Whether more ads are reachable. Search only.</ResponseField>
+<ResponseField name="query" type="string">Echoes the query (or the archive id on the lookup endpoint).</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/facebook/ads/search?query=Nike&country=US&active_status=active" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/facebook/ads/search?" +
+    new URLSearchParams({
+      query: "Nike",
+      country: "US",
+      active_status: "active",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/facebook/ads/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "Nike", "country": "US", "active_status": "active"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "ads": [
+    {
+      "ad_archive_id": "1284772093418206",
+      "page_id": "15087023444",
+      "page_name": "Nike",
+      "ad_creative_body": "Built for the long run. The new Pegasus 42 lands today.",
+      "ad_creative_link_title": "Pegasus 42",
+      "ad_creative_link_caption": "nike.com",
+      "ad_creative_link_description": "Free shipping for members.",
+      "ad_snapshot_url": "https://www.facebook.com/ads/library/?id=1284772093418206",
+      "start_date_utc": 1785225600.0,
+      "start_date": "2026-07-26T14:40:00Z",
+      "end_date_utc": null,
+      "end_date": null,
+      "is_active": true,
+      "publisher_platforms": ["FACEBOOK", "INSTAGRAM"],
+      "images": [
+        "https://scontent.xx.fbcdn.net/v/t39.35426-6/449120_n.jpg"
+      ],
+      "videos": [],
+      "cta_text": "Shop Now",
+      "cta_type": "SHOP_NOW"
+    }
+  ],
+  "count": 1,
+  "end_cursor": "AQHZHZHNfbGlicmFyeV9jdXJzb3JfMDAx",
+  "has_next_page": true,
+  "query": "Nike"
+}
+```
+
+<Tip>
+  The Ad Library is country-partitioned. To size a competitor's full spend
+  footprint, sweep `country` across the markets you care about rather than
+  paginating a single one deeper.
+</Tip>

@@ -1,0 +1,117 @@
+---
+title: "Get Media"
+api: "GET https://scrapebadger.com/v1/instagram/media/{code}"
+description: "Full media detail by shortcode — photo, video, reel or carousel — with caption, counts, resources, usertags and location. Plus oEmbed."
+---
+
+Fetch a single piece of media by its shortcode `code` (the token in a
+`/p/…`, `/reel/…` or `/tv/…` URL). An `oembed` variant returns Instagram's
+embed payload.
+
+**Credits:** 5 (media detail) · 2 (`oembed`)
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="code" type="string" required>
+  Media shortcode, e.g. `C8xYzAbCdE1`.
+</ParamField>
+
+## Related paths
+
+- `GET /v1/instagram/media/{code}/oembed` — Instagram oEmbed payload. **2 credits.**
+
+## Response
+
+<ResponseField name="media" type="object">
+  The full `Media`. Key fields:
+
+  <Expandable title="media">
+    <ResponseField name="pk" type="string" />
+    <ResponseField name="id" type="string" />
+    <ResponseField name="code" type="string">Shortcode.</ResponseField>
+    <ResponseField name="taken_at" type="string">ISO 8601 UTC.</ResponseField>
+    <ResponseField name="taken_at_utc" type="integer">Unix seconds.</ResponseField>
+    <ResponseField name="media_type" type="integer">1 = photo, 2 = video, 8 = carousel.</ResponseField>
+    <ResponseField name="product_type" type="string">e.g. `feed`, `clips` (reel), `igtv`, `carousel_container`.</ResponseField>
+    <ResponseField name="caption_text" type="string" />
+    <ResponseField name="like_count" type="integer" />
+    <ResponseField name="comment_count" type="integer" />
+    <ResponseField name="play_count" type="integer" />
+    <ResponseField name="view_count" type="integer" />
+    <ResponseField name="video_url" type="string" />
+    <ResponseField name="thumbnail_url" type="string" />
+    <ResponseField name="url" type="string" />
+    <ResponseField name="user" type="object">Author `UserShort`.</ResponseField>
+    <ResponseField name="usertags" type="object[]">Tagged users + position.</ResponseField>
+    <ResponseField name="coauthor_producers" type="object[]">Collab co-authors.</ResponseField>
+    <ResponseField name="location" type="object">`pk`, `name`, `lat`, `lng`.</ResponseField>
+    <ResponseField name="resources" type="object[]">Carousel / multi-resource children.</ResponseField>
+    <ResponseField name="hashtags" type="string[]">Parsed from the caption.</ResponseField>
+    <ResponseField name="mentions" type="string[]">Parsed from the caption.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/instagram/media/C8xYzAbCdE1" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/instagram/media/C8xYzAbCdE1",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { media } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/instagram/media/C8xYzAbCdE1",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+media = res.json()["media"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "media": {
+    "pk": "3401234567890123456",
+    "id": "3401234567890123456_25025320",
+    "code": "C8xYzAbCdE1",
+    "taken_at": "2026-07-30T18:04:11Z",
+    "taken_at_utc": 1785434651,
+    "media_type": 2,
+    "product_type": "clips",
+    "caption_text": "Summer on Instagram. #summer @friend",
+    "like_count": 1240553,
+    "comment_count": 8842,
+    "play_count": 9820114,
+    "view_count": 9820114,
+    "video_url": "https://scontent.cdninstagram.com/v/reel.mp4",
+    "thumbnail_url": "https://scontent.cdninstagram.com/v/thumb.jpg",
+    "url": "https://www.instagram.com/reel/C8xYzAbCdE1/",
+    "user": { "pk": "25025320", "username": "instagram", "is_verified": true },
+    "usertags": [{ "user": { "username": "friend" }, "x": 0.5, "y": 0.5 }],
+    "coauthor_producers": [],
+    "location": { "pk": "213385402", "name": "New York, New York", "lat": 40.7128, "lng": -74.006 },
+    "resources": [],
+    "hashtags": ["summer"],
+    "mentions": ["friend"],
+    "scraped_at": "2026-08-05T12:00:00Z"
+  }
+}
+```

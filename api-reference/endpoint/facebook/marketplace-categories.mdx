@@ -1,0 +1,77 @@
+---
+title: "Marketplace Categories"
+api: "GET https://scrapebadger.com/v1/facebook/marketplace/categories"
+description: "The Facebook Marketplace top-level category slugs — free reference catalog."
+---
+
+The Facebook Marketplace top-level **category slugs**, the vocabulary behind
+the `category_id` field on a listing.
+
+**Credits:** 0 (free)
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Response
+
+<ResponseField name="categories" type="Category[]">
+  Each `Category` has `slug` and `name` (the human-readable label).
+</ResponseField>
+<ResponseField name="count" type="integer">Number of categories returned.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/facebook/marketplace/categories" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/facebook/marketplace/categories",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/facebook/marketplace/categories",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "categories": [
+    { "slug": "vehicles", "name": "Vehicles" },
+    { "slug": "propertyrentals", "name": "Property Rentals" },
+    { "slug": "apparel", "name": "Apparel" },
+    { "slug": "electronics", "name": "Electronics" },
+    { "slug": "entertainment", "name": "Entertainment" },
+    { "slug": "family", "name": "Family" },
+    { "slug": "free", "name": "Free Stuff" },
+    { "slug": "garden", "name": "Garden & Outdoor" },
+    { "slug": "hobbies", "name": "Hobbies" },
+    { "slug": "homegoods", "name": "Home Goods" },
+    { "slug": "homeimprovement", "name": "Home Improvement" },
+    { "slug": "instruments", "name": "Musical Instruments" },
+    { "slug": "officesupplies", "name": "Office Supplies" },
+    { "slug": "petsupplies", "name": "Pet Supplies" },
+    { "slug": "sportinggoods", "name": "Sporting Goods" },
+    { "slug": "toys", "name": "Toys & Games" },
+    { "slug": "propertyforsale", "name": "Property For Sale" }
+  ],
+  "count": 17
+}
+```

@@ -1,0 +1,186 @@
+---
+title: "Marketplace Category & Reference"
+api: "GET https://scrapebadger.com/v1/facebook/marketplace/category/{category}"
+description: "Browse a whole Facebook Marketplace category in one location, plus the free location and category slug catalogs."
+---
+
+Browse a Marketplace category feed — `vehicles`, `propertyrentals`,
+`electronics`, `apparel` and the rest — scoped to one location, with price and
+sort filters. Returns the same `MarketplaceListing` shape as
+[`/marketplace/search`](/api-reference/endpoint/facebook/marketplace-search).
+
+This page also documents the two free reference endpoints that list the valid
+`location` and `category` slugs.
+
+**Credits:** 5 (category browse) · 0 (`/marketplace/locations`, `/marketplace/categories`)
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="category" type="string" required>
+  Marketplace category slug — one of `vehicles`, `propertyrentals`,
+  `propertyforsale`, `apparel`, `electronics`, `entertainment`, `family`,
+  `free`, `garden`, `hobbies`, `homegoods`, `homeimprovement`, `instruments`,
+  `officesupplies`, `petsupplies`, `sportinggoods`, `toys`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="location" type="string" default="nyc">
+  Marketplace location slug, e.g. `nyc`, `la`, `london`.
+</ParamField>
+
+<ParamField query="min_price" type="integer">Minimum price.</ParamField>
+<ParamField query="max_price" type="integer">Maximum price.</ParamField>
+
+<ParamField query="sort_by" type="string">
+  One of `best_match`, `price_ascend`, `price_descend`, `distance_ascend`,
+  `creation_time_descend`.
+</ParamField>
+
+<ParamField query="after" type="string">
+  Pagination cursor — the `end_cursor` from a previous response.
+</ParamField>
+
+## Response
+
+<ResponseField name="listings" type="MarketplaceListing[]">
+  Same shape as
+  [`/marketplace/search`](/api-reference/endpoint/facebook/marketplace-search) —
+  `id`, `title`, `url`, `price_formatted`, `price_amount`, `currency`,
+  `primary_photo`, `creation_time_utc`, `created_at`, `location_text`, `city`,
+  `state`, `latitude`, `longitude`, `subtitles[]`, `delivery_types[]`,
+  `attributes`, `is_sold`, `is_pending`, `is_live` and `seller`.
+</ResponseField>
+<ResponseField name="count" type="integer">Number of listings in this page.</ResponseField>
+<ResponseField name="end_cursor" type="string">Pass as `after` for the next page.</ResponseField>
+<ResponseField name="has_next_page" type="boolean">Whether more listings are reachable.</ResponseField>
+<ResponseField name="query" type="string">Echoes the category slug that was browsed.</ResponseField>
+<ResponseField name="location" type="string">The location slug that was browsed.</ResponseField>
+
+<Note>
+  Vertical categories fill `attributes` with vertical-specific keys — vehicle
+  `make` / `model` / `mileage` on `vehicles`, `beds` / `baths` on
+  `propertyrentals` and `propertyforsale`. `subtitles[]` carries the same
+  metadata as Facebook's own display bullets.
+</Note>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/facebook/marketplace/category/vehicles?location=la&max_price=15000&sort_by=price_ascend" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/facebook/marketplace/category/vehicles?" +
+    new URLSearchParams({
+      location: "la",
+      max_price: "15000",
+      sort_by: "price_ascend",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/facebook/marketplace/category/vehicles",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"location": "la", "max_price": 15000, "sort_by": "price_ascend"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "listings": [
+    {
+      "id": "992418377620134",
+      "title": "2014 Honda Civic LX",
+      "url": "https://www.facebook.com/marketplace/item/992418377620134/",
+      "price_formatted": "$8,900",
+      "price_amount": "8900",
+      "currency": "USD",
+      "primary_photo": "https://scontent.xx.fbcdn.net/v/t45.5328-4/553219_n.jpg",
+      "photos": [],
+      "creation_time_utc": 1785044100.0,
+      "created_at": "2026-07-24T12:15:00Z",
+      "location_text": "Pasadena, CA",
+      "city": "Pasadena",
+      "state": "CA",
+      "latitude": 34.1478,
+      "longitude": -118.1445,
+      "category_id": "vehicles",
+      "subtitles": ["112,400 miles"],
+      "delivery_types": ["local_pick_up"],
+      "attributes": { "make": "Honda", "model": "Civic", "mileage": "112400" },
+      "is_sold": false,
+      "is_pending": false,
+      "is_live": true,
+      "seller": {
+        "id": "100002218844907",
+        "name": "Marisol Vega",
+        "url": "https://www.facebook.com/profile.php?id=100002218844907",
+        "profile_picture": "https://scontent.xx.fbcdn.net/v/t1.30497-1/33119_n.jpg",
+        "typename": "User"
+      }
+    }
+  ],
+  "count": 1,
+  "end_cursor": "AQHVjZWhpY2xlc19jdXJzb3JfMDAx",
+  "has_next_page": true,
+  "query": "vehicles",
+  "location": "la"
+}
+```
+
+## Reference endpoints
+
+Both are free (0 credits) and hit no Facebook surface.
+
+### `GET /v1/facebook/marketplace/locations`
+
+<ResponseField name="locations" type="object[]">
+  `{ slug, name }` pairs for the high-traffic Marketplace cities — `nyc`,
+  `la`, `chicago`, `houston`, `seattle`, `sanfrancisco`, `miami`, `atlanta`,
+  `london`, `toronto`, `sydney`. Not exhaustive: any city slug Facebook
+  accepts works as a `location`.
+</ResponseField>
+<ResponseField name="count" type="integer">Number of locations returned.</ResponseField>
+
+### `GET /v1/facebook/marketplace/categories`
+
+<ResponseField name="categories" type="object[]">
+  `{ slug, name }` pairs for every Marketplace top-level category.
+</ResponseField>
+<ResponseField name="count" type="integer">Number of categories returned.</ResponseField>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/facebook/marketplace/categories" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```json Response
+{
+  "categories": [
+    { "slug": "vehicles", "name": "Vehicles" },
+    { "slug": "propertyrentals", "name": "Property Rentals" },
+    { "slug": "electronics", "name": "Electronics" }
+  ],
+  "count": 17
+}
+```

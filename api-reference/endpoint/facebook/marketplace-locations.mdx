@@ -1,0 +1,73 @@
+---
+title: "Marketplace Locations"
+api: "GET https://scrapebadger.com/v1/facebook/marketplace/locations"
+description: "The common Facebook Marketplace location slugs used as the location parameter — free reference catalog."
+---
+
+The common Facebook Marketplace **location slugs**. Not exhaustive — any city
+slug Facebook accepts works — these are the high-traffic ones surfaced for
+convenience.
+
+**Credits:** 0 (free)
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Response
+
+<ResponseField name="locations" type="Location[]">
+  Each `Location` has `slug` (the value you pass as a `location` parameter) and
+  `name` (the human-readable city).
+</ResponseField>
+<ResponseField name="count" type="integer">Number of locations returned.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/facebook/marketplace/locations" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/facebook/marketplace/locations",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/facebook/marketplace/locations",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "locations": [
+    { "slug": "nyc", "name": "New York, NY" },
+    { "slug": "la", "name": "Los Angeles, CA" },
+    { "slug": "chicago", "name": "Chicago, IL" },
+    { "slug": "houston", "name": "Houston, TX" },
+    { "slug": "seattle", "name": "Seattle, WA" },
+    { "slug": "sanfrancisco", "name": "San Francisco, CA" },
+    { "slug": "miami", "name": "Miami, FL" },
+    { "slug": "atlanta", "name": "Atlanta, GA" },
+    { "slug": "london", "name": "London, UK" },
+    { "slug": "toronto", "name": "Toronto, ON" },
+    { "slug": "sydney", "name": "Sydney, AU" }
+  ],
+  "count": 11
+}
+```

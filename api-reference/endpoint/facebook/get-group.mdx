@@ -1,0 +1,119 @@
+---
+title: "Get Group & Group Posts"
+api: "GET https://scrapebadger.com/v1/facebook/groups/{group_id}"
+description: "Facebook Group metadata — privacy, member count, description, creation date — plus the group feed."
+---
+
+Fetch a Facebook Group's metadata, and its feed from the companion endpoint.
+
+| Endpoint | Returns |
+| -------- | ------- |
+| `GET /v1/facebook/groups/{group_id}` | `Group` metadata |
+| `GET /v1/facebook/groups/{group_id}/posts` | the group feed (`Post[]`) |
+
+**Credits:** 5 (each)
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="group_id" type="string" required>
+  Numeric group id or the group's vanity slug — the
+  `facebook.com/groups/<group_id>` segment.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="after" type="string">
+  `/posts` only. Pagination cursor — the `end_cursor` from a previous response.
+</ParamField>
+
+## Response — `/groups/{group_id}`
+
+Returns a single `Group` object.
+
+<ResponseField name="id" type="string">Numeric group id.</ResponseField>
+<ResponseField name="name" type="string">Group name.</ResponseField>
+<ResponseField name="url" type="string">Canonical `facebook.com/groups/` URL.</ResponseField>
+<ResponseField name="privacy" type="string">Facebook's privacy setting — typically `Public` or `Private`.</ResponseField>
+<ResponseField name="visibility" type="string">Whether the group is listed in search (`visible`) or hidden.</ResponseField>
+<ResponseField name="member_count" type="integer">Number of members.</ResponseField>
+<ResponseField name="description" type="string">Group intro / rules text.</ResponseField>
+<ResponseField name="cover_photo" type="string">Cover image URL.</ResponseField>
+<ResponseField name="creation_time_utc" type="number">Group creation time, Unix seconds.</ResponseField>
+<ResponseField name="created_at" type="string">Group creation time, ISO 8601 UTC.</ResponseField>
+
+## Response — `/groups/{group_id}/posts`
+
+<ResponseField name="posts" type="Post[]">
+  Full `Post` objects — `id`, `post_id`, `url`, `permalink_url`, `message`,
+  `creation_time_utc`, `created_at`, `author` (Actor), `attachments[]`
+  (Media), `reaction_count`, `reaction_count_text`, `top_reactions[]`,
+  `comment_count`, `share_count`, `story_type`. See
+  [Get Page or Profile Posts](/api-reference/endpoint/facebook/get-page-posts)
+  for the field-by-field breakdown.
+</ResponseField>
+<ResponseField name="count" type="integer">Number of posts in this page.</ResponseField>
+<ResponseField name="end_cursor" type="string">Pass as `after` for the next page.</ResponseField>
+<ResponseField name="has_next_page" type="boolean">Whether more posts are reachable.</ResponseField>
+
+<Warning>
+  A **private** group returns metadata but an empty `posts[]` — Facebook serves
+  no feed units to a non-member session. Check `privacy` before treating an
+  empty feed as an error.
+</Warning>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/facebook/groups/1503289913" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/facebook/groups/1503289913",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const group = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/facebook/groups/1503289913",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+group = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "id": "1503289913",
+  "name": "Brooklyn Buy Nothing",
+  "url": "https://www.facebook.com/groups/1503289913",
+  "privacy": "Public",
+  "visibility": "visible",
+  "member_count": 42817,
+  "description": "Give and receive freely with your Brooklyn neighbours. No selling, no trading, no cash.",
+  "cover_photo": "https://scontent.xx.fbcdn.net/v/t39.30808-6/771204_n.jpg",
+  "creation_time_utc": 1476403200.0,
+  "created_at": "2016-10-14T00:00:00Z"
+}
+```
+
+<Tip>
+  Discover groups with
+  [`/search/groups`](/api-reference/endpoint/facebook/search) — it returns
+  `SearchResult` objects with `type: "group"`; take the `id` here for full
+  metadata.
+</Tip>
