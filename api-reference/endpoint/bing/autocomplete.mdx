@@ -1,0 +1,84 @@
+---
+title: "Autocomplete"
+api: "GET https://scrapebadger.com/v1/bing/autocomplete"
+description: "Get Bing search-box query suggestions for a partial term."
+---
+
+Get Bing's search-box suggestions for a partial term. The cheapest call in
+this API — useful for expanding a seed keyword into real Bing queries before
+running [`/search`](/api-reference/endpoint/bing/search) on each one.
+
+**Credits:** 1
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Partial search term, e.g. `coff`.
+</ParamField>
+
+<ParamField query="market" type="string" default="en-US">
+  Bing market code, e.g. `en-US`. Suggestions are market-specific. See
+  [`/markets`](/api-reference/endpoint/bing/list-markets).
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested term.</ResponseField>
+<ResponseField name="market" type="string">The market the suggestions were fetched for.</ResponseField>
+<ResponseField name="result_count" type="integer">Number of suggestions.</ResponseField>
+<ResponseField name="suggestions" type="string[]">Suggested queries, in Bing's order.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/bing/autocomplete?query=coff" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/bing/autocomplete?" +
+    new URLSearchParams({ query: "coff" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { suggestions } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/bing/autocomplete",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "coff"},
+)
+suggestions = res.json()["suggestions"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "coff",
+  "market": "en-US",
+  "result_count": 8,
+  "suggestions": [
+    "coffee",
+    "coffee maker",
+    "coffee near me",
+    "coffee shop",
+    "coffee table",
+    "coffee grinder",
+    "coffee machine",
+    "coffee beans"
+  ]
+}
+```

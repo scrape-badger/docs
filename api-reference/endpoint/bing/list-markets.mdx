@@ -1,0 +1,77 @@
+---
+title: "List Markets"
+api: "GET https://scrapebadger.com/v1/bing/markets"
+description: "List the curated Bing market codes. Free."
+---
+
+List the curated Bing market codes. This endpoint is **free**.
+
+**Credits:** 0
+
+<Note>
+  There are no per-country Bing domains — every market is served from
+  `www.bing.com`. The `market` code (`language-COUNTRY`) sets the result
+  language and country ranking. **Any well-formed `mkt` value is accepted** by
+  the search endpoints; this list is the curated reference set of 30 codes,
+  which also drives exit-IP geo-targeting.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Response
+
+<ResponseField name="result_count" type="integer">Number of markets.</ResponseField>
+<ResponseField name="markets" type="Market[]">
+  Curated markets.
+
+  <Expandable title="Market">
+    <ResponseField name="code" type="string">Bing market code, e.g. `en-US`.</ResponseField>
+    <ResponseField name="name" type="string">e.g. `United States`.</ResponseField>
+    <ResponseField name="country" type="string">Two-letter country code, e.g. `US`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/bing/markets" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/bing/markets", {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+});
+const { markets } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/bing/markets",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+markets = res.json()["markets"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "result_count": 30,
+  "markets": [
+    { "code": "en-US", "name": "United States", "country": "US" },
+    { "code": "en-GB", "name": "United Kingdom", "country": "GB" },
+    { "code": "de-DE", "name": "Germany", "country": "DE" },
+    { "code": "fr-FR", "name": "France", "country": "FR" },
+    { "code": "ja-JP", "name": "Japan", "country": "JP" }
+  ]
+}
+```
