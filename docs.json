@@ -227,6 +227,54 @@
         ]
       },
       {
+        "tab": "Baidu",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "baidu/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/baidu/search",
+              "api-reference/endpoint/baidu/news",
+              "api-reference/endpoint/baidu/images",
+              "api-reference/endpoint/baidu/autocomplete"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "DuckDuckGo",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "duckduckgo/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/duckduckgo/search",
+              "api-reference/endpoint/duckduckgo/images",
+              "api-reference/endpoint/duckduckgo/news",
+              "api-reference/endpoint/duckduckgo/videos"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api-reference/endpoint/duckduckgo/autocomplete",
+              "api-reference/endpoint/duckduckgo/instant",
+              "api-reference/endpoint/duckduckgo/regions"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Reddit",
         "groups": [
           {

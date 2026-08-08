@@ -1,0 +1,136 @@
+---
+title: "Image Search"
+api: "GET https://scrapebadger.com/v1/duckduckgo/images"
+description: "Search DuckDuckGo images with size, color, type, layout and license filters."
+---
+
+Search DuckDuckGo images. 100 results per page.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search query, e.g. `sunset`.
+</ParamField>
+
+<ParamField query="region" type="string" default="wt-wt">
+  DuckDuckGo region code (`kl`), e.g. `us-en`. `wt-wt` = all regions.
+</ParamField>
+
+<ParamField query="safesearch" type="string" default="moderate">
+  One of `on`, `moderate`, `off`.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  Result page, `1`–`10`. 100 results per page.
+</ParamField>
+
+<ParamField query="size" type="string">
+  `Small`, `Medium`, `Large` or `Wallpaper`.
+</ParamField>
+
+<ParamField query="color" type="string">
+  `color`, `Monochrome`, or a named color such as `Red`, `Blue`, `Green`.
+</ParamField>
+
+<ParamField query="image_type" type="string">
+  `photo`, `clipart`, `gif`, `transparent` or `line`.
+</ParamField>
+
+<ParamField query="layout" type="string">
+  `Square`, `Tall` or `Wide`.
+</ParamField>
+
+<ParamField query="license" type="string">
+  `Any`, `Public`, `Share`, `ShareCommercially` or `Modify`.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="region" type="string">The region that was applied.</ResponseField>
+<ResponseField name="results" type="ImageResult[]">
+  Image results.
+
+  <Expandable title="ImageResult">
+    <ResponseField name="title" type="string" />
+    <ResponseField name="image" type="string">Full-size image URL.</ResponseField>
+    <ResponseField name="thumbnail" type="string" />
+    <ResponseField name="url" type="string">The page the image was found on.</ResponseField>
+    <ResponseField name="width" type="integer" />
+    <ResponseField name="height" type="integer" />
+    <ResponseField name="source" type="string">The index the result came from, e.g. `Bing`.</ResponseField>
+    <ResponseField name="encoding_format" type="string">e.g. `jpeg`, `png`.</ResponseField>
+    <ResponseField name="discovery_date" type="string" />
+  </Expandable>
+</ResponseField>
+<ResponseField name="result_count" type="integer">Results on this page.</ResponseField>
+<ResponseField name="has_next" type="boolean">Page on this.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/duckduckgo/images?query=sunset&size=Large&layout=Wide" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/duckduckgo/images?" +
+    new URLSearchParams({
+      query: "sunset",
+      size: "Large",
+      layout: "Wide",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/duckduckgo/images",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "query": "sunset",
+        "size": "Large",
+        "layout": "Wide",
+    },
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "sunset",
+  "region": "wt-wt",
+  "results": [
+    {
+      "title": "Beautiful Sunset Over the Ocean",
+      "image": "https://example.com/images/sunset-4k.jpg",
+      "thumbnail": "https://tse1.mm.bing.net/th?id=OIP.abc123",
+      "url": "https://example.com/gallery/sunset",
+      "width": 3840,
+      "height": 2160,
+      "source": "Bing",
+      "encoding_format": "jpeg",
+      "discovery_date": "2026-07-14T00:00:00.0000000"
+    }
+  ],
+  "result_count": 100,
+  "has_next": true
+}
+```

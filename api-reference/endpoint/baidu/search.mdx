@@ -1,0 +1,227 @@
+---
+title: "Baidu Web Search"
+api: "GET https://scrapebadger.com/v1/baidu/search"
+description: "Search baidu.com — organic results with the real target URL, related searches, language and publish-date filters."
+---
+
+Search `baidu.com` — the web SERP of China's #1 search engine. Every organic
+result carries the **real target URL** in `url` (decoded from Baidu's `mu`
+attribute), alongside the `baidu.com/link?url=` tracking redirect in
+`baidu_url`.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords, e.g. `咖啡机` or `coffee machine`. URL-encode as UTF-8.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  Result page, `1`–`76`. Baidu's SERP stops serving past ~76 pages regardless of
+  the total it reports — see [Pagination](#pagination).
+</ParamField>
+
+<ParamField query="num" type="integer" default="10">
+  Results per page, `1`–`50` (Baidu's own cap). The page offset is
+  `(page - 1) * num`, so keep `num` fixed across a crawl of one query.
+</ParamField>
+
+<ParamField query="language" type="string" default="all">
+  Restrict result language. One of `all`, `zh-cn` (simplified Chinese), `zh-tw`
+  (traditional Chinese) — Baidu's only three language codes.
+</ParamField>
+
+<ParamField query="time_from" type="integer">
+  Unix timestamp — only results published **after** this.
+</ParamField>
+
+<ParamField query="time_to" type="integer">
+  Unix timestamp — only results published **before** this. Pass either bound
+  alone; the other end of the window defaults to open.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="page" type="integer">The page returned.</ResponseField>
+<ResponseField name="num" type="integer">Results per page that was requested.</ResponseField>
+<ResponseField name="total_results" type="integer">
+  **Baidu's own claim**, parsed from `百度为您找到相关结果约N个` — not a
+  reachable count. Useful as a *relative* signal only. `null` when Baidu omits
+  the line.
+</ResponseField>
+<ResponseField name="url" type="string">The baidu.com URL that was fetched.</ResponseField>
+<ResponseField name="results" type="OrganicResult[]">
+  Organic results on this page.
+
+  <Expandable title="OrganicResult">
+    <ResponseField name="position" type="integer">1-based rank on the page.</ResponseField>
+    <ResponseField name="title" type="string">Result title text.</ResponseField>
+    <ResponseField name="url" type="string">
+      The **real target URL**, decoded from the result's `mu` attribute.
+    </ResponseField>
+    <ResponseField name="baidu_url" type="string">
+      Baidu's `baidu.com/link?url=...` tracking redirect.
+    </ResponseField>
+    <ResponseField name="display_url" type="string">The URL as displayed on the result, when Baidu shows one.</ResponseField>
+    <ResponseField name="snippet" type="string">Result description text.</ResponseField>
+    <ResponseField name="source" type="string">Site name shown on the result, e.g. `阿里巴巴1688`.</ResponseField>
+    <ResponseField name="date" type="string">Baidu's own date string, e.g. `2026年7月27日` or `3天前`.</ResponseField>
+    <ResponseField name="date_at" type="string">ISO 8601 date (`YYYY-MM-DD`), set only when `date` is unambiguous.</ResponseField>
+    <ResponseField name="thumbnail" type="string">Thumbnail image URL, when the result carries one.</ResponseField>
+    <ResponseField name="tpl" type="string">Baidu's result template id, e.g. `se_com_default`, `www_index`.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="related_searches" type="RelatedSearch[]">
+  Baidu's query suggestions from the foot of the SERP.
+
+  <Expandable title="RelatedSearch">
+    <ResponseField name="query" type="string">The suggested query.</ResponseField>
+    <ResponseField name="url" type="string">Baidu SERP URL for the suggestion.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<Note>
+  Only `position`, `title`, `query`, `page`, `num` and `url` are guaranteed
+  present. Every other field is nullable — Baidu's SERP renders a different
+  field set per result template (`tpl`).
+</Note>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/baidu/search?query=%E5%92%96%E5%95%A1%E6%9C%BA&num=20&language=zh-cn" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/baidu/search?" +
+    new URLSearchParams({
+      query: "咖啡机",
+      num: "20",
+      language: "zh-cn",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/baidu/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "咖啡机", "num": 20, "language": "zh-cn"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "咖啡机",
+  "page": 1,
+  "num": 10,
+  "total_results": 4820000,
+  "results": [
+    {
+      "position": 1,
+      "title": "专业咖啡机价格-最新专业咖啡机价格、批发报价、价格大全 - 阿里巴巴",
+      "url": "https://www.1688.com/jiage/-D7A8D2B5BFA7B7C8BBFA.html",
+      "baidu_url": "http://www.baidu.com/link?url=m4_ZyR-m51ZWH--9M5Fnrzn4W0NebuakZ7fPd1qIt2l",
+      "display_url": null,
+      "snippet": "阿里巴巴为您找到2,955个今日最新的专业咖啡机价格,专业咖啡机批发价格等行情走势,您还可以找磨咖啡机,...",
+      "source": "阿里巴巴1688",
+      "date": "2026年7月27日",
+      "date_at": "2026-07-27",
+      "thumbnail": "https://t9.baidu.com/it/u=1053246899,2367519289&fm=217&app=126",
+      "tpl": "www_index"
+    },
+    {
+      "position": 2,
+      "title": "高压咖啡机价格-最新高压咖啡机价格、批发报价、价格大全 - 阿里巴巴",
+      "url": "https://www.1688.com/jiage/-B8DFD1B9BFA7B7C8BBFA.html",
+      "baidu_url": "http://www.baidu.com/link?url=m4_ZyR-m51ZWH--9M5Fnrzn4W0NebuakZ7fPd1qIt2lDSNc",
+      "display_url": null,
+      "snippet": "阿里巴巴为您找到3,770个今日最新的高压咖啡机价格,高压咖啡机批发价格等行情走势,您还可以找市场价格、...",
+      "source": "阿里巴巴1688",
+      "date": "2026年7月25日",
+      "date_at": "2026-07-25",
+      "thumbnail": "https://t9.baidu.com/it/u=303549370,1074137836&fm=217&app=126",
+      "tpl": "www_index"
+    }
+  ],
+  "related_searches": [
+    {
+      "query": "咖啡机器人多少钱一台",
+      "url": "https://www.baidu.com/s?wd=%E5%92%96%E5%95%A1%E6%9C%BA%E5%99%A8%E4%BA%BA%E5%A4%9A%E5%B0%91%E9%92%B1%E4%B8%80%E5%8F%B0&tn=baidu"
+    },
+    {
+      "query": "咖啡机全自动研磨一体",
+      "url": "https://www.baidu.com/s?wd=%E5%92%96%E5%95%A1%E6%9C%BA%E5%85%A8%E8%87%AA%E5%8A%A8%E7%A0%94%E7%A3%A8%E4%B8%80%E4%BD%93&tn=baidu"
+    },
+    {
+      "query": "咖啡机厂家",
+      "url": "https://www.baidu.com/s?wd=%E5%92%96%E5%95%A1%E6%9C%BA%E5%8E%82%E5%AE%B6&tn=baidu"
+    }
+  ],
+  "url": "https://www.baidu.com/s?wd=%E5%92%96%E5%95%A1%E6%9C%BA&ie=utf-8"
+}
+```
+
+## Pagination
+
+<Warning>
+  `total_results` is not reachable. Baidu's SERP dries up past roughly **page
+  76**, so `page` is clamped to `1`–`76` — a request beyond the wall is rejected
+  rather than billed for an empty page.
+</Warning>
+
+The page offset is `(page - 1) * num`. Raising `num` is therefore the cheaper
+route to depth than raising `page`: `num=50` reaches 500 results in **10 calls**
+instead of 50. Keep `num` fixed for the whole crawl of one query — changing it
+mid-crawl shifts the offset window and re-serves rows you already have.
+
+<Tip>
+  To go wider than one query's wall, expand the seed rather than paging deeper:
+  feed `related_searches` (free, already in this response) and
+  [`/autocomplete`](/api-reference/endpoint/baidu/autocomplete) (1 credit) back
+  in as new queries, then merge results on `url`.
+</Tip>
+
+## Date filtering
+
+`time_from` / `time_to` are Unix timestamps and map onto Baidu's own `gpc`
+filter. Either bound may be passed alone — the open end defaults to `0` (from)
+or now (to).
+
+```bash
+# Results published in the last 7 days
+curl "https://scrapebadger.com/v1/baidu/search?query=%E5%92%96%E5%95%A1%E6%9C%BA&time_from=$(($(date +%s) - 604800))" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+<Note>
+  Baidu filters on **its own idea** of a page's publish date, which is not
+  always the date rendered in `date`. Treat the window as a filter on Baidu's
+  index, not a guarantee about the page.
+</Note>
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Anti-bot challenge — **not billed**. Retry; it succeeds. |
+| `502` | Baidu returned a page without the result container. Retry. |

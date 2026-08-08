@@ -1,0 +1,119 @@
+---
+title: "News Search"
+api: "GET https://scrapebadger.com/v1/duckduckgo/news"
+description: "Search DuckDuckGo news — headline, source, excerpt, Unix + ISO dates, image."
+---
+
+Search DuckDuckGo news. 30 results per page. Every date ships in both forms:
+`date_utc` (Unix seconds) and `date_at` (ISO 8601 UTC string).
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search query, e.g. `artificial intelligence`.
+</ParamField>
+
+<ParamField query="region" type="string" default="wt-wt">
+  DuckDuckGo region code (`kl`), e.g. `us-en`. `wt-wt` = all regions.
+</ParamField>
+
+<ParamField query="safesearch" type="string" default="moderate">
+  One of `on`, `moderate`, `off`.
+</ParamField>
+
+<ParamField query="timelimit" type="string">
+  Restrict result age: `day`, `week`, `month` or `year`. Omit for all time.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  Result page, `1`–`10`. 30 results per page.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="region" type="string">The region that was applied.</ResponseField>
+<ResponseField name="results" type="NewsResult[]">
+  News results.
+
+  <Expandable title="NewsResult">
+    <ResponseField name="title" type="string" />
+    <ResponseField name="url" type="string" />
+    <ResponseField name="excerpt" type="string" />
+    <ResponseField name="source" type="string">Publisher, e.g. `Reuters`.</ResponseField>
+    <ResponseField name="image" type="string | null" />
+    <ResponseField name="relative_time" type="string">DuckDuckGo's own label, e.g. `2 hours ago`.</ResponseField>
+    <ResponseField name="date_utc" type="integer">Publication time as Unix seconds.</ResponseField>
+    <ResponseField name="date_at" type="string">Publication time as an ISO 8601 UTC string.</ResponseField>
+    <ResponseField name="syndicate" type="string">The aggregator DuckDuckGo sourced from, e.g. `Bing`.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="result_count" type="integer">Results on this page.</ResponseField>
+<ResponseField name="has_next" type="boolean">Page on this.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/duckduckgo/news?query=artificial+intelligence&timelimit=week" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/duckduckgo/news?" +
+    new URLSearchParams({
+      query: "artificial intelligence",
+      timelimit: "week",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/duckduckgo/news",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "query": "artificial intelligence",
+        "timelimit": "week",
+    },
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "artificial intelligence",
+  "region": "wt-wt",
+  "results": [
+    {
+      "title": "AI breakthrough announced by research lab",
+      "url": "https://www.reuters.com/technology/ai-breakthrough",
+      "excerpt": "Researchers announced a new artificial intelligence model that...",
+      "source": "Reuters",
+      "image": "https://www.reuters.com/resizer/image.jpg",
+      "relative_time": "2 hours ago",
+      "date_utc": 1754640000,
+      "date_at": "2026-08-08T08:00:00Z",
+      "syndicate": "Bing"
+    }
+  ],
+  "result_count": 30,
+  "has_next": true
+}
+```

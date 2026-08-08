@@ -1,0 +1,144 @@
+---
+title: "Baidu News"
+api: "GET https://scrapebadger.com/v1/baidu/news"
+description: "Search Baidu's news vertical — articles with publisher, publish date and the real article URL, ordered by relevance or recency."
+---
+
+Search Baidu's news vertical. Articles carry the publisher name, the publish
+date in both Baidu's raw form and ISO 8601, and the **real article URL** — not
+a `baidu.com` redirect.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords, e.g. `人工智能`. URL-encode as UTF-8.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  Result page, `1`–`76`. Fixed at 10 articles per page — the news vertical has no
+  page-size parameter.
+</ParamField>
+
+<ParamField query="sort" type="string" default="relevance">
+  Result ordering. `relevance` (Baidu's default ranking) or `time` (most recent
+  first).
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="page" type="integer">The page returned.</ResponseField>
+<ResponseField name="total_results" type="integer">Baidu's own reported total, when it renders one. `null` otherwise.</ResponseField>
+<ResponseField name="url" type="string">The baidu.com URL that was fetched.</ResponseField>
+<ResponseField name="results" type="NewsResult[]">
+  Articles on this page.
+
+  <Expandable title="NewsResult">
+    <ResponseField name="position" type="integer">1-based rank on the page.</ResponseField>
+    <ResponseField name="title" type="string">Article headline.</ResponseField>
+    <ResponseField name="url" type="string">The **real article URL**.</ResponseField>
+    <ResponseField name="baidu_url" type="string">Baidu's tracking redirect, when the article carries one.</ResponseField>
+    <ResponseField name="snippet" type="string">Article excerpt.</ResponseField>
+    <ResponseField name="source" type="string">Publisher name, e.g. `新华网`, `微信公众平台`.</ResponseField>
+    <ResponseField name="date" type="string">Baidu's own date string, e.g. `2026年8月1日` or `3小时前`.</ResponseField>
+    <ResponseField name="date_at" type="string">ISO 8601 date (`YYYY-MM-DD`), set only when `date` is unambiguous.</ResponseField>
+    <ResponseField name="thumbnail" type="string">Article image URL, when present.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<Note>
+  Only `position`, `title`, `query` and `page` are guaranteed present. Every
+  other field is nullable — Baidu's news cards vary by publisher.
+</Note>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/baidu/news?query=%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD&sort=time" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/baidu/news?" +
+    new URLSearchParams({ query: "人工智能", sort: "time" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/baidu/news",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "人工智能", "sort": "time"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "人工智能",
+  "page": 1,
+  "total_results": null,
+  "results": [
+    {
+      "position": 1,
+      "title": "以科学了解咖啡的秘密",
+      "url": "http://www.jgj.moa.gov.cn/kptd/202012/t20201207_6357680.htm",
+      "baidu_url": null,
+      "snippet": "咖啡是用经过烘焙的咖啡豆制作冲泡的饮料,与可可、茶并称为世界三大饮料,是流行于世界的主要饮品。",
+      "source": "农产品质量安全监管司",
+      "date": "2020年12月25日",
+      "date_at": "2020-12-25",
+      "thumbnail": null
+    },
+    {
+      "position": 2,
+      "title": "咖啡知识 | 咖啡知识大全",
+      "url": "https://mp.weixin.qq.com/s?__biz=MzA5MzI2MzYyMQ==&mid=2247503901&idx=5",
+      "baidu_url": null,
+      "snippet": "豆是咖啡树果实中的种子,它们会经过采摘、干燥、烘焙等处理过程,最终被磨成粉用于冲泡咖啡...",
+      "source": "微信公众平台",
+      "date": "2024年8月15日",
+      "date_at": "2024-08-15",
+      "thumbnail": "https://t9.baidu.com/it/u=546988488,560360434&fm=217&app=126"
+    }
+  ],
+  "url": "https://www.baidu.com/s?tn=news&word=%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD&ie=utf-8"
+}
+```
+
+## Sorting for monitoring
+
+For a news monitor, poll with `sort=time` and stop at the first article you have
+already seen. Deduplicate on `url` (the real article URL), **not** on `title` —
+Chinese outlets syndicate the same headline across many domains, and on
+`baidu_url`, which is per-impression and changes between requests.
+
+<Note>
+  `sort=time` orders by Baidu's own index date. Freshly indexed older articles
+  can appear above newer ones, so `date_at` is the field to trust when you need
+  a real chronology.
+</Note>
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Anti-bot challenge — **not billed**. Retry; it succeeds. |
+| `502` | Baidu returned a page without the result container. Retry. |

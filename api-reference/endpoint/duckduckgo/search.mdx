@@ -1,0 +1,131 @@
+---
+title: "Web Search"
+api: "GET https://scrapebadger.com/v1/duckduckgo/search"
+description: "Search the DuckDuckGo web SERP — organic results, the zero-click abstract box, ads flagged."
+---
+
+Search the DuckDuckGo web SERP. Ad results are returned and flagged `is_ad`;
+the zero-click abstract box is attached when DuckDuckGo shows one.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search query, e.g. `web scraping`.
+</ParamField>
+
+<ParamField query="region" type="string" default="wt-wt">
+  DuckDuckGo region code (`kl`), e.g. `us-en`, `uk-en`, `de-de`. `wt-wt` = all
+  regions. List every code with
+  [`/regions`](/api-reference/endpoint/duckduckgo/regions).
+</ParamField>
+
+<ParamField query="safesearch" type="string" default="moderate">
+  One of `on`, `moderate`, `off`.
+</ParamField>
+
+<ParamField query="timelimit" type="string">
+  Restrict result age: `day`, `week`, `month` or `year`. Omit for all time.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  Result page, `1`–`25`.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="region" type="string">The region that was applied.</ResponseField>
+<ResponseField name="results" type="SearchResult[]">
+  Organic results plus flagged ads.
+
+  <Expandable title="SearchResult">
+    <ResponseField name="title" type="string" />
+    <ResponseField name="url" type="string" />
+    <ResponseField name="snippet" type="string" />
+    <ResponseField name="display_url" type="string" />
+    <ResponseField name="is_ad" type="boolean">`true` for ad results — filter on this to keep organic only.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="abstract" type="AbstractBox | null">
+  The zero-click / instant-answer box above the organic results, when shown.
+
+  <Expandable title="AbstractBox">
+    <ResponseField name="heading" type="string" />
+    <ResponseField name="text" type="string" />
+    <ResponseField name="url" type="string" />
+    <ResponseField name="image" type="string | null" />
+    <ResponseField name="source" type="string">e.g. `Wikipedia`.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="result_count" type="integer">Results on this page.</ResponseField>
+<ResponseField name="has_next" type="boolean">Page on this.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/duckduckgo/search?query=web+scraping&region=us-en" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/duckduckgo/search?" +
+    new URLSearchParams({
+      query: "web scraping",
+      region: "us-en",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/duckduckgo/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "query": "web scraping",
+        "region": "us-en",
+    },
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "web scraping",
+  "region": "us-en",
+  "results": [
+    {
+      "title": "Web scraping - Wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Web_scraping",
+      "snippet": "Web scraping, web harvesting, or web data extraction is data scraping used for extracting data from websites...",
+      "display_url": "en.wikipedia.org/wiki/Web_scraping",
+      "is_ad": false
+    }
+  ],
+  "abstract": {
+    "heading": "Web scraping",
+    "text": "Web scraping, web harvesting, or web data extraction is data scraping used for extracting data from websites.",
+    "url": "https://en.wikipedia.org/wiki/Web_scraping",
+    "image": null,
+    "source": "Wikipedia"
+  },
+  "result_count": 24,
+  "has_next": true
+}
+```

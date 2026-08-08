@@ -1,0 +1,110 @@
+---
+title: "Baidu Autocomplete"
+api: "GET https://scrapebadger.com/v1/baidu/autocomplete"
+description: "Baidu search-box suggestions for a partial term — the cheapest call in the Baidu API at 1 credit."
+---
+
+Baidu's search-box suggestions for a partial term — what the dropdown on
+`baidu.com` would show as you type. At **1 credit** this is the cheapest call in
+the Baidu API and the fastest way to turn a seed term into real Chinese queries
+people actually search.
+
+**Credits:** 1
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Partial search term, e.g. `咖啡` or `coff`. URL-encode as UTF-8.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the partial term.</ResponseField>
+<ResponseField name="suggestions" type="Suggestion[]">
+  Baidu's suggestions, in Baidu's own order (most likely first).
+
+  <Expandable title="Suggestion">
+    <ResponseField name="query" type="string">The suggested query.</ResponseField>
+    <ResponseField name="type" type="string">Baidu's suggestion type, e.g. `sug`. `null` when Baidu omits it.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/baidu/autocomplete?query=%E5%92%96%E5%95%A1" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/baidu/autocomplete?" + new URLSearchParams({ query: "咖啡" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/baidu/autocomplete",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "咖啡"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "咖啡",
+  "suggestions": [
+    { "query": "咖啡品牌排行榜", "type": "sug" },
+    { "query": "咖啡机", "type": "sug" },
+    { "query": "咖啡品牌", "type": "sug" },
+    { "query": "咖啡豆", "type": "sug" },
+    { "query": "咖啡斑", "type": "sug" }
+  ]
+}
+```
+
+## Keyword expansion
+
+Autocomplete is the cheap half of a two-step keyword workflow:
+
+1. Call `/autocomplete` on the seed term (1 credit) to get Baidu's real query
+   variants.
+2. Call [`/search`](/api-reference/endpoint/baidu/search) on each variant
+   (5 credits) and merge results on `url`.
+
+That covers a topic far more broadly than paging one query toward its page-76
+wall, for fewer credits. The `related_searches` block on every `/search`
+response feeds the same loop for free.
+
+<Tip>
+  Suggestions are **prefix-driven**, so the seed's ending changes the whole set:
+  `咖啡` returns brand and bean queries, while `咖啡机` returns machine queries.
+  Fan out over a few seeds rather than trusting one.
+</Tip>
+
+<Note>
+  Latin input works — `coff` returns suggestions — but Baidu's suggestion index
+  is overwhelmingly Chinese, so Chinese seeds return far more.
+</Note>
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Anti-bot challenge — **not billed**. Retry; it succeeds. |
+| `502` | Baidu's suggestion API returned an unparseable payload. Retry. |

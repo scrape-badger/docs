@@ -1,0 +1,128 @@
+---
+title: "Video Search"
+api: "GET https://scrapebadger.com/v1/duckduckgo/videos"
+description: "Search DuckDuckGo videos — title, publisher, uploader, duration, views, thumbnails."
+---
+
+Search DuckDuckGo videos. 60 results per page.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search query, e.g. `python tutorial`.
+</ParamField>
+
+<ParamField query="region" type="string" default="wt-wt">
+  DuckDuckGo region code (`kl`), e.g. `us-en`. `wt-wt` = all regions.
+</ParamField>
+
+<ParamField query="safesearch" type="string" default="moderate">
+  One of `on`, `moderate`, `off`.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  Result page, `1`–`10`. 60 results per page.
+</ParamField>
+
+<ParamField query="duration" type="string">
+  `short`, `medium` or `long`.
+</ParamField>
+
+<ParamField query="resolution" type="string">
+  `high` or `standard`.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="region" type="string">The region that was applied.</ResponseField>
+<ResponseField name="results" type="VideoResult[]">
+  Video results.
+
+  <Expandable title="VideoResult">
+    <ResponseField name="title" type="string" />
+    <ResponseField name="content" type="string">The watch URL.</ResponseField>
+    <ResponseField name="description" type="string" />
+    <ResponseField name="duration" type="string">e.g. `10:23`.</ResponseField>
+    <ResponseField name="publisher" type="string">e.g. `YouTube`.</ResponseField>
+    <ResponseField name="uploader" type="string">The channel or account name.</ResponseField>
+    <ResponseField name="published_at" type="string">ISO 8601 publication time.</ResponseField>
+    <ResponseField name="view_count" type="integer" />
+    <ResponseField name="images" type="object">Thumbnail URLs keyed by size, e.g. `small`, `medium`, `large`, `motion`.</ResponseField>
+    <ResponseField name="embed_url" type="string" />
+  </Expandable>
+</ResponseField>
+<ResponseField name="result_count" type="integer">Results on this page.</ResponseField>
+<ResponseField name="has_next" type="boolean">Page on this.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/duckduckgo/videos?query=python+tutorial&duration=long" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/duckduckgo/videos?" +
+    new URLSearchParams({
+      query: "python tutorial",
+      duration: "long",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/duckduckgo/videos",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "query": "python tutorial",
+        "duration": "long",
+    },
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "python tutorial",
+  "region": "wt-wt",
+  "results": [
+    {
+      "title": "Python Full Course for Beginners",
+      "content": "https://www.youtube.com/watch?v=abc123",
+      "description": "Learn Python from scratch in this complete course...",
+      "duration": "4:26:52",
+      "publisher": "YouTube",
+      "uploader": "Programming with Mosh",
+      "published_at": "2026-01-15T14:00:00.0000000",
+      "view_count": 12345678,
+      "images": {
+        "small": "https://tse1.mm.bing.net/th?id=OVP.small",
+        "medium": "https://tse1.mm.bing.net/th?id=OVP.medium",
+        "large": "https://tse1.mm.bing.net/th?id=OVP.large"
+      },
+      "embed_url": "https://www.youtube.com/embed/abc123"
+    }
+  ],
+  "result_count": 60,
+  "has_next": true
+}
+```

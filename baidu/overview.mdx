@@ -1,0 +1,180 @@
+---
+title: "Baidu API Overview"
+description: "Scrape Baidu — China's #1 search engine — as clean JSON: web SERP with language and date-window filters, the news vertical, image search and autocomplete. Every result carries the real target URL, not Baidu's tracking redirect. No China proxy required."
+---
+
+## Overview
+
+The ScrapeBadger **Baidu API** turns `baidu.com` into a clean JSON feed: the
+web SERP (with language and publish-date filters), the news vertical, image
+search with full-size image URLs and pixel dimensions, and search-box
+autocomplete.
+
+Baidu is **China's #1 search engine at roughly 60% market share** — the single
+largest search surface outside Google, and the one that decides visibility for
+the Chinese-language web. It is also the search engine most Western SEO and
+market-research tooling simply skips.
+
+<Info>
+  All endpoints are `GET`, live under `https://scrapebadger.com/v1/baidu/*`,
+  and authenticate with the `X-API-Key` header. Credits are charged per request
+  (see the table below) and reported on the `X-Credits-Used` response header.
+</Info>
+
+## The real URL, not the redirect
+
+Baidu does not link straight to a result. Every organic link is a
+`baidu.com/link?url=...` tracking redirect that only resolves to the
+destination when followed — which is why competing Baidu APIs hand you a
+`baidu.com` URL and leave you to make one extra HTTP request per result to
+learn where it actually goes.
+
+ScrapeBadger returns **both**, on every result:
+
+| Field | What it is |
+| ----- | ---------- |
+| `url` | The **real target URL**, decoded from the result's `mu` attribute. |
+| `baidu_url` | Baidu's `baidu.com/link?url=` tracking redirect. |
+
+```json
+{
+  "position": 1,
+  "title": "专业咖啡机价格 - 阿里巴巴",
+  "url": "https://www.1688.com/jiage/-D7A8D2B5BFA7B7C8BBFA.html",
+  "baidu_url": "http://www.baidu.com/link?url=m4_ZyR-m51ZWH--9M5Fnrzn4W0Nebua"
+}
+```
+
+So a rank-tracking or domain-visibility job needs **one call, not 1 + N** — you
+can group results by real hostname straight out of the response.
+
+## Global access, no China proxy
+
+Baidu is reachable from outside China but rate-limits and challenges foreign
+traffic aggressively. ScrapeBadger absorbs that: requests are served through
+its own exit pool with session reuse and challenge handling, so **you do not
+need a China-based proxy, a mainland VPS, or an ICP filing**. Call the API from
+anywhere.
+
+## Features
+
+- **Web search** — organic results with `title`, real `url`, `snippet`,
+  `source` (the site name Baidu shows), `date`/`date_at`, `thumbnail` and
+  Baidu's own `tpl` template id. Up to **50 results per page**.
+- **Language filter** — restrict to simplified (`zh-cn`) or traditional
+  (`zh-tw`) Chinese, or leave it open with `all`.
+- **Publish-date window** — `time_from` / `time_to` as Unix timestamps, mapped
+  onto Baidu's own `gpc` date filter.
+- **Related searches** — Baidu's query suggestions from the foot of the SERP,
+  with their SERP URLs, for keyword expansion.
+- **News vertical** — articles with publisher, publish date and real article
+  URLs, ordered by relevance or recency.
+- **Image search** — full-size `image_url` (Baidu's decoded `objURL`), three
+  Baidu-hosted copies (`thumbnail_url`, `middle_url`, `hover_url`), pixel
+  `width`/`height`, format, and the source page (`from_url`, `from_title`).
+- **Autocomplete** — Baidu's search-box suggestions for 1 credit, the cheapest
+  way to expand a seed term into real Chinese queries.
+
+## Dates
+
+Every dated result ships **two** fields:
+
+| Field | Value |
+| ----- | ----- |
+| `date` | Baidu's own string, exactly as rendered — `2026年8月1日`, `3天前`, `2小时前`. |
+| `date_at` | ISO 8601 date (`YYYY-MM-DD`), set **only** when the raw form is unambiguous. |
+
+<Note>
+  There is deliberately **no timestamp field**. Baidu's SERP carries no
+  time-of-day, so a midnight epoch would be fabricated precision. Sort on
+  `date_at` and keep `date` for display.
+</Note>
+
+## Credits
+
+| Endpoint | Path | Credits |
+| -------- | ---- | ------- |
+| Web search | `GET /v1/baidu/search` | 5 |
+| News | `GET /v1/baidu/news` | 5 |
+| Images | `GET /v1/baidu/images` | 5 |
+| Autocomplete | `GET /v1/baidu/autocomplete` | 1 |
+
+## Quickstart
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/baidu/search?query=%E5%92%96%E5%95%A1%E6%9C%BA&num=20" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+import { ScrapeBadger } from "scrapebadger";
+
+const client = new ScrapeBadger({ apiKey: process.env.SCRAPEBADGER_API_KEY });
+
+const results = await client.baidu.search("咖啡机", { num: 20, language: "zh-cn" });
+for (const r of results.results) {
+  // r.url is the real destination, r.baidu_url the tracking redirect
+  console.log(`${r.position}. ${r.title} — ${r.url}`);
+}
+```
+
+```python Python
+import asyncio
+from scrapebadger import ScrapeBadger
+
+async def main():
+    async with ScrapeBadger(api_key="YOUR_API_KEY") as client:
+        results = await client.baidu.search("咖啡机", num=20, language="zh-cn")
+        for r in results.results:
+            print(r.position, r.title, r.url)
+
+asyncio.run(main())
+```
+
+</CodeGroup>
+
+## Pagination limits
+
+`total_results` is **Baidu's own claim** (parsed from
+`百度为您找到相关结果约N个`), not a reachable count. Baidu's SERP stops
+serving results past roughly **page 76** regardless of the total it reports, so
+`page` is clamped to `1`–`76` — a request beyond the wall is rejected rather
+than billed for a structurally empty page.
+
+- `num` controls page size, `1`–`50` (Baidu's own cap). Fewer, bigger pages is
+  the cheaper way to depth: `num=50` reaches 500 results in 10 calls.
+- Page offset is `(page - 1) * num`, so **changing `num` between pages shifts
+  the window.** Keep `num` fixed for the whole crawl of one query.
+- Images are a fixed **30 per page**, `page` `1`–`50`.
+
+<Tip>
+  To go wider than one query's page wall, expand the seed instead of paging
+  deeper: run [`/autocomplete`](/api-reference/endpoint/baidu/autocomplete) (1
+  credit) and the `related_searches` off the first SERP, then search each term
+  and merge on `url`. Cheaper coverage than paging to 76.
+</Tip>
+
+## Character encoding
+
+Queries are Chinese in practice, so **URL-encode the query as UTF-8** and let
+your HTTP client do it (`URLSearchParams`, `requests` `params=`, the SDKs).
+Every response is UTF-8; `snippet` and `title` come back with Baidu's own
+punctuation (`,`, `、`) intact rather than transliterated.
+
+Latin queries work too — Baidu serves a mixed SERP for `coffee machine` — but
+Chinese terms return meaningfully richer results.
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Anti-bot challenge — **not billed**. Retry; it succeeds. |
+| `502` | Baidu returned a page without the expected result container. Retry. |
+
+<Note>
+  Baidu serves a challenge page with HTTP 200. Those are detected by result-
+  container marker, not status code, and surfaced as `422` so a challenge is
+  never billed or mistaken for a genuinely empty SERP.
+</Note>

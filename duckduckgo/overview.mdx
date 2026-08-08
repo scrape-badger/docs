@@ -1,0 +1,144 @@
+---
+title: "DuckDuckGo API Overview"
+description: "Search the DuckDuckGo web SERP, images, news and videos, pull search suggestions and Instant Answers — no DuckDuckGo API key required."
+---
+
+## Overview
+
+The ScrapeBadger **DuckDuckGo API** turns DuckDuckGo into a clean JSON feed:
+the web SERP with ads flagged and the zero-click abstract box, image search
+with size/color/type/layout/license filters, news with both relative and
+absolute dates, video search with view counts and embed URLs, search-box
+autocomplete, the Instant Answer API, and the full region code list.
+
+<Info>
+  All endpoints are `GET`, live under `https://scrapebadger.com/v1/duckduckgo/*`,
+  and authenticate with the `X-API-Key` header. Credits are charged per request
+  (see the table below) and reported on the `X-Credits-Used` response header.
+</Info>
+
+## Features
+
+- **Web search** — organic results with `title`, `url`, `snippet`,
+  `display_url`; ad results are returned and flagged `is_ad` so you can
+  include or exclude them yourself. The zero-click `abstract` box (heading,
+  text, source, image) is attached when DuckDuckGo shows one.
+- **Image search** — 100 results per page with dimensions, source page,
+  encoding format and discovery date, filterable by `size`, `color`,
+  `image_type`, `layout` and `license`.
+- **News search** — 30 results per page; every date ships in **both** forms:
+  `date_utc` (Unix seconds) and `date_at` (ISO 8601 UTC), plus DuckDuckGo's
+  own `relative_time` and the `syndicate` it aggregated from.
+- **Video search** — 60 results per page with publisher, uploader, duration,
+  `view_count`, thumbnails and `embed_url`.
+- **Autocomplete** — search-box suggestions for a partial query, region-aware.
+- **Instant Answers** — DuckDuckGo's entity/abstract/definition/direct-answer
+  API for reference queries, with `related_topics`.
+- **Region targeting** — every search endpoint takes a `region` (DuckDuckGo
+  `kl` code, e.g. `us-en`); `wt-wt` (All Regions, no locale bias) is the
+  default. `/regions` lists all supported codes, free.
+
+## Regions
+
+`region` is a DuckDuckGo `kl` code — `country-language`, e.g. `us-en`,
+`uk-en`, `de-de`, `fr-fr`, `jp-jp`. The default `wt-wt` means **All Regions**
+(no locale bias). List every supported code with
+[`/regions`](/api-reference/endpoint/duckduckgo/regions) (free).
+
+| Common codes | Region |
+| ------------ | ------ |
+| `wt-wt` | All Regions (default) |
+| `us-en` | United States |
+| `uk-en` | United Kingdom |
+| `de-de` | Germany |
+| `fr-fr` | France |
+| `jp-jp` | Japan |
+
+## Credits
+
+| Endpoint | Path | Credits |
+| -------- | ---- | ------- |
+| Web search | `GET /v1/duckduckgo/search` | 5 |
+| Image search | `GET /v1/duckduckgo/images` | 5 |
+| News search | `GET /v1/duckduckgo/news` | 5 |
+| Video search | `GET /v1/duckduckgo/videos` | 5 |
+| Autocomplete | `GET /v1/duckduckgo/autocomplete` | 1 |
+| Instant Answer | `GET /v1/duckduckgo/instant` | 1 |
+| List regions | `GET /v1/duckduckgo/regions` | 0 |
+
+## Quickstart
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/duckduckgo/search?query=web+scraping&region=us-en" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/duckduckgo/search?" +
+    new URLSearchParams({
+      query: "web scraping",
+      region: "us-en",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+console.log(data.results.length, "results");
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/duckduckgo/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "query": "web scraping",
+        "region": "us-en",
+    },
+)
+print(len(res.json()["results"]), "results")
+```
+
+</CodeGroup>
+
+## Pagination
+
+Every search endpoint pages with a `page` parameter and returns `has_next` —
+page on that, not on `result_count`.
+
+| Surface | Max page | Results per page |
+| ------- | -------- | ---------------- |
+| `/search` | 25 | ~10–30 |
+| `/images` | 10 | 100 |
+| `/news` | 10 | 30 |
+| `/videos` | 10 | 60 |
+
+## Other notes
+
+- **SafeSearch** — `safesearch` accepts `on`, `moderate` (default) or `off`
+  on `/search`, `/images`, `/news` and `/videos`.
+- **Time filters** — `timelimit` (`day`, `week`, `month`, `year`) narrows
+  `/search` and `/news` to recent results; omit it for all time.
+- **Instant Answers are entity-shaped.** `/instant` answers reference
+  queries (people, places, definitions, calculations); most long-tail search
+  phrases return an empty payload — that is DuckDuckGo's behaviour, not an
+  error. Use `/search` for general queries.
+- **Datetimes ship in both forms** — news dates come as `date_utc` (Unix
+  seconds) and `date_at` (ISO 8601 UTC string).
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Anti-bot challenge — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — not billed. |
+
+<Tip>
+  Start from [`/autocomplete`](/api-reference/endpoint/duckduckgo/autocomplete)
+  (1 credit) to expand a partial term into real DuckDuckGo queries, then run
+  [`/search`](/api-reference/endpoint/duckduckgo/search) on each one and merge
+  on `url`.
+</Tip>

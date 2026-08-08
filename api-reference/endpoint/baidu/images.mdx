@@ -1,0 +1,151 @@
+---
+title: "Baidu Image Search"
+api: "GET https://scrapebadger.com/v1/baidu/images"
+description: "Search Baidu images — full-size image URLs, Baidu-hosted thumbnail copies, pixel dimensions, format and the source page each image came from."
+---
+
+Search Baidu images. Each result carries the **full-size image URL** (Baidu's
+decoded `objURL`), three Baidu-hosted copies at different sizes, the real pixel
+dimensions, the file format, and the page the image was found on.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords, e.g. `猫`. URL-encode as UTF-8.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  Result page, `1`–`50`. Fixed at **30 images per page** — Baidu's own page size,
+  not adjustable.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="page" type="integer">The page returned.</ResponseField>
+<ResponseField name="total_results" type="integer">Baidu's own reported total for the query.</ResponseField>
+<ResponseField name="results" type="ImageResult[]">
+  Images on this page (up to 30).
+
+  <Expandable title="ImageResult">
+    <ResponseField name="position" type="integer">1-based rank on the page.</ResponseField>
+    <ResponseField name="title" type="string">Image title / caption.</ResponseField>
+    <ResponseField name="image_url" type="string">
+      **Full-size image URL** on the origin host, decoded from Baidu's obfuscated
+      `objURL`.
+    </ResponseField>
+    <ResponseField name="thumbnail_url" type="string">Baidu-hosted thumbnail copy.</ResponseField>
+    <ResponseField name="middle_url" type="string">Baidu-hosted mid-size copy.</ResponseField>
+    <ResponseField name="hover_url" type="string">Baidu-hosted hover-preview copy.</ResponseField>
+    <ResponseField name="width" type="integer">Full-size image width in pixels.</ResponseField>
+    <ResponseField name="height" type="integer">Full-size image height in pixels.</ResponseField>
+    <ResponseField name="type" type="string">Image format, e.g. `jpg`.</ResponseField>
+    <ResponseField name="from_url" type="string">Page the image was found on.</ResponseField>
+    <ResponseField name="from_title" type="string">Title of the page the image was found on.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<Note>
+  Only `position`, `query` and `page` are guaranteed present — including `title`,
+  which Baidu omits on some tiles. Every other field is nullable.
+</Note>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/baidu/images?query=%E7%8C%AB" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/baidu/images?" + new URLSearchParams({ query: "猫" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/baidu/images",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "猫"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "猫",
+  "page": 1,
+  "total_results": 748836,
+  "results": [
+    {
+      "position": 1,
+      "title": "白杯,咖啡,咖啡豆 4k",
+      "image_url": "https://s2.best-wallpaper.net/wallpaper/iphone/1708/White-cup-coffee-coffee-beans_iphone_640x1136.jpg",
+      "thumbnail_url": "https://img0.baidu.com/it/u=1467163901,1497482106&fm=253&fmt=auto&app=138&f=JPEG?w=282&h=500",
+      "middle_url": "https://img0.baidu.com/it/u=1467163901,1497482106&fm=253&fmt=auto&app=138&f=JPEG?w=282&h=500",
+      "hover_url": "https://img0.baidu.com/it/u=1467163901,1497482106&fm=253&fmt=auto&app=138&f=JPEG?w=282&h=500",
+      "width": 640,
+      "height": 1136,
+      "type": "jpg",
+      "from_url": "http://cn.best-wallpaper.net/white-cup-coffee-coffee-beans_wallpapers.html",
+      "from_title": "白杯,咖啡,咖啡豆 4k"
+    },
+    {
+      "position": 2,
+      "title": "时光里的咖啡记忆 #咖啡 #拿铁 - 抖音",
+      "image_url": "https://p3-pc-sign.douyinpic.com/tos-cn-i-0813c000-ce/oIf4pFOAEQFIwUojvFf8aAUA9ACTnDezEAqxEq~tplv-dy-aweme-images:q75.webp",
+      "thumbnail_url": "https://img2.baidu.com/it/u=2072998656,274351222&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1067",
+      "middle_url": "https://img2.baidu.com/it/u=2072998656,274351222&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1067",
+      "hover_url": "https://img2.baidu.com/it/u=2072998656,274351222&fm=253&fmt=auto&app=138&f=JPEG?w=800&h=1067",
+      "width": 1080,
+      "height": 1440,
+      "type": "jpg",
+      "from_url": "http://www.douyin.com/note/7467811736117087545",
+      "from_title": "时光里的咖啡记忆 #咖啡 #拿铁 - 抖音"
+    }
+  ]
+}
+```
+
+## Which URL to use
+
+| Field | Host | Use it for |
+| ----- | ---- | ---------- |
+| `image_url` | The origin site | Downloading the real asset at full resolution. |
+| `thumbnail_url` / `middle_url` / `hover_url` | `img*.baidu.com` | Grids and previews — Baidu's CDN is fast and does not hotlink-block. |
+
+<Warning>
+  `image_url` points at a third-party host, so it can 404, hotlink-block, or
+  redirect — Baidu's index outlives the pages it indexed. Fall back to
+  `thumbnail_url` when a fetch of `image_url` fails, and treat `width`/`height`
+  as describing the original asset, not the Baidu-hosted copies.
+</Warning>
+
+<Note>
+  `type` is Baidu's declared format and is frequently `jpg` even for a `.webp`
+  asset. Sniff the bytes if the real format matters.
+</Note>
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Anti-bot challenge — **not billed**. Retry; it succeeds. |
+| `502` | Baidu's image JSON API returned an unparseable payload. Retry. |

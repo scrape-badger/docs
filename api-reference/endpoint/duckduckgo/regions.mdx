@@ -1,0 +1,68 @@
+---
+title: "List Regions"
+api: "GET https://scrapebadger.com/v1/duckduckgo/regions"
+description: "List all supported DuckDuckGo region (kl) codes."
+---
+
+List every DuckDuckGo region (`kl`) code accepted by the `region` parameter.
+This endpoint is **free**.
+
+**Credits:** 0
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Response
+
+<ResponseField name="regions" type="Region[]">
+  Supported regions, in DuckDuckGo's own order.
+
+  <Expandable title="Region">
+    <ResponseField name="code" type="string">The `kl` code, e.g. `us-en`. `wt-wt` = All Regions.</ResponseField>
+    <ResponseField name="name" type="string">Human label, e.g. `United States`.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="count" type="integer">Number of regions.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/duckduckgo/regions" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/duckduckgo/regions", {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+});
+const { regions } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/duckduckgo/regions",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+regions = res.json()["regions"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "regions": [
+    { "code": "wt-wt", "name": "All Regions" },
+    { "code": "ar-es", "name": "Argentina" },
+    { "code": "au-en", "name": "Australia" },
+    { "code": "us-en", "name": "United States" }
+  ],
+  "count": 64
+}
+```

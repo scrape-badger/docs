@@ -1,0 +1,111 @@
+---
+title: "Instant Answer"
+api: "GET https://scrapebadger.com/v1/duckduckgo/instant"
+description: "Query the DuckDuckGo Instant Answer API — abstract, definition, direct answer, related topics."
+---
+
+Query the DuckDuckGo Instant Answer API. Best for reference queries — entities,
+people, places, definitions and calculations.
+
+**Credits:** 1
+
+<Note>
+  Instant Answers are **entity-shaped**: most long-tail search phrases return
+  an empty payload. That is DuckDuckGo's behaviour, not an error — use
+  [`/search`](/api-reference/endpoint/duckduckgo/search) for general queries.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Query for the Instant Answer API, e.g. `Nikola Tesla`.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="abstract" type="string">Abstract, may contain HTML.</ResponseField>
+<ResponseField name="abstract_text" type="string">Abstract as plain text.</ResponseField>
+<ResponseField name="abstract_source" type="string">e.g. `Wikipedia`.</ResponseField>
+<ResponseField name="abstract_url" type="string" />
+<ResponseField name="heading" type="string">The topic name.</ResponseField>
+<ResponseField name="answer" type="string">Direct answer for calculation/conversion queries.</ResponseField>
+<ResponseField name="answer_type" type="string">e.g. `calc`, `ip`, `color_code`.</ResponseField>
+<ResponseField name="definition" type="string">Dictionary definition, when applicable.</ResponseField>
+<ResponseField name="definition_source" type="string" />
+<ResponseField name="definition_url" type="string" />
+<ResponseField name="image" type="string" />
+<ResponseField name="type" type="string">Answer category: `A` (article), `D` (disambiguation), `C` (category), `N` (name), `E` (exclusive).</ResponseField>
+<ResponseField name="redirect" type="string">Set for `!bang` redirect queries.</ResponseField>
+<ResponseField name="related_topics" type="Topic[]">
+  Related topics.
+
+  <Expandable title="Topic">
+    <ResponseField name="text" type="string" />
+    <ResponseField name="url" type="string" />
+    <ResponseField name="icon" type="string | null" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/duckduckgo/instant?query=Nikola+Tesla" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/duckduckgo/instant?" +
+    new URLSearchParams({ query: "Nikola Tesla" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/duckduckgo/instant",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "Nikola Tesla"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "Nikola Tesla",
+  "abstract": "Nikola Tesla was a Serbian-American inventor, electrical engineer...",
+  "abstract_text": "Nikola Tesla was a Serbian-American inventor, electrical engineer...",
+  "abstract_source": "Wikipedia",
+  "abstract_url": "https://en.wikipedia.org/wiki/Nikola_Tesla",
+  "heading": "Nikola Tesla",
+  "answer": "",
+  "answer_type": "",
+  "definition": "",
+  "definition_source": "",
+  "definition_url": "",
+  "image": "/i/ee2712bd.jpg",
+  "type": "A",
+  "redirect": "",
+  "related_topics": [
+    {
+      "text": "Wardenclyffe Tower - An early experimental wireless transmission station...",
+      "url": "https://duckduckgo.com/Wardenclyffe_Tower",
+      "icon": null
+    }
+  ]
+}
+```

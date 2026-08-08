@@ -1,0 +1,80 @@
+---
+title: "Autocomplete"
+api: "GET https://scrapebadger.com/v1/duckduckgo/autocomplete"
+description: "Get DuckDuckGo search-box suggestions for a partial query."
+---
+
+Get DuckDuckGo's search-box suggestions for a partial query. Region-aware.
+
+**Credits:** 1
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Partial query to complete, e.g. `web scra`.
+</ParamField>
+
+<ParamField query="region" type="string" default="wt-wt">
+  DuckDuckGo region code (`kl`), e.g. `us-en`. `wt-wt` = all regions.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="suggestions" type="string[]">Suggested queries, in DuckDuckGo's order.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/duckduckgo/autocomplete?query=web+scra" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/duckduckgo/autocomplete?" +
+    new URLSearchParams({ query: "web scra" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { suggestions } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/duckduckgo/autocomplete",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "web scra"},
+)
+suggestions = res.json()["suggestions"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "web scra",
+  "suggestions": [
+    "web scraping",
+    "web scraping python",
+    "web scraping tools",
+    "web scraping api",
+    "web scraper chrome extension"
+  ]
+}
+```
+
+<Tip>
+  Autocomplete costs 1 credit — expand a partial term into real DuckDuckGo
+  queries here, then run [`/search`](/api-reference/endpoint/duckduckgo/search)
+  on each one.
+</Tip>
