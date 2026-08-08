@@ -247,6 +247,28 @@
         ]
       },
       {
+        "tab": "Bing",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "bing/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/bing/search",
+              "api-reference/endpoint/bing/images",
+              "api-reference/endpoint/bing/videos",
+              "api-reference/endpoint/bing/news",
+              "api-reference/endpoint/bing/autocomplete",
+              "api-reference/endpoint/bing/list-markets"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "DuckDuckGo",
         "groups": [
           {

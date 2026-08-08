@@ -1,0 +1,109 @@
+---
+title: "News Search"
+api: "GET https://scrapebadger.com/v1/bing/news"
+description: "Search Bing News — headline, source, snippet and absolute publish time per article, with a freshness filter."
+---
+
+Search Bing News. Parsed from **Bing's RSS feed** rather than the HTML news
+cards — that is why every article carries an absolute publish time
+(`published_at` ISO 8601 plus `published_utc` Unix) instead of a relative
+"2 hours ago", and why the schema is stable.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords, e.g. `interest rates`.
+</ParamField>
+
+<ParamField query="market" type="string" default="en-US">
+  Bing market code, e.g. `en-US`. See
+  [`/markets`](/api-reference/endpoint/bing/list-markets).
+</ParamField>
+
+<ParamField query="freshness" type="string">
+  Restrict to recent articles. One of `day`, `week`, `month`.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="market" type="string">The market the results were fetched for.</ResponseField>
+<ResponseField name="result_count" type="integer">Articles returned.</ResponseField>
+<ResponseField name="results" type="NewsArticle[]">
+  News articles.
+
+  <Expandable title="NewsArticle">
+    <ResponseField name="position" type="integer">1-based rank.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="url" type="string">Destination article URL — Bing's redirect is resolved.</ResponseField>
+    <ResponseField name="source" type="string">Publisher name.</ResponseField>
+    <ResponseField name="snippet" type="string" />
+    <ResponseField name="published" type="string">Raw RFC-822 publish date from Bing.</ResponseField>
+    <ResponseField name="published_at" type="string">ISO 8601 UTC publish time.</ResponseField>
+    <ResponseField name="published_utc" type="number">Unix publish timestamp.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/bing/news?query=interest+rates&freshness=week" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/bing/news?" +
+    new URLSearchParams({ query: "interest rates", freshness: "week" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/bing/news",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "interest rates", "freshness": "week"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "interest rates",
+  "market": "en-US",
+  "result_count": 10,
+  "results": [
+    {
+      "position": 1,
+      "title": "Fed Holds Rates Steady as Inflation Cools",
+      "url": "https://www.reuters.com/markets/us/fed-holds-rates-steady",
+      "source": "Reuters",
+      "snippet": "The Federal Reserve kept its benchmark interest rate unchanged...",
+      "published": "Fri, 07 Aug 2026 14:03:00 GMT",
+      "published_at": "2026-08-07T14:03:00+00:00",
+      "published_utc": 1786197780.0
+    }
+  ]
+}
+```
+
+<Note>
+  Because articles come from the RSS feed, thumbnails/imagery are not
+  included — the trade for absolute dates and a stable schema.
+</Note>

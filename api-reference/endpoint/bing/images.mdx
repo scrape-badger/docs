@@ -1,0 +1,106 @@
+---
+title: "Image Search"
+api: "GET https://scrapebadger.com/v1/bing/images"
+description: "Search Bing Images — full-size URL, thumbnail, source page and pixel dimensions per result."
+---
+
+Search Bing Images. Each result carries the **full-size image URL**, a Bing
+thumbnail, the page the image lives on, and its pixel dimensions.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords, e.g. `golden retriever`.
+</ParamField>
+
+<ParamField query="market" type="string" default="en-US">
+  Bing market code, e.g. `en-US`. See
+  [`/markets`](/api-reference/endpoint/bing/list-markets).
+</ParamField>
+
+<ParamField query="count" type="integer" default="35">
+  Results to return.
+</ParamField>
+
+<ParamField query="safe_search" type="string">
+  One of `off`, `moderate`, `strict`.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="market" type="string">The market the results were fetched for.</ResponseField>
+<ResponseField name="result_count" type="integer">Images returned.</ResponseField>
+<ResponseField name="results" type="ImageResult[]">
+  Image results.
+
+  <Expandable title="ImageResult">
+    <ResponseField name="position" type="integer">1-based rank.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="image_url" type="string">Full-size image URL.</ResponseField>
+    <ResponseField name="thumbnail_url" type="string">Bing-hosted thumbnail URL.</ResponseField>
+    <ResponseField name="source_url" type="string">The page the image lives on.</ResponseField>
+    <ResponseField name="source_domain" type="string" />
+    <ResponseField name="width" type="integer">Full-size width in pixels.</ResponseField>
+    <ResponseField name="height" type="integer">Full-size height in pixels.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/bing/images?query=golden+retriever&count=10" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/bing/images?" +
+    new URLSearchParams({ query: "golden retriever", count: "10" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/bing/images",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "golden retriever", "count": 10},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "golden retriever",
+  "market": "en-US",
+  "result_count": 10,
+  "results": [
+    {
+      "position": 1,
+      "title": "Golden Retriever Dog Breed Information",
+      "image_url": "https://www.akc.org/wp-content/uploads/2017/11/Golden-Retriever.jpg",
+      "thumbnail_url": "https://tse1.mm.bing.net/th?id=OIP.abc123",
+      "source_url": "https://www.akc.org/dog-breeds/golden-retriever/",
+      "source_domain": "akc.org",
+      "width": 1920,
+      "height": 1080
+    }
+  ]
+}
+```

@@ -1,0 +1,129 @@
+---
+title: "Bing API Overview"
+description: "Search Bing's web SERP with organic results, ads and related searches, plus image, video and news search and query autocomplete — across 30+ markets, no Bing API key required."
+---
+
+## Overview
+
+The ScrapeBadger **Bing API** turns `bing.com` into a clean JSON feed: the web
+SERP (organic results with resolved destination URLs, ads, related searches and
+the true reported match count), image search with full-size URLs and
+dimensions, video search with duration and publisher, news search with
+absolute publish timestamps, and search-box autocomplete.
+
+<Info>
+  All endpoints are `GET`, live under `https://scrapebadger.com/v1/bing/*`,
+  and authenticate with the `X-API-Key` header. Credits are charged per request
+  (see the table below) and reported on the `X-Credits-Used` response header.
+</Info>
+
+## Features
+
+- **Web SERP** — organic results with `position`, resolved destination `url`
+  (Bing's `/ck/a` redirects are decoded), `display_url`, `site_name`,
+  `snippet` and `deep_links[]`, plus `ads[]`, `related_searches[]` and Bing's
+  reported `total_results`.
+- **Image search** — full-size `image_url`, `thumbnail_url`, the page the
+  image lives on (`source_url` / `source_domain`) and pixel `width`/`height`.
+- **Video search** — title, thumbnail, `duration`, host platform (`source`,
+  e.g. YouTube), `publisher`, `views` and age.
+- **News search** — headline, publisher, snippet and **absolute publish
+  times** (`published_at` ISO 8601 plus `published_utc` Unix), with a
+  `freshness` filter of `day`, `week` or `month`.
+- **Autocomplete** — Bing's search-box suggestions for 1 credit.
+- **SafeSearch control** — `safe_search=off|moderate|strict` on search,
+  images and videos.
+
+## Markets
+
+Every endpoint takes a single `market` code in `language-COUNTRY` form
+(`en-US`, `de-DE`, `pt-BR`, …). There are no per-country domains — every
+market is served from `www.bing.com`; the market sets the result language and
+country ranking, and requests exit from an IP in the matching country.
+
+[`GET /v1/bing/markets`](/api-reference/endpoint/bing/list-markets) (free)
+returns the curated reference set of 30 market codes. Any well-formed `mkt`
+value is accepted by the search endpoints, including ones not on that list.
+
+## Credits
+
+| Endpoint | Path | Credits |
+| -------- | ---- | ------- |
+| Web search | `GET /v1/bing/search` | 5 |
+| Image search | `GET /v1/bing/images` | 5 |
+| Video search | `GET /v1/bing/videos` | 5 |
+| News search | `GET /v1/bing/news` | 5 |
+| Autocomplete | `GET /v1/bing/autocomplete` | 1 |
+| List markets | `GET /v1/bing/markets` | 0 |
+
+## Quickstart
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/bing/search?query=coffee+machine&market=en-GB" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/bing/search?" +
+    new URLSearchParams({
+      query: "coffee machine",
+      market: "en-GB",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+console.log(data.total_results, "matches,", data.result_count, "returned");
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/bing/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "coffee machine", "market": "en-GB"},
+)
+data = res.json()
+print(data["total_results"], "matches,", data["result_count"], "returned")
+```
+
+</CodeGroup>
+
+## Result depth
+
+<Warning>
+  `/search` has a **depth ceiling**. Bing serves non-JS clients a
+  server-rendered layout that carries the first **~4–10 organic results** and
+  lazy-loads the rest only in a real JS browser. The API extracts everything
+  Bing renders plus the true `total_results` count — it does not pretend to
+  paginate past what Bing serves. `count` is an upper bound, not a guarantee.
+</Warning>
+
+`/images` and `/videos` do not have this ceiling — their grids are
+server-rendered densely, so the default `count=35` is genuinely reachable.
+
+## Other notes
+
+- **News comes from Bing's RSS feed**, not the HTML news cards. That is why
+  publish times are absolute (`published_at`, `published_utc`) and the schema
+  is stable — but article thumbnails are not included.
+- **Organic `url` values are final destinations.** Bing wraps every result in
+  a `/ck/a` tracking redirect; the API resolves it so you get the real URL.
+- **`ads[]` and `related_searches[]`** appear only when Bing serves them for
+  that query and market.
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Bing served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |
+
+<Tip>
+  Start from [`/autocomplete`](/api-reference/endpoint/bing/autocomplete)
+  (1 credit) to expand a seed term into real Bing queries, then run
+  [`/search`](/api-reference/endpoint/bing/search) on each suggestion.
+</Tip>

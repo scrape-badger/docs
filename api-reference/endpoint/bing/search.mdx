@@ -1,0 +1,152 @@
+---
+title: "Web Search"
+api: "GET https://scrapebadger.com/v1/bing/search"
+description: "Search the Bing web SERP — organic results, ads, related searches and the reported total match count."
+---
+
+Search Bing's web SERP. Organic results carry the **resolved destination URL**
+(Bing's `/ck/a` tracking redirects are decoded), display URL, site name,
+snippet and deep links.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords, e.g. `coffee machine`.
+</ParamField>
+
+<ParamField query="market" type="string" default="en-US">
+  Bing market code (`language-COUNTRY`), e.g. `en-US`, `de-DE`. See
+  [`/markets`](/api-reference/endpoint/bing/list-markets).
+</ParamField>
+
+<ParamField query="count" type="integer" default="10">
+  Results per page, `1`–`50`. An upper bound, not a guarantee — see
+  [Result depth](#result-depth).
+</ParamField>
+
+<ParamField query="offset" type="integer" default="0">
+  Zero-based result offset for pagination.
+</ParamField>
+
+<ParamField query="safe_search" type="string">
+  One of `off`, `moderate`, `strict`.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="market" type="string">The market the results were fetched for.</ResponseField>
+<ResponseField name="total_results" type="integer">
+  Bing's reported total match count (approximate), e.g. `59300`.
+</ResponseField>
+<ResponseField name="total_results_text" type="string">
+  The count as displayed, e.g. `About 59,300 results`.
+</ResponseField>
+<ResponseField name="result_count" type="integer">Organic results returned in this response.</ResponseField>
+<ResponseField name="results" type="SearchResult[]">
+  Organic results.
+
+  <Expandable title="SearchResult">
+    <ResponseField name="position" type="integer">1-based rank within this page.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="url" type="string">Destination URL — the `/ck/a` redirect is resolved.</ResponseField>
+    <ResponseField name="display_url" type="string">Human-readable URL shown by Bing.</ResponseField>
+    <ResponseField name="site_name" type="string" />
+    <ResponseField name="snippet" type="string" />
+    <ResponseField name="deep_links" type="DeepLink[]">`title`, `url` — sitelinks under the main result.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="ads" type="Ad[]">
+  Ads served for this query, when present.
+
+  <Expandable title="Ad">
+    <ResponseField name="position" type="integer" />
+    <ResponseField name="title" type="string" />
+    <ResponseField name="url" type="string" />
+    <ResponseField name="display_url" type="string" />
+    <ResponseField name="snippet" type="string" />
+  </Expandable>
+</ResponseField>
+<ResponseField name="related_searches" type="string[]">Bing's related query suggestions.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/bing/search?query=coffee+machine&market=en-GB" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/bing/search?" +
+    new URLSearchParams({ query: "coffee machine", market: "en-GB" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/bing/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "coffee machine", "market": "en-GB"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "coffee machine",
+  "market": "en-GB",
+  "total_results": 59300,
+  "total_results_text": "About 59,300 results",
+  "result_count": 8,
+  "results": [
+    {
+      "position": 1,
+      "title": "The 9 Best Coffee Makers of 2026, Tested & Reviewed",
+      "url": "https://www.seriouseats.com/best-coffee-makers-5069325",
+      "display_url": "https://www.seriouseats.com/best-coffee-makers",
+      "site_name": "Serious Eats",
+      "snippet": "We brewed hundreds of cups to find the best drip coffee makers...",
+      "deep_links": [
+        { "title": "Our Top Picks", "url": "https://www.seriouseats.com/best-coffee-makers-5069325#toc-our-top-picks" }
+      ]
+    }
+  ],
+  "ads": [
+    {
+      "position": 1,
+      "title": "Coffee Machines - Free Delivery",
+      "url": "https://www.example-retailer.com/coffee",
+      "display_url": "www.example-retailer.com",
+      "snippet": "Shop our range of bean-to-cup machines."
+    }
+  ],
+  "related_searches": ["best coffee machine 2026", "espresso machine", "bean to cup coffee machine"]
+}
+```
+
+## Result depth
+
+<Warning>
+  Bing serves non-JS clients a server-rendered layout carrying the first
+  **~4–10 organic results**; the rest are lazy-loaded only in a real JS
+  browser. The API returns everything Bing renders plus the true
+  `total_results` — treat `count` as an upper bound and `result_count` as the
+  truth.
+</Warning>
