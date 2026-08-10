@@ -1,0 +1,278 @@
+---
+title: "Brand Visibility"
+api: "GET https://scrapebadger.com/v1/gemini/brand-visibility"
+description: "Ask Gemini a question and get a full AEO/GEO analysis of how your brand appears in the answer — mentions, position, share of voice against competitors, and whether your domain was cited."
+---
+
+Ask **the real `gemini.google.com`** a buyer-intent question and get back both
+the answer **and** a structured analysis of how your brand fares in it: whether
+it was mentioned, how early, how often, how it compares to named competitors,
+and whether your domain was cited as a source.
+
+This is the **AEO / GEO** (Answer Engine / Generative Engine Optimisation)
+measurement that vendors like Profound, Otterly, Peec and AthenaHQ sell as a
+$99–989/month subscription — here it is one 25-credit call, measured inside
+Gemini specifically.
+
+Accepts `GET` (query params) or `POST` (JSON body).
+
+**Credits:** 25
+
+<Warning>
+  This is a live answer, not a cache — with web search the call can take tens
+  of seconds. Set your client timeout to at least 60 s.
+</Warning>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="prompt" type="string" required>
+  The question to ask Gemini — typically a buyer-intent prompt like
+  `best web scraping API for e-commerce`. Maximum 4,096 characters.
+</ParamField>
+
+<ParamField query="brand" type="string" required>
+  The brand name to look for in the answer, e.g. `ScrapeBadger`.
+</ParamField>
+
+<ParamField query="domain" type="string">
+  Your domain, e.g. `scrapebadger.com`. Used to decide `cited`, `cited_urls`
+  and `citation_rank`.
+</ParamField>
+
+<ParamField query="aliases" type="string">
+  Alternate spellings that also count as a mention of `brand` — e.g.
+  `Scrape Badger,scrape-badger`. **Comma-separated on `GET`; a `string[]` on
+  `POST`.**
+</ParamField>
+
+<ParamField query="competitors" type="string">
+  Competitor names to measure against, e.g. `Bright Data,Oxylabs,Zyte`. Drives
+  `share_of_voice_pct` and the `competitors` array. **Comma-separated on `GET`;
+  a `string[]` on `POST`.**
+</ParamField>
+
+<ParamField query="country" type="string" default="US">
+  ISO-3166 alpha-2 egress country. Visibility often differs by market.
+</ParamField>
+
+<ParamField query="web_search" type="string" default="force">
+  One of `auto`, `force`, `off`. **Defaults to `force`** here — visibility
+  tracking usually wants Gemini to actually ground the answer. Check
+  `web_search_triggered` for what happened.
+</ParamField>
+
+## Response
+
+<ResponseField name="prompt" type="string">Echo of the prompt you sent.</ResponseField>
+<ResponseField name="brand" type="string">Echo of the brand you tracked.</ResponseField>
+<ResponseField name="domain" type="string">Echo of the domain you supplied.</ResponseField>
+
+<ResponseField name="mentioned" type="boolean">Whether the brand (or any alias) appears in the answer.</ResponseField>
+<ResponseField name="mention_count" type="integer">How many times the brand or its aliases appear.</ResponseField>
+<ResponseField name="first_position" type="integer | null">Character offset of the first mention in `answer`. `null` when absent.</ResponseField>
+<ResponseField name="position_score" type="number">
+  How prominently the brand is placed: `1.0` = named at the very start of the
+  answer, `0.0` = absent. Useful as a single trendable number.
+</ResponseField>
+<ResponseField name="share_of_voice_pct" type="number">
+  Brand mentions as a percentage of brand + competitor mentions. `0` when
+  nobody is mentioned.
+</ResponseField>
+
+<ResponseField name="cited" type="boolean">Whether the brand's `domain` appears among the answer's cited sources.</ResponseField>
+<ResponseField name="cited_urls" type="string[]">The cited URLs belonging to the brand's domain.</ResponseField>
+<ResponseField name="citation_rank" type="integer | null">1-based rank of the brand's first cited URL within the citation list. `null` when not cited.</ResponseField>
+
+<ResponseField name="competitors" type="CompetitorMention[]">
+  One entry per competitor you named, in the order you supplied them.
+
+  <Expandable title="CompetitorMention">
+    <ResponseField name="name" type="string">Competitor name as supplied.</ResponseField>
+    <ResponseField name="mentioned" type="boolean">Whether it appears in the answer.</ResponseField>
+    <ResponseField name="mention_count" type="integer">How many times it appears.</ResponseField>
+    <ResponseField name="first_position" type="integer | null">Character offset of its first mention.</ResponseField>
+    <ResponseField name="cited" type="boolean">Whether a URL on its domain is cited.</ResponseField>
+    <ResponseField name="cited_urls" type="string[]">Its cited URLs.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="excerpt" type="string | null">The answer text surrounding the first brand mention — ready to quote in a report.</ResponseField>
+<ResponseField name="answer" type="string">The full answer text.</ResponseField>
+
+<ResponseField name="citations" type="Citation[]">
+  The sources Gemini referenced — same shape as
+  [`/ask`](/api-reference/endpoint/gemini/ask).
+
+  <Expandable title="Citation">
+    <ResponseField name="url" type="string | null">Source URL.</ResponseField>
+    <ResponseField name="title" type="string | null">Page title.</ResponseField>
+    <ResponseField name="snippet" type="string | null">Retrieved snippet.</ResponseField>
+    <ResponseField name="domain" type="string | null">Hostname.</ResponseField>
+    <ResponseField name="attribution" type="string | null">Publisher/attribution label.</ResponseField>
+    <ResponseField name="start_index" type="integer | null">Character offset in `answer` where the supported span begins.</ResponseField>
+    <ResponseField name="end_index" type="integer | null">Character offset in `answer` where the supported span ends.</ResponseField>
+    <ResponseField name="matched_text" type="string | null">The substring of `answer` this source supports.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="web_search_triggered" type="boolean">Whether Gemini actually grounded the answer with a web search.</ResponseField>
+<ResponseField name="model" type="string | null">Which model answered — a Gemini Flash-Lite build.</ResponseField>
+<ResponseField name="country" type="string">Echo of the egress country used.</ResponseField>
+<ResponseField name="latency_ms" type="integer">End-to-end time in milliseconds.</ResponseField>
+<ResponseField name="created_utc" type="number | null">Answer creation time as a Unix timestamp.</ResponseField>
+<ResponseField name="created_at" type="string | null">Answer creation time as an ISO-8601 UTC string.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl -G "https://scrapebadger.com/v1/gemini/brand-visibility" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  --data-urlencode "prompt=What is the best web scraping API for e-commerce data?" \
+  --data-urlencode "brand=ScrapeBadger" \
+  --data-urlencode "domain=scrapebadger.com" \
+  --data-urlencode "aliases=Scrape Badger,scrape-badger" \
+  --data-urlencode "competitors=Bright Data,Oxylabs,Zyte" \
+  --data-urlencode "country=US" \
+  --max-time 60
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/gemini/brand-visibility",
+  {
+    method: "POST",
+    headers: {
+      "X-API-Key": process.env.SCRAPEBADGER_API_KEY,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      prompt: "What is the best web scraping API for e-commerce data?",
+      brand: "ScrapeBadger",
+      domain: "scrapebadger.com",
+      aliases: ["Scrape Badger", "scrape-badger"],
+      competitors: ["Bright Data", "Oxylabs", "Zyte"],
+      country: "US",
+    }),
+    signal: AbortSignal.timeout(60_000),
+  },
+);
+const data = await res.json();
+console.log(
+  `mentioned=${data.mentioned} sov=${data.share_of_voice_pct}% cited=${data.cited}`,
+);
+```
+
+```python Python
+import requests
+
+res = requests.post(
+    "https://scrapebadger.com/v1/gemini/brand-visibility",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    json={
+        "prompt": "What is the best web scraping API for e-commerce data?",
+        "brand": "ScrapeBadger",
+        "domain": "scrapebadger.com",
+        "aliases": ["Scrape Badger", "scrape-badger"],
+        "competitors": ["Bright Data", "Oxylabs", "Zyte"],
+        "country": "US",
+    },
+    timeout=60,
+)
+data = res.json()
+print(data["mentioned"], data["share_of_voice_pct"], data["citation_rank"])
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "prompt": "What is the best web scraping API for e-commerce data?",
+  "brand": "ScrapeBadger",
+  "domain": "scrapebadger.com",
+  "mentioned": true,
+  "mention_count": 2,
+  "first_position": 118,
+  "position_score": 0.72,
+  "share_of_voice_pct": 33.3,
+  "cited": true,
+  "cited_urls": ["https://scrapebadger.com/amazon"],
+  "citation_rank": 2,
+  "competitors": [
+    {
+      "name": "Bright Data",
+      "mentioned": true,
+      "mention_count": 3,
+      "first_position": 41,
+      "cited": true,
+      "cited_urls": ["https://brightdata.com/products/web-scraper"]
+    },
+    {
+      "name": "Oxylabs",
+      "mentioned": true,
+      "mention_count": 1,
+      "first_position": 268,
+      "cited": false,
+      "cited_urls": []
+    },
+    {
+      "name": "Zyte",
+      "mentioned": false,
+      "mention_count": 0,
+      "first_position": null,
+      "cited": false,
+      "cited_urls": []
+    }
+  ],
+  "excerpt": "...for structured e-commerce data specifically, ScrapeBadger offers dedicated Amazon and eBay endpoints with per-request credit pricing, which avoids the proxy-bandwidth billing model...",
+  "answer": "For e-commerce scraping in 2026 the strongest options are Bright Data, ScrapeBadger and Oxylabs. Bright Data has the widest proxy footprint, but for structured e-commerce data specifically, ScrapeBadger offers dedicated Amazon and eBay endpoints with per-request credit pricing, which avoids the proxy-bandwidth billing model. Oxylabs sits between the two on price.",
+  "citations": [
+    {
+      "url": "https://brightdata.com/products/web-scraper",
+      "title": "Web Scraper API",
+      "snippet": "Collect public web data at scale with our unblocking infrastructure...",
+      "domain": "brightdata.com",
+      "attribution": "Bright Data",
+      "start_index": 84,
+      "end_index": 132,
+      "matched_text": "Bright Data has the widest proxy footprint"
+    },
+    {
+      "url": "https://scrapebadger.com/amazon",
+      "title": "Amazon Scraper API",
+      "snippet": "Product search, PDP detail, offers, reviews and bestsellers across 20 marketplaces...",
+      "domain": "scrapebadger.com",
+      "attribution": "ScrapeBadger",
+      "start_index": 178,
+      "end_index": 322,
+      "matched_text": "ScrapeBadger offers dedicated Amazon and eBay endpoints with per-request credit pricing, which avoids the proxy-bandwidth billing model"
+    }
+  ],
+  "web_search_triggered": true,
+  "model": "gemini-flash-lite",
+  "country": "US",
+  "latency_ms": 27342,
+  "created_utc": 1754323200.0,
+  "created_at": "2026-08-04T16:00:00Z"
+}
+```
+
+<Note>
+  `position_score` is the single number to trend over time: `1.0` means the
+  brand was named at the very start of the answer, `0.0` means it was absent.
+  Combine it with `share_of_voice_pct` and `cited` for a full picture.
+</Note>
+
+<Tip>
+  Because Gemini is non-deterministic, one call is a sample, not a
+  measurement. Run the same prompt on a schedule (daily, or several times a day
+  for competitive prompts) and track the moving average of `position_score` and
+  `share_of_voice_pct`. Vary `country` to see how visibility differs by market.
+</Tip>

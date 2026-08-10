@@ -1213,6 +1213,29 @@
         ]
       },
       {
+        "tab": "Gemini",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "gemini/overview"
+            ]
+          },
+          {
+            "group": "Ask",
+            "pages": [
+              "api-reference/endpoint/gemini/ask"
+            ]
+          },
+          {
+            "group": "Brand Visibility",
+            "pages": [
+              "api-reference/endpoint/gemini/brand-visibility"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "MCP Server",
         "groups": [
           {
