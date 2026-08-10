@@ -1,0 +1,76 @@
+---
+title: SDKs
+description: Official ScrapeBadger SDKs for 12 languages, all generated from the same OpenAPI spec.
+---
+
+Every SDK below exposes the same API surface — 29 scrapers, 400+ operations —
+because they are all generated from the ScrapeBadger OpenAPI specification.
+A new endpoint lands in every language at the same time.
+
+Authentication is identical everywhere: pass your API key and the SDK sends it
+as the `x-api-key` header.
+
+## Installation
+
+| Language | Install | Repository |
+|---|---|---|
+| Node.js / TypeScript | `npm install scrapebadger` | [scrapebadger-node](https://github.com/scrape-badger/scrapebadger-node) |
+| Python | `pip install scrapebadger` | [scrapebadger-python](https://github.com/scrape-badger/scrapebadger-python) |
+| Go | `go get github.com/scrape-badger/scrapebadger-go` | [scrapebadger-go](https://github.com/scrape-badger/scrapebadger-go) |
+| Rust | `cargo add scrapebadger-sdk` | [scrapebadger-rust](https://github.com/scrape-badger/scrapebadger-rust) |
+| PHP | `composer require scrape-badger/scrapebadger-php` | [scrapebadger-php](https://github.com/scrape-badger/scrapebadger-php) |
+| C# / .NET | `dotnet add package ScrapeBadger` | [scrapebadger-csharp](https://github.com/scrape-badger/scrapebadger-csharp) |
+| Java | `com.scrapebadger:scrapebadger:0.1.0` (Maven Central) | [scrapebadger-java](https://github.com/scrape-badger/scrapebadger-java) |
+| Kotlin | `com.scrapebadger:scrapebadger-kotlin:0.1.0` (Maven Central) | [scrapebadger-kotlin](https://github.com/scrape-badger/scrapebadger-kotlin) |
+| Ruby | `gem install scrapebadger` | [scrapebadger-ruby](https://github.com/scrape-badger/scrapebadger-ruby) |
+| Swift | SPM: `https://github.com/scrape-badger/scrapebadger-swift` from `0.1.0` | [scrapebadger-swift](https://github.com/scrape-badger/scrapebadger-swift) |
+| Dart / Flutter | `dart pub add scrapebadger` | [scrapebadger-dart](https://github.com/scrape-badger/scrapebadger-dart) |
+| C++ | source releases (cpprestsdk, CMake) | [scrapebadger-cpp](https://github.com/scrape-badger/scrapebadger-cpp) |
+
+Each repository's README documents every operation with per-language examples.
+
+## Example
+
+<CodeGroup>
+
+```python Python
+import requests
+
+response = requests.get(
+    'https://scrapebadger.com/v1/twitter/users/elonmusk/by_username',
+    headers={'x-api-key': 'YOUR_API_KEY'}
+)
+print(response.json())
+```
+
+```go Go
+package main
+
+import (
+    "context"
+    "fmt"
+
+    scrapebadger "github.com/scrape-badger/scrapebadger-go"
+)
+
+func main() {
+    cfg := scrapebadger.NewConfiguration()
+    cfg.AddDefaultHeader("x-api-key", "YOUR_API_KEY")
+    client := scrapebadger.NewAPIClient(cfg)
+
+    user, _, err := client.TwitterAPI.
+        TwitterGetUserByUsername(context.Background(), "elonmusk").Execute()
+    if err != nil {
+        panic(err)
+    }
+    fmt.Println(user)
+}
+```
+
+</CodeGroup>
+
+<Note>
+The generated SDK repositories are replaced wholesale on every API change —
+never send pull requests to them. Issues and feature requests belong on the
+[roadmap](https://github.com/scrape-badger/roadmap).
+</Note>
