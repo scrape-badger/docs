@@ -1,0 +1,17 @@
+/*
+ * With 28 API tabs the top nav tab bar overflows the viewport and Mintlify
+ * clips it, hiding the later APIs (SCR-212). Make it scroll horizontally.
+ * `.nav-tabs` / `.nav-tabs-item` are documented Mintlify selectors:
+ * https://mintlify.com/docs/customize/custom-scripts
+ */
+.nav-tabs {
+  min-width: 0; /* let the flex item shrink below its content so it can scroll */
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+}
+
+.nav-tabs-item {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
