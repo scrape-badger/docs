@@ -1,0 +1,123 @@
+---
+title: "Video Search"
+api: "GET https://scrapebadger.com/v1/yahoo/videos"
+description: "Search Yahoo Videos — title, thumbnail, duration, source platform, description and views per result."
+---
+
+Search Yahoo Videos. Each result carries the destination watch URL, thumbnail,
+duration, the host platform (e.g. YouTube), a description, and views as
+displayed.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords, e.g. `espresso tutorial`.
+</ParamField>
+
+<ParamField query="market" type="string" default="us">
+  Yahoo market code (lowercase), e.g. `us`. See
+  [`/markets`](/api-reference/endpoint/yahoo/list-markets). Echoed back — the
+  video vertical is US-hosted, see [Page size](#page-size).
+</ParamField>
+
+<ParamField query="count" type="integer" default="30">
+  Results to return, `1`–`100`. Trims the rendered grid — see
+  [Page size](#page-size).
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="market" type="string">The market the results were fetched for.</ResponseField>
+<ResponseField name="result_count" type="integer">Videos returned.</ResponseField>
+<ResponseField name="results" type="VideoResult[]">
+  Video results.
+
+  <Expandable title="VideoResult">
+    <ResponseField name="position" type="integer">1-based rank.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="url" type="string">Destination watch URL.</ResponseField>
+    <ResponseField name="thumbnail_url" type="string" />
+    <ResponseField name="duration" type="string">e.g. `13:47`.</ResponseField>
+    <ResponseField name="source" type="string">Host platform, e.g. `YouTube`.</ResponseField>
+    <ResponseField name="source_domain" type="string" />
+    <ResponseField name="description" type="string" />
+    <ResponseField name="views" type="string">View count as displayed, e.g. `1.8M views`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/yahoo/videos?query=espresso+tutorial&count=10" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/yahoo/videos?" +
+    new URLSearchParams({ query: "espresso tutorial", count: "10" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/yahoo/videos",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "espresso tutorial", "count": 10},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "espresso tutorial",
+  "market": "us",
+  "result_count": 10,
+  "results": [
+    {
+      "position": 1,
+      "title": "How to Make Espresso — Beginner's Guide",
+      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "thumbnail_url": "https://tse2.mm.bing.net/th?id=OVP.abc123",
+      "duration": "13:47",
+      "source": "YouTube",
+      "source_domain": "youtube.com",
+      "description": "Everything you need to pull a good shot at home, start to finish.",
+      "views": "1.8M views"
+    }
+  ]
+}
+```
+
+<Note>
+  `duration` and `views` are returned **as Yahoo displays them** (`13:47`,
+  `1.8M views`) — they are display strings, not numbers.
+</Note>
+
+## Page size
+
+<Note>
+  Yahoo renders roughly **60 tiles** into the first response and has no native
+  page-size parameter, so `count` trims that list rather than paginating.
+
+  The video vertical only exists on `video.search.yahoo.com`, so results are
+  fetched from that fixed US host regardless of the `market` you pass; the
+  value is echoed back for consistency.
+</Note>

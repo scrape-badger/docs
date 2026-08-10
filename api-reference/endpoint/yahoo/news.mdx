@@ -1,0 +1,121 @@
+---
+title: "News Search"
+api: "GET https://scrapebadger.com/v1/yahoo/news"
+description: "Search Yahoo News — headline, publisher, syndication source, snippet and thumbnail per article."
+---
+
+Search Yahoo News. Every article carries the resolved destination URL, the
+publisher, the syndication source it ran through (`via`), a snippet and a
+thumbnail — plus Yahoo's reported total match count for the query.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords, e.g. `interest rates`.
+</ParamField>
+
+<ParamField query="market" type="string" default="us">
+  Yahoo market code (lowercase), e.g. `us`. See
+  [`/markets`](/api-reference/endpoint/yahoo/list-markets).
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="market" type="string">The market the results were fetched for.</ResponseField>
+<ResponseField name="total_results" type="integer">
+  Yahoo's reported total match count (approximate), e.g. `1420000`.
+</ResponseField>
+<ResponseField name="total_results_text" type="string">
+  The count as displayed, e.g. `About 1,420,000 results`.
+</ResponseField>
+<ResponseField name="result_count" type="integer">Articles returned.</ResponseField>
+<ResponseField name="results" type="NewsArticle[]">
+  News articles.
+
+  <Expandable title="NewsArticle">
+    <ResponseField name="position" type="integer">1-based rank.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="url" type="string">Destination article URL — Yahoo's redirect is resolved.</ResponseField>
+    <ResponseField name="source" type="string">Publisher name.</ResponseField>
+    <ResponseField name="via" type="string">Syndication source, e.g. `via Yahoo Finance`.</ResponseField>
+    <ResponseField name="snippet" type="string" />
+    <ResponseField name="published" type="string">
+      **Relative** age as displayed, e.g. `26 minutes ago` — see
+      [Timestamps](#timestamps).
+    </ResponseField>
+    <ResponseField name="thumbnail_url" type="string" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/yahoo/news?query=interest+rates" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/yahoo/news?" +
+    new URLSearchParams({ query: "interest rates" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/yahoo/news",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "interest rates"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "interest rates",
+  "market": "us",
+  "total_results": 1420000,
+  "total_results_text": "About 1,420,000 results",
+  "result_count": 10,
+  "results": [
+    {
+      "position": 1,
+      "title": "Fed Holds Rates Steady as Inflation Cools",
+      "url": "https://www.reuters.com/markets/us/fed-holds-rates-steady",
+      "source": "Reuters",
+      "via": "via Yahoo Finance",
+      "snippet": "The Federal Reserve kept its benchmark interest rate unchanged...",
+      "published": "26 minutes ago",
+      "thumbnail_url": "https://s.yimg.com/uu/api/res/1.2/abc123--/news-thumb.jpg"
+    }
+  ]
+}
+```
+
+## Timestamps
+
+<Warning>
+  Yahoo News renders **relative ages only** — `26 minutes ago`, `3 hours ago`,
+  `2 days ago` — and shows no absolute date anywhere on the page. `published`
+  is that display string verbatim; there is no `published_at` or
+  `published_utc` field, unlike the
+  [Bing news endpoint](/api-reference/endpoint/bing/news), which reads an RSS
+  feed. Derive absolute times from your own request time if you need them.
+</Warning>

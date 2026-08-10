@@ -1,0 +1,142 @@
+---
+title: "Yahoo API Overview"
+description: "Search Yahoo's web SERP with organic results, ads and related searches, plus image, video and news search and query autocomplete — across 35 markets, no Yahoo API key required."
+---
+
+## Overview
+
+The ScrapeBadger **Yahoo API** turns `search.yahoo.com` into a clean JSON
+feed: the web SERP (organic results with resolved destination URLs, ads and
+related searches), image search with full-size URLs and dimensions, video
+search with duration and host platform, news search with publisher and
+syndication source, and search-box autocomplete.
+
+<Info>
+  All endpoints are `GET`, live under `https://scrapebadger.com/v1/yahoo/*`,
+  and authenticate with the `X-API-Key` header. Credits are charged per request
+  (see the table below) and reported on the `X-Credits-Used` response header.
+</Info>
+
+## Features
+
+- **Web SERP** — organic results with `position`, resolved destination `url`
+  (Yahoo's redirect wrapper is decoded), `display_url` and `snippet`, plus
+  `ads[]` and `related_searches[]`.
+- **Image search** — full-size `image_url`, `thumbnail_url`, the page the
+  image lives on (`source_url` / `source_domain`) and pixel `width`/`height`.
+- **Video search** — title, thumbnail, `duration`, host platform (`source`,
+  e.g. YouTube), `description` and `views`.
+- **News search** — headline, publisher, syndication source (`via`),
+  thumbnail and Yahoo's reported total match count.
+- **Autocomplete** — Yahoo's search-box suggestions for 1 credit.
+- **SafeSearch control** — `safe_search=off|moderate|strict` on web search.
+
+## Markets
+
+Yahoo localizes search through **regional subdomains** — `fr.search.yahoo.com`,
+`de.search.yahoo.com`, and so on — rather than a query parameter. Every
+endpoint takes a single lowercase `market` code (`us`, `uk`, `de`, `br`, …)
+that selects the subdomain.
+
+[`GET /v1/yahoo/markets`](/api-reference/endpoint/yahoo/list-markets) (free)
+returns all 35 supported codes with the search host each one maps to.
+
+<Note>
+  **Yahoo Japan is not covered.** `search.yahoo.co.jp` is operated by a
+  separate company running its own engine and page structure — it is not a
+  Yahoo Search market and is deliberately excluded.
+</Note>
+
+## Credits
+
+| Endpoint | Path | Credits |
+| -------- | ---- | ------- |
+| Web search | `GET /v1/yahoo/search` | 5 |
+| Image search | `GET /v1/yahoo/images` | 5 |
+| Video search | `GET /v1/yahoo/videos` | 5 |
+| News search | `GET /v1/yahoo/news` | 5 |
+| Autocomplete | `GET /v1/yahoo/autocomplete` | 1 |
+| List markets | `GET /v1/yahoo/markets` | 0 |
+
+## Quickstart
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/yahoo/search?query=coffee+machine&market=uk" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/yahoo/search?" +
+    new URLSearchParams({
+      query: "coffee machine",
+      market: "uk",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+console.log(data.result_count, "results returned");
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/yahoo/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "coffee machine", "market": "uk"},
+)
+data = res.json()
+print(data["result_count"], "results returned")
+```
+
+</CodeGroup>
+
+## Pagination
+
+<Warning>
+  Yahoo serves **7 organic results per page** and has no page-size parameter.
+  `offset` is a zero-based *absolute result offset*, so page 2 is `offset=7`,
+  page 3 is `offset=14`, and so on.
+</Warning>
+
+`/images` and `/videos` work differently: Yahoo renders roughly 60 tiles into
+the first response with no native page-size control, so `count` **trims that
+list client-side** rather than paginating. Values above what Yahoo rendered
+simply return everything available.
+
+## Other notes
+
+- **Yahoo web search is Bing-syndicated.** Yahoo has not run its own web
+  crawler for years — organic results come from Microsoft's index. Expect
+  results close to, but not identical to, the
+  [Bing API](/bing/overview): Yahoo applies its own ranking, ad load and
+  page layout on top.
+- **News timestamps are relative only.** Yahoo News renders ages like
+  `"26 minutes ago"` and no absolute date anywhere on the page, so `published`
+  is that display string. There is no `published_at` or `published_utc` field
+  — unlike the Bing news endpoint, which reads an RSS feed. Compute absolute
+  times from your own request time if you need them.
+- **Images and videos are US-hosted.** Those verticals only exist in this form
+  on `images.search.yahoo.com` / `video.search.yahoo.com`, so they are fetched
+  from the fixed US hosts regardless of the `market` you pass. The `market`
+  value is echoed back for consistency.
+- **Organic `url` values are final destinations.** Yahoo wraps results in a
+  tracking redirect; the API resolves it so you get the real URL.
+- **`ads[]` and `related_searches[]`** appear only when Yahoo serves them for
+  that query and market.
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Yahoo served a consent or challenge page instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |
+
+<Tip>
+  Start from [`/autocomplete`](/api-reference/endpoint/yahoo/autocomplete)
+  (1 credit) to expand a seed term into real Yahoo queries, then run
+  [`/search`](/api-reference/endpoint/yahoo/search) on each suggestion.
+</Tip>

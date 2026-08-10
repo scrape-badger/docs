@@ -1,0 +1,116 @@
+---
+title: "Image Search"
+api: "GET https://scrapebadger.com/v1/yahoo/images"
+description: "Search Yahoo Images — full-size URL, thumbnail, source page and pixel dimensions per result."
+---
+
+Search Yahoo Images. Each result carries the **full-size image URL**, a
+thumbnail, the page the image lives on, and its pixel dimensions.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords, e.g. `golden retriever`.
+</ParamField>
+
+<ParamField query="market" type="string" default="us">
+  Yahoo market code (lowercase), e.g. `us`. See
+  [`/markets`](/api-reference/endpoint/yahoo/list-markets). Echoed back — the
+  image vertical is US-hosted, see [Page size](#page-size).
+</ParamField>
+
+<ParamField query="count" type="integer" default="30">
+  Results to return, `1`–`100`. Trims the rendered grid — see
+  [Page size](#page-size).
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="market" type="string">The market the results were fetched for.</ResponseField>
+<ResponseField name="result_count" type="integer">Images returned.</ResponseField>
+<ResponseField name="results" type="ImageResult[]">
+  Image results.
+
+  <Expandable title="ImageResult">
+    <ResponseField name="position" type="integer">1-based rank.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="image_url" type="string">Full-size image URL.</ResponseField>
+    <ResponseField name="thumbnail_url" type="string">Thumbnail URL.</ResponseField>
+    <ResponseField name="source_url" type="string">The page the image lives on.</ResponseField>
+    <ResponseField name="source_domain" type="string" />
+    <ResponseField name="width" type="integer">Full-size width in pixels.</ResponseField>
+    <ResponseField name="height" type="integer">Full-size height in pixels.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/yahoo/images?query=golden+retriever&count=10" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/yahoo/images?" +
+    new URLSearchParams({ query: "golden retriever", count: "10" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/yahoo/images",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "golden retriever", "count": 10},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "golden retriever",
+  "market": "us",
+  "result_count": 10,
+  "results": [
+    {
+      "position": 1,
+      "title": "Golden Retriever Dog Breed Information",
+      "image_url": "https://www.akc.org/wp-content/uploads/2017/11/Golden-Retriever.jpg",
+      "thumbnail_url": "https://tse1.mm.bing.net/th?id=OIP.abc123",
+      "source_url": "https://www.akc.org/dog-breeds/golden-retriever/",
+      "source_domain": "akc.org",
+      "width": 1920,
+      "height": 1080
+    }
+  ]
+}
+```
+
+## Page size
+
+<Note>
+  Yahoo renders roughly **60 tiles** into the first response and has no native
+  page-size parameter, so `count` trims that list rather than paginating.
+  Asking for more than Yahoo rendered simply returns everything available.
+
+  The image vertical only exists on `images.search.yahoo.com`, so results are
+  fetched from that fixed US host regardless of the `market` you pass; the
+  value is echoed back for consistency.
+</Note>

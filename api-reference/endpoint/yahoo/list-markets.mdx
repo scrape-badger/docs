@@ -1,0 +1,92 @@
+---
+title: "List Markets"
+api: "GET https://scrapebadger.com/v1/yahoo/markets"
+description: "List the 35 supported Yahoo market codes and the regional search host each maps to. Free."
+---
+
+List the supported Yahoo market codes. This endpoint is **free**.
+
+**Credits:** 0
+
+<Note>
+  Yahoo localizes search through **regional subdomains** —
+  `fr.search.yahoo.com`, `de.search.yahoo.com`, and so on — rather than a
+  query parameter. The lowercase `market` code selects the subdomain, returned
+  here as `host`.
+</Note>
+
+<Warning>
+  **Yahoo Japan is not covered.** `search.yahoo.co.jp` is operated by a
+  separate company running its own engine and page structure — it is not a
+  Yahoo Search market and is deliberately excluded.
+</Warning>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Response
+
+<ResponseField name="result_count" type="integer">Number of markets.</ResponseField>
+<ResponseField name="markets" type="Market[]">
+  Supported markets.
+
+  <Expandable title="Market">
+    <ResponseField name="code" type="string">Yahoo market code (lowercase), e.g. `us`.</ResponseField>
+    <ResponseField name="name" type="string">e.g. `United States`.</ResponseField>
+    <ResponseField name="country" type="string">Two-letter country code, e.g. `US`.</ResponseField>
+    <ResponseField name="host" type="string">Regional search host, e.g. `fr.search.yahoo.com`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/yahoo/markets" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/yahoo/markets", {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+});
+const { markets } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/yahoo/markets",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+markets = res.json()["markets"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "result_count": 35,
+  "markets": [
+    { "code": "us", "name": "United States", "country": "US", "host": "search.yahoo.com" },
+    { "code": "uk", "name": "United Kingdom", "country": "GB", "host": "uk.search.yahoo.com" },
+    { "code": "de", "name": "Germany", "country": "DE", "host": "de.search.yahoo.com" },
+    { "code": "fr", "name": "France", "country": "FR", "host": "fr.search.yahoo.com" },
+    { "code": "br", "name": "Brazil", "country": "BR", "host": "br.search.yahoo.com" }
+  ]
+}
+```
+
+## Supported markets
+
+| Region | Codes |
+| ------ | ----- |
+| English-speaking | `us`, `uk`, `ca`, `au`, `in`, `ie`, `nz`, `za` |
+| Europe | `fr`, `de`, `es`, `it`, `nl`, `be`, `ch`, `at`, `se`, `no`, `dk`, `fi`, `gr`, `tr` |
+| Latin America | `br`, `mx`, `ar`, `cl`, `co` |
+| Asia-Pacific | `sg`, `my`, `ph`, `th`, `tw`, `hk`, `id`, `vn` |

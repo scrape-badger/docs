@@ -1,0 +1,139 @@
+---
+title: "Web Search"
+api: "GET https://scrapebadger.com/v1/yahoo/search"
+description: "Search the Yahoo web SERP — organic results, ads and related searches."
+---
+
+Search Yahoo's web SERP. Organic results carry the **resolved destination URL**
+(Yahoo's tracking redirect is decoded), display URL and snippet.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords, e.g. `coffee machine`.
+</ParamField>
+
+<ParamField query="market" type="string" default="us">
+  Yahoo market code (lowercase), e.g. `us`, `uk`, `de`. See
+  [`/markets`](/api-reference/endpoint/yahoo/list-markets).
+</ParamField>
+
+<ParamField query="offset" type="integer" default="0">
+  Zero-based **absolute** result offset. Yahoo serves 7 organic results per
+  page, so page 2 is `offset=7` — see [Pagination](#pagination).
+</ParamField>
+
+<ParamField query="safe_search" type="string">
+  One of `off`, `moderate`, `strict`.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="market" type="string">The market the results were fetched for.</ResponseField>
+<ResponseField name="result_count" type="integer">Organic results returned in this response.</ResponseField>
+<ResponseField name="results" type="SearchResult[]">
+  Organic results.
+
+  <Expandable title="SearchResult">
+    <ResponseField name="position" type="integer">1-based rank within this page.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="url" type="string">Destination URL — Yahoo's redirect is resolved.</ResponseField>
+    <ResponseField name="display_url" type="string">Human-readable URL shown by Yahoo.</ResponseField>
+    <ResponseField name="snippet" type="string" />
+  </Expandable>
+</ResponseField>
+<ResponseField name="ads" type="Ad[]">
+  Ads served for this query, when present.
+
+  <Expandable title="Ad">
+    <ResponseField name="position" type="integer" />
+    <ResponseField name="title" type="string" />
+    <ResponseField name="url" type="string" />
+    <ResponseField name="display_url" type="string" />
+    <ResponseField name="snippet" type="string" />
+  </Expandable>
+</ResponseField>
+<ResponseField name="related_searches" type="string[]">Yahoo's related query suggestions.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/yahoo/search?query=coffee+machine&market=uk" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/yahoo/search?" +
+    new URLSearchParams({ query: "coffee machine", market: "uk" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/yahoo/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "coffee machine", "market": "uk"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "coffee machine",
+  "market": "uk",
+  "result_count": 7,
+  "results": [
+    {
+      "position": 1,
+      "title": "The 9 Best Coffee Makers of 2026, Tested & Reviewed",
+      "url": "https://www.seriouseats.com/best-coffee-makers-5069325",
+      "display_url": "www.seriouseats.com/best-coffee-makers",
+      "snippet": "We brewed hundreds of cups to find the best drip coffee makers..."
+    }
+  ],
+  "ads": [
+    {
+      "position": 1,
+      "title": "Coffee Machines - Free Delivery",
+      "url": "https://www.example-retailer.com/coffee",
+      "display_url": "www.example-retailer.com",
+      "snippet": "Shop our range of bean-to-cup machines."
+    }
+  ],
+  "related_searches": ["best coffee machine 2026", "espresso machine", "bean to cup coffee machine"]
+}
+```
+
+## Pagination
+
+<Warning>
+  Yahoo serves **7 organic results per page** and exposes no page-size
+  parameter. `offset` is a zero-based absolute result offset — page 2 is
+  `offset=7`, page 3 is `offset=14`. Yahoo also reports no total match count
+  on the web SERP, so there is no `total_results` field here.
+</Warning>
+
+<Note>
+  Yahoo web search is **Bing-syndicated** — organic results come from
+  Microsoft's index. Expect results close to, but not identical to, the
+  [Bing API](/bing/overview): Yahoo applies its own ranking, ad load and
+  layout on top.
+</Note>

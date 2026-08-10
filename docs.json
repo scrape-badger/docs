@@ -297,6 +297,28 @@
         ]
       },
       {
+        "tab": "Yahoo",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "yahoo/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/yahoo/search",
+              "api-reference/endpoint/yahoo/images",
+              "api-reference/endpoint/yahoo/videos",
+              "api-reference/endpoint/yahoo/news",
+              "api-reference/endpoint/yahoo/autocomplete",
+              "api-reference/endpoint/yahoo/list-markets"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Reddit",
         "groups": [
           {
