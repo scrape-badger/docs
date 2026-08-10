@@ -1,0 +1,203 @@
+---
+title: "Gemini API Overview"
+description: "Ask the real gemini.google.com a question and get the answer back as structured JSON — with the web sources it cited, anchored to the exact text they support. No Google account or API key required."
+---
+
+## Overview
+
+The ScrapeBadger **Gemini API** sends a prompt to **the real `gemini.google.com`** —
+not the Gemini developer API — and returns the answer as structured JSON,
+including the web sources Gemini actually grounded on and cited.
+
+Requests are **anonymous**: no Google account, no Gemini API key, no billing
+relationship with Google. You see what a logged-out user in your chosen country
+sees, answered by the anonymous surface's **Gemini Flash-Lite** model.
+
+<Info>
+  All endpoints live under `https://scrapebadger.com/v1/gemini/*` and
+  authenticate with the `X-API-Key` header. `/ask` and `/brand-visibility`
+  accept both `GET` (query params) and `POST` (JSON body). Credits are charged
+  per request and reported on the `X-Credits-Used` response header.
+</Info>
+
+<Warning>
+  **Answers are a live render of gemini.google.com, not a cached lookup** — the
+  clock includes Gemini composing the answer and, when it grounds, running its
+  own web search. Set your HTTP client timeout to **60 s or more**; the default
+  5–10 s timeout in most SDKs will abort the call.
+</Warning>
+
+## Features
+
+- **Real Gemini answers** — the full text as rendered on gemini.google.com,
+  plus a Markdown variant when one is available.
+- **Anchored citations** — every citation carries `start_index` / `end_index`
+  character offsets into `answer` and the `matched_text` it supports, so you can
+  highlight exactly which sentence a source backs.
+- **The full search trail** — `search_results` is everything Gemini retrieved,
+  each flagged `cited: true/false`. `citations` is the subset it actually
+  referenced. Most APIs only give you the second list.
+- **Did it really search?** — `web_search_triggered` tells you whether Gemini
+  grounded the answer with a web search or answered from its own weights. Force
+  it with `web_search=force`, or suppress it with `web_search=off`.
+- **Brand visibility (AEO/GEO) built in** — one call returns mention counts,
+  position score, share of voice against named competitors, and whether your
+  domain was cited. No separate subscription.
+- **Country control** — `country` picks the egress country, so you can compare
+  the answer a user in `DE` gets against the one in `US`.
+
+## Honesty caveat
+
+<Warning>
+  Each request is a **single, fresh, anonymous question**. There is no
+  conversation memory, no multi-turn follow-up, no model selection, no
+  streaming, and no image input — `conversation_id` and `message_id` identify
+  the one-shot exchange, they are not handles you can continue from. The
+  anonymous surface always answers with a **Gemini Flash-Lite** model; the
+  `model` field reports which build answered, it is **not** a request
+  parameter.
+
+  Gemini is non-deterministic: the same prompt asked twice can produce
+  different wording and different sources. For monitoring use cases, sample
+  repeatedly and aggregate rather than trusting a single call.
+</Warning>
+
+## Credits
+
+| Endpoint | Path | Credits |
+| -------- | ---- | ------- |
+| Ask | `GET`/`POST` `/v1/gemini/ask` | 20 |
+| Brand visibility | `GET`/`POST` `/v1/gemini/brand-visibility` | 25 |
+| Health | `GET`/`HEAD` `/v1/gemini/health` | 0 |
+
+<Note>
+  At the PAYG rate of $0.15 per 1K credits, an `/ask` call is **$0.003** —
+  **$3.00 per 1,000 answers**. Subscription tiers cut that substantially. Non-2xx
+  responses are never billed.
+</Note>
+
+## Quickstart
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/gemini/ask?prompt=What%20are%20the%20best%20web%20scraping%20APIs%20in%202026%3F" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  --max-time 60
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/gemini/ask", {
+  method: "POST",
+  headers: {
+    "X-API-Key": process.env.SCRAPEBADGER_API_KEY,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    prompt: "What are the best web scraping APIs in 2026?",
+    country: "US",
+    web_search: "force",
+  }),
+  signal: AbortSignal.timeout(60_000),
+});
+const data = await res.json();
+console.log(data.answer);
+console.log(data.source_domains);
+```
+
+```python Python
+import requests
+
+res = requests.post(
+    "https://scrapebadger.com/v1/gemini/ask",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    json={
+        "prompt": "What are the best web scraping APIs in 2026?",
+        "country": "US",
+        "web_search": "force",
+    },
+    timeout=60,
+)
+data = res.json()
+print(data["answer"])
+print(data["source_domains"])
+```
+
+</CodeGroup>
+
+## What you can build
+
+<CardGroup cols={2}>
+  <Card title="AEO / GEO monitoring" icon="chart-line">
+    Track whether Gemini names your brand for the prompts your buyers ask, how
+    early it names you, and how you rank against competitors — with
+    [`/brand-visibility`](/api-reference/endpoint/gemini/brand-visibility).
+  </Card>
+  <Card title="Citation-source auditing" icon="link">
+    Find which domains Gemini trusts for a topic. `search_results` shows
+    everything it retrieved; `cited` shows what survived into the answer.
+  </Card>
+  <Card title="Answer-quality research" icon="magnifying-glass">
+    Compare answers across countries, or with `web_search` forced on and off, to
+    separate what Gemini knows from what it looked up.
+  </Card>
+  <Card title="Cross-model comparison" icon="quote-left">
+    Ask the same prompt on the [ChatGPT API](/chatgpt/overview) and here — both
+    return the same response shape, so comparing how each model answers and who
+    each model cites is a diff, not a project.
+  </Card>
+</CardGroup>
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is this the Gemini developer API?">
+    No. This drives the public `gemini.google.com` web interface as an
+    anonymous visitor. You do not need a Google account, a Gemini API key, or a
+    Google AI subscription — and answers include the web citations Gemini
+    showed, which the developer API does not return in this form.
+  </Accordion>
+  <Accordion title="Why can a call take tens of seconds?">
+    Because a real answer is being generated, and when Gemini grounds it runs
+    its own web search first. Budget a 60 s client timeout and run calls
+    concurrently rather than in a tight sequence.
+  </Accordion>
+  <Accordion title="Can I continue a conversation or ask a follow-up?">
+    No. Every request is a fresh, standalone question with no memory of previous
+    calls. Put all necessary context in the single `prompt` (up to 4,096
+    characters).
+  </Accordion>
+  <Accordion title="Can I choose which model answers?">
+    No. The anonymous gemini.google.com surface always answers with a Gemini
+    Flash-Lite model. The `model` field in a response reports which build
+    answered — but you cannot request a specific one.
+  </Accordion>
+  <Accordion title="I got an answer with no citations. Is that a bug?">
+    Check `web_search_triggered`. If it is `false`, Gemini answered from its
+    training data and there were no sources to cite — that is normal for
+    general-knowledge prompts. Set `web_search=force` if you always want it to
+    ground the answer.
+  </Accordion>
+  <Accordion title="Will the same prompt always give the same answer?">
+    No. Gemini is non-deterministic, and the live web changes. For tracking,
+    sample the same prompt on a schedule and look at the trend, not a single
+    result.
+  </Accordion>
+  <Accordion title="Does country change the answer?">
+    It changes the egress country of the request, which affects the localised
+    results Gemini retrieves and can change the answer's emphasis and language.
+    Pass any ISO-3166 alpha-2 code; the default is `US`.
+  </Accordion>
+  <Accordion title="What happens if a request fails?">
+    You get `{"detail": {"code": ..., "message": ...}}` with an HTTP status of
+    422, 429 or 502 depending on the cause. **Non-2xx responses are never
+    billed**, so a retry costs you nothing extra beyond the successful call.
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+  Start with [`/ask`](/api-reference/endpoint/gemini/ask) to see the shape of a
+  real answer, then move to
+  [`/brand-visibility`](/api-reference/endpoint/gemini/brand-visibility) once
+  you know which prompts matter for your market.
+</Tip>
