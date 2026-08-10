@@ -47,6 +47,7 @@
             "pages": [
               "index",
               "quickstart",
+              "sdks",
               "authentication",
               "credits-and-pricing",
               "rate-limits"
