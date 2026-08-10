@@ -1,0 +1,81 @@
+---
+title: "List Markets"
+api: "GET https://scrapebadger.com/v1/yandex/markets"
+description: "List the Yandex domains this API supports, with each domain's default region and language."
+---
+
+List the supported Yandex domains. Yandex localises by **domain (TLD)**, not a
+query parameter — each market bundles a domain with its default region (`lr`)
+and language.
+
+**Credits:** 0 (free)
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Response
+
+<ResponseField name="result_count" type="integer">Number of markets returned.</ResponseField>
+<ResponseField name="markets" type="Market[]">
+  Supported markets.
+
+  <Expandable title="Market">
+    <ResponseField name="code" type="string">Short market code, e.g. `tr`, `com`, `ru`.</ResponseField>
+    <ResponseField name="domain" type="string">The Yandex host, e.g. `yandex.com.tr`.</ResponseField>
+    <ResponseField name="country_code" type="string">Two-letter country code.</ResponseField>
+    <ResponseField name="default_lr" type="integer">Default Yandex region id for the domain.</ResponseField>
+    <ResponseField name="lang" type="string">Default UI language.</ResponseField>
+    <ResponseField name="name" type="string">Human-readable name.</ResponseField>
+    <ResponseField name="clears_reliably" type="boolean">Whether this domain reliably clears anti-bot (`tr` is the safe default).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/yandex/markets" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/yandex/markets", {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+});
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/yandex/markets",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "result_count": 6,
+  "markets": [
+    { "code": "tr", "domain": "yandex.com.tr", "country_code": "TR", "default_lr": 11508, "lang": "tr", "name": "Turkey", "clears_reliably": true },
+    { "code": "com", "domain": "yandex.com", "country_code": "US", "default_lr": 84, "lang": "en", "name": "International (English)", "clears_reliably": false },
+    { "code": "ru", "domain": "yandex.ru", "country_code": "RU", "default_lr": 225, "lang": "ru", "name": "Russia", "clears_reliably": false },
+    { "code": "by", "domain": "yandex.by", "country_code": "BY", "default_lr": 149, "lang": "ru", "name": "Belarus", "clears_reliably": false },
+    { "code": "kz", "domain": "yandex.kz", "country_code": "KZ", "default_lr": 159, "lang": "ru", "name": "Kazakhstan", "clears_reliably": false },
+    { "code": "uz", "domain": "yandex.uz", "country_code": "UZ", "default_lr": 171, "lang": "ru", "name": "Uzbekistan", "clears_reliably": false }
+  ]
+}
+```
+
+<Tip>
+  Default to `tr` (`yandex.com.tr`) — it's the only domain that reliably clears
+  Yandex's anti-bot. Switch domains only when you need another country's index.
+</Tip>

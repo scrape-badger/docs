@@ -1,0 +1,111 @@
+---
+title: "Yandex API Overview"
+description: "Search Yandex's web SERP with organic results, ads, inline images and videos, plus image search and reverse image search — across yandex.com.tr, .com, .ru, .by, .kz and .uz, no Yandex API key required."
+---
+
+## Overview
+
+The ScrapeBadger **Yandex API** turns Yandex Search into a clean JSON feed: the
+web SERP (organic results with resolved destination URLs, ads, inline images
+and videos, related searches and pagination), text-query image search with
+full-resolution URLs and dimensions, and **reverse image search** by URL
+(hosting pages, similar images, detected tags and other sizes).
+
+<Info>
+  All endpoints are `GET`, live under `https://scrapebadger.com/v1/yandex/*`,
+  and authenticate with the `X-API-Key` header. Credits are charged per request
+  (see the table below) and reported on the `X-Credits-Used` response header.
+</Info>
+
+## Features
+
+- **Web SERP** — organic results with `position`, resolved destination `url`
+  (Yandex's `/r?u=` redirects are decoded), `displayed_url`, `domain`,
+  `snippet`, `favicon` and `sitelinks[]`, plus `ads[]`, `inline_images[]`,
+  `inline_videos[]`, `related_searches[]`, an optional `knowledge_graph` and
+  `pagination`.
+- **Image search** — full-resolution `image` (`url`, `width`, `height`),
+  `thumbnail`, the page the image lives on (`source_url`) and `suggested_searches[]`.
+- **Reverse image search** — pass a public image URL and get the pages that
+  host it (`sites[]`), visually `similar_images[]`, detected `tags[]` and the
+  same image at `other_sizes[]`, via Yandex's two-step CBIR flow.
+
+## Markets
+
+Yandex localises by **domain (TLD)**, not a query parameter. The `domain`
+parameter selects one of `tr` (yandex.com.tr), `com`, `ru`, `by`, `kz` or `uz`.
+
+<Warning>
+  The default is **`tr` (yandex.com.tr)** — measured to reliably clear Yandex's
+  anti-bot. `com` and `ru` serve SmartCaptcha far more often and have a lower
+  success rate; prefer `tr` unless you specifically need another region's index.
+</Warning>
+
+[`GET /v1/yandex/markets`](/api-reference/endpoint/yandex/list-markets) (free)
+returns the supported domains with their default region (`lr`) and language.
+
+## Credits
+
+| Endpoint | Path | Credits |
+| -------- | ---- | ------- |
+| Web search | `GET /v1/yandex/search` | 7 |
+| Image search | `GET /v1/yandex/images/search` | 7 |
+| Reverse image search | `GET /v1/yandex/images/reverse` | 7 |
+| List markets | `GET /v1/yandex/markets` | 0 |
+
+## Quickstart
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/yandex/search?query=coffee+machine&domain=tr" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/yandex/search?" +
+    new URLSearchParams({ query: "coffee machine", domain: "tr" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+console.log(data.result_count, "organic results");
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/yandex/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "coffee machine", "domain": "tr"},
+)
+data = res.json()
+print(data["result_count"], "organic results")
+```
+
+</CodeGroup>
+
+## Other notes
+
+- **The domain is the anti-bot lever.** `yandex.com.tr` clears reliably;
+  `yandex.com`/`.ru` frequently serve SmartCaptcha. The scraper defaults to
+  `tr` and recovers blocks by re-rolling a fresh Turkish residential exit.
+- **Organic `url` values are final destinations.** Yandex wraps results in a
+  `/r?u=` tracking redirect; the API unwraps it so you get the real URL.
+- **Reverse image search is a two-step flow.** The API uploads/derives a
+  `cbir_id` for your image, then reads the hosting pages, similar images, tags
+  and other sizes. An image with no matches returns `is_empty: true`.
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Yandex served SmartCaptcha instead of content — **not billed**. Retry; a fresh exit usually clears it. |
+| `502` | Unexpected upstream failure — **not billed**. |
+
+<Tip>
+  Keep `domain=tr` for the highest success rate. Only switch domains when you
+  specifically need another country's ranking, and expect a lower clear rate on
+  `com`/`ru`.
+</Tip>

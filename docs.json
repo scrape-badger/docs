@@ -319,6 +319,26 @@
         ]
       },
       {
+        "tab": "Yandex",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "yandex/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/yandex/search",
+              "api-reference/endpoint/yandex/images-search",
+              "api-reference/endpoint/yandex/images-reverse",
+              "api-reference/endpoint/yandex/list-markets"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Reddit",
         "groups": [
           {

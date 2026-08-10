@@ -1,0 +1,151 @@
+---
+title: "Web Search"
+api: "GET https://scrapebadger.com/v1/yandex/search"
+description: "Search the Yandex web SERP — organic results, ads, inline images and videos, related searches and pagination."
+---
+
+Search Yandex's web SERP. Organic results carry the **resolved destination URL**
+(Yandex's `/r?u=` tracking redirects are decoded), displayed URL, domain,
+snippet, favicon and sitelinks.
+
+**Credits:** 7
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords, e.g. `coffee machine`.
+</ParamField>
+
+<ParamField query="domain" type="string" default="tr">
+  Yandex domain: `tr` (yandex.com.tr, the default — reliably clears anti-bot),
+  `com`, `ru`, `by`, `kz`, `uz`. `com`/`ru` have a lower success rate. See
+  [`/markets`](/api-reference/endpoint/yandex/list-markets).
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  Result page, `1`–`25`.
+</ParamField>
+
+<ParamField query="lr" type="integer">
+  Yandex region id, e.g. `213` = Moscow, `84` = USA. Defaults to the domain's
+  region.
+</ParamField>
+
+<ParamField query="lang" type="string">
+  UI language: `ru`, `en`, `tr`, `be`, `kk`, `uk`.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="domain" type="string">The domain the results were fetched from.</ResponseField>
+<ResponseField name="region_lr" type="integer">The Yandex region id used.</ResponseField>
+<ResponseField name="lang" type="string">The UI language used.</ResponseField>
+<ResponseField name="page" type="integer">The page returned.</ResponseField>
+<ResponseField name="search_url" type="string">The Yandex URL that was scraped.</ResponseField>
+<ResponseField name="total_results" type="integer">Yandex's reported total match count (approximate).</ResponseField>
+<ResponseField name="spellcheck" type="string">Yandex's "did you mean" suggestion, when present.</ResponseField>
+<ResponseField name="result_count" type="integer">Organic results returned in this response.</ResponseField>
+<ResponseField name="organic_results" type="OrganicResult[]">
+  Organic results.
+
+  <Expandable title="OrganicResult">
+    <ResponseField name="position" type="integer">1-based rank within this page.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="url" type="string">Destination URL — the `/r?u=` redirect is resolved.</ResponseField>
+    <ResponseField name="displayed_url" type="string">Human-readable URL shown by Yandex.</ResponseField>
+    <ResponseField name="domain" type="string" />
+    <ResponseField name="snippet" type="string" />
+    <ResponseField name="favicon" type="string" />
+    <ResponseField name="sitelinks" type="Sitelink[]">`title`, `url`, `snippet` — links under the main result.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="ads" type="Ad[]">
+  Ads served for this query, when present (`position`, `title`, `url`, `displayed_url`, `domain`, `snippet`, `sitelinks`).
+</ResponseField>
+<ResponseField name="inline_images" type="InlineImage[]">
+  Image results shown inline on the SERP (`title`, `source_url`, `thumbnail`).
+</ResponseField>
+<ResponseField name="inline_videos" type="InlineVideo[]">
+  Video results shown inline (`title`, `url`, `source`, `channel`, `duration`, `views`, `date`, `thumbnail`).
+</ResponseField>
+<ResponseField name="knowledge_graph" type="object">Knowledge-panel data, when Yandex renders one.</ResponseField>
+<ResponseField name="related_searches" type="string[]">Yandex's related query suggestions.</ResponseField>
+<ResponseField name="pagination" type="Pagination">`current`, `next_url`, `other_pages` map of page → URL.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/yandex/search?query=coffee+machine&domain=tr" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/yandex/search?" +
+    new URLSearchParams({ query: "coffee machine", domain: "tr" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/yandex/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "coffee machine", "domain": "tr"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "coffee machine",
+  "domain": "tr",
+  "region_lr": 11508,
+  "lang": "tr",
+  "page": 1,
+  "search_url": "https://yandex.com.tr/search/?text=coffee+machine",
+  "total_results": 14000000,
+  "spellcheck": null,
+  "result_count": 10,
+  "organic_results": [
+    {
+      "position": 1,
+      "title": "Coffee Machines — Buyer's Guide",
+      "url": "https://www.example.com/coffee-machines",
+      "displayed_url": "example.com › coffee-machines",
+      "domain": "example.com",
+      "snippet": "Compare drip, espresso and bean-to-cup machines...",
+      "favicon": "https://favicon.yandex.net/favicon/example.com",
+      "sitelinks": []
+    }
+  ],
+  "ads": [],
+  "inline_images": [],
+  "inline_videos": [],
+  "knowledge_graph": null,
+  "related_searches": ["best coffee machine", "espresso machine"],
+  "pagination": { "current": 1, "next_url": "https://yandex.com.tr/search/?text=coffee+machine&p=1", "other_pages": {} }
+}
+```
+
+## Anti-bot
+
+<Warning>
+  Keep `domain=tr`. `yandex.com` and `yandex.ru` serve SmartCaptcha far more
+  often and return `422` (not billed). The scraper retries on a fresh exit, but
+  the `tr` domain clears most reliably.
+</Warning>

@@ -1,0 +1,126 @@
+---
+title: "Reverse Image Search"
+api: "GET https://scrapebadger.com/v1/yandex/images/reverse"
+description: "Reverse image search by URL — find the pages that host an image, visually similar images, detected tags and other sizes, via Yandex's CBIR flow."
+---
+
+Reverse image search by URL. Pass a public image URL and Yandex returns the web
+pages that host (a copy of) it, visually similar images, detected object tags
+and the same image at other resolutions.
+
+**Credits:** 7
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="image_url" type="string" required>
+  Public URL of the image to reverse-search.
+</ParamField>
+
+<ParamField query="domain" type="string" default="tr">
+  Yandex domain: `tr` (default), `com`, `ru`, `by`, `kz`, `uz`. `com`/`ru` have
+  a lower success rate. See [`/markets`](/api-reference/endpoint/yandex/list-markets).
+</ParamField>
+
+## Response
+
+<ResponseField name="query_image_url" type="string">Echo of the image URL you searched.</ResponseField>
+<ResponseField name="domain" type="string">The domain the search ran on.</ResponseField>
+<ResponseField name="search_url" type="string">The Yandex CBIR URL that was scraped.</ResponseField>
+<ResponseField name="cbir_id" type="string">Yandex's internal id for the uploaded image query.</ResponseField>
+<ResponseField name="is_empty" type="boolean">`true` when Yandex found no matches for the image.</ResponseField>
+<ResponseField name="preview" type="Image">Yandex's preview of the query image: `url`, `width`, `height`.</ResponseField>
+<ResponseField name="result_count" type="integer">Number of hosting pages returned.</ResponseField>
+<ResponseField name="sites" type="CbirSite[]">
+  Web pages that host (a copy of) the image.
+
+  <Expandable title="CbirSite">
+    <ResponseField name="title" type="string" />
+    <ResponseField name="description" type="string" />
+    <ResponseField name="url" type="string">The hosting page.</ResponseField>
+    <ResponseField name="domain" type="string" />
+    <ResponseField name="thumbnail" type="Image">`url`, `width`, `height`.</ResponseField>
+    <ResponseField name="original_image" type="Image">The image on that page: `url`, `width`, `height`.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="similar_images" type="SimilarImage[]">
+  Visually similar images (`title`, `thumbnail`, `url`, `width`, `height`).
+</ResponseField>
+<ResponseField name="tags" type="ImageTag[]">
+  Objects/refinements Yandex detected in the image (`text`, `url`).
+</ResponseField>
+<ResponseField name="other_sizes" type="OtherSize[]">
+  The same image at different resolutions (`label`, `url`, `width`, `height`).
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/yandex/images/reverse?image_url=https://example.com/photo.jpg&domain=tr" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/yandex/images/reverse?" +
+    new URLSearchParams({ image_url: "https://example.com/photo.jpg", domain: "tr" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/yandex/images/reverse",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"image_url": "https://example.com/photo.jpg", "domain": "tr"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query_image_url": "https://example.com/photo.jpg",
+  "domain": "tr",
+  "search_url": "https://yandex.com.tr/images/search?cbir_id=...&rpt=imageview",
+  "cbir_id": "1234567/abcdef",
+  "is_empty": false,
+  "preview": { "url": "https://avatars.mds.yandex.net/i?id=preview", "width": 450, "height": 300 },
+  "result_count": 12,
+  "sites": [
+    {
+      "title": "Product page",
+      "description": "Espresso machine — 2L, stainless steel",
+      "url": "https://shop.example.com/espresso",
+      "domain": "shop.example.com",
+      "thumbnail": { "url": "https://avatars.mds.yandex.net/i?id=thumb", "width": 200, "height": 133 },
+      "original_image": { "url": "https://shop.example.com/img/espresso.jpg", "width": 2000, "height": 1333 }
+    }
+  ],
+  "similar_images": [
+    { "title": "Similar machine", "thumbnail": "https://avatars.mds.yandex.net/i?id=sim", "url": "https://other.example.com/machine", "width": 1200, "height": 800 }
+  ],
+  "tags": [{ "text": "espresso machine", "url": "https://yandex.com.tr/images/search?text=espresso+machine" }],
+  "other_sizes": [{ "label": "Original 2000×1333", "url": "https://shop.example.com/img/espresso.jpg", "width": 2000, "height": 1333 }]
+}
+```
+
+## Notes
+
+<Info>
+  Reverse search runs Yandex's two-step CBIR flow: the API derives a `cbir_id`
+  for your image, then reads the hosting pages, similar images, tags and other
+  sizes. When Yandex finds nothing, `is_empty` is `true` and the result arrays
+  are empty.
+</Info>

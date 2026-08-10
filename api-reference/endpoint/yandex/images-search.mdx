@@ -1,0 +1,106 @@
+---
+title: "Image Search"
+api: "GET https://scrapebadger.com/v1/yandex/images/search"
+description: "Search Yandex Images by text query — full-resolution image URL, dimensions, thumbnail and source page."
+---
+
+Search Yandex Images by text. Each result carries the full-resolution image
+(`url`, `width`, `height`), a thumbnail and the page the image lives on.
+
+**Credits:** 7
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Image search keywords, e.g. `coffee machine`.
+</ParamField>
+
+<ParamField query="domain" type="string" default="tr">
+  Yandex domain: `tr` (default), `com`, `ru`, `by`, `kz`, `uz`. `com`/`ru` have
+  a lower success rate. See [`/markets`](/api-reference/endpoint/yandex/list-markets).
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  Result page, `1`–`25`.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="domain" type="string">The domain the results were fetched from.</ResponseField>
+<ResponseField name="page" type="integer">The page returned.</ResponseField>
+<ResponseField name="search_url" type="string">The Yandex URL that was scraped.</ResponseField>
+<ResponseField name="result_count" type="integer">Image results returned in this response.</ResponseField>
+<ResponseField name="results" type="ImageResult[]">
+  Image results.
+
+  <Expandable title="ImageResult">
+    <ResponseField name="position" type="integer">1-based rank.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="source" type="string">The site the image is from.</ResponseField>
+    <ResponseField name="source_url" type="string">The page hosting the image.</ResponseField>
+    <ResponseField name="thumbnail" type="string">Yandex thumbnail URL.</ResponseField>
+    <ResponseField name="image" type="Image">Full-resolution image: `url`, `width`, `height`.</ResponseField>
+    <ResponseField name="snippet" type="string" />
+  </Expandable>
+</ResponseField>
+<ResponseField name="suggested_searches" type="string[]">Related image-search suggestions.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/yandex/images/search?query=coffee+machine&domain=tr" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/yandex/images/search?" +
+    new URLSearchParams({ query: "coffee machine", domain: "tr" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/yandex/images/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "coffee machine", "domain": "tr"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "coffee machine",
+  "domain": "tr",
+  "page": 1,
+  "search_url": "https://yandex.com.tr/images/search?text=coffee+machine",
+  "result_count": 30,
+  "results": [
+    {
+      "position": 1,
+      "title": "Espresso Machine",
+      "source": "example.com",
+      "source_url": "https://www.example.com/product/espresso",
+      "thumbnail": "https://avatars.mds.yandex.net/i?id=abc123",
+      "image": { "url": "https://www.example.com/img/espresso.jpg", "width": 2000, "height": 1333 },
+      "snippet": "Stainless steel espresso machine"
+    }
+  ],
+  "suggested_searches": ["espresso machine", "bean to cup"]
+}
+```
