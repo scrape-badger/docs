@@ -56,15 +56,39 @@ the market it was read from.
     <ResponseField name="can_bundle" type="boolean">Whether the seller accepts bundles.</ResponseField>
     <ResponseField name="can_reserve" type="boolean">Whether the item can be reserved.</ResponseField>
     <ResponseField name="is_reserved" type="boolean">Whether the item is currently reserved.</ResponseField>
-    <ResponseField name="is_closed" type="boolean">Whether the listing is closed (sold or withdrawn).</ResponseField>
-    <ResponseField name="is_hidden" type="boolean">Whether the listing is hidden by the seller.</ResponseField>
-    <ResponseField name="is_visible" type="boolean">Whether the listing is publicly visible.</ResponseField>
+    <ResponseField name="is_closed" type="boolean">Whether Vinted renders the listing as no longer available (the "Sold" banner page). See [Listing states](#listing-states) — check `is_hidden` before reading this as "sold".</ResponseField>
+    <ResponseField name="is_hidden" type="boolean">Whether the listing is hidden by the seller (manually or via holiday mode). Hidden listings render the same "Sold" banner on Vinted — this flag is the only way to tell them apart from sold ones.</ResponseField>
+    <ResponseField name="is_visible" type="boolean">`false` when the listing is hidden from the catalog (`!is_hidden`).</ResponseField>
     <ResponseField name="user" type="object">Seller summary (`id`, `login`, `photo_url`, `business`).</ResponseField>
     <ResponseField name="seller" type="object">
       Richer seller record: `id`, `login`, `photo_url`, `business`, `feedback_count`, `feedback_reputation`, `item_count`, `location`, `last_seen`, `badges`.
     </ResponseField>
   </Expandable>
 </ResponseField>
+
+### Listing states
+
+Every response is read live from the Vinted listing page at request time —
+there is no cache. The state flags combine as follows:
+
+| State | HTTP | `is_closed` | `can_buy` | `is_hidden` | `is_reserved` |
+|---|---|---|---|---|---|
+| Active | 200 | `false` | `true` | `false` | `false` |
+| Sold | 200 | `true` | `false` | `false` | `false` |
+| Hidden by seller (incl. holiday mode) | 200 | `true` | `false` | `true` | `false` |
+| Reserved for a buyer | 200 | — | `false` | `false` | `true` |
+| Deleted / withdrawn | 404 | — | — | — | — |
+
+To detect a **sale**, require `is_closed && !can_buy && !is_hidden && !is_reserved`.
+Vinted shows the same "Sold" banner for seller-hidden listings, so `is_closed`
+alone over-counts; a hidden listing can come back on the market.
+
+Listings the seller withdraws or deletes stop rendering entirely — they return
+a fast `404`, never a closed page.
+
+On a sold or hidden listing, `price.amount` is the seller's **asking price**
+(Vinted keeps showing it). The realised sale price is not present anywhere in
+Vinted's public payload, so we cannot expose it.
 
 ### Example Response
 
