@@ -1,6 +1,6 @@
 ---
 title: "MCP Server"
-description: "Connect AI agents to ScrapeBadger via Model Context Protocol. 216 tools for Twitter/X, Google, YouTube, TikTok, Amazon, eBay, Reddit, real estate, and web scraping. One-click OAuth for Claude."
+description: "Connect AI agents to ScrapeBadger via Model Context Protocol. 344 tools for Twitter/X, Instagram, Google, YouTube, TikTok, Amazon, eBay, Reddit, real estate, and web scraping. Latest MCP spec (2026-07-28), one-click OAuth for Claude."
 ---
 
 # MCP Server
@@ -14,8 +14,8 @@ ScrapeBadger provides a hosted MCP (Model Context Protocol) server at `mcp.scrap
 ## Key Features
 
 <CardGroup cols={3}>
-  <Card title="216 Tools" icon="wrench">
-    Every ScrapeBadger API endpoint is available as a typed MCP tool with structured parameters.
+  <Card title="344 Tools" icon="wrench">
+    Every ScrapeBadger API endpoint is available as a typed MCP tool with structured parameters, annotations, and output schemas.
   </Card>
   <Card title="Zero Setup" icon="bolt">
     Hosted at mcp.scrapebadger.com — connect Claude with one click, or add one config snippet to any other AI tool.
@@ -26,11 +26,11 @@ ScrapeBadger provides a hosted MCP (Model Context Protocol) server at `mcp.scrap
   <Card title="Same Pricing" icon="credit-card">
     No extra cost — MCP uses the same credit-based pricing as the REST API.
   </Card>
-  <Card title="14 Products" icon="layer-group">
-    Twitter/X, Google, YouTube, TikTok, Amazon, eBay, Reddit, Vinted, Leboncoin, Zillow, Realtor, Idealista, Immobiliare, and general web scraping — all in one server.
+  <Card title="30 Products" icon="layer-group">
+    Twitter/X, Instagram, Facebook, LinkedIn, Google, YouTube, TikTok, Reddit, Amazon, eBay, Walmart, Vinted, Depop, real estate, search engines, LLM answers, and general web scraping — all in one server.
   </Card>
-  <Card title="OAuth or API Key" icon="key">
-    Connect Claude via one-click OAuth consent (no key handling), or authenticate any client with your API key.
+  <Card title="Latest MCP Standard" icon="shield-check">
+    Speaks the stateless 2026-07-28 protocol revision and every earlier one; OAuth 2.1 with PKCE, resource indicators, and Client ID Metadata Documents.
   </Card>
 </CardGroup>
 
@@ -39,20 +39,35 @@ ScrapeBadger provides a hosted MCP (Model Context Protocol) server at `mcp.scrap
 | Product | Tools | Description |
 |----------|-------|-------------|
 | **Twitter/X** | 49 | Profiles, tweets, advanced search, trends, communities, lists, spaces, real-time stream monitors, filter rules |
-| **Google** | 32 | Web search (SERP), Images, Videos, AI Mode, Lens, Maps, News, Trends, Jobs, Hotels, Shopping, Patents, Scholar, Finance, Flights |
+| **Instagram** | 39 | Profiles, posts, reels, stories, highlights, comments, followers, hashtags, locations, audio, search |
+| **Google** | 33 | Web search (SERP), Images, Videos, Lens, Maps, News, Trends, Jobs, Hotels, Shopping, Patents, Scholar, Finance, Flights |
 | **YouTube** | 27 | Search, video/Shorts detail, comments, transcripts, channels, playlists, trending, hashtags, community posts, music search |
 | **TikTok** | 22 | Profiles, videos, comments, transcripts, hashtags, music, search, trending, ad library |
+| **Facebook** | 15 | Pages, profiles, groups, posts, comments, Marketplace, Ad Library |
 | **Amazon** | 14 | Product search, PDP detail, offers, reviews, bestsellers, deals, category browse, sellers (20 marketplaces) |
 | **Reddit** | 12 | Post/subreddit/user search, comment trees, trending, domain posts |
 | **eBay** | 11 | Active + sold listing search, item detail, reviews, sellers, categories (18 marketplaces) |
 | **Leboncoin** | 10 | French classifieds search, ad detail, sellers, categories, regions |
+| **LinkedIn** | 10 | Job search, company jobs, companies, schools, profiles, posts, articles, courses |
+| **Walmart** | 10 | Product search, category browse, deals, PDP detail, reviews, sellers, stores (US) |
 | **Vinted** | 8 | Item search, details, seller profiles, brands, markets |
 | **Idealista** | 8 | Location suggest, listing search, full-inventory search, property detail + stats, agencies (ES, IT, PT) |
 | **Immobiliare** | 7 | Listing search, detail, agencies, price insights (IT, ES, GR, LU) |
+| **DuckDuckGo** | 7 | Web/image/news/video search, autocomplete, instant answers, regions |
 | **Web Scraping** | 6 | Scrape any URL, anti-bot detection, screenshots, AI extraction, batch jobs |
+| **Bing** | 6 | Web/image/video/news search, autocomplete (30+ markets) |
+| **Yahoo** | 6 | Web/image/video/news search, autocomplete, per-country markets |
 | **Zillow** | 5 | Property search, detail + valuation, agents (US + CA) |
+| **LoopNet** | 5 | Commercial real estate search, listing detail, brokers |
+| **Depop** | 5 | Product search, product detail, sellers, markets |
+| **Redfin** | 5 | Property search, detail, agents, autocomplete |
 | **Realtor** | 4 | Listing search, property detail, autocomplete (realtor.com + realtor.ca) |
+| **Baidu** | 4 | Web/news/image search + autocomplete with real target URLs |
+| **Yandex** | 4 | Web search, image search, reverse image search (CBIR) |
+| **Apartments.com** | 3 | Rental search and property detail |
 | **ChatGPT** | 3 | `chatgpt_ask` (answer + citations from the real chatgpt.com), `chatgpt_brand_visibility` (AEO/GEO brand analysis), `chatgpt_list_models` |
+| **Perplexity** | 3 | Grounded answers with citations + brand-visibility scoring |
+| **Gemini** | 2 | Answers with cited web sources + brand-visibility scoring |
 | **Account** | 1 | Credit balance, tier, and rate-limit info |
 
 ## Google Tools
@@ -141,9 +156,17 @@ Clients that support MCP OAuth (claude.ai, Claude Desktop, Claude Code, ChatGPT)
 
 | Method | Example | Best For |
 |--------|---------|----------|
-| **Bearer header** | `Authorization: Bearer sb_live_...` | Cursor, Windsurf, VS Code, Cline |
-| **Query parameter** | `?api_key=sb_live_...` | Claude Desktop (via mcp-remote) |
+| **Bearer header** | `Authorization: Bearer sb_live_...` | Cursor, Windsurf, VS Code, Cline, mcp-remote (`--header`) |
 | **Environment variable** | `SCRAPEBADGER_API_KEY=sb_live_...` | Local/stdio installations |
+| **Query parameter** (deprecated) | `?api_key=sb_live_...` | Legacy configs only — URLs end up in logs and history; switch to the Bearer header or OAuth |
+
+## Protocol & Standards
+
+The server tracks the latest MCP specification (revision **2026-07-28**):
+
+- **Protocol versions** — speaks the stateless 2026-07-28 revision (per-request versioning, `server/discover`) and serves every earlier revision (2025-11-25, 2025-06-18, …) from the same endpoint, so older clients keep working. Streamable HTTP transport only; the deprecated HTTP+SSE transport is not offered.
+- **Tool metadata** — all 344 tools carry a human-readable `title`, `readOnlyHint`/`destructiveHint`/`openWorldHint` annotations, and an output schema. Tool results are size-capped to stay within client limits, and the tool list is served with cache hints (`ttlMs`/`cacheScope`) for faster clients.
+- **OAuth 2.1** — authorization code + PKCE (S256), refresh-token rotation, RFC 8414 authorization-server metadata, RFC 9728 protected-resource metadata, RFC 8707 resource indicators, RFC 9207 `iss` authorization responses, and Client ID Metadata Documents (HTTPS-URL client ids, the 2026-07-28 successor to Dynamic Client Registration — which remains supported for older clients).
 
 ## MCP Endpoint
 

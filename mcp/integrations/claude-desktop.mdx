@@ -47,13 +47,21 @@ If you prefer API-key auth via a config file:
       "mcpServers": {
         "scrapebadger": {
           "command": "npx",
-          "args": ["-y", "mcp-remote", "https://mcp.scrapebadger.com/mcp?api_key=YOUR_API_KEY"]
+          "args": [
+            "-y",
+            "mcp-remote",
+            "https://mcp.scrapebadger.com/mcp",
+            "--header",
+            "Authorization: Bearer YOUR_API_KEY"
+          ]
         }
       }
     }
     ```
 
-    Replace `YOUR_API_KEY` with your ScrapeBadger API key.
+    Replace `YOUR_API_KEY` with your ScrapeBadger API key. (The older
+    `?api_key=` query parameter still works but is deprecated — URLs leak
+    into logs and shell history; prefer the header.)
   </Step>
   <Step title="Restart Claude Desktop">
     Fully quit and restart Claude Desktop. The ScrapeBadger tools will appear in the tools menu.
@@ -66,7 +74,7 @@ Claude Desktop uses stdio transport only. The `npx mcp-remote` package bridges b
 
 ## Verify
 
-After restarting, click the tools icon (hammer) in Claude Desktop. You should see 216 ScrapeBadger tools listed (Twitter/X, Google, YouTube, TikTok, Amazon, eBay, Reddit, real estate, and web scraping).
+After restarting, click the tools icon (hammer) in Claude Desktop. You should see 344 ScrapeBadger tools listed (Twitter/X, Google, YouTube, TikTok, Amazon, eBay, Reddit, real estate, and web scraping).
 
 ## Examples
 
