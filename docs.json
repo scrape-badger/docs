@@ -1135,7 +1135,9 @@
           {
             "group": "Ads",
             "pages": [
-              "api-reference/endpoint/tiktok/search-ads"
+              "api-reference/endpoint/tiktok/search-ads",
+              "api-reference/endpoint/tiktok/search-advertisers",
+              "api-reference/endpoint/tiktok/get-ad-detail"
             ]
           },
           {

@@ -1,0 +1,21 @@
+---
+title: "Get Ad Detail"
+openapi: "GET /v1/tiktok/ads/{ad_id}"
+description: "A single TikTok ad's advertiser, creatives, and the full EU-DSA targeting and impression breakdown — per-region impressions by age and gender, audience size, interests, countries, languages and devices."
+---
+
+<Note>
+  The TikTok Ad Library is **EU-only** (EU Digital Services Act ad transparency).
+  Pass an ad `id` from a [Search the Ad Library](/api-reference/endpoint/tiktok/search-ads)
+  result and an EU `region`.
+</Note>
+
+<Note>
+  Each request costs **8 credits**. Failed requests are not charged.
+</Note>
+
+<Tip>
+  The real per-region impression numbers live in `targeting.location.data[].breakdowns`
+  (by age and gender). The top-level `impression` and `spent` fields are usually
+  `0`/`""` for EU disclosures — sum the breakdowns to size a campaign's reach.
+</Tip>
