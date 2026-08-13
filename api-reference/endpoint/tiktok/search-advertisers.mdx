@@ -1,0 +1,28 @@
+---
+title: "Search Advertisers"
+openapi: "GET /v1/tiktok/ads/advertisers"
+description: "Look up TikTok advertiser business ids by name, then feed the id into the Ad Library search to list every ad an advertiser runs."
+---
+
+<Note>
+  The TikTok Ad Library is **EU-only** (EU Digital Services Act ad transparency).
+  Use an EU `region` such as `DE`, `FR`, `IE`, or `NL`.
+</Note>
+
+<Note>
+  Matching is on the **legal entity name, not the brand**. Searching `nike`
+  returns entities like `NIKE Retail B.V.` and `NIKE COM SRL` — a brand often
+  spans several legal entities, and some are only discoverable via an ad's
+  `advertiser.adv_biz_ids` on [Get Ad Detail](/api-reference/endpoint/tiktok/get-ad-detail).
+</Note>
+
+<Note>
+  Each request costs **5 credits**. Failed requests are not charged.
+</Note>
+
+<Tip>
+  Full workflow: **Search Advertisers** (`?query=Nike`) → take an advertiser `id`
+  → [Search the Ad Library](/api-reference/endpoint/tiktok/search-ads)
+  (`?advertiser_id=<id>`) → take an ad `id` →
+  [Get Ad Detail](/api-reference/endpoint/tiktok/get-ad-detail).
+</Tip>

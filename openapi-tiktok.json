@@ -2405,6 +2405,180 @@
           }
         }
       }
+    },
+    "/v1/tiktok/ads/advertisers": {
+      "get": {
+        "operationId": "searchTikTokAdvertisers",
+        "summary": "Search TikTok advertisers",
+        "description": "Look up advertiser business ids by name in TikTok's EU Ad Library. Matching is on the legal entity name, not the brand.",
+        "tags": [
+          "TikTok Ads"
+        ],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Advertiser name (or partial) to look up."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "DE"
+            },
+            "description": "EU region code — the Ad Library is EU-only."
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Maximum number of suggestions."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching advertisers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdvertiserSearchResponse"
+                },
+                "example": {
+                  "advertisers": [
+                    {
+                      "name": "NIKE COM SRL",
+                      "id": "7587573238117498896"
+                    },
+                    {
+                      "name": "NIKE Retail B.V.",
+                      "id": "6876453864464188162"
+                    }
+                  ],
+                  "keywords": [],
+                  "query": "nike",
+                  "region": "DE"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/ads/{ad_id}": {
+      "get": {
+        "operationId": "getTikTokAdDetail",
+        "summary": "Get TikTok ad detail",
+        "description": "Fetch a single ad's advertiser, creatives, and full targeting/impression breakdown (per-region age/gender impressions, audience size, interests, countries, languages).",
+        "tags": [
+          "TikTok Ads"
+        ],
+        "parameters": [
+          {
+            "name": "ad_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Ad id from an ads/search result."
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "DE"
+            },
+            "description": "EU region code — the Ad Library is EU-only."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Ad detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdDetailResponse"
+                },
+                "example": {
+                  "ad": {
+                    "id": "1873163420032386",
+                    "name": "Nike Store",
+                    "title": "@nike",
+                    "first_shown_date": 1786320000000,
+                    "last_shown_date": 1786406400000,
+                    "videos": [
+                      {
+                        "video_url": "https://library.tiktok.com/api/v1/cdn/ad.mp4",
+                        "cover_img": "https://p16-common-sign.tiktokcdn.com/cover.image"
+                      }
+                    ],
+                    "estimated_audience": "10K-100K",
+                    "advertising_objective": "Reach",
+                    "call_to_action": "Learn more",
+                    "external_url": "https://www.nike.com/de/"
+                  },
+                  "advertiser": {
+                    "name": "Nike Store",
+                    "adv_biz_ids": "7564865556147552273",
+                    "registry_location": "Germany",
+                    "sponsor": "Nike Store",
+                    "tt_user": null
+                  },
+                  "targeting": {
+                    "location": {
+                      "total_region": 1,
+                      "total_impressions": "10K-100K",
+                      "data": [
+                        {
+                          "region": "DE",
+                          "impressions": "23K",
+                          "breakdowns": [
+                            {
+                              "age": "18-24",
+                              "gender": "FEMALE",
+                              "impressions": "9K"
+                            },
+                            {
+                              "age": "25-34",
+                              "gender": "FEMALE",
+                              "impressions": "5K"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "target_audience_size": "22.8M-27.9M",
+                    "interest": "Home Design, Education",
+                    "countries": [
+                      "DE"
+                    ],
+                    "languages": [
+                      "German"
+                    ],
+                    "operating_systems": [
+                      "ALL"
+                    ]
+                  },
+                  "display_mode": "enhanced",
+                  "region": "DE"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3498,6 +3672,46 @@
             "items": {
               "$ref": "#/components/schemas/TikTokAdVideo"
             }
+          },
+          "title": {
+            "type": "string",
+            "description": "Ad caption / creative title."
+          },
+          "estimated_audience": {
+            "type": "string",
+            "description": "Audience bracket, e.g. \"10K-100K\"."
+          },
+          "impression": {
+            "type": "integer",
+            "description": "Usually 0 on search/detail; real numbers live in targeting.location."
+          },
+          "spent": {
+            "type": "string",
+            "description": "Spend bracket when disclosed (often empty)."
+          },
+          "advertising_objective": {
+            "type": "string",
+            "description": "e.g. \"Reach\", \"Traffic\"."
+          },
+          "call_to_action": {
+            "type": "string",
+            "description": "e.g. \"Learn more\" (populated on detail)."
+          },
+          "external_url": {
+            "type": "string",
+            "description": "Ad landing page (populated on detail)."
+          },
+          "show_mode": {
+            "type": "integer"
+          },
+          "sor_audit_status": {
+            "type": "string"
+          },
+          "image_urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -3792,6 +4006,229 @@
           }
         },
         "description": "Error body returned by deprecated (410 Gone) endpoints."
+      },
+      "AdvertiserSuggestion": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Advertiser legal entity name."
+          },
+          "id": {
+            "type": "string",
+            "description": "Advertiser business id — pass as advertiser_id to ads/search."
+          }
+        },
+        "description": "One advertiser match."
+      },
+      "AdvertiserSearchResponse": {
+        "type": "object",
+        "properties": {
+          "advertisers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdvertiserSuggestion"
+            }
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Ad-keyword suggestions, when present."
+          },
+          "query": {
+            "type": "string"
+          },
+          "region": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "query",
+          "region"
+        ]
+      },
+      "AdAdvertiser": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "adv_biz_ids": {
+            "type": "string",
+            "description": "Advertiser business id — feeds ads/search?advertiser_id=."
+          },
+          "registry_location": {
+            "type": "string"
+          },
+          "sponsor": {
+            "type": "string"
+          },
+          "tt_user": {
+            "type": "object",
+            "nullable": true,
+            "description": "Linked TikTok account, when disclosed."
+          }
+        },
+        "description": "The advertiser behind an ad."
+      },
+      "AdTargetingBreakdown": {
+        "type": "object",
+        "properties": {
+          "age": {
+            "type": "string"
+          },
+          "gender": {
+            "type": "string"
+          },
+          "impressions": {
+            "type": "string",
+            "description": "Bracketed range, e.g. \"0-1K\", \"2K\"."
+          }
+        }
+      },
+      "AdTargetingRegion": {
+        "type": "object",
+        "properties": {
+          "region": {
+            "type": "string"
+          },
+          "impressions": {
+            "type": "string"
+          },
+          "breakdowns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdTargetingBreakdown"
+            }
+          }
+        }
+      },
+      "AdTargetingLocation": {
+        "type": "object",
+        "properties": {
+          "total_region": {
+            "type": "integer"
+          },
+          "total_impressions": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdTargetingRegion"
+            }
+          }
+        },
+        "description": "Location targeting + the only place real impression numbers live."
+      },
+      "AdTargeting": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "$ref": "#/components/schemas/AdTargetingLocation"
+          },
+          "age": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "gender": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "target_audience_size": {
+            "type": "string",
+            "description": "e.g. \"22.8M-27.9M\"."
+          },
+          "audience": {
+            "type": "string"
+          },
+          "interest": {
+            "type": "string",
+            "description": "Comma-joined string, e.g. \"Home Design, Education\"."
+          },
+          "video_interactions": {
+            "type": "string"
+          },
+          "creator_interactions": {
+            "type": "string"
+          },
+          "countries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "provinces": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "languages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "device_models": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "operating_systems": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "high_spending_power": {
+            "type": "string"
+          },
+          "audience_exclude": {
+            "type": "string"
+          }
+        },
+        "description": "Targeting + impression breakdown disclosed for an ad (EU-DSA)."
+      },
+      "AdDetailResponse": {
+        "type": "object",
+        "properties": {
+          "ad": {
+            "$ref": "#/components/schemas/TikTokAd"
+          },
+          "advertiser": {
+            "$ref": "#/components/schemas/AdAdvertiser"
+          },
+          "targeting": {
+            "$ref": "#/components/schemas/AdTargeting"
+          },
+          "display_mode": {
+            "type": "string",
+            "description": "TikTok disclosure mode, e.g. \"enhanced\"."
+          },
+          "region": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ad",
+          "advertiser",
+          "targeting",
+          "region"
+        ]
       }
     }
   }
