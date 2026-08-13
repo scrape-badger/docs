@@ -1,0 +1,161 @@
+---
+title: "Get Ad Creative"
+api: "GET https://scrapebadger.com/v1/google/ads/creative"
+description: "Full detail for one Ads Transparency Center creative — media, every rendered size variation, run dates and optional political disclosure."
+---
+
+Full detail for a single creative: media, rendered size variations, first- and
+last-shown dates and the target domain. Optionally attaches the advertiser's
+political-ad spend disclosure for the region.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="advertiser_id" type="string" required>
+  Advertiser ID, e.g. `AR01614014350098432001`.
+</ParamField>
+
+<ParamField query="creative_id" type="string" required>
+  Creative ID, e.g. `CR10484731423840108545`. Take both ids from
+  [`/ads/search`](/api-reference/endpoint/google-ads-transparency/search-ads).
+</ParamField>
+
+<ParamField query="region" type="string" default="US">
+  ISO 3166-1 alpha-2 region, or `anywhere`.
+</ParamField>
+
+<ParamField query="political" type="boolean" default="false">
+  Also fetch the advertiser's political-ad spend disclosure for `region`. Costs
+  one extra upstream call and is empty for non-political advertisers.
+</ParamField>
+
+## Response
+
+<ResponseField name="creative_id" type="string" />
+<ResponseField name="advertiser_id" type="string" />
+<ResponseField name="advertiser_name" type="string" />
+<ResponseField name="target_domain" type="string" />
+<ResponseField name="region" type="string" />
+<ResponseField name="format" type="string">`TEXT`, `IMAGE` or `VIDEO`.</ResponseField>
+<ResponseField name="media_url" type="string" />
+<ResponseField name="first_shown_utc" type="integer" />
+<ResponseField name="first_shown_at" type="string" />
+<ResponseField name="last_shown_utc" type="integer" />
+<ResponseField name="last_shown_at" type="string" />
+<ResponseField name="days_shown" type="integer" />
+<ResponseField name="details_link" type="string" />
+<ResponseField name="variations" type="CreativeVariation[]">
+  Each rendered size of the creative.
+
+  <Expandable title="CreativeVariation">
+    <ResponseField name="media_url" type="string" />
+    <ResponseField name="preview_html" type="string" />
+    <ResponseField name="width" type="integer" />
+    <ResponseField name="height" type="integer" />
+  </Expandable>
+</ResponseField>
+<ResponseField name="political" type="PoliticalDisclosure">
+  Present only with `political=true` and a disclosing advertiser.
+
+  <Expandable title="PoliticalDisclosure">
+    <ResponseField name="currency" type="string" />
+    <ResponseField name="spend" type="number">Exact disclosed spend for the region.</ResponseField>
+    <ResponseField name="spend_min" type="number">Per-creative disclosure range — not yet populated.</ResponseField>
+    <ResponseField name="spend_max" type="number">Not yet populated.</ResponseField>
+    <ResponseField name="impressions_min" type="integer">Not yet populated.</ResponseField>
+    <ResponseField name="impressions_max" type="integer">Not yet populated.</ResponseField>
+    <ResponseField name="ads_count" type="integer" />
+    <ResponseField name="regions" type="PoliticalRegionSpend[]">`region`, `currency`, `spend`, `ads_count`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/google/ads/creative?advertiser_id=AR01614014350098432001&creative_id=CR10484731423840108545&region=US" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/google/ads/creative?" +
+    new URLSearchParams({
+      advertiser_id: "AR01614014350098432001",
+      creative_id: "CR10484731423840108545",
+      region: "US",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const creative = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/google/ads/creative",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "advertiser_id": "AR01614014350098432001",
+        "creative_id": "CR10484731423840108545",
+        "region": "US",
+    },
+)
+creative = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "creative_id": "CR10484731423840108545",
+  "advertiser_id": "AR01614014350098432001",
+  "advertiser_name": "Nike, Inc.",
+  "target_domain": "nike.com",
+  "region": "US",
+  "format": "IMAGE",
+  "media_url": "https://tpc.googlesyndication.com/simgad/example",
+  "first_shown_utc": 1749513600,
+  "first_shown_at": "2026-06-10T00:00:00Z",
+  "last_shown_utc": 1754870400,
+  "last_shown_at": "2026-08-11T00:00:00Z",
+  "days_shown": 63,
+  "details_link": "https://adstransparency.google.com/advertiser/AR01614014350098432001/creative/CR10484731423840108545",
+  "variations": [
+    {
+      "media_url": "https://tpc.googlesyndication.com/simgad/example-300x250",
+      "preview_html": "<div class=\"ad\">…</div>",
+      "width": 300,
+      "height": 250
+    },
+    {
+      "media_url": "https://tpc.googlesyndication.com/simgad/example-728x90",
+      "width": 728,
+      "height": 90
+    }
+  ],
+  "political": null
+}
+```
+
+<Note>
+  A missing political disclosure never fails the lookup — the creative parsed
+  fine, so `political` simply comes back `null`.
+</Note>
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `400` | Unknown region. |
+| `404` | No such creative for that advertiser. |
+| `502` | Upstream Transparency Center failure — **not billed**. |

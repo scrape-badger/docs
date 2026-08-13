@@ -1,0 +1,84 @@
+---
+title: "List Markets"
+api: "GET https://scrapebadger.com/v1/google-play/markets"
+description: "Supported Google Play storefront countries (gl) and content languages (hl). Free."
+---
+
+Supported storefront countries (`country` → Play's `gl`) and content languages
+(`lang` → Play's `hl`). Static reference data, so this endpoint is **free**.
+
+**Credits:** 0
+
+<Note>
+  Play is one global host, so the two axes are **independent**: `gl` selects
+  pricing, availability and ranking; `hl` selects the language of descriptions
+  and reviews. Every country is reachable from every other.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Response
+
+<ResponseField name="result_count" type="integer">Storefront countries returned (47).</ResponseField>
+<ResponseField name="markets" type="Market[]">
+  Storefront countries.
+
+  <Expandable title="Market">
+    <ResponseField name="code" type="string">ISO 3166-1 alpha-2, e.g. `US`.</ResponseField>
+    <ResponseField name="name" type="string">e.g. `United States`.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="languages" type="Market[]">
+  Content languages (31) — `code` is the `hl` value, e.g. `pt-BR`.
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/google-play/markets" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/google-play/markets", {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+});
+const { markets, languages } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/google-play/markets",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "result_count": 47,
+  "markets": [
+    { "code": "US", "name": "United States" },
+    { "code": "GB", "name": "United Kingdom" },
+    { "code": "DE", "name": "Germany" },
+    { "code": "BR", "name": "Brazil" },
+    { "code": "JP", "name": "Japan" }
+  ],
+  "languages": [
+    { "code": "en", "name": "English" },
+    { "code": "de", "name": "German" },
+    { "code": "fr", "name": "French" },
+    { "code": "pt-BR", "name": "Portuguese (Brazil)" }
+  ]
+}
+```

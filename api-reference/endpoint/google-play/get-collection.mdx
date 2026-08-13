@@ -1,0 +1,113 @@
+---
+title: "Top Charts"
+api: "GET https://scrapebadger.com/v1/google-play/collections/{collection}"
+description: "Google Play top charts — currently unavailable, because Play renders the ranking client-side. Returns 422 (not billed)."
+---
+
+Top charts for a category and country.
+
+<Warning>
+  **This endpoint currently returns `422` for every request, and `422` is not
+  billed.**
+
+  Google Play no longer server-renders the top-chart ranking. The category page
+  carries the chart *tabs* — their ids and labels are in the payload — but the
+  item list is empty and filled in client-side. That was confirmed across
+  `GAME`/US, `COMMUNICATION`/US and `GAME`/DE, so it is Play's rendering model
+  and not a per-page fluke. The legacy `/store/apps/collection/{id}` URLs still
+  answer `200` but serve an empty shell.
+
+  Use
+  [`/categories/{category_id}`](/api-reference/endpoint/google-play/browse-category)
+  for that category's apps in Play's own order.
+</Warning>
+
+The route ships reading the chart cluster the correct way, so it starts
+returning data unchanged if Google restores server-side rendering. Returning the
+page's editorial rails instead would charge you for a ranking you did not ask
+for and could not distinguish from the real one.
+
+**Credits:** 5 when it returns data. `422` is **not billed**.
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="collection" type="string" required>
+  `topselling_free`, `topselling_paid` or `topgrossing`. Anything else is
+  a `400`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="category" type="string" default="APPLICATION">
+  Category to rank within, e.g. `GAME` or `SOCIAL`. Defaults to all apps. See
+  [`/categories`](/api-reference/endpoint/google-play/list-categories).
+</ParamField>
+
+<ParamField query="country" type="string" default="US">
+  Play storefront (`gl`).
+</ParamField>
+
+<ParamField query="lang" type="string" default="en">
+  Play content language (`hl`).
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">The collection requested.</ResponseField>
+<ResponseField name="url" type="string">The Play URL the chart was read from.</ResponseField>
+<ResponseField name="result_count" type="integer">Apps returned.</ResponseField>
+<ResponseField name="apps" type="AppCard[]">
+  Ranked apps — same shape as
+  [search results](/api-reference/endpoint/google-play/search), in chart order.
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/google-play/collections/topselling_free?category=GAME&country=US" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/google-play/collections/topselling_free?" +
+    new URLSearchParams({ category: "GAME", country: "US" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+// Currently 422 — fall back to /categories/GAME.
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/google-play/collections/topselling_free",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"category": "GAME", "country": "US"},
+)
+# Currently 422 — fall back to /categories/GAME.
+```
+
+</CodeGroup>
+
+```json Response (current behaviour)
+{
+  "detail": "Google Play renders the topselling_free chart client-side; no server-side ranking is available for category GAME. Use /categories/GAME for that category's apps."
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `400` | Unknown collection id. |
+| `422` | Play renders this chart client-side — **not billed**. Retrying will not help; use `/categories/{id}`. |
+| `502` | Unexpected upstream failure — **not billed**. |

@@ -1,0 +1,130 @@
+---
+title: "Google Ads Transparency API Overview"
+description: "Search the Google Ads Transparency Center as JSON — creatives by advertiser or domain, per-creative media and run dates, advertiser lookup, and disclosed political spend by region."
+---
+
+## Overview
+
+The ScrapeBadger **Ads Transparency API** turns Google's Ads Transparency
+Center into JSON: every creative an advertiser has run, with its format, media,
+first- and last-shown dates and days-shown count; the detail of a single
+creative including its size variations; advertiser lookup by name or domain; and
+the disclosed spend, ad mix and per-day spend curve for an advertiser in a
+region.
+
+<Info>
+  All endpoints are `GET`, live under `https://scrapebadger.com/v1/google/ads/*`,
+  and authenticate with the `X-API-Key` header. Credits are charged per request
+  (see the table below) and reported on the `X-Credits-Used` response header.
+</Info>
+
+## Features
+
+- **Creative search** — by `advertiser_id` or free-text `query`, with format
+  and date-window filtering, and token pagination up to 100 per page.
+- **Creative detail** — media URL, preview HTML, every rendered size
+  `variation`, run dates and the target domain.
+- **Advertiser lookup** — resolve a brand name or domain to the
+  `advertiser_id` the other endpoints take.
+- **Political disclosure** — for advertisers who run political ads, Google's
+  disclosed spend, currency, ad count and per-day spend curve for one region.
+- **Dual timestamps** — every date ships twice: `*_utc` (Unix seconds) and
+  `*_at` (ISO 8601 UTC).
+
+## Finding an advertiser
+
+<Warning>
+  **Free-text `query` on `/ads/search` is domain-based.** It matches verified
+  advertiser domains such as `nike.com`, not brand names. Searching `Nike`
+  usually returns nothing.
+
+  For a brand name, go through
+  [`/ads/advertisers`](/api-reference/endpoint/google-ads-transparency/search-advertisers)
+  first and use the `advertiser_id` it returns.
+</Warning>
+
+```bash
+# 1. name -> advertiser_id
+curl "https://scrapebadger.com/v1/google/ads/advertisers?query=nike&region=US" \
+  -H "X-API-Key: YOUR_API_KEY"
+
+# 2. advertiser_id -> creatives
+curl "https://scrapebadger.com/v1/google/ads/search?advertiser_id=AR01614014350098432001&region=US" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+## Regions
+
+`region` is an ISO 3166-1 alpha-2 code (`US`, `DE`, `GB`, …) naming the region
+the ad was served in, or `anywhere` for no region filter. Google filters by its
+own numeric geo-target criteria ids internally; the mapping is handled for you.
+
+<Note>
+  Spend disclosure is **region-scoped**: `anywhere` returns nothing on
+  `/ads/advertiser`, so that endpoint falls back to `US`.
+</Note>
+
+## Filter honesty
+
+Not every filter can be pushed upstream, and this API tells you which ones were
+applied instead of pretending. `/ads/search` returns a `filters_applied` object:
+
+| Filter | Where it is applied |
+| ------ | ------------------- |
+| `region`, `advertiser_id`, `query` | Pushed into Google's RPC. |
+| `format`, `start_date`/`end_date` | Applied here, over the returned page — Google answers an unknown request field with `200` and an empty body, and a wrong guess would look like "this advertiser has no ads". |
+| `platform`, `political` | **Not applied at all.** Validated, then reported as `false` in `filters_applied`. |
+
+Because `format` and the date window are applied after the fetch,
+`returned_results` can be smaller than `num` while `next_page_token` is still
+set. Keep paging.
+
+## Credits
+
+| Endpoint | Path | Credits |
+| -------- | ---- | ------- |
+| Search creatives | `GET /v1/google/ads/search` | 10 |
+| Creative detail | `GET /v1/google/ads/creative` | 5 |
+| Search advertisers | `GET /v1/google/ads/advertisers` | 5 |
+| Advertiser detail | `GET /v1/google/ads/advertiser` | 5 |
+
+## Quickstart
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/google/ads/search?query=nike.com&region=US&num=40" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/google/ads/search?" +
+    new URLSearchParams({ query: "nike.com", region: "US", num: "40" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+console.log(data.returned_results, "creatives of", data.total_results);
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/google/ads/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "nike.com", "region": "US", "num": 40},
+)
+data = res.json()
+print(data["returned_results"], "creatives of", data["total_results"])
+```
+
+</CodeGroup>
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `400` | Neither `advertiser_id` nor `query` given; unknown platform, format, region or date. |
+| `404` | No such creative for that advertiser, or no disclosure for that advertiser and region. |
+| `502` | Upstream Transparency Center failure — **not billed**. |

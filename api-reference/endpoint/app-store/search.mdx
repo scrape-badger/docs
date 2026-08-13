@@ -1,0 +1,166 @@
+---
+title: "Search Apps"
+api: "GET https://scrapebadger.com/v1/app-store/search"
+description: "Full-text search across the App Store — every hit carries the complete iTunes record, not a thin card."
+---
+
+Full-text search across the App Store. Every hit carries the same ~40 fields the
+detail endpoint returns, so a search result rarely needs a follow-up lookup.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search term, e.g. `slack`.
+</ParamField>
+
+<ParamField query="country" type="string" default="us">
+  Storefront code, lowercase ISO 3166-1 alpha-2. See
+  [`/markets`](/api-reference/endpoint/app-store/list-markets).
+</ParamField>
+
+<ParamField query="entity" type="string" default="software">
+  Which catalogue to search: `software` (iPhone), `iPadSoftware` or
+  `macSoftware`. These are **separate catalogues, not filters** — a Mac-only app
+  is absent from `software` entirely.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="50">
+  Results to return, `1`–`200`.
+</ParamField>
+
+<ParamField query="offset" type="integer" default="0">
+  Results to skip, `0`–`199`. Applied by this service, not by Apple — the
+  Search API `403`s its own `offset` parameter, so paging is a slice of one
+  200-result response and `offset + limit` is capped at 200.
+</ParamField>
+
+<ParamField query="lang" type="string">
+  Result language, e.g. `en_us` or `de_de`. Defaults to the storefront's.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested term.</ResponseField>
+<ResponseField name="country" type="string">Storefront searched.</ResponseField>
+<ResponseField name="entity" type="string">Catalogue searched.</ResponseField>
+<ResponseField name="result_count" type="integer">Apps returned in this page.</ResponseField>
+<ResponseField name="apps" type="App[]">
+  Matching apps, in Apple's relevance order. Same shape as
+  [app detail](/api-reference/endpoint/app-store/get-app) minus `extras`.
+
+  <Expandable title="App (key fields)">
+    <ResponseField name="app_id" type="integer">Numeric track id, e.g. `618783545`.</ResponseField>
+    <ResponseField name="bundle_id" type="string">e.g. `com.tinyspeck.chatlyio`.</ResponseField>
+    <ResponseField name="name" type="string" />
+    <ResponseField name="url" type="string" />
+    <ResponseField name="developer_id" type="integer" />
+    <ResponseField name="developer_name" type="string" />
+    <ResponseField name="price" type="number" />
+    <ResponseField name="currency" type="string" />
+    <ResponseField name="formatted_price" type="string">e.g. `Free`.</ResponseField>
+    <ResponseField name="rating" type="number">Average rating, all versions.</ResponseField>
+    <ResponseField name="rating_count" type="integer" />
+    <ResponseField name="version" type="string" />
+    <ResponseField name="minimum_os_version" type="string" />
+    <ResponseField name="file_size_bytes" type="integer" />
+    <ResponseField name="genres" type="string[]" />
+    <ResponseField name="genre_ids" type="integer[]" />
+    <ResponseField name="content_rating" type="string" />
+    <ResponseField name="icon_url" type="string" />
+    <ResponseField name="screenshot_urls" type="string[]" />
+    <ResponseField name="release_date_at" type="string">ISO 8601 UTC (with `release_date_utc`).</ResponseField>
+    <ResponseField name="current_version_release_date_at" type="string" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/app-store/search?query=slack&country=us&limit=25" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/app-store/search?" +
+    new URLSearchParams({ query: "slack", country: "us", limit: "25" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { apps } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/app-store/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "slack", "country": "us", "limit": 25},
+)
+apps = res.json()["apps"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "slack",
+  "country": "us",
+  "entity": "software",
+  "result_count": 25,
+  "apps": [
+    {
+      "app_id": 618783545,
+      "bundle_id": "com.tinyspeck.chatlyio",
+      "name": "Slack",
+      "kind": "software",
+      "url": "https://apps.apple.com/us/app/slack/id618783545",
+      "developer_id": 618783544,
+      "developer_name": "Slack Technologies, Inc.",
+      "developer_url": "https://apps.apple.com/us/developer/slack-technologies-inc/id618783544",
+      "seller_name": "Slack Technologies, Inc.",
+      "price": 0.0,
+      "currency": "USD",
+      "formatted_price": "Free",
+      "rating": 4.8,
+      "rating_count": 216114,
+      "rating_current_version": 4.8,
+      "rating_count_current_version": 3891,
+      "description": "Slack brings team communication and collaboration into one place...",
+      "release_notes": "We fixed a handful of bugs to keep things running smoothly.",
+      "version": "26.08.10",
+      "minimum_os_version": "16.0",
+      "file_size_bytes": 194837504,
+      "content_rating": "4+",
+      "advisories": [],
+      "genres": ["Business", "Productivity"],
+      "genre_ids": [6000, 6007],
+      "primary_genre": "Business",
+      "primary_genre_id": 6000,
+      "language_codes": ["EN", "DE", "FR", "JA"],
+      "icon_url": "https://is1-ssl.mzstatic.com/image/thumb/example/512x512bb.jpg",
+      "screenshot_urls": ["https://is1-ssl.mzstatic.com/image/thumb/shot1/392x696bb.png"],
+      "release_date_utc": 1367280000.0,
+      "release_date_at": "2013-04-30T00:00:00Z",
+      "current_version_release_date_utc": 1754870400.0,
+      "current_version_release_date_at": "2026-08-11T00:00:00Z",
+      "extras": null
+    }
+  ]
+}
+```
+
+<Warning>
+  Apple caps this catalogue at **200 results per query** and offers no deep
+  paging. `offset + limit` above 200 returns fewer results rather than an error.
+</Warning>

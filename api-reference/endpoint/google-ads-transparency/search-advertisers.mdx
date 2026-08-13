@@ -1,0 +1,119 @@
+---
+title: "Search Advertisers"
+api: "GET https://scrapebadger.com/v1/google/ads/advertisers"
+description: "Resolve an advertiser name or domain to Google Ads Transparency Center advertiser IDs."
+---
+
+Resolve an advertiser name or domain to the `advertiser_id` the other endpoints
+take. This is the **entry point for brand-name lookups** — free-text search on
+[`/ads/search`](/api-reference/endpoint/google-ads-transparency/search-ads) is
+domain-based and will not find a brand by name.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Advertiser name or domain to autocomplete. Minimum 2 characters.
+</ParamField>
+
+<ParamField query="region" type="string" default="US">
+  ISO 3166-1 alpha-2 region, or `anywhere`. Echoed on the response.
+</ParamField>
+
+<ParamField query="num" type="integer" default="10">
+  Suggestions to return, `1`–`20`.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested text.</ResponseField>
+<ResponseField name="region" type="string" />
+<ResponseField name="advertisers" type="AdvertiserSuggestion[]">
+  <Expandable title="AdvertiserSuggestion">
+    <ResponseField name="advertiser_id" type="string">Pass to `/ads/search` and `/ads/advertiser`.</ResponseField>
+    <ResponseField name="name" type="string" />
+    <ResponseField name="region" type="string">The advertiser's own registered region, when disclosed.</ResponseField>
+    <ResponseField name="domain" type="string">Verified domain — a bare-domain suggestion has this but no name.</ResponseField>
+    <ResponseField name="verified" type="boolean" />
+    <ResponseField name="ads_count" type="integer" />
+    <ResponseField name="details_link" type="string">The advertiser's Transparency Center page.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/google/ads/advertisers?query=nike&region=US&num=10" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/google/ads/advertisers?" +
+    new URLSearchParams({ query: "nike", region: "US", num: "10" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { advertisers } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/google/ads/advertisers",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "nike", "region": "US", "num": 10},
+)
+advertisers = res.json()["advertisers"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "nike",
+  "region": "US",
+  "advertisers": [
+    {
+      "advertiser_id": "AR01614014350098432001",
+      "name": "Nike, Inc.",
+      "region": "US",
+      "domain": "nike.com",
+      "verified": true,
+      "ads_count": 1284,
+      "details_link": "https://adstransparency.google.com/advertiser/AR01614014350098432001"
+    },
+    {
+      "advertiser_id": "AR08811772660094828545",
+      "name": "Nike Deutschland GmbH",
+      "region": "DE",
+      "domain": "nike.com",
+      "verified": true,
+      "ads_count": 402,
+      "details_link": "https://adstransparency.google.com/advertiser/AR08811772660094828545"
+    }
+  ]
+}
+```
+
+<Tip>
+  A brand often has one advertiser entity per country. Check the suggestion's
+  own `region` before assuming the first hit is the one running ads in the
+  market you care about.
+</Tip>
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `400` | `query` shorter than 2 characters, or `num` out of range. |
+| `502` | Upstream Transparency Center failure — **not billed**. |

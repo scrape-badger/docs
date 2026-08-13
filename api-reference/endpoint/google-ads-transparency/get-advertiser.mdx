@@ -1,0 +1,146 @@
+---
+title: "Get Advertiser"
+api: "GET https://scrapebadger.com/v1/google/ads/advertiser"
+description: "Advertiser identity plus Google's disclosed spend, ad-format mix and per-day spend curve for one region."
+---
+
+Advertiser identity plus the spend Google discloses for one region: total spend
+and currency, ad count, the share of spend by creative format, and a per-day
+spend curve across the requested window.
+
+**Credits:** 5
+
+<Note>
+  Spend disclosure exists for **political advertisers**. A commercial
+  advertiser with no disclosure returns `404` rather than a row of zeroes.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="advertiser_id" type="string" required>
+  Advertiser ID, e.g. `AR01614014350098432001`. Resolve a name with
+  [`/ads/advertisers`](/api-reference/endpoint/google-ads-transparency/search-advertisers).
+</ParamField>
+
+<ParamField query="region" type="string" default="US">
+  ISO 3166-1 alpha-2 region. Disclosure is region-scoped — `anywhere` returns
+  nothing, so it falls back to `US`.
+</ParamField>
+
+<ParamField query="start_date" type="string">
+  Window start, `YYYY-MM-DD`. Defaults to 30 days ago.
+</ParamField>
+
+<ParamField query="end_date" type="string">
+  Window end, `YYYY-MM-DD`. Defaults to today.
+</ParamField>
+
+## Response
+
+<ResponseField name="advertiser_id" type="string" />
+<ResponseField name="advertiser_name" type="string" />
+<ResponseField name="region" type="string" />
+<ResponseField name="verified" type="boolean" />
+<ResponseField name="ads_count" type="integer">Ads disclosed for the region.</ResponseField>
+<ResponseField name="currency" type="string">e.g. `USD`.</ResponseField>
+<ResponseField name="spend" type="number">Disclosed spend for the region and window.</ResponseField>
+<ResponseField name="start_date" type="string">Echo of the requested window start.</ResponseField>
+<ResponseField name="end_date" type="string">Echo of the requested window end.</ResponseField>
+<ResponseField name="details_link" type="string">The advertiser's Transparency Center page.</ResponseField>
+<ResponseField name="ad_mix" type="AdvertiserAdMix[]">
+  Share of disclosed spend by creative format.
+
+  <Expandable title="AdvertiserAdMix">
+    <ResponseField name="format" type="string">`TEXT`, `IMAGE` or `VIDEO`.</ResponseField>
+    <ResponseField name="share" type="number">Fraction of spend, `0`–`1`.</ResponseField>
+    <ResponseField name="spend" type="number" />
+  </Expandable>
+</ResponseField>
+<ResponseField name="spend_by_date" type="AdvertiserSpendPoint[]">
+  One point per day of the window.
+
+  <Expandable title="AdvertiserSpendPoint">
+    <ResponseField name="date" type="string">`YYYYMMDD`, as Google returns it.</ResponseField>
+    <ResponseField name="share" type="number" />
+    <ResponseField name="spend" type="number" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/google/ads/advertiser?advertiser_id=AR01614014350098432001&region=US&start_date=2026-07-01&end_date=2026-07-31" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/google/ads/advertiser?" +
+    new URLSearchParams({
+      advertiser_id: "AR01614014350098432001",
+      region: "US",
+      start_date: "2026-07-01",
+      end_date: "2026-07-31",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const advertiser = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/google/ads/advertiser",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "advertiser_id": "AR01614014350098432001",
+        "region": "US",
+        "start_date": "2026-07-01",
+        "end_date": "2026-07-31",
+    },
+)
+advertiser = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "advertiser_id": "AR01614014350098432001",
+  "advertiser_name": "Example Campaign Committee",
+  "region": "US",
+  "verified": true,
+  "ads_count": 318,
+  "currency": "USD",
+  "spend": 1284500.0,
+  "start_date": "2026-07-01",
+  "end_date": "2026-07-31",
+  "details_link": "https://adstransparency.google.com/advertiser/AR01614014350098432001",
+  "ad_mix": [
+    { "format": "VIDEO", "share": 0.62, "spend": 796390.0 },
+    { "format": "IMAGE", "share": 0.27, "spend": 346815.0 },
+    { "format": "TEXT", "share": 0.11, "spend": 141295.0 }
+  ],
+  "spend_by_date": [
+    { "date": "20260701", "share": 0.031, "spend": 39819.5 },
+    { "date": "20260702", "share": 0.028, "spend": 35966.0 }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `400` | Unknown region, or a malformed date. |
+| `404` | No Ads Transparency disclosure for that advertiser, region and window. |
+| `502` | Upstream Transparency Center failure — **not billed**. |

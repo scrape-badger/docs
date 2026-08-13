@@ -1,0 +1,102 @@
+---
+title: "Get App Permissions"
+api: "GET https://scrapebadger.com/v1/google-play/apps/{app_id}/permissions"
+description: "Every Android permission an app declares, grouped the way Google Play groups them."
+---
+
+Every Android permission the app declares, grouped as Play groups them. Cheaper
+than a full detail fetch because it reads a single Play RPC.
+
+**Credits:** 3
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="app_id" type="string" required>
+  Android package id, e.g. `com.whatsapp`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="lang" type="string" default="en">
+  Play content language (`hl`) — sets the language of the group and permission
+  labels.
+</ParamField>
+
+## Response
+
+<ResponseField name="app_id" type="string" />
+<ResponseField name="result_count" type="integer">Permission groups returned.</ResponseField>
+<ResponseField name="permission_groups" type="PermissionGroup[]">
+  <Expandable title="PermissionGroup">
+    <ResponseField name="group" type="string">e.g. `Camera`, `Location`, `Other`.</ResponseField>
+    <ResponseField name="icon_url" type="string">Play's group icon.</ResponseField>
+    <ResponseField name="permissions" type="string[]">Individual permissions in the group.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/google-play/apps/com.whatsapp/permissions?lang=en" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/google-play/apps/com.whatsapp/permissions?lang=en",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { permission_groups } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/google-play/apps/com.whatsapp/permissions",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"lang": "en"},
+)
+groups = res.json()["permission_groups"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "app_id": "com.whatsapp",
+  "result_count": 3,
+  "permission_groups": [
+    {
+      "group": "Camera",
+      "icon_url": "https://play-lh.googleusercontent.com/perm-camera",
+      "permissions": ["take pictures and videos"]
+    },
+    {
+      "group": "Location",
+      "icon_url": "https://play-lh.googleusercontent.com/perm-location",
+      "permissions": ["approximate location (network-based)", "precise location (GPS and network-based)"]
+    },
+    {
+      "group": "Other",
+      "icon_url": "https://play-lh.googleusercontent.com/perm-other",
+      "permissions": ["view network connections", "full network access", "run at startup"]
+    }
+  ]
+}
+```
+
+<Note>
+  The same tree is already on the
+  [app detail](/api-reference/endpoint/google-play/get-app) response as
+  `permissions` — use this route when you want permissions alone and do not
+  want to pay 5 credits for the whole record.
+</Note>

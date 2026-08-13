@@ -1,0 +1,72 @@
+---
+title: "List Markets"
+api: "GET https://scrapebadger.com/v1/app-store/markets"
+description: "Supported App Store storefronts. Free."
+---
+
+Supported App Store storefronts — the values every `country` parameter accepts.
+Static reference data, so this endpoint is **free**.
+
+**Credits:** 0
+
+<Note>
+  Informational: the routes accept **any well-formed 2-letter code** and let
+  Apple arbitrate, so a storefront missing from this list still works.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Response
+
+<ResponseField name="result_count" type="integer">Storefronts returned (170).</ResponseField>
+<ResponseField name="markets" type="Market[]">
+  <Expandable title="Market">
+    <ResponseField name="code" type="string">Lowercase ISO 3166-1 alpha-2, e.g. `us`.</ResponseField>
+    <ResponseField name="name" type="string">e.g. `United States`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/app-store/markets" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/app-store/markets", {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+});
+const { markets } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/app-store/markets",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+markets = res.json()["markets"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "result_count": 170,
+  "markets": [
+    { "code": "us", "name": "United States" },
+    { "code": "gb", "name": "United Kingdom" },
+    { "code": "de", "name": "Germany" },
+    { "code": "jp", "name": "Japan" },
+    { "code": "br", "name": "Brazil" }
+  ]
+}
+```

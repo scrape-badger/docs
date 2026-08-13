@@ -1,0 +1,132 @@
+---
+title: "Get App Reviews"
+api: "GET https://scrapebadger.com/v1/app-store/apps/{app_id}/reviews"
+description: "Customer reviews for an App Store app — 50 per page, pages 1-10, most recent or most helpful."
+---
+
+Customer reviews for an app — 50 per page, pages 1 to 10, per storefront.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="app_id" type="string" required>
+  **Numeric** track id, e.g. `310633997`. Apple's review feed has no bundle-id
+  form — a bundle id here returns `400`. Resolve it through
+  [`/apps/{bundle_id}`](/api-reference/endpoint/app-store/get-app) and use the
+  `app_id` from that response.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="country" type="string" default="us">
+  Storefront code, lowercase ISO 3166-1 alpha-2.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  Page number, `1`–`10`. Apple hard-rejects page 11+, so the ceiling is
+  enforced here with a clear error instead of an upstream failure.
+</ParamField>
+
+<ParamField query="sort" type="string" default="mostRecent">
+  `mostRecent` or `mostHelpful`.
+</ParamField>
+
+## Response
+
+<ResponseField name="app_id" type="string" />
+<ResponseField name="country" type="string">Storefront the reviews came from.</ResponseField>
+<ResponseField name="page" type="integer" />
+<ResponseField name="sort" type="string" />
+<ResponseField name="result_count" type="integer">Reviews in this page.</ResponseField>
+<ResponseField name="reviews" type="Review[]">
+  <Expandable title="Review">
+    <ResponseField name="review_id" type="string" />
+    <ResponseField name="user_name" type="string" />
+    <ResponseField name="user_url" type="string" />
+    <ResponseField name="title" type="string" />
+    <ResponseField name="content" type="string" />
+    <ResponseField name="rating" type="integer">`1`–`5`.</ResponseField>
+    <ResponseField name="version" type="string">App version reviewed.</ResponseField>
+    <ResponseField name="vote_sum" type="integer">Net helpful votes.</ResponseField>
+    <ResponseField name="vote_count" type="integer">Total votes cast.</ResponseField>
+    <ResponseField name="updated_utc" type="number">Unix seconds.</ResponseField>
+    <ResponseField name="updated_at" type="string">ISO 8601 UTC.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/app-store/apps/310633997/reviews?country=us&page=1&sort=mostRecent" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/app-store/apps/310633997/reviews?" +
+    new URLSearchParams({ country: "us", page: "1", sort: "mostHelpful" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { reviews } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/app-store/apps/310633997/reviews",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"country": "us", "page": 1, "sort": "mostRecent"},
+)
+reviews = res.json()["reviews"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "app_id": "310633997",
+  "country": "us",
+  "page": 1,
+  "sort": "mostRecent",
+  "result_count": 50,
+  "reviews": [
+    {
+      "review_id": "11284763055",
+      "user_name": "dana_in_dc",
+      "user_url": "https://itunes.apple.com/us/reviews?userProfileId=1043201991",
+      "title": "Rock solid for international calls",
+      "content": "Voice quality is consistently better than anything else I've tried abroad.",
+      "rating": 5,
+      "version": "26.16.72",
+      "vote_sum": 12,
+      "vote_count": 14,
+      "updated_utc": 1754956800.0,
+      "updated_at": "2026-08-12T00:00:00Z"
+    }
+  ]
+}
+```
+
+<Tip>
+  Reviews are **per-storefront**: the `us` and `de` feeds for one app are
+  different review sets, not translations of one set. Sweep the storefronts you
+  care about rather than assuming `us` covers them.
+</Tip>
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `400` | Non-numeric app id, page above 10, unknown sort, or malformed country. |
+| `404` | No review feed for that app in that storefront. |
+| `429` | Apple is throttling — retry shortly. |

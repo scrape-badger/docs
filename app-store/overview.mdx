@@ -1,0 +1,134 @@
+---
+title: "Apple App Store API Overview"
+description: "Search the App Store, pull full app detail with the star histogram, in-app-purchase list and App Privacy label, read customer reviews, browse a developer's catalogue and the top charts — across 170 storefronts."
+---
+
+## Overview
+
+The ScrapeBadger **App Store API** returns Apple's app catalogue as JSON: full
+app detail (bundle id, version, pricing, ratings, genres, minimum OS, file size,
+screenshots, in-app purchases and what's new), full-text search, per-storefront
+customer reviews, a developer's catalogue and the top-free / top-paid /
+top-grossing charts.
+
+<Info>
+  All endpoints are `GET`, live under `https://scrapebadger.com/v1/app-store/*`,
+  and authenticate with the `X-API-Key` header. Credits are charged per request
+  (see the table below) and reported on the `X-Credits-Used` response header.
+</Info>
+
+## Features
+
+- **Two ids, one route** — `/apps/{app_id}` accepts either the numeric track id
+  (`310633997`) or the bundle id (`com.whatsapp`). A value containing a dot is
+  treated as a bundle id.
+- **Rich detail** — around 40 core fields per app: `bundle_id`, `version`,
+  `price`/`formatted_price`, `rating` and `rating_count` (plus current-version
+  ratings), `genres` and `genre_ids`, `minimum_os_version`, `file_size_bytes`,
+  `content_rating`, `advisories`, `language_codes`, `supported_devices` and
+  every artwork URL.
+- **`extras` enrichment** — the storefront page adds what the API omits: the
+  1–5 star `rating_histogram`, the `in_app_purchases` price list,
+  full-resolution iPhone and iPad screenshots with dimensions, `whats_new`,
+  chart position, Editors' Choice and the App Privacy ("nutrition label")
+  breakdown.
+- **Reviews** — 50 per page, pages 1–10, `mostRecent` or `mostHelpful`, with
+  Apple's helpful-vote counts.
+- **Charts** — top-free, top-paid and top-grossing for iPhone or iPad,
+  optionally scoped to a genre.
+- **Dual timestamps** — every date ships twice: `*_utc` (Unix seconds) and
+  `*_at` (ISO 8601 UTC).
+
+## Storefronts and catalogues
+
+`country` is Apple's storefront code (lowercase ISO 3166-1 alpha-2, e.g. `us`,
+`de`, `jp`) and governs pricing, availability, review sets and charts.
+[`GET /v1/app-store/markets`](/api-reference/endpoint/app-store/list-markets)
+(free) lists 170 storefronts; any well-formed 2-letter code is accepted and
+Apple arbitrates.
+
+`entity` on `/search` picks the **catalogue**, and the catalogues are separate
+rather than filters — `software` (iPhone), `iPadSoftware` and `macSoftware`. A
+Mac-only app is absent from `software` entirely.
+
+## Credits
+
+| Endpoint | Path | Credits |
+| -------- | ---- | ------- |
+| Search apps | `GET /v1/app-store/search` | 5 |
+| App detail | `GET /v1/app-store/apps/{app_id}` | 5 |
+| App reviews | `GET /v1/app-store/apps/{app_id}/reviews` | 5 |
+| Developer apps | `GET /v1/app-store/developers/{developer_id}` | 5 |
+| Top charts | `GET /v1/app-store/charts` | 5 |
+| List genres | `GET /v1/app-store/genres` | 0 |
+| List markets | `GET /v1/app-store/markets` | 0 |
+
+## Quickstart
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/app-store/apps/310633997?country=us" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/app-store/apps/310633997?country=us",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const app = await res.json();
+console.log(app.name, app.version, app.rating, app.extras?.rating_histogram);
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/app-store/apps/310633997",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"country": "us"},
+)
+app = res.json()
+print(app["name"], app["version"], app["rating"])
+```
+
+</CodeGroup>
+
+## Result depth
+
+<Warning>
+  **Search is capped at 200 results per query, with no deep paging.** Apple's
+  Search API rejects its own `offset` parameter, so `offset` here is a slice of
+  one 200-result response and `offset + limit` is capped at 200.
+</Warning>
+
+- **Reviews** stop at page 10 (500 reviews per storefront per sort). Apple
+  hard-rejects page 11+, so the ceiling is enforced with a clear `400` rather
+  than a confusing upstream error.
+- **Charts** return up to 200 entries; `rank` is the app's position in the feed.
+
+## Other notes
+
+- **Reviews are per-storefront**, not translations: the `us` and `de` feeds for
+  one app are different review sets.
+- **Reviews need a numeric id.** Apple's review feed has no bundle-id form —
+  resolve a bundle id through `/apps/{bundle_id}` first and use its `app_id`.
+- **`extras` is best-effort.** It comes from Apple's server-rendered product
+  page, a web-client implementation detail; if that fetch or parse fails the
+  response degrades to the core iTunes fields rather than failing. Set
+  `include_extras=false` to skip the second fetch entirely.
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `400` | Bad country, entity, sort, chart type or genre id; a bundle id where a numeric id is required; review page above 10. |
+| `404` | No such app, or no such developer in that storefront. |
+| `429` | Apple is throttling — retry shortly. |
+| `502` | Unexpected upstream failure — **not billed**. |
+
+<Tip>
+  Search results carry the same ~40 fields as the detail endpoint, so a search
+  hit rarely needs a follow-up lookup unless you want `extras`.
+</Tip>

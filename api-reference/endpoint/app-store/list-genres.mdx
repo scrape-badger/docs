@@ -1,0 +1,77 @@
+---
+title: "List Genres"
+api: "GET https://scrapebadger.com/v1/app-store/genres"
+description: "App Store genre ids for use with /charts?genre=. Free."
+---
+
+App Store genre ids, for use with
+[`/charts?genre=`](/api-reference/endpoint/app-store/charts). Static reference
+data, so this endpoint is **free**.
+
+**Credits:** 0
+
+<Note>
+  Every id listed is verified to return a **non-empty chart**. Four ids Apple
+  still documents are deliberately absent because their feeds come back empty —
+  Catalogs (6022), Stickers (6025), Games/Dice (7007) and Games/Educational
+  (7008). They can still appear in an app's own `genre_ids`; they just cannot
+  be charted.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Response
+
+<ResponseField name="result_count" type="integer">Genres returned (40).</ResponseField>
+<ResponseField name="genres" type="Genre[]">
+  <Expandable title="Genre">
+    <ResponseField name="genre_id" type="integer">e.g. `6014`.</ResponseField>
+    <ResponseField name="name" type="string">e.g. `Games` or `Games/Puzzle`.</ResponseField>
+    <ResponseField name="parent_id" type="integer">Set on Games subgenres (`6014`); `null` otherwise.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/app-store/genres" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/app-store/genres", {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+});
+const { genres } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/app-store/genres",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+genres = res.json()["genres"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "result_count": 40,
+  "genres": [
+    { "genre_id": 6000, "name": "Business", "parent_id": null },
+    { "genre_id": 6005, "name": "Social Networking", "parent_id": null },
+    { "genre_id": 6007, "name": "Productivity", "parent_id": null },
+    { "genre_id": 6014, "name": "Games", "parent_id": null },
+    { "genre_id": 7012, "name": "Games/Puzzle", "parent_id": 6014 }
+  ]
+}
+```
