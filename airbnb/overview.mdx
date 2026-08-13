@@ -1,0 +1,144 @@
+---
+title: "Airbnb Scraper Overview"
+description: "Scrape Airbnb stays search, full listing detail, 12-month availability calendars, paginated reviews, and experiences — worldwide, with structured JSON responses."
+---
+
+# Airbnb Scraper API
+
+Search stays by place name or map bounding box, pull a listing's full detail, read a 12-month availability and pricing calendar, page through guest reviews, and search Airbnb **Experiences** — all from **Airbnb** worldwide. ScrapeBadger handles authentication, rotating proxies, anti-bot evasion, and parsing automatically — no upstream API key required.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="Global Stays Search" icon="earth-americas">
+    Free-text [`location`](/api-reference/endpoint/airbnb/search) or a precise map bounding box, with dates, guest counts, price, bedrooms, beds, bathrooms, and room-type filters.
+  </Card>
+  <Card title="Full Listing Detail" icon="house">
+    Description, room type, capacity, GPS, address, rating breakdown across six categories, amenities, house rules, cancellation policy, host profile, and every photo.
+  </Card>
+  <Card title="12-Month Calendar" icon="calendar-days">
+    Day-by-day availability, check-in / check-out eligibility, min and max nights, and nightly price for up to twelve months ahead.
+  </Card>
+  <Card title="Paginated Reviews" icon="star">
+    Full review text with ratings, language, reviewer profile, host responses, and photos — sorted by recency or rating.
+  </Card>
+  <Card title="Experiences" icon="ticket">
+    Search Airbnb Experiences by location and fetch full experience detail — duration, highlights, host, price, and GPS.
+  </Card>
+  <Card title="SDK Support" icon="code">
+    First-class support via the ScrapeBadger Node.js and Python SDKs.
+  </Card>
+</CardGroup>
+
+<Note>
+  Coverage is global — anywhere Airbnb lists stays or experiences is reachable. Every endpoint accepts `currency` and `locale`, defaulting to `USD` and `en`, so you can request prices and text in the market's own currency and language without changing anything else.
+</Note>
+
+## Coverage & Defaults
+
+| Parameter | Default | Notes |
+|-----------|---------|-------|
+| `currency` | `USD` | Any Airbnb-supported currency, e.g. `EUR`, `GBP`, `JPY`. |
+| `locale` | `en` | Any Airbnb-supported locale, e.g. `fr`, `es`, `it`, `de`. |
+| Geography | Worldwide | Free-text `location` is geocoded server-side; a map bounding box is also accepted. |
+
+<Tip>
+  Start from [`/search`](/api-reference/endpoint/airbnb/search) to get `room_id` values, then reuse the same id on [`/listings/{room_id}`](/api-reference/endpoint/airbnb/get-listing), [`/listings/{room_id}/calendar`](/api-reference/endpoint/airbnb/get-calendar), and [`/listings/{room_id}/reviews`](/api-reference/endpoint/airbnb/get-reviews).
+</Tip>
+
+## Quick Start
+
+<CodeGroup>
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/airbnb/search?" +
+    new URLSearchParams({
+      location: "Paris, France",
+      check_in: "2026-09-12",
+      check_out: "2026-09-15",
+      adults: "2",
+      price_max: "250",
+      room_type: "Entire home/apt",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+console.log(data.count, "listings");
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/airbnb/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "location": "Paris, France",
+        "check_in": "2026-09-12",
+        "check_out": "2026-09-15",
+        "adults": 2,
+        "price_max": 250,
+        "room_type": "Entire home/apt",
+    },
+)
+data = res.json()
+print(data["count"], "listings")
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/airbnb/search?location=Paris%2C%20France&check_in=2026-09-12&check_out=2026-09-15&adults=2&price_max=250" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+## Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/airbnb/search`](/api-reference/endpoint/airbnb/search) | GET | Search stays by place or map bounding box |
+| [`/v1/airbnb/listings/{room_id}`](/api-reference/endpoint/airbnb/get-listing) | GET | Full detail for a single listing |
+| [`/v1/airbnb/listings/{room_id}/calendar`](/api-reference/endpoint/airbnb/get-calendar) | GET | Up to 12 months of availability and pricing |
+| [`/v1/airbnb/listings/{room_id}/reviews`](/api-reference/endpoint/airbnb/get-reviews) | GET | Paginated guest reviews |
+| [`/v1/airbnb/experiences`](/api-reference/endpoint/airbnb/search-experiences) | GET | Search Airbnb Experiences by location |
+| [`/v1/airbnb/experiences/{experience_id}`](/api-reference/endpoint/airbnb/get-experience) | GET | Full detail for a single experience |
+
+## Credit Costs
+
+| Endpoint | Cost |
+|----------|------|
+| Search stays | 5 credits |
+| Get listing detail | 5 credits |
+| Get calendar | 5 credits |
+| Get reviews | 5 credits |
+| Search experiences | 5 credits |
+| Get experience detail | 5 credits |
+| Health check | 0 credits |
+| Failed requests | 0 credits |
+
+## Authentication
+
+All requests require your API key in the `X-API-Key` header:
+
+```bash
+curl "https://scrapebadger.com/v1/airbnb/search?location=Paris%2C%20France" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+Credits are charged per request (see the table above) and reported on the `X-Credits-Used` response header.
+
+## Anti-Bot & Proxies
+
+Airbnb protects its inventory with IP-reputation scoring, TLS/HTTP fingerprinting, and session-bound API tokens. ScrapeBadger clears these automatically using rotating proxies, browser fingerprint rotation, and freshly minted sessions. You never manage proxies, sessions, or CAPTCHAs, and you never need an upstream API key.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Search Stays" icon="magnifying-glass" href="/api-reference/endpoint/airbnb/search">
+    Full API reference for searching Airbnb stays
+  </Card>
+  <Card title="Get Listing Detail" icon="house" href="/api-reference/endpoint/airbnb/get-listing">
+    Retrieve a listing's complete detail by its `room_id`
+  </Card>
+</CardGroup>

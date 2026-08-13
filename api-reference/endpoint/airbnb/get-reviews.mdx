@@ -1,0 +1,139 @@
+---
+title: "Get Reviews"
+api: "GET https://scrapebadger.com/v1/airbnb/listings/{room_id}/reviews"
+description: "Paginated Airbnb guest reviews — full text, per-review rating, language, reviewer profile, host response and photos."
+---
+
+Page through a listing's guest reviews by `room_id`. Each review carries the
+full comment text, the guest's rating, the review language, the reviewer's
+profile, the host's response when there is one, and any photos the guest
+attached. Paginate with `limit` and `offset` against `total_count`.
+
+## Path Parameters
+
+<ParamField path="room_id" type="string" required>
+  Airbnb room id, e.g. `48291736`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="limit" type="integer" default="24">
+  Reviews per page. Maximum `50`.
+</ParamField>
+
+<ParamField query="offset" type="integer" default="0">
+  Number of reviews to skip.
+</ParamField>
+
+<ParamField query="sort" type="string" default="MOST_RECENT">
+  Sort order. One of `MOST_RECENT`, `RATING_DESC`, `RATING_ASC`.
+</ParamField>
+
+<ParamField query="currency" type="string" default="USD">
+  Currency for prices, e.g. `EUR`, `GBP`.
+</ParamField>
+
+<ParamField query="locale" type="string" default="en">
+  Locale for text, e.g. `fr`, `es`.
+</ParamField>
+
+## Response
+
+<ResponseField name="room_id" type="string">Airbnb room id.</ResponseField>
+<ResponseField name="total_count" type="integer">Total reviews on the listing.</ResponseField>
+<ResponseField name="limit" type="integer">Echo of the requested page size.</ResponseField>
+<ResponseField name="offset" type="integer">Echo of the requested offset.</ResponseField>
+<ResponseField name="reviews" type="Review[]">
+  Reviews for this page.
+
+  <Expandable title="Review">
+    <ResponseField name="id" type="string">Airbnb review id.</ResponseField>
+    <ResponseField name="comments" type="string">Full review text.</ResponseField>
+    <ResponseField name="rating" type="integer">Guest rating, `1`–`5`.</ResponseField>
+    <ResponseField name="language" type="string">Language code the review was written in, e.g. `en`.</ResponseField>
+    <ResponseField name="created_at" type="string">Publication timestamp (ISO 8601).</ResponseField>
+    <ResponseField name="localized_date" type="string">Airbnb's relative date, e.g. `2 days ago`.</ResponseField>
+    <ResponseField name="reviewer_name" type="string" />
+    <ResponseField name="reviewer_id" type="string" />
+    <ResponseField name="reviewer_location" type="string">Guest's stated location.</ResponseField>
+    <ResponseField name="reviewer_image" type="string">Guest avatar URL.</ResponseField>
+    <ResponseField name="response" type="string">Host's public reply, or `null`.</ResponseField>
+    <ResponseField name="photos" type="string[]">Photo URLs attached to the review.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/airbnb/listings/48291736/reviews?" +
+    new URLSearchParams({ limit: "50", offset: "0", sort: "MOST_RECENT" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/airbnb/listings/48291736/reviews",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"limit": 50, "offset": 0, "sort": "MOST_RECENT"},
+)
+data = res.json()
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/airbnb/listings/48291736/reviews?limit=50&offset=0&sort=MOST_RECENT" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "room_id": "48291736",
+  "total_count": 214,
+  "limit": 50,
+  "offset": 0,
+  "reviews": [
+    {
+      "id": "1284739201",
+      "comments": "Inês's place is exactly as pictured — the balcony view over the Tagus is worth the four flights of stairs. Spotless, quiet at night despite being right by tram 28, and she left us a map of her favourite tascas. Would stay again.",
+      "rating": 5,
+      "language": "en",
+      "created_at": "2026-08-12T09:41:22Z",
+      "localized_date": "2 days ago",
+      "reviewer_name": "Daniel",
+      "reviewer_id": "38472910",
+      "reviewer_location": "Dublin, Ireland",
+      "reviewer_image": "https://a0.muscache.com/im/pictures/user/38472910-profile.jpg",
+      "response": "Thank you Daniel! You were wonderful guests — come back any time.",
+      "photos": [
+        "https://a0.muscache.com/im/pictures/review/1284739201-balcony.jpeg"
+      ]
+    },
+    {
+      "id": "1281002934",
+      "comments": "Très bien situé, appartement propre et bien équipé. Un peu bruyant le matin à cause du tram, mais rien de grave.",
+      "rating": 4,
+      "language": "fr",
+      "created_at": "2026-07-30T18:02:10Z",
+      "localized_date": "2 weeks ago",
+      "reviewer_name": "Camille",
+      "reviewer_id": "19283746",
+      "reviewer_location": "Lyon, France",
+      "reviewer_image": "https://a0.muscache.com/im/pictures/user/19283746-profile.jpg",
+      "response": null,
+      "photos": []
+    }
+  ]
+}
+```
+
+<Note>
+  Each reviews request costs **5 credits**. Failed requests are not charged.
+</Note>

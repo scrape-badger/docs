@@ -1,0 +1,108 @@
+---
+title: "Get Experience Detail"
+api: "GET https://scrapebadger.com/v1/airbnb/experiences/{experience_id}"
+description: "Full Airbnb Experience detail — description, rating, highlights, host, price, address, GPS and all photos."
+---
+
+Fetch a single experience's complete detail by its `experience_id` (from
+[`/experiences`](/api-reference/endpoint/airbnb/search-experiences) or an
+Airbnb URL such as `airbnb.com/experiences/1847362`). Guest counts shape the
+price context Airbnb returns.
+
+## Path Parameters
+
+<ParamField path="experience_id" type="string" required>
+  Airbnb experience id, e.g. `1847362`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="adults" type="integer" default="1">Number of adults.</ParamField>
+<ParamField query="children" type="integer" default="0">Number of children.</ParamField>
+<ParamField query="infants" type="integer" default="0">Number of infants.</ParamField>
+
+<ParamField query="currency" type="string" default="USD">
+  Currency for prices, e.g. `EUR`, `GBP`.
+</ParamField>
+
+<ParamField query="locale" type="string" default="en">
+  Locale for text, e.g. `fr`, `es`.
+</ParamField>
+
+## Response
+
+<ResponseField name="experience_id" type="string">Airbnb experience id.</ResponseField>
+<ResponseField name="title" type="string" />
+<ResponseField name="description" type="string">Full experience description.</ResponseField>
+<ResponseField name="rating" type="number">Average rating.</ResponseField>
+<ResponseField name="review_count" type="integer">Number of reviews.</ResponseField>
+<ResponseField name="is_ticketed" type="boolean">Ticketed (Airbnb Original) experience.</ResponseField>
+<ResponseField name="latitude" type="number" />
+<ResponseField name="longitude" type="number" />
+<ResponseField name="address" type="string">Meeting point as shown by Airbnb.</ResponseField>
+<ResponseField name="host_name" type="string">Experience host.</ResponseField>
+<ResponseField name="highlights" type="string[]">What the experience includes, e.g. `Food and drinks`.</ResponseField>
+<ResponseField name="images" type="string[]">All experience photo URLs.</ResponseField>
+<ResponseField name="price" type="string">Formatted price, e.g. `€45 / person`.</ResponseField>
+<ResponseField name="experience_url" type="string">Canonical experience URL on airbnb.com.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/airbnb/experiences/1847362?adults=2&currency=EUR",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const experience = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/airbnb/experiences/1847362",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"adults": 2, "currency": "EUR"},
+)
+experience = res.json()
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/airbnb/experiences/1847362?adults=2&currency=EUR" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "experience_id": "1847362",
+  "title": "Trastevere street food walk with a Roman chef",
+  "description": "We start at the Piazza San Cosimato market, taste supplì at a family fry shop that has been open since 1954, cut through the back lanes for porchetta and pecorino, and finish with a proper maritozzo. I cook in Rome for a living, so expect opinions about carbonara. Vegetarian route available on request.",
+  "rating": 4.96,
+  "review_count": 1204,
+  "is_ticketed": false,
+  "latitude": 41.8894,
+  "longitude": 12.4692,
+  "address": "Piazza San Cosimato, Trastevere, Rome, Italy",
+  "host_name": "Giulia",
+  "highlights": [
+    "Food and drinks included",
+    "Small group — 8 guests maximum",
+    "Hosted in Italian and English"
+  ],
+  "images": [
+    "https://a0.muscache.com/im/pictures/experience/1847362-supplice.jpeg",
+    "https://a0.muscache.com/im/pictures/experience/1847362-market.jpeg",
+    "https://a0.muscache.com/im/pictures/experience/1847362-maritozzo.jpeg"
+  ],
+  "price": "€45 / person",
+  "experience_url": "https://www.airbnb.com/experiences/1847362"
+}
+```
+
+<Note>
+  Each experience-detail request costs **5 credits**. Failed requests are not charged.
+</Note>

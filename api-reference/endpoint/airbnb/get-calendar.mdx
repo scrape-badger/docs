@@ -1,0 +1,164 @@
+---
+title: "Get Availability Calendar"
+api: "GET https://scrapebadger.com/v1/airbnb/listings/{room_id}/calendar"
+description: "Day-by-day Airbnb availability and pricing — up to 12 months of check-in / check-out eligibility, min and max nights, and nightly price."
+---
+
+Fetch a listing's availability calendar by `room_id`. Each day carries whether
+it is available, whether it is bookable, whether it can be used as a check-in
+or check-out date, the minimum and maximum stay length, and the nightly price.
+Request up to twelve months from a starting `month` / `year`.
+
+## Path Parameters
+
+<ParamField path="room_id" type="string" required>
+  Airbnb room id, e.g. `48291736`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="month" type="integer" default="1">
+  Starting month, `1`–`12`.
+</ParamField>
+
+<ParamField query="year" type="integer" default="2026">
+  Starting year.
+</ParamField>
+
+<ParamField query="months" type="integer" default="12">
+  Number of months to return, `1`–`12`.
+</ParamField>
+
+<ParamField query="currency" type="string" default="USD">
+  Currency for prices, e.g. `EUR`, `GBP`.
+</ParamField>
+
+<ParamField query="locale" type="string" default="en">
+  Locale for text, e.g. `fr`, `es`.
+</ParamField>
+
+## Response
+
+<ResponseField name="room_id" type="string">Airbnb room id.</ResponseField>
+<ResponseField name="months" type="Month[]">
+  One entry per requested month, in order.
+
+  <Expandable title="Month">
+    <ResponseField name="month" type="integer">Month number, `1`–`12`.</ResponseField>
+    <ResponseField name="year" type="integer" />
+    <ResponseField name="days" type="Day[]">
+      Every day in that month.
+
+      <Expandable title="Day">
+        <ResponseField name="date" type="string">`YYYY-MM-DD`.</ResponseField>
+        <ResponseField name="available" type="boolean">Not blocked or already booked.</ResponseField>
+        <ResponseField name="bookable" type="boolean">Can actually be booked, respecting stay rules.</ResponseField>
+        <ResponseField name="available_for_checkin" type="boolean">Usable as a check-in date.</ResponseField>
+        <ResponseField name="available_for_checkout" type="boolean">Usable as a check-out date.</ResponseField>
+        <ResponseField name="min_nights" type="integer">Minimum stay length starting on this date.</ResponseField>
+        <ResponseField name="max_nights" type="integer">Maximum stay length starting on this date.</ResponseField>
+        <ResponseField name="price" type="string">Formatted nightly price, e.g. `€172` — `null` when Airbnb hides it.</ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/airbnb/listings/48291736/calendar?" +
+    new URLSearchParams({
+      month: "9",
+      year: "2026",
+      months: "3",
+      currency: "EUR",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const calendar = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/airbnb/listings/48291736/calendar",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"month": 9, "year": 2026, "months": 3, "currency": "EUR"},
+)
+calendar = res.json()
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/airbnb/listings/48291736/calendar?month=9&year=2026&months=3&currency=EUR" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "room_id": "48291736",
+  "months": [
+    {
+      "month": 9,
+      "year": 2026,
+      "days": [
+        {
+          "date": "2026-09-01",
+          "available": false,
+          "bookable": false,
+          "available_for_checkin": false,
+          "available_for_checkout": false,
+          "min_nights": 2,
+          "max_nights": 28,
+          "price": null
+        },
+        {
+          "date": "2026-09-12",
+          "available": true,
+          "bookable": true,
+          "available_for_checkin": true,
+          "available_for_checkout": false,
+          "min_nights": 3,
+          "max_nights": 28,
+          "price": "€172"
+        },
+        {
+          "date": "2026-09-13",
+          "available": true,
+          "bookable": true,
+          "available_for_checkin": true,
+          "available_for_checkout": true,
+          "min_nights": 2,
+          "max_nights": 28,
+          "price": "€168"
+        }
+      ]
+    },
+    {
+      "month": 10,
+      "year": 2026,
+      "days": [
+        {
+          "date": "2026-10-01",
+          "available": true,
+          "bookable": true,
+          "available_for_checkin": true,
+          "available_for_checkout": true,
+          "min_nights": 2,
+          "max_nights": 28,
+          "price": "€145"
+        }
+      ]
+    }
+  ]
+}
+```
+
+<Note>
+  Each calendar request costs **5 credits**. Failed requests are not charged.
+</Note>

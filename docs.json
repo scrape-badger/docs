@@ -669,7 +669,9 @@
         "groups": [
           {
             "group": "Google Play API",
-            "pages": ["google-play/overview"]
+            "pages": [
+              "google-play/overview"
+            ]
           },
           {
             "group": "Endpoints",
@@ -693,7 +695,9 @@
         "groups": [
           {
             "group": "Apple App Store API",
-            "pages": ["app-store/overview"]
+            "pages": [
+              "app-store/overview"
+            ]
           },
           {
             "group": "Endpoints",
@@ -825,6 +829,28 @@
             "pages": [
               "api-reference/endpoint/loopnet/list-markets",
               "api-reference/endpoint/loopnet/list-property-types"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Airbnb",
+        "groups": [
+          {
+            "group": "Airbnb API",
+            "pages": [
+              "airbnb/overview"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api-reference/endpoint/airbnb/search",
+              "api-reference/endpoint/airbnb/get-listing",
+              "api-reference/endpoint/airbnb/get-calendar",
+              "api-reference/endpoint/airbnb/get-reviews",
+              "api-reference/endpoint/airbnb/search-experiences",
+              "api-reference/endpoint/airbnb/get-experience"
             ]
           }
         ]

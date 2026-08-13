@@ -1,0 +1,129 @@
+---
+title: "Search Experiences"
+api: "GET https://scrapebadger.com/v1/airbnb/experiences"
+description: "Search Airbnb Experiences by location — title, duration, rating, price, GPS and photos, with cursor pagination."
+---
+
+Search Airbnb **Experiences** in a place. `location` is required and geocoded
+server-side. Page through results by feeding `next_page_cursor` back as
+`cursor`, then fetch full detail with
+[`/experiences/{experience_id}`](/api-reference/endpoint/airbnb/get-experience).
+
+## Query Parameters
+
+<ParamField query="location" type="string" required>
+  Free-text place, geocoded server-side — e.g. `Rome, Italy`, `Lisbon`.
+</ParamField>
+
+<ParamField query="cursor" type="string">
+  Pagination cursor — pass the `next_page_cursor` from the previous response.
+</ParamField>
+
+<ParamField query="currency" type="string" default="USD">
+  Currency for prices, e.g. `EUR`, `GBP`.
+</ParamField>
+
+<ParamField query="locale" type="string" default="en">
+  Locale for text, e.g. `fr`, `es`.
+</ParamField>
+
+## Response
+
+<ResponseField name="location" type="string">Echo of the resolved location.</ResponseField>
+<ResponseField name="count" type="integer">Experiences returned on this page.</ResponseField>
+<ResponseField name="next_page_cursor" type="string">
+  Cursor for the next page — pass it back as `cursor`. `null` on the last page.
+</ResponseField>
+<ResponseField name="experiences" type="Experience[]">
+  Experience cards for this page.
+
+  <Expandable title="Experience">
+    <ResponseField name="experience_id" type="string">Airbnb experience id — feed to [`/experiences/{experience_id}`](/api-reference/endpoint/airbnb/get-experience).</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="duration" type="string">e.g. `2.5 hours`.</ResponseField>
+    <ResponseField name="rating" type="number">Average rating, e.g. `4.96`.</ResponseField>
+    <ResponseField name="review_count" type="integer">Number of reviews.</ResponseField>
+    <ResponseField name="rating_label" type="string">Formatted rating, e.g. `4.96 (1,204)`.</ResponseField>
+    <ResponseField name="price" type="string">Formatted price, e.g. `€45 / person`.</ResponseField>
+    <ResponseField name="latitude" type="number" />
+    <ResponseField name="longitude" type="number" />
+    <ResponseField name="images" type="string[]">Photo URLs.</ResponseField>
+    <ResponseField name="experience_url" type="string">Canonical experience URL on airbnb.com.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/airbnb/experiences?" +
+    new URLSearchParams({ location: "Rome, Italy", currency: "EUR" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/airbnb/experiences",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"location": "Rome, Italy", "currency": "EUR"},
+)
+data = res.json()
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/airbnb/experiences?location=Rome%2C%20Italy&currency=EUR" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "location": "Rome, Italy",
+  "count": 20,
+  "next_page_cursor": "eyJpdGVtc19vZmZzZXQiOjIwLCJ2ZXJzaW9uIjoxfQ==",
+  "experiences": [
+    {
+      "experience_id": "1847362",
+      "title": "Trastevere street food walk with a Roman chef",
+      "duration": "2.5 hours",
+      "rating": 4.96,
+      "review_count": 1204,
+      "rating_label": "4.96 (1,204)",
+      "price": "€45 / person",
+      "latitude": 41.8894,
+      "longitude": 12.4692,
+      "images": [
+        "https://a0.muscache.com/im/pictures/experience/1847362-supplice.jpeg",
+        "https://a0.muscache.com/im/pictures/experience/1847362-market.jpeg"
+      ],
+      "experience_url": "https://www.airbnb.com/experiences/1847362"
+    },
+    {
+      "experience_id": "2938471",
+      "title": "Sunrise photography tour of the Roman Forum",
+      "duration": "3 hours",
+      "rating": 4.89,
+      "review_count": 372,
+      "rating_label": "4.89 (372)",
+      "price": "€68 / person",
+      "latitude": 41.8925,
+      "longitude": 12.4853,
+      "images": [
+        "https://a0.muscache.com/im/pictures/experience/2938471-forum.jpeg"
+      ],
+      "experience_url": "https://www.airbnb.com/experiences/2938471"
+    }
+  ]
+}
+```
+
+<Note>
+  Each experiences-search request costs **5 credits**. Failed requests are not charged.
+</Note>

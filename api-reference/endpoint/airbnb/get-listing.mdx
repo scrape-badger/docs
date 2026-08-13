@@ -1,0 +1,196 @@
+---
+title: "Get Listing Detail"
+api: "GET https://scrapebadger.com/v1/airbnb/listings/{room_id}"
+description: "Full Airbnb listing detail — description, capacity, GPS, rating breakdown, amenities, house rules, cancellation policy, host profile and all photos."
+---
+
+Fetch a single listing's complete detail by its `room_id` (from
+[`/search`](/api-reference/endpoint/airbnb/search) or an Airbnb URL such as
+`airbnb.com/rooms/48291736`). The response carries everything the search card
+has, plus the full description, the six-category rating breakdown, every
+amenity, the house rules, and the host profile.
+
+## Path Parameters
+
+<ParamField path="room_id" type="string" required>
+  Airbnb room id, e.g. `48291736`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="adults" type="integer" default="1">
+  Number of adults — affects the price context returned by Airbnb.
+</ParamField>
+
+<ParamField query="currency" type="string" default="USD">
+  Currency for prices, e.g. `EUR`, `GBP`.
+</ParamField>
+
+<ParamField query="locale" type="string" default="en">
+  Locale for text, e.g. `fr`, `es`.
+</ParamField>
+
+## Response
+
+<ResponseField name="room_id" type="string">Airbnb room id.</ResponseField>
+<ResponseField name="title" type="string">Listing headline.</ResponseField>
+<ResponseField name="summary" type="string">
+  One-line summary, e.g. `Rental unit in Lisbon · ★4.8 · 1 bedroom · 1 bed · 1 bath`.
+</ResponseField>
+<ResponseField name="description" type="string">Full listing description.</ResponseField>
+<ResponseField name="room_type" type="string">e.g. `Entire home/apt`.</ResponseField>
+<ResponseField name="person_capacity" type="integer">Maximum number of guests.</ResponseField>
+<ResponseField name="latitude" type="number" />
+<ResponseField name="longitude" type="number" />
+<ResponseField name="address" type="string">Approximate address as shown by Airbnb.</ResponseField>
+<ResponseField name="rating" type="number">Average rating.</ResponseField>
+<ResponseField name="review_count" type="integer">Number of reviews.</ResponseField>
+<ResponseField name="rating_breakdown" type="object">
+  <Expandable title="rating_breakdown">
+    <ResponseField name="accuracy" type="number" />
+    <ResponseField name="checkin" type="number" />
+    <ResponseField name="cleanliness" type="number" />
+    <ResponseField name="communication" type="number" />
+    <ResponseField name="location" type="number" />
+    <ResponseField name="value" type="number" />
+  </Expandable>
+</ResponseField>
+<ResponseField name="is_superhost" type="boolean">Host holds Superhost status.</ResponseField>
+<ResponseField name="highlights" type="string[]">Listing highlights, e.g. `Self check-in`.</ResponseField>
+<ResponseField name="amenities" type="Amenity[]">
+  Every amenity Airbnb lists, including unavailable ones.
+
+  <Expandable title="Amenity">
+    <ResponseField name="id" type="string">Amenity id.</ResponseField>
+    <ResponseField name="title" type="string">e.g. `Wifi`.</ResponseField>
+    <ResponseField name="subtitle" type="string">Extra detail, e.g. `Fast · 220 Mbps`.</ResponseField>
+    <ResponseField name="available" type="boolean">`false` = listed as not offered.</ResponseField>
+    <ResponseField name="group" type="string">Amenity group, e.g. `Bathroom`, `Kitchen and dining`.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="house_rules" type="string[]">House rules as displayed.</ResponseField>
+<ResponseField name="cancellation_policy" type="string">Cancellation policy summary.</ResponseField>
+<ResponseField name="host" type="object">
+  <Expandable title="host">
+    <ResponseField name="name" type="string" />
+    <ResponseField name="is_superhost" type="boolean" />
+    <ResponseField name="about" type="string">Host bio.</ResponseField>
+    <ResponseField name="highlights" type="string[]">e.g. `Lives in Lisbon, Portugal`.</ResponseField>
+    <ResponseField name="response_time" type="string">e.g. `within an hour`.</ResponseField>
+    <ResponseField name="profile_image" type="string">Host avatar URL.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="images" type="string[]">All listing photo URLs.</ResponseField>
+<ResponseField name="listing_url" type="string">Canonical listing URL on airbnb.com.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/airbnb/listings/48291736?adults=2&currency=EUR",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const listing = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/airbnb/listings/48291736",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"adults": 2, "currency": "EUR"},
+)
+listing = res.json()
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/airbnb/listings/48291736?adults=2&currency=EUR" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "room_id": "48291736",
+  "title": "Sunlit apartment in Alfama with river view",
+  "summary": "Rental unit in Lisbon · ★4.8 · 1 bedroom · 1 bed · 1 bath",
+  "description": "A bright top-floor apartment in the heart of Alfama, two minutes from the Miradouro de Santa Luzia. Original azulejos, a compact but fully equipped kitchen, and a small balcony looking over the Tagus. Trams 12 and 28 stop at the corner.",
+  "room_type": "Entire home/apt",
+  "person_capacity": 3,
+  "latitude": 38.7118,
+  "longitude": -9.1294,
+  "address": "Alfama, Lisbon, Portugal",
+  "rating": 4.83,
+  "review_count": 214,
+  "rating_breakdown": {
+    "accuracy": 4.9,
+    "checkin": 4.95,
+    "cleanliness": 4.78,
+    "communication": 4.97,
+    "location": 4.88,
+    "value": 4.62
+  },
+  "is_superhost": true,
+  "highlights": [
+    "Self check-in",
+    "Great location",
+    "Free cancellation for 48 hours"
+  ],
+  "amenities": [
+    {
+      "id": "4",
+      "title": "Wifi",
+      "subtitle": "Fast · 220 Mbps",
+      "available": true,
+      "group": "Internet and office"
+    },
+    {
+      "id": "8",
+      "title": "Kitchen",
+      "subtitle": "Space where guests can cook their own meals",
+      "available": true,
+      "group": "Kitchen and dining"
+    },
+    {
+      "id": "41",
+      "title": "Elevator",
+      "subtitle": null,
+      "available": false,
+      "group": "Accessibility"
+    }
+  ],
+  "house_rules": [
+    "Check-in after 3:00 PM",
+    "Checkout before 11:00 AM",
+    "3 guests maximum",
+    "No smoking",
+    "No parties or events"
+  ],
+  "cancellation_policy": "Free cancellation before Sep 7. Cancel before check-in on Sep 12 for a partial refund.",
+  "host": {
+    "name": "Inês",
+    "is_superhost": true,
+    "about": "Born and raised in Lisbon. I restore old apartments and love pointing guests to the places tourists miss.",
+    "highlights": [
+      "Lives in Lisbon, Portugal",
+      "Speaks Portuguese, English, Spanish"
+    ],
+    "response_time": "within an hour",
+    "profile_image": "https://a0.muscache.com/im/pictures/user/9f2a1c-profile.jpg"
+  },
+  "images": [
+    "https://a0.muscache.com/im/pictures/miso/Hosting-48291736/original/2c8f1a44-living.jpeg",
+    "https://a0.muscache.com/im/pictures/miso/Hosting-48291736/original/8e3b7d19-bedroom.jpeg",
+    "https://a0.muscache.com/im/pictures/miso/Hosting-48291736/original/b71e0c25-balcony.jpeg"
+  ],
+  "listing_url": "https://www.airbnb.com/rooms/48291736"
+}
+```
+
+<Note>
+  Each listing-detail request costs **5 credits**. Failed requests are not charged.
+</Note>

@@ -1,0 +1,218 @@
+---
+title: "Search Stays"
+api: "GET https://scrapebadger.com/v1/airbnb/search"
+description: "Search Airbnb stays by place name or map bounding box — with dates, guest counts, price, bedrooms, beds, bathrooms and room-type filters."
+---
+
+Search Airbnb for stays. Target an area either with free-text `location`
+(geocoded server-side) **or** with a precise map bounding box
+(`ne_lat` / `ne_lng` / `sw_lat` / `sw_lng`, all four together). Page through
+results by feeding `next_page_cursor` back as `cursor`.
+
+## Query Parameters
+
+<ParamField query="location" type="string">
+  Free-text place, geocoded server-side — e.g. `Paris, France`, `Lisbon`,
+  `Trastevere, Rome`. Provide either `location` **or** the bounding-box
+  parameters below.
+</ParamField>
+
+<ParamField query="ne_lat" type="number">
+  North-east corner latitude of the map bounding box. Requires `ne_lng`,
+  `sw_lat` and `sw_lng`.
+</ParamField>
+
+<ParamField query="ne_lng" type="number">
+  North-east corner longitude of the map bounding box.
+</ParamField>
+
+<ParamField query="sw_lat" type="number">
+  South-west corner latitude of the map bounding box.
+</ParamField>
+
+<ParamField query="sw_lng" type="number">
+  South-west corner longitude of the map bounding box.
+</ParamField>
+
+<ParamField query="check_in" type="string">
+  Check-in date, `YYYY-MM-DD`.
+</ParamField>
+
+<ParamField query="check_out" type="string">
+  Check-out date, `YYYY-MM-DD`.
+</ParamField>
+
+<ParamField query="adults" type="integer" default="1">Number of adults.</ParamField>
+<ParamField query="children" type="integer" default="0">Number of children.</ParamField>
+<ParamField query="infants" type="integer" default="0">Number of infants.</ParamField>
+<ParamField query="pets" type="integer" default="0">Number of pets.</ParamField>
+
+<ParamField query="price_min" type="integer">Minimum nightly price, in `currency`.</ParamField>
+<ParamField query="price_max" type="integer">Maximum nightly price, in `currency`.</ParamField>
+<ParamField query="min_bedrooms" type="integer">Minimum number of bedrooms.</ParamField>
+<ParamField query="min_beds" type="integer">Minimum number of beds.</ParamField>
+<ParamField query="min_bathrooms" type="integer">Minimum number of bathrooms.</ParamField>
+
+<ParamField query="room_type" type="string">
+  Room type. One of `Entire home/apt`, `Private room`, `Shared room`,
+  `Hotel room`.
+</ParamField>
+
+<ParamField query="cursor" type="string">
+  Pagination cursor — pass the `next_page_cursor` from the previous response.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="18">
+  Listings per page. Maximum `50`.
+</ParamField>
+
+<ParamField query="currency" type="string" default="USD">
+  Currency for prices, e.g. `EUR`, `GBP`.
+</ParamField>
+
+<ParamField query="locale" type="string" default="en">
+  Locale for text, e.g. `fr`, `es`.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the resolved search area.</ResponseField>
+<ResponseField name="count" type="integer">Listings returned on this page.</ResponseField>
+<ResponseField name="next_page_cursor" type="string">
+  Cursor for the next page — pass it back as `cursor`. `null` on the last page.
+</ResponseField>
+<ResponseField name="listings" type="Listing[]">
+  Listing cards for this page.
+
+  <Expandable title="Listing">
+    <ResponseField name="room_id" type="string">Airbnb room id — feed to [`/listings/{room_id}`](/api-reference/endpoint/airbnb/get-listing), [`/calendar`](/api-reference/endpoint/airbnb/get-calendar) and [`/reviews`](/api-reference/endpoint/airbnb/get-reviews).</ResponseField>
+    <ResponseField name="name" type="string">Short listing name, e.g. `Rental unit in Paris`.</ResponseField>
+    <ResponseField name="title" type="string">Listing headline.</ResponseField>
+    <ResponseField name="rating" type="number">Average rating, e.g. `4.87`.</ResponseField>
+    <ResponseField name="review_count" type="integer">Number of reviews.</ResponseField>
+    <ResponseField name="rating_label" type="string">Formatted rating, e.g. `4.8 (214)`.</ResponseField>
+    <ResponseField name="price" type="object">
+      <Expandable title="price">
+        <ResponseField name="label" type="string">Full price line, e.g. `$182 per night`.</ResponseField>
+        <ResponseField name="price" type="string">Formatted price, e.g. `$182`.</ResponseField>
+        <ResponseField name="qualifier" type="string">e.g. `per night`, `total`.</ResponseField>
+        <ResponseField name="amount" type="number">Numeric price.</ResponseField>
+        <ResponseField name="currency" type="string">e.g. `USD`.</ResponseField>
+        <ResponseField name="original_price" type="string">Struck-through price when discounted, else `null`.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="badges" type="string[]">Airbnb badges, e.g. `["Guest favorite"]`.</ResponseField>
+    <ResponseField name="latitude" type="number" />
+    <ResponseField name="longitude" type="number" />
+    <ResponseField name="images" type="string[]">Photo URLs.</ResponseField>
+    <ResponseField name="listing_url" type="string">Canonical listing URL on airbnb.com.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/airbnb/search?" +
+    new URLSearchParams({
+      location: "Paris, France",
+      check_in: "2026-09-12",
+      check_out: "2026-09-15",
+      adults: "2",
+      price_max: "250",
+      room_type: "Entire home/apt",
+      currency: "EUR",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/airbnb/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "location": "Paris, France",
+        "check_in": "2026-09-12",
+        "check_out": "2026-09-15",
+        "adults": 2,
+        "price_max": 250,
+        "room_type": "Entire home/apt",
+        "currency": "EUR",
+    },
+)
+data = res.json()
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/airbnb/search?location=Paris%2C%20France&check_in=2026-09-12&check_out=2026-09-15&adults=2&price_max=250&currency=EUR" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "Paris, France",
+  "count": 18,
+  "next_page_cursor": "eyJzZWN0aW9uX29mZnNldCI6MCwiaXRlbXNfb2Zmc2V0IjoxOCwidmVyc2lvbiI6MX0=",
+  "listings": [
+    {
+      "room_id": "48291736",
+      "name": "Rental unit in Paris",
+      "title": "Sunlit Haussmannian flat near Canal Saint-Martin",
+      "rating": 4.87,
+      "review_count": 214,
+      "rating_label": "4.8 (214)",
+      "price": {
+        "label": "€172 per night",
+        "price": "€172",
+        "qualifier": "per night",
+        "amount": 172,
+        "currency": "EUR",
+        "original_price": "€215"
+      },
+      "badges": ["Guest favorite"],
+      "latitude": 48.8721,
+      "longitude": 2.3648,
+      "images": [
+        "https://a0.muscache.com/im/pictures/miso/Hosting-48291736/original/2c8f1a44-living.jpeg",
+        "https://a0.muscache.com/im/pictures/miso/Hosting-48291736/original/8e3b7d19-bedroom.jpeg"
+      ],
+      "listing_url": "https://www.airbnb.com/rooms/48291736"
+    },
+    {
+      "room_id": "1029384756",
+      "name": "Condo in Paris",
+      "title": "Quiet studio in Le Marais with balcony",
+      "rating": 4.92,
+      "review_count": 88,
+      "rating_label": "4.9 (88)",
+      "price": {
+        "label": "€139 per night",
+        "price": "€139",
+        "qualifier": "per night",
+        "amount": 139,
+        "currency": "EUR",
+        "original_price": null
+      },
+      "badges": [],
+      "latitude": 48.8566,
+      "longitude": 2.3622,
+      "images": [
+        "https://a0.muscache.com/im/pictures/miso/Hosting-1029384756/original/44a1c9f0-studio.jpeg"
+      ],
+      "listing_url": "https://www.airbnb.com/rooms/1029384756"
+    }
+  ]
+}
+```
+
+<Note>
+  Each search request costs **5 credits**. Failed requests are not charged.
+</Note>
