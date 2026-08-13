@@ -1,0 +1,150 @@
+---
+title: "Get App Reviews"
+api: "GET https://scrapebadger.com/v1/google-play/apps/{app_id}/reviews"
+description: "Paginated Google Play user reviews with developer replies, sorted by newest, rating or helpfulness."
+---
+
+Paginated user reviews from Play's own review RPC — up to 150 per page, with
+developer replies where they exist. Play paginates by continuation token, not
+by page number: pass the previous response's `next_page_token` as `page_token`.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="app_id" type="string" required>
+  Android package id, e.g. `com.whatsapp`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="country" type="string" default="US">
+  Play storefront (`gl`).
+</ParamField>
+
+<ParamField query="lang" type="string" default="en">
+  Play content language (`hl`) — reviews are returned in this language's feed.
+</ParamField>
+
+<ParamField query="sort" type="string" default="newest">
+  Review ordering: `newest`, `rating` or `helpfulness`. Each returns a
+  measurably different first page.
+</ParamField>
+
+<ParamField query="count" type="integer" default="40">
+  Reviews per page, `1`–`150`. Play silently truncates beyond 150, so the
+  ceiling is enforced rather than letting you pay for results that will not
+  arrive.
+</ParamField>
+
+<ParamField query="page_token" type="string">
+  Continuation token from a previous response's `next_page_token`.
+</ParamField>
+
+## Response
+
+<ResponseField name="app_id" type="string" />
+<ResponseField name="sort" type="string">The ordering used.</ResponseField>
+<ResponseField name="result_count" type="integer">Reviews in this page.</ResponseField>
+<ResponseField name="next_page_token" type="string">
+  Pass as `page_token` for the next page. `null` on the last page.
+</ResponseField>
+<ResponseField name="reviews" type="Review[]">
+  <Expandable title="Review">
+    <ResponseField name="review_id" type="string" />
+    <ResponseField name="user_name" type="string" />
+    <ResponseField name="user_image" type="string" />
+    <ResponseField name="score" type="integer">Star rating, `1`–`5`.</ResponseField>
+    <ResponseField name="text" type="string" />
+    <ResponseField name="thumbs_up" type="integer">Helpful votes.</ResponseField>
+    <ResponseField name="review_created_version" type="string">App version reviewed.</ResponseField>
+    <ResponseField name="at_utc" type="number">Posted, Unix seconds.</ResponseField>
+    <ResponseField name="at" type="string">Posted, ISO 8601 UTC.</ResponseField>
+    <ResponseField name="reply_author" type="string" />
+    <ResponseField name="reply_content" type="string" />
+    <ResponseField name="replied_utc" type="number" />
+    <ResponseField name="replied_at" type="string" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/google-play/apps/com.whatsapp/reviews?sort=newest&count=40" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/google-play/apps/com.whatsapp/reviews?" +
+    new URLSearchParams({ sort: "newest", count: "40" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { reviews, next_page_token } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/google-play/apps/com.whatsapp/reviews",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"sort": "newest", "count": 40},
+)
+page = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "app_id": "com.whatsapp",
+  "sort": "newest",
+  "result_count": 40,
+  "next_page_token": "CpEBCo4BQU9xcFRPRXhhbXBsZVRva2VuQmFzZTY0",
+  "reviews": [
+    {
+      "review_id": "0f2c1a9e-5d31-4a77-9f0c-3b2a1e6d8c44",
+      "user_name": "Priya S.",
+      "user_image": "https://play-lh.googleusercontent.com/a/user=mo",
+      "score": 5,
+      "text": "Calls are clear even on a weak connection. The new sticker picker is great.",
+      "thumbs_up": 42,
+      "review_created_version": "2.26.16.72",
+      "at_utc": 1754956800.0,
+      "at": "2026-08-12T00:00:00Z",
+      "reply_author": null,
+      "reply_content": null,
+      "replied_utc": null,
+      "replied_at": null
+    },
+    {
+      "review_id": "b71d4e02-8c6a-4c19-a0f5-71d9e2f3c118",
+      "user_name": "Marco R.",
+      "score": 2,
+      "text": "Backups keep failing since the last update.",
+      "thumbs_up": 118,
+      "review_created_version": "2.26.16.72",
+      "at_utc": 1754870400.0,
+      "at": "2026-08-11T00:00:00Z",
+      "reply_author": "WhatsApp LLC",
+      "reply_content": "Sorry about that — please contact us in-app so we can look into it.",
+      "replied_utc": 1754884800.0,
+      "replied_at": "2026-08-11T04:00:00Z"
+    }
+  ]
+}
+```
+
+<Tip>
+  Reviews are per-language: the `en` and `de` feeds for one app are different
+  review sets, not translations of one set.
+</Tip>

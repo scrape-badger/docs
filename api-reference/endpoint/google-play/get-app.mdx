@@ -1,0 +1,228 @@
+---
+title: "Get App Detail"
+api: "GET https://scrapebadger.com/v1/google-play/apps/{app_id}"
+description: "Full Google Play app detail — ratings histogram, install bands, pricing and IAP range, developer legal entity, media, version metadata, Data Safety and the permission tree."
+---
+
+Everything Play's product page carries, in one fetch: the description, the 1–5
+star histogram, install bands, price and in-app-purchase range, the developer's
+contact and legal entity, media, release and update timestamps, the Data Safety
+declaration, the permission tree and the similar-apps rail.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="app_id" type="string" required>
+  Android package id, e.g. `com.whatsapp`. It is the `id` query parameter of a
+  `play.google.com/store/apps/details?id=...` URL.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="country" type="string" default="US">
+  Play storefront (`gl`) — sets pricing and availability.
+</ParamField>
+
+<ParamField query="lang" type="string" default="en">
+  Play content language (`hl`), e.g. `en` or `pt-BR`.
+</ParamField>
+
+## Response
+
+<ResponseField name="app_id" type="string">Android package id.</ResponseField>
+<ResponseField name="title" type="string" />
+<ResponseField name="url" type="string" />
+<ResponseField name="description" type="string">Full store description.</ResponseField>
+<ResponseField name="summary" type="string">One-line pitch.</ResponseField>
+<ResponseField name="developer" type="Developer">
+  Publisher and the legal entity Play discloses beneath it — the two differ
+  more often than not.
+
+  <Expandable title="Developer">
+    <ResponseField name="name" type="string">e.g. `WhatsApp LLC`.</ResponseField>
+    <ResponseField name="developer_id" type="string">Numeric id, for [`/developers/{id}`](/api-reference/endpoint/google-play/get-developer).</ResponseField>
+    <ResponseField name="url" type="string" />
+    <ResponseField name="email" type="string" />
+    <ResponseField name="website" type="string" />
+    <ResponseField name="address" type="string">Postal address from the legal block.</ResponseField>
+    <ResponseField name="phone" type="string" />
+    <ResponseField name="legal_name" type="string">e.g. `Meta Platforms, Inc.`.</ResponseField>
+    <ResponseField name="legal_email" type="string" />
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="score" type="number">Average rating.</ResponseField>
+<ResponseField name="score_text" type="string" />
+<ResponseField name="ratings" type="integer">Total ratings.</ResponseField>
+<ResponseField name="reviews" type="integer">Total written reviews.</ResponseField>
+<ResponseField name="histogram" type="RatingHistogram">
+  `one_star` … `five_star` — the bar chart Play renders.
+</ResponseField>
+
+<ResponseField name="installs" type="string">Install band, e.g. `5,000,000,000+`.</ResponseField>
+<ResponseField name="installs_short" type="string">e.g. `5B+`.</ResponseField>
+<ResponseField name="min_installs" type="integer" />
+<ResponseField name="max_installs" type="integer" />
+<ResponseField name="chart_rank" type="ChartRank">
+  The "#1 top free communication" badge when the app carries one — `rank`, `chart`.
+</ResponseField>
+
+<ResponseField name="price" type="Price">`price`, `currency`, `price_text`, `is_free`.</ResponseField>
+<ResponseField name="offers_iap" type="boolean" />
+<ResponseField name="iap_range" type="string">e.g. `$0.99 - $99.99 per item`.</ResponseField>
+<ResponseField name="contains_ads" type="boolean" />
+<ResponseField name="ad_supported" type="boolean" />
+
+<ResponseField name="genre" type="string" />
+<ResponseField name="genre_id" type="string">Category id, e.g. `COMMUNICATION`.</ResponseField>
+<ResponseField name="genre_url" type="string" />
+<ResponseField name="content_rating" type="string" />
+<ResponseField name="content_rating_description" type="string" />
+
+<ResponseField name="icon" type="string" />
+<ResponseField name="header_image" type="string" />
+<ResponseField name="screenshots" type="string[]" />
+<ResponseField name="video" type="string" />
+<ResponseField name="video_image" type="string" />
+
+<ResponseField name="released" type="string">Release date as displayed.</ResponseField>
+<ResponseField name="released_utc" type="number">Unix seconds.</ResponseField>
+<ResponseField name="released_at" type="string">ISO 8601 UTC.</ResponseField>
+<ResponseField name="updated_utc" type="number" />
+<ResponseField name="updated_at" type="string" />
+<ResponseField name="version" type="string" />
+<ResponseField name="android_version" type="string" />
+<ResponseField name="android_version_text" type="string" />
+<ResponseField name="recent_changes" type="string">What's new in this version.</ResponseField>
+
+<ResponseField name="privacy_policy" type="string" />
+<ResponseField name="data_safety" type="DataSafetySection[]">
+  Play's Data Safety card — `title`, `description` per row.
+</ResponseField>
+<ResponseField name="permissions" type="PermissionGroup[]">
+  `group`, `icon_url`, `permissions[]` — the same tree
+  [`/permissions`](/api-reference/endpoint/google-play/get-permissions) returns.
+</ResponseField>
+
+<ResponseField name="similar_apps_url" type="string">Link to the full similar-apps cluster.</ResponseField>
+<ResponseField name="similar_apps" type="AppCard[]">The detail page's similar-apps rail.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/google-play/apps/com.whatsapp?country=US&lang=en" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/google-play/apps/com.whatsapp?" +
+    new URLSearchParams({ country: "US", lang: "en" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const app = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/google-play/apps/com.whatsapp",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"country": "US", "lang": "en"},
+)
+app = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "app_id": "com.whatsapp",
+  "title": "WhatsApp Messenger",
+  "url": "https://play.google.com/store/apps/details?id=com.whatsapp&hl=en&gl=US",
+  "summary": "Simple. Reliable. Private.",
+  "description": "WhatsApp from Meta is a FREE messaging and video calling app...",
+  "developer": {
+    "name": "WhatsApp LLC",
+    "developer_id": "5700313618786177705",
+    "url": "https://play.google.com/store/apps/dev?id=5700313618786177705",
+    "email": "androidsupport@support.whatsapp.com",
+    "website": "https://www.whatsapp.com/",
+    "address": "1601 Willow Road Menlo Park, CA 94025 United States",
+    "legal_name": "WhatsApp LLC",
+    "legal_email": "androidsupport@support.whatsapp.com"
+  },
+  "score": 4.3,
+  "score_text": "4.3",
+  "ratings": 195204118,
+  "reviews": 5820113,
+  "histogram": {
+    "one_star": 17842011,
+    "two_star": 4210338,
+    "three_star": 8930442,
+    "four_star": 20114876,
+    "five_star": 144106451
+  },
+  "installs": "10,000,000,000+",
+  "installs_short": "10B+",
+  "min_installs": 10000000000,
+  "max_installs": 20000000000,
+  "chart_rank": { "rank": "#3", "chart": "top free communication" },
+  "price": { "price": 0.0, "currency": "USD", "price_text": "Free", "is_free": true },
+  "offers_iap": false,
+  "contains_ads": false,
+  "ad_supported": false,
+  "genre": "Communication",
+  "genre_id": "COMMUNICATION",
+  "content_rating": "Everyone",
+  "icon": "https://play-lh.googleusercontent.com/example=w240-h480-rw",
+  "screenshots": ["https://play-lh.googleusercontent.com/shot1=w720"],
+  "released": "Jan 1, 2010",
+  "released_utc": 1262304000.0,
+  "released_at": "2010-01-01T00:00:00Z",
+  "updated_utc": 1754870400.0,
+  "updated_at": "2026-08-11T00:00:00Z",
+  "version": "2.26.16.72",
+  "android_version": "5.0",
+  "android_version_text": "5.0 and up",
+  "recent_changes": "• Bug fixes and performance improvements.",
+  "privacy_policy": "https://www.whatsapp.com/legal/privacy-policy",
+  "data_safety": [
+    {
+      "title": "This app may share these data types with third parties",
+      "description": "Location, Personal info and 5 others"
+    },
+    { "title": "Data is encrypted in transit", "description": null }
+  ],
+  "permissions": [
+    { "group": "Camera", "icon_url": "https://play-lh.googleusercontent.com/cam", "permissions": ["take pictures and videos"] }
+  ],
+  "similar_apps_url": "https://play.google.com/store/apps/collection/cluster?clp=example",
+  "similar_apps": [
+    {
+      "app_id": "org.telegram.messenger",
+      "title": "Telegram",
+      "developer": "Telegram FZ-LLC",
+      "score": 4.3,
+      "installs": "1,000,000,000+",
+      "price": { "price": 0.0, "currency": "USD", "price_text": "Free", "is_free": true }
+    }
+  ]
+}
+```
+
+<Note>
+  A field Play does not render for that app or storefront comes back `null` (or
+  an empty list) rather than being omitted — `chart_rank` and `iap_range` are
+  the usual absentees.
+</Note>

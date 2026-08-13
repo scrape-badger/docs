@@ -1,0 +1,116 @@
+---
+title: "Browse a Category"
+api: "GET https://scrapebadger.com/v1/google-play/categories/{category_id}"
+description: "Every app across a Google Play category page's editorial rails, deduped and in Play's own order."
+---
+
+Browse a Play category. Returns every app across all of the category page's
+editorial rails ("Popular", "Be the first to play", genre spotlights), deduped
+and in the order Play ranked them — around 100 apps for a broad category like
+`GAME`.
+
+**Credits:** 5
+
+<Note>
+  This is the **working alternative to top charts**. Play renders the ranked
+  top-chart list client-side, so
+  [`/collections/{collection}`](/api-reference/endpoint/google-play/get-collection)
+  answers `422`. A category browse is server-rendered and returns real data.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="category_id" type="string" required>
+  Play category id, e.g. `SOCIAL`, `GAME_PUZZLE`, `APPLICATION`. The full list
+  is at
+  [`/categories`](/api-reference/endpoint/google-play/list-categories) (free);
+  it also matches `genre_id` on an app detail record.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="country" type="string" default="US">
+  Play storefront (`gl`).
+</ParamField>
+
+<ParamField query="lang" type="string" default="en">
+  Play content language (`hl`).
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">The category id requested.</ResponseField>
+<ResponseField name="url" type="string">The Play URL the apps were read from.</ResponseField>
+<ResponseField name="result_count" type="integer">Apps returned.</ResponseField>
+<ResponseField name="apps" type="AppCard[]">
+  Apps in the category — same shape as
+  [search results](/api-reference/endpoint/google-play/search).
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/google-play/categories/GAME_PUZZLE?country=US&lang=en" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/google-play/categories/GAME_PUZZLE?" +
+    new URLSearchParams({ country: "US", lang: "en" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { apps } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/google-play/categories/GAME_PUZZLE",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"country": "US", "lang": "en"},
+)
+apps = res.json()["apps"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "GAME_PUZZLE",
+  "url": "https://play.google.com/store/apps/category/GAME_PUZZLE?hl=en&gl=US",
+  "result_count": 96,
+  "apps": [
+    {
+      "app_id": "com.king.candycrushsaga",
+      "title": "Candy Crush Saga",
+      "developer": "King",
+      "summary": "Switch and match Candies in this tasty puzzle adventure",
+      "icon": "https://play-lh.googleusercontent.com/example=w240-h480-rw",
+      "score": 4.6,
+      "score_text": "4.6",
+      "installs": "1,000,000,000+",
+      "genre": "Puzzle",
+      "content_rating": "Everyone",
+      "price": { "price": 0.0, "currency": "USD", "price_text": "Free", "is_free": true },
+      "url": "https://play.google.com/store/apps/details?id=com.king.candycrushsaga"
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | No apps in that category for the storefront — usually an unknown category id. |
+| `422` | Play returned no usable data — **not billed**. Retry. |

@@ -1,0 +1,201 @@
+---
+title: "Get App Detail"
+api: "GET https://scrapebadger.com/v1/app-store/apps/{app_id}"
+description: "Full App Store app detail by track id or bundle id, enriched with the star histogram, in-app-purchase list, full-resolution screenshots and App Privacy label."
+---
+
+Full detail for one app. Merges two sources: Apple's iTunes lookup (the core
+fields, always present) and the storefront product page (`extras`, best-effort —
+a storefront failure degrades the response rather than failing it).
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="app_id" type="string" required>
+  Numeric track id (e.g. `310633997`) **or** bundle id (e.g. `com.whatsapp`).
+  A value containing a dot is treated as a bundle id.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="country" type="string" default="us">
+  Storefront code, lowercase ISO 3166-1 alpha-2 — sets pricing, availability
+  and the localised copy.
+</ParamField>
+
+<ParamField query="lang" type="string">
+  Result language, e.g. `en_us`. Defaults to the storefront's.
+</ParamField>
+
+<ParamField query="include_extras" type="boolean" default="true">
+  Fetch the storefront page for the rating histogram, in-app-purchase list,
+  full-resolution screenshots and App Privacy detail. Set `false` to skip that
+  second fetch when only the core iTunes fields are needed.
+</ParamField>
+
+## Response
+
+Every field from [search](/api-reference/endpoint/app-store/search), plus:
+
+<ResponseField name="extras" type="AppExtras">
+  Storefront enrichment. `null` when `include_extras=false` or when the
+  storefront fetch failed.
+
+  <Expandable title="AppExtras">
+    <ResponseField name="rating_histogram" type="RatingHistogram">
+      `average`, `total`, `one_star` … `five_star`. Apple's storefront `total`
+      can differ slightly from `rating_count` — the two are computed on
+      different schedules, and both are surfaced rather than reconciled.
+    </ResponseField>
+    <ResponseField name="has_in_app_purchases" type="boolean" />
+    <ResponseField name="in_app_purchases" type="InAppPurchase[]">
+      `name`, `price` — the localised display price; Apple exposes no
+      numeric/currency split on the page.
+    </ResponseField>
+    <ResponseField name="iphone_screenshots" type="Screenshot[]">`url`, `width`, `height` at native resolution.</ResponseField>
+    <ResponseField name="ipad_screenshots" type="Screenshot[]" />
+    <ResponseField name="whats_new" type="string" />
+    <ResponseField name="whats_new_version" type="string" />
+    <ResponseField name="description" type="string">The storefront's copy of the description.</ResponseField>
+    <ResponseField name="chart_position" type="integer" />
+    <ResponseField name="chart_category" type="string" />
+    <ResponseField name="is_editors_choice" type="boolean" />
+    <ResponseField name="privacy_types" type="PrivacyType[]">
+      App Privacy "nutrition label" groups — `identifier`, `title`, `detail`, `categories[]`.
+    </ResponseField>
+    <ResponseField name="information" type="object">
+      The page's raw Information rows (Seller, Size, Category, Compatibility,
+      Languages, Age Rating, Copyright …) as a flat string map — Apple adds and
+      renames rows per app type, so nothing is dropped.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/app-store/apps/310633997?country=us" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/app-store/apps/com.whatsapp?country=us",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const app = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/app-store/apps/310633997",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"country": "us", "include_extras": "true"},
+)
+app = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "app_id": 310633997,
+  "bundle_id": "net.whatsapp.WhatsApp",
+  "name": "WhatsApp Messenger",
+  "kind": "software",
+  "url": "https://apps.apple.com/us/app/whatsapp-messenger/id310633997",
+  "developer_id": 310634000,
+  "developer_name": "WhatsApp Inc.",
+  "seller_name": "WhatsApp Inc.",
+  "price": 0.0,
+  "currency": "USD",
+  "formatted_price": "Free",
+  "rating": 4.7,
+  "rating_count": 15216441,
+  "rating_current_version": 4.7,
+  "rating_count_current_version": 21883,
+  "description": "WhatsApp from Meta is a FREE messaging and video calling app...",
+  "release_notes": "Bug fixes and performance improvements.",
+  "version": "26.16.72",
+  "minimum_os_version": "15.1",
+  "file_size_bytes": 246718464,
+  "content_rating": "12+",
+  "advisories": ["Infrequent/Mild Profanity or Crude Humor"],
+  "genres": ["Social Networking", "Utilities"],
+  "genre_ids": [6005, 6002],
+  "primary_genre": "Social Networking",
+  "primary_genre_id": 6005,
+  "language_codes": ["EN", "DE", "ES", "FR", "PT"],
+  "icon_url": "https://is1-ssl.mzstatic.com/image/thumb/example/512x512bb.jpg",
+  "screenshot_urls": ["https://is1-ssl.mzstatic.com/image/thumb/shot1/392x696bb.png"],
+  "release_date_utc": 1241740800.0,
+  "release_date_at": "2009-05-08T00:00:00Z",
+  "current_version_release_date_utc": 1754870400.0,
+  "current_version_release_date_at": "2026-08-11T00:00:00Z",
+  "extras": {
+    "rating_histogram": {
+      "average": 4.7,
+      "total": 15216441,
+      "one_star": 486926,
+      "two_star": 152164,
+      "three_star": 304328,
+      "four_star": 1673808,
+      "five_star": 12599215
+    },
+    "has_in_app_purchases": false,
+    "in_app_purchases": [],
+    "iphone_screenshots": [
+      { "url": "https://is1-ssl.mzstatic.com/image/thumb/shot1/1290x2796bb.png", "width": 1290, "height": 2796 }
+    ],
+    "ipad_screenshots": [],
+    "whats_new": "Bug fixes and performance improvements.",
+    "whats_new_version": "26.16.72",
+    "chart_position": 4,
+    "chart_category": "Social Networking",
+    "is_editors_choice": false,
+    "privacy_types": [
+      {
+        "identifier": "DATA_LINKED_TO_YOU",
+        "title": "Data Linked to You",
+        "detail": "The following data, which may be collected and linked to your identity, may be used for the following purposes:",
+        "categories": ["Contact Info", "User Content", "Identifiers", "Usage Data", "Diagnostics"]
+      }
+    ],
+    "information": {
+      "Seller": "WhatsApp Inc.",
+      "Size": "235.3 MB",
+      "Category": "Social Networking",
+      "Compatibility": "iPhone — Requires iOS 15.1 or later.",
+      "Languages": "English and 59 more",
+      "Age Rating": "12+",
+      "Copyright": "© 2026 WhatsApp LLC"
+    }
+  }
+}
+```
+
+<Note>
+  A **numeric id** runs both fetches concurrently, so enrichment usually costs
+  no extra latency. A **bundle id** costs one extra round trip: the storefront
+  page is addressable by numeric id only, so the lookup has to resolve first.
+</Note>
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `400` | Malformed country code. |
+| `404` | No such app in that storefront (Apple answers `200` with an empty result; the absence is detected so you are not billed for an empty success). |
+| `429` | Apple is throttling — retry shortly. |
+| `502` | Unexpected upstream failure — **not billed**. |

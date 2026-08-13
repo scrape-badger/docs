@@ -1,0 +1,137 @@
+---
+title: "Search Apps"
+api: "GET https://scrapebadger.com/v1/google-play/search"
+description: "Search Google Play for apps and games — the rich result card carries description, installs, rating and price."
+---
+
+Search Google Play for apps and games. Each result is a full `AppCard` —
+description, installs, rating, genre, content rating and price — so a search
+result rarely needs a follow-up detail fetch just to rank or filter.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords, e.g. `puzzle`.
+</ParamField>
+
+<ParamField query="country" type="string" default="US">
+  Play storefront (`gl`), ISO 3166-1 alpha-2. See
+  [`/markets`](/api-reference/endpoint/google-play/list-markets).
+</ParamField>
+
+<ParamField query="lang" type="string" default="en">
+  Play content language (`hl`), e.g. `en` or `pt-BR`.
+</ParamField>
+
+<ParamField query="price" type="string">
+  Restrict by price: `free` or `paid`. Omit for both.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="url" type="string">The Play URL the results were read from.</ResponseField>
+<ResponseField name="result_count" type="integer">Apps returned.</ResponseField>
+<ResponseField name="apps" type="AppCard[]">
+  Matching apps, in Play's ranking order.
+
+  <Expandable title="AppCard">
+    <ResponseField name="app_id" type="string">Android package id, e.g. `com.king.candycrushsaga`.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="developer" type="string" />
+    <ResponseField name="summary" type="string">One-line pitch.</ResponseField>
+    <ResponseField name="description" type="string">Full store description, when the card carries it.</ResponseField>
+    <ResponseField name="icon" type="string" />
+    <ResponseField name="header_image" type="string" />
+    <ResponseField name="screenshots" type="string[]" />
+    <ResponseField name="score" type="number">Average rating, e.g. `4.6`.</ResponseField>
+    <ResponseField name="score_text" type="string">Rating as displayed, e.g. `4.6`.</ResponseField>
+    <ResponseField name="installs" type="string">Install band, e.g. `1,000,000,000+`.</ResponseField>
+    <ResponseField name="genre" type="string" />
+    <ResponseField name="content_rating" type="string" />
+    <ResponseField name="price" type="Price">`price`, `currency`, `price_text`, `is_free`.</ResponseField>
+    <ResponseField name="url" type="string" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/google-play/search?query=puzzle&country=US&price=free" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/google-play/search?" +
+    new URLSearchParams({ query: "puzzle", country: "US", price: "free" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { apps } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/google-play/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "puzzle", "country": "US", "price": "free"},
+)
+apps = res.json()["apps"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "puzzle",
+  "url": "https://play.google.com/store/search?q=puzzle&c=apps&hl=en&gl=US&price=1",
+  "result_count": 30,
+  "apps": [
+    {
+      "app_id": "com.king.candycrushsaga",
+      "title": "Candy Crush Saga",
+      "developer": "King",
+      "summary": "Switch and match Candies in this tasty puzzle adventure",
+      "icon": "https://play-lh.googleusercontent.com/example=w240-h480-rw",
+      "header_image": "https://play-lh.googleusercontent.com/example=w720-h310-rw",
+      "screenshots": ["https://play-lh.googleusercontent.com/shot1=w720"],
+      "score": 4.6,
+      "score_text": "4.6",
+      "installs": "1,000,000,000+",
+      "genre": "Casual",
+      "content_rating": "Everyone",
+      "price": { "price": 0.0, "currency": "USD", "price_text": "Free", "is_free": true },
+      "url": "https://play.google.com/store/apps/details?id=com.king.candycrushsaga"
+    }
+  ]
+}
+```
+
+## Result depth
+
+<Warning>
+  Play server-renders about **30 results** per query and exposes no page
+  number — its infinite-scroll continuation is a cluster RPC Google no longer
+  accepts from outside its own client, so there is deliberately no `page`
+  parameter. Widen a result set with
+  [`/apps/{id}/similar`](/api-reference/endpoint/google-play/get-similar) and
+  [`/developers/{id}`](/api-reference/endpoint/google-play/get-developer).
+</Warning>
+
+<Note>
+  Only the apps catalogue is searched. Play's books and movies catalogues use
+  volume ids rather than Android package ids, so they are not returned here —
+  their ids would 404 against every other route in this API.
+</Note>

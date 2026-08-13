@@ -1,0 +1,98 @@
+---
+title: "Get Similar Apps"
+api: "GET https://scrapebadger.com/v1/google-play/apps/{app_id}/similar"
+description: "The apps Google Play recommends alongside a given app."
+---
+
+The "Similar apps" rail from the app's detail page. Play caps that rail at
+roughly a dozen entries; the full list behind its "See more" link is a cluster
+page, addressable via `similar_apps_url` on the
+[detail response](/api-reference/endpoint/google-play/get-app).
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="app_id" type="string" required>
+  Android package id, e.g. `com.whatsapp`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="country" type="string" default="US">
+  Play storefront (`gl`) — recommendations are storefront-specific.
+</ParamField>
+
+<ParamField query="lang" type="string" default="en">
+  Play content language (`hl`).
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">The `app_id` the rail was read for.</ResponseField>
+<ResponseField name="url" type="string">The Play URL the rail was read from.</ResponseField>
+<ResponseField name="result_count" type="integer">Apps returned.</ResponseField>
+<ResponseField name="apps" type="AppCard[]">
+  Recommended apps — same shape as
+  [search results](/api-reference/endpoint/google-play/search).
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/google-play/apps/com.whatsapp/similar?country=US" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/google-play/apps/com.whatsapp/similar?country=US",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { apps } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/google-play/apps/com.whatsapp/similar",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"country": "US"},
+)
+apps = res.json()["apps"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "com.whatsapp",
+  "url": "https://play.google.com/store/apps/details?id=com.whatsapp&hl=en&gl=US",
+  "result_count": 12,
+  "apps": [
+    {
+      "app_id": "org.telegram.messenger",
+      "title": "Telegram",
+      "developer": "Telegram FZ-LLC",
+      "summary": "Fast. Secure. Powerful.",
+      "icon": "https://play-lh.googleusercontent.com/telegram=w240-h480-rw",
+      "score": 4.3,
+      "score_text": "4.3",
+      "installs": "1,000,000,000+",
+      "genre": "Communication",
+      "content_rating": "Everyone",
+      "price": { "price": 0.0, "currency": "USD", "price_text": "Free", "is_free": true },
+      "url": "https://play.google.com/store/apps/details?id=org.telegram.messenger"
+    }
+  ]
+}
+```

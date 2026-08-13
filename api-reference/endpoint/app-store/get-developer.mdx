@@ -1,0 +1,125 @@
+---
+title: "Get Developer Apps"
+api: "GET https://scrapebadger.com/v1/app-store/developers/{developer_id}"
+description: "An App Store developer and every app they publish in a storefront."
+---
+
+A developer and their catalogue in one call — Apple mixes a single `artist`
+entry in with the `software` entries, and this route splits them.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="developer_id" type="string" required>
+  Numeric artist id, e.g. `284882218`. Take it from `developer_id` on any app
+  record. Non-numeric values are rejected with `400`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="country" type="string" default="us">
+  Storefront code, lowercase ISO 3166-1 alpha-2.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="50">
+  Apps to return, `1`–`200`.
+</ParamField>
+
+## Response
+
+<ResponseField name="country" type="string" />
+<ResponseField name="developer" type="Developer">
+  <Expandable title="Developer">
+    <ResponseField name="developer_id" type="integer" />
+    <ResponseField name="name" type="string" />
+    <ResponseField name="developer_type" type="string">Apple's artist type, e.g. `software`.</ResponseField>
+    <ResponseField name="url" type="string" />
+  </Expandable>
+</ResponseField>
+<ResponseField name="result_count" type="integer">Apps returned.</ResponseField>
+<ResponseField name="apps" type="App[]">
+  The developer's apps — same shape as
+  [search results](/api-reference/endpoint/app-store/search).
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/app-store/developers/284882218?country=us&limit=50" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/app-store/developers/284882218?" +
+    new URLSearchParams({ country: "us", limit: "50" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { developer, apps } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/app-store/developers/284882218",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"country": "us", "limit": 50},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "country": "us",
+  "developer": {
+    "developer_id": 284882218,
+    "name": "Meta Platforms, Inc.",
+    "developer_type": "software",
+    "url": "https://apps.apple.com/us/developer/meta-platforms-inc/id284882218"
+  },
+  "result_count": 9,
+  "apps": [
+    {
+      "app_id": 284882215,
+      "bundle_id": "com.facebook.Facebook",
+      "name": "Facebook",
+      "url": "https://apps.apple.com/us/app/facebook/id284882215",
+      "developer_id": 284882218,
+      "developer_name": "Meta Platforms, Inc.",
+      "price": 0.0,
+      "currency": "USD",
+      "formatted_price": "Free",
+      "rating": 4.1,
+      "rating_count": 15602118,
+      "version": "526.0",
+      "minimum_os_version": "15.1",
+      "file_size_bytes": 358612992,
+      "content_rating": "12+",
+      "genres": ["Social Networking"],
+      "genre_ids": [6005],
+      "icon_url": "https://is1-ssl.mzstatic.com/image/thumb/facebook/512x512bb.jpg",
+      "current_version_release_date_at": "2026-08-10T00:00:00Z"
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `400` | Non-numeric developer id, or malformed country. |
+| `404` | No such developer in that storefront. |
+| `429` | Apple is throttling — retry shortly. |

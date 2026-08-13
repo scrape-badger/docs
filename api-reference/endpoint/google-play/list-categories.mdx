@@ -1,0 +1,91 @@
+---
+title: "List Categories"
+api: "GET https://scrapebadger.com/v1/google-play/categories"
+description: "The Google Play app and game category ids. Free."
+---
+
+Every Play app and game category id — the values
+[`/categories/{category_id}`](/api-reference/endpoint/google-play/browse-category)
+and `/collections/{collection}?category=` accept. They also match the `genre_id`
+returned on an app detail record. Static reference data, so this endpoint is
+**free**.
+
+**Credits:** 0
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Response
+
+<ResponseField name="result_count" type="integer">Categories returned (60).</ResponseField>
+<ResponseField name="categories" type="Category[]">
+  <Expandable title="Category">
+    <ResponseField name="category_id" type="string">e.g. `GAME_PUZZLE`.</ResponseField>
+    <ResponseField name="name" type="string">e.g. `Puzzle`.</ResponseField>
+    <ResponseField name="url" type="string">The Play category page.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/google-play/categories" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/google-play/categories", {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+});
+const { categories } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/google-play/categories",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+categories = res.json()["categories"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "result_count": 60,
+  "categories": [
+    {
+      "category_id": "APPLICATION",
+      "name": "All apps",
+      "url": "https://play.google.com/store/apps/category/APPLICATION"
+    },
+    {
+      "category_id": "COMMUNICATION",
+      "name": "Communication",
+      "url": "https://play.google.com/store/apps/category/COMMUNICATION"
+    },
+    {
+      "category_id": "GAME",
+      "name": "All games",
+      "url": "https://play.google.com/store/apps/category/GAME"
+    },
+    {
+      "category_id": "GAME_PUZZLE",
+      "name": "Puzzle",
+      "url": "https://play.google.com/store/apps/category/GAME_PUZZLE"
+    }
+  ]
+}
+```
+
+<Note>
+  The list covers the `APPLICATION` categories plus the `GAME_*` and `FAMILY_*`
+  subcategories.
+</Note>

@@ -1,0 +1,207 @@
+---
+title: "Search Ad Creatives"
+api: "GET https://scrapebadger.com/v1/google/ads/search"
+description: "Search Google Ads Transparency Center creatives by advertiser id or verified domain, with format and date-window filtering."
+---
+
+Search creatives by advertiser or domain. One of `advertiser_id` or `query` is
+required.
+
+**Credits:** 10
+
+<Warning>
+  Free-text `query` is **domain-based** — it matches verified advertiser domains
+  like `nike.com`, not brand names. For a brand name, resolve it first with
+  [`/ads/advertisers`](/api-reference/endpoint/google-ads-transparency/search-advertisers)
+  and pass the resulting `advertiser_id`.
+</Warning>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="advertiser_id" type="string">
+  Advertiser ID as shown in the Transparency Center URL, e.g.
+  `AR01614014350098432001`. Required unless `query` is given.
+</ParamField>
+
+<ParamField query="query" type="string">
+  Free text — a verified advertiser domain such as `tesla.com`. Required unless
+  `advertiser_id` is given.
+</ParamField>
+
+<ParamField query="region" type="string" default="US">
+  ISO 3166-1 alpha-2 region the ad was served in, or `anywhere` for no region
+  filter.
+</ParamField>
+
+<ParamField query="platform" type="string">
+  Surface the ad ran on: `SEARCH`, `MAPS`, `PLAY`, `SHOPPING` or `YOUTUBE`.
+  **Validated but not applied** — see `filters_applied.platform`.
+</ParamField>
+
+<ParamField query="format" type="string">
+  Creative format: `TEXT`, `IMAGE` or `VIDEO`. Applied over the returned page.
+</ParamField>
+
+<ParamField query="start_date" type="string">
+  `YYYY-MM-DD`. Keeps creatives still running on or after this date.
+</ParamField>
+
+<ParamField query="end_date" type="string">
+  `YYYY-MM-DD`. Keeps creatives first shown on or before this date.
+</ParamField>
+
+<ParamField query="political" type="boolean" default="false">
+  Restrict to political ads. **Validated but not applied** — see
+  `filters_applied.political`.
+</ParamField>
+
+<ParamField query="num" type="integer" default="40">
+  Results per page, `1`–`100`.
+</ParamField>
+
+<ParamField query="cursor" type="string">
+  `next_page_token` from a previous response.
+</ParamField>
+
+## Response
+
+<ResponseField name="region" type="string">The region requested.</ResponseField>
+<ResponseField name="total_results" type="integer">
+  Google's reported total for the advertiser or domain, when it sends one.
+</ResponseField>
+<ResponseField name="returned_results" type="integer">
+  Creatives in this response **after** the format and date filters — can be
+  smaller than `num` while `next_page_token` is still set.
+</ResponseField>
+<ResponseField name="next_page_token" type="string">Pass as `cursor` for the next page. `null` on the last page.</ResponseField>
+<ResponseField name="filters_applied" type="AppliedFilters">
+  Which filters were honoured: `region`, `advertiser_id`, `query`, `format`,
+  `date_range`, `platform`, `political`. `platform` and `political` are always
+  `false`.
+</ResponseField>
+<ResponseField name="creatives" type="AdCreative[]">
+  <Expandable title="AdCreative">
+    <ResponseField name="creative_id" type="string">e.g. `CR10484731423840108545`.</ResponseField>
+    <ResponseField name="advertiser_id" type="string" />
+    <ResponseField name="advertiser_name" type="string" />
+    <ResponseField name="target_domain" type="string">The advertiser's verified domain.</ResponseField>
+    <ResponseField name="format" type="string">`TEXT`, `IMAGE` or `VIDEO`.</ResponseField>
+    <ResponseField name="media_url" type="string">Image or video asset, for image and video creatives.</ResponseField>
+    <ResponseField name="preview_html" type="string">Google's rendered preview markup.</ResponseField>
+    <ResponseField name="first_shown_utc" type="integer" />
+    <ResponseField name="first_shown_at" type="string">ISO 8601 UTC.</ResponseField>
+    <ResponseField name="last_shown_utc" type="integer" />
+    <ResponseField name="last_shown_at" type="string" />
+    <ResponseField name="days_shown" type="integer" />
+    <ResponseField name="details_link" type="string">The Transparency Center page for this creative.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/google/ads/search?advertiser_id=AR01614014350098432001&region=US&format=VIDEO&num=40" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/google/ads/search?" +
+    new URLSearchParams({
+      advertiser_id: "AR01614014350098432001",
+      region: "US",
+      format: "VIDEO",
+      num: "40",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/google/ads/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "advertiser_id": "AR01614014350098432001",
+        "region": "US",
+        "format": "VIDEO",
+        "num": 40,
+    },
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "region": "US",
+  "total_results": 1284,
+  "returned_results": 2,
+  "next_page_token": "CkgKRkFSMDE2MTQwMTQzNTAwOTg0MzIwMDEQZBgB",
+  "filters_applied": {
+    "region": true,
+    "advertiser_id": true,
+    "query": false,
+    "format": true,
+    "date_range": false,
+    "platform": false,
+    "political": false
+  },
+  "creatives": [
+    {
+      "creative_id": "CR10484731423840108545",
+      "advertiser_id": "AR01614014350098432001",
+      "advertiser_name": "Nike, Inc.",
+      "target_domain": "nike.com",
+      "format": "VIDEO",
+      "media_url": "https://www.youtube.com/embed/dQw4w9WgXcQ",
+      "preview_html": "<iframe src=\"https://www.youtube.com/embed/dQw4w9WgXcQ\"></iframe>",
+      "first_shown_utc": 1749513600,
+      "first_shown_at": "2026-06-10T00:00:00Z",
+      "last_shown_utc": 1754870400,
+      "last_shown_at": "2026-08-11T00:00:00Z",
+      "days_shown": 63,
+      "details_link": "https://adstransparency.google.com/advertiser/AR01614014350098432001/creative/CR10484731423840108545"
+    },
+    {
+      "creative_id": "CR17738822901234567890",
+      "advertiser_id": "AR01614014350098432001",
+      "advertiser_name": "Nike, Inc.",
+      "target_domain": "nike.com",
+      "format": "VIDEO",
+      "media_url": "https://www.youtube.com/embed/abc123XYZ",
+      "first_shown_utc": 1752105600,
+      "first_shown_at": "2026-07-10T00:00:00Z",
+      "last_shown_utc": 1754784000,
+      "last_shown_at": "2026-08-10T00:00:00Z",
+      "days_shown": 32,
+      "details_link": "https://adstransparency.google.com/advertiser/AR01614014350098432001/creative/CR17738822901234567890"
+    }
+  ]
+}
+```
+
+<Note>
+  The date window matches on **overlap**, not on start: a creative shown
+  2026-01-01 to 2026-06-01 matches a March query, because callers ask "what was
+  running then", not "what started then".
+</Note>
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `400` | Neither `advertiser_id` nor `query` given; unknown `platform`, `format`, region or date. |
+| `502` | Upstream Transparency Center failure — **not billed**. |

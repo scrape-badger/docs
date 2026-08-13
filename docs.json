@@ -655,6 +655,69 @@
         ]
       },
       {
+        "tab": "Google Play",
+        "groups": [
+          {
+            "group": "Google Play API",
+            "pages": ["google-play/overview"]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api-reference/endpoint/google-play/search",
+              "api-reference/endpoint/google-play/get-app",
+              "api-reference/endpoint/google-play/get-reviews",
+              "api-reference/endpoint/google-play/get-permissions",
+              "api-reference/endpoint/google-play/get-similar",
+              "api-reference/endpoint/google-play/get-developer",
+              "api-reference/endpoint/google-play/browse-category",
+              "api-reference/endpoint/google-play/get-collection",
+              "api-reference/endpoint/google-play/list-categories",
+              "api-reference/endpoint/google-play/list-markets"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "App Store",
+        "groups": [
+          {
+            "group": "Apple App Store API",
+            "pages": ["app-store/overview"]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api-reference/endpoint/app-store/search",
+              "api-reference/endpoint/app-store/get-app",
+              "api-reference/endpoint/app-store/get-reviews",
+              "api-reference/endpoint/app-store/get-developer",
+              "api-reference/endpoint/app-store/charts",
+              "api-reference/endpoint/app-store/list-genres",
+              "api-reference/endpoint/app-store/list-markets"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Ads Transparency",
+        "groups": [
+          {
+            "group": "Google Ads Transparency API",
+            "pages": ["google-ads-transparency/overview"]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api-reference/endpoint/google-ads-transparency/search-ads",
+              "api-reference/endpoint/google-ads-transparency/get-creative",
+              "api-reference/endpoint/google-ads-transparency/search-advertisers",
+              "api-reference/endpoint/google-ads-transparency/get-advertiser"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Leboncoin",
         "groups": [
           {

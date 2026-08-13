@@ -1,0 +1,139 @@
+---
+title: "Top Charts"
+api: "GET https://scrapebadger.com/v1/app-store/charts"
+description: "App Store top-free, top-paid and top-grossing charts for a storefront, optionally scoped to one genre."
+---
+
+Top charts for a storefront, for iPhone or iPad, optionally scoped to a single
+genre. `rank` is the app's position in the feed — Apple sends no explicit rank
+field.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="country" type="string" default="us">
+  Storefront code, lowercase ISO 3166-1 alpha-2. See
+  [`/markets`](/api-reference/endpoint/app-store/list-markets).
+</ParamField>
+
+<ParamField query="type" type="string" default="top-free">
+  `top-free`, `top-paid` or `top-grossing`.
+</ParamField>
+
+<ParamField query="genre" type="integer">
+  Genre id to scope the chart, e.g. `6014` (Games). Omit for the overall chart.
+  Only ids from [`/genres`](/api-reference/endpoint/app-store/list-genres) are
+  accepted — every one of them is verified to return a non-empty chart.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="50">
+  Entries to return, `1`–`200`.
+</ParamField>
+
+<ParamField query="entity" type="string" default="apps">
+  `apps` (iPhone) or `ipad`.
+</ParamField>
+
+## Response
+
+<ResponseField name="country" type="string" />
+<ResponseField name="type" type="string">The chart type returned.</ResponseField>
+<ResponseField name="entity" type="string">`apps` or `ipad`.</ResponseField>
+<ResponseField name="genre_id" type="integer">The genre scope, or `null` for the overall chart.</ResponseField>
+<ResponseField name="result_count" type="integer">Entries returned.</ResponseField>
+<ResponseField name="apps" type="ChartEntry[]">
+  <Expandable title="ChartEntry">
+    <ResponseField name="rank" type="integer">1-based chart position.</ResponseField>
+    <ResponseField name="app_id" type="integer" />
+    <ResponseField name="name" type="string" />
+    <ResponseField name="url" type="string" />
+    <ResponseField name="developer_name" type="string" />
+    <ResponseField name="developer_url" type="string" />
+    <ResponseField name="icon_url" type="string" />
+    <ResponseField name="price" type="number" />
+    <ResponseField name="currency" type="string" />
+    <ResponseField name="formatted_price" type="string" />
+    <ResponseField name="genre" type="string" />
+    <ResponseField name="genre_id" type="integer" />
+    <ResponseField name="summary" type="string" />
+    <ResponseField name="rights" type="string">Copyright line, when Apple sends one.</ResponseField>
+    <ResponseField name="release_date_utc" type="number" />
+    <ResponseField name="release_date_at" type="string" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/app-store/charts?country=us&type=top-free&genre=6014&limit=50" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/app-store/charts?" +
+    new URLSearchParams({ country: "us", type: "top-grossing", limit: "50" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { apps } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/app-store/charts",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"country": "us", "type": "top-free", "genre": 6014, "limit": 50},
+)
+chart = res.json()["apps"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "country": "us",
+  "type": "top-free",
+  "entity": "apps",
+  "genre_id": 6014,
+  "result_count": 50,
+  "apps": [
+    {
+      "rank": 1,
+      "app_id": 1544098059,
+      "name": "Block Blast!",
+      "url": "https://apps.apple.com/us/app/block-blast/id1544098059",
+      "developer_name": "Hungry Studio",
+      "developer_url": "https://apps.apple.com/us/developer/hungry-studio/id1543997352",
+      "icon_url": "https://is1-ssl.mzstatic.com/image/thumb/blockblast/100x100bb.png",
+      "price": 0.0,
+      "currency": "USD",
+      "formatted_price": "Free",
+      "genre": "Games",
+      "genre_id": 6014,
+      "summary": "A classic block puzzle game that is easy to learn.",
+      "rights": "© 2026 Hungry Studio",
+      "release_date_utc": 1610236800.0,
+      "release_date_at": "2021-01-10T00:00:00Z"
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `400` | Unknown chart type, entity, genre id, or malformed country. |
+| `429` | Apple is throttling — retry shortly. |
+| `502` | Unexpected upstream failure — **not billed**. |

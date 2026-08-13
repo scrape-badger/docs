@@ -1,0 +1,121 @@
+---
+title: "Get Developer Apps"
+api: "GET https://scrapebadger.com/v1/google-play/developers/{developer}"
+description: "A Google Play developer's published apps, by numeric developer id or display name."
+---
+
+A developer's published apps. Play serves developer pages on two different
+paths and picks by id type — `/store/apps/dev` for the numeric id,
+`/store/apps/developer` for the display name — so this route chooses the path
+from the id shape rather than making you know which one you hold.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="developer" type="string" required>
+  Either the numeric id from an app's `developer.developer_id`
+  (e.g. `5700313618786177705`) or the display name from `developer.name`
+  (e.g. `WhatsApp LLC`). URL-encode names containing spaces.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="country" type="string" default="US">
+  Play storefront (`gl`).
+</ParamField>
+
+<ParamField query="lang" type="string" default="en">
+  Play content language (`hl`).
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">The developer id or name requested.</ResponseField>
+<ResponseField name="url" type="string">The Play URL the catalogue was read from.</ResponseField>
+<ResponseField name="result_count" type="integer">Apps returned.</ResponseField>
+<ResponseField name="apps" type="AppCard[]">
+  The developer's apps — same shape as
+  [search results](/api-reference/endpoint/google-play/search).
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/google-play/developers/5700313618786177705?country=US" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/google-play/developers/" +
+    encodeURIComponent("WhatsApp LLC") +
+    "?country=US",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { apps } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/google-play/developers/5700313618786177705",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"country": "US"},
+)
+apps = res.json()["apps"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "5700313618786177705",
+  "url": "https://play.google.com/store/apps/dev?id=5700313618786177705&hl=en&gl=US",
+  "result_count": 3,
+  "apps": [
+    {
+      "app_id": "com.whatsapp",
+      "title": "WhatsApp Messenger",
+      "developer": "WhatsApp LLC",
+      "score": 4.3,
+      "installs": "10,000,000,000+",
+      "genre": "Communication",
+      "price": { "price": 0.0, "currency": "USD", "price_text": "Free", "is_free": true },
+      "url": "https://play.google.com/store/apps/details?id=com.whatsapp"
+    },
+    {
+      "app_id": "com.whatsapp.w4b",
+      "title": "WhatsApp Business",
+      "developer": "WhatsApp LLC",
+      "score": 4.2,
+      "installs": "500,000,000+",
+      "genre": "Business",
+      "price": { "price": 0.0, "currency": "USD", "price_text": "Free", "is_free": true },
+      "url": "https://play.google.com/store/apps/details?id=com.whatsapp.w4b"
+    }
+  ]
+}
+```
+
+<Warning>
+  Play server-renders only the first rail of a large catalogue — around 10 apps
+  for a publisher with dozens. The rest load on scroll behind a cluster RPC
+  Google has closed off, so they are not reachable.
+</Warning>
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | No apps for that developer in the storefront — usually a wrong id form. |
+| `422` | Play returned no usable data — **not billed**. Retry. |

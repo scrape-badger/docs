@@ -1,0 +1,141 @@
+---
+title: "Google Play API Overview"
+description: "Turn the Google Play Store into JSON — app detail with the full ratings histogram, install bands, IAP range, the Data Safety declaration and permission tree, plus search, reviews, similar apps, developer catalogues and category browse across 47 storefronts."
+---
+
+## Overview
+
+The ScrapeBadger **Google Play API** reads `play.google.com` server-side and
+returns clean JSON: full app detail (ratings histogram, install bands, pricing
+and in-app-purchase range, developer legal entity, screenshots, version and
+what's-new), keyword search, paginated reviews with developer replies, the
+Android permission tree, the similar-apps rail, a developer's catalogue and
+category browse.
+
+<Info>
+  All endpoints are `GET`, live under `https://scrapebadger.com/v1/google-play/*`,
+  and authenticate with the `X-API-Key` header. Credits are charged per request
+  (see the table below) and reported on the `X-Credits-Used` response header.
+</Info>
+
+## Features
+
+- **App detail in one call** — `score`, `ratings`, `reviews`, the 1–5 star
+  `histogram`, `installs` with `min_installs`/`max_installs` bands, `price`
+  plus `offers_iap` and `iap_range`, `contains_ads`, genre, content rating,
+  media, `version`, `android_version`, `recent_changes` (what's new), the
+  `data_safety` declaration, the `permissions` tree and the similar-apps rail.
+- **Reviews** — Play's own review RPC, up to 150 per page, sorted by
+  `newest`, `rating` or `helpfulness`, with developer replies and both
+  timestamp forms.
+- **Permissions** — every Android permission the app declares, grouped as Play
+  groups them, for 3 credits.
+- **Discovery** — `/search`, `/apps/{id}/similar`, `/developers/{id}` and
+  `/categories/{id}` all return the same rich `AppCard` shape, so a list result
+  rarely needs a follow-up detail fetch just to rank or filter.
+- **Dual timestamps** — every date ships twice: `*_utc` (Unix seconds, for
+  maths) and `*_at` (ISO 8601 UTC, for humans).
+
+## Markets and languages
+
+Play is one global host, so storefront and language are **independent**:
+
+- `country` sets the `gl` storefront — pricing, availability and ranking.
+- `lang` sets the `hl` content language — description, what's-new and reviews.
+
+[`GET /v1/google-play/markets`](/api-reference/endpoint/google-play/list-markets)
+(free) returns the 47 supported storefront countries and 31 content languages.
+[`GET /v1/google-play/categories`](/api-reference/endpoint/google-play/list-categories)
+(free) returns the 60 category ids that `/categories/{id}` accepts.
+
+## Credits
+
+| Endpoint | Path | Credits |
+| -------- | ---- | ------- |
+| Search apps | `GET /v1/google-play/search` | 5 |
+| App detail | `GET /v1/google-play/apps/{app_id}` | 5 |
+| App reviews | `GET /v1/google-play/apps/{app_id}/reviews` | 5 |
+| App permissions | `GET /v1/google-play/apps/{app_id}/permissions` | 3 |
+| Similar apps | `GET /v1/google-play/apps/{app_id}/similar` | 5 |
+| Developer apps | `GET /v1/google-play/developers/{developer}` | 5 |
+| Browse category | `GET /v1/google-play/categories/{category_id}` | 5 |
+| Top charts | `GET /v1/google-play/collections/{collection}` | 5 |
+| List categories | `GET /v1/google-play/categories` | 0 |
+| List markets | `GET /v1/google-play/markets` | 0 |
+
+## Quickstart
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/google-play/apps/com.whatsapp?country=US&lang=en" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/google-play/apps/com.whatsapp?" +
+    new URLSearchParams({ country: "US", lang: "en" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const app = await res.json();
+console.log(app.title, app.score, app.installs);
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/google-play/apps/com.whatsapp",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"country": "US", "lang": "en"},
+)
+app = res.json()
+print(app["title"], app["score"], app["installs"])
+```
+
+</CodeGroup>
+
+## Top charts
+
+<Warning>
+  **`/collections/{collection}` returns `422`.** Google no longer
+  server-renders the top-chart ranking — the category page carries the chart
+  *tabs* but their item list is filled in client-side, so no server-side
+  ranking exists to read. The endpoint answers `422` (which is **not billed**)
+  with a message saying so, rather than quietly returning the page's editorial
+  rails as if they were a chart.
+
+  Use
+  [`/categories/{category_id}`](/api-reference/endpoint/google-play/browse-category)
+  for a category's apps in Play's own order.
+</Warning>
+
+## Result depth
+
+- **`/search`** returns the ~30 results Play renders server-side. There is no
+  `page` parameter: Play's search has no page number, and its infinite-scroll
+  continuation is a cluster RPC Google no longer accepts from outside its own
+  client. Widen a result set with `/apps/{id}/similar` and `/developers/{id}`.
+- **`/developers/{developer}`** returns the first rail Play renders — around
+  10 apps for a publisher with dozens.
+- **`/categories/{category_id}`** returns every app across all of the category
+  page's editorial rails, deduped — around 100 apps for a broad category.
+- **`/apps/{id}/similar`** returns the detail page's rail, capped by Play at
+  roughly a dozen; `similar_apps_url` on the detail response is the "see more"
+  cluster page.
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `400` | Unknown collection id. |
+| `404` | The app, developer or category does not exist in that storefront. |
+| `422` | Play returned no usable data (challenge, or a client-rendered chart) — **not billed**. |
+| `502` | Unexpected upstream failure — **not billed**. |
+
+<Tip>
+  App detail already carries the permission tree, the Data Safety card and the
+  similar-apps rail — the sibling routes are only needed when you want *more*
+  reviews, a standalone permissions call, or the full similar-apps cluster.
+</Tip>
