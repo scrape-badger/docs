@@ -220,6 +220,16 @@
             ]
           },
           {
+            "group": "Ads Transparency",
+            "pages": [
+              "google-ads-transparency/overview",
+              "api-reference/endpoint/google-ads-transparency/search-ads",
+              "api-reference/endpoint/google-ads-transparency/get-creative",
+              "api-reference/endpoint/google-ads-transparency/search-advertisers",
+              "api-reference/endpoint/google-ads-transparency/get-advertiser"
+            ]
+          },
+          {
             "group": "Autocomplete",
             "pages": [
               "api-reference/google/google-autocomplete/google-search-suggestions"
@@ -695,24 +705,6 @@
               "api-reference/endpoint/app-store/charts",
               "api-reference/endpoint/app-store/list-genres",
               "api-reference/endpoint/app-store/list-markets"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Ads Transparency",
-        "groups": [
-          {
-            "group": "Google Ads Transparency API",
-            "pages": ["google-ads-transparency/overview"]
-          },
-          {
-            "group": "Endpoints",
-            "pages": [
-              "api-reference/endpoint/google-ads-transparency/search-ads",
-              "api-reference/endpoint/google-ads-transparency/get-creative",
-              "api-reference/endpoint/google-ads-transparency/search-advertisers",
-              "api-reference/endpoint/google-ads-transparency/get-advertiser"
             ]
           }
         ]
