@@ -52,6 +52,12 @@ look one up directly by its archive id.
   result.
 </ParamField>
 
+<ParamField query="country" type="string" default="US">
+  ISO 3166-1 alpha-2 country code for the lookup. Pass an EU/UK code (e.g.
+  `DE`, `FR`, `GB`) to get the `transparency` object with EU DSA reach and
+  demographic data.
+</ParamField>
+
 ## Response
 
 <ResponseField name="ads" type="AdLibraryAd[]">
@@ -63,6 +69,17 @@ look one up directly by its archive id.
   (`FACEBOOK`, `INSTAGRAM`, `MESSENGER`, `AUDIENCE_NETWORK`), `images[]`,
   `videos[]`, `cta_text` (button label) and `cta_type` (Facebook's CTA enum,
   e.g. `SHOP_NOW`, `LEARN_MORE`, `SIGN_UP`).
+</ResponseField>
+<ResponseField name="ads[].transparency" type="AdTransparency">
+  Lookup endpoint only, when `country` is an EU/UK market or the ad targets
+  the EU. Carries `payer_beneficiary[]` (`{payer, beneficiary}` pairs),
+  `targets_eu`, `has_violating_payer_beneficiary`, `is_ad_taken_down`,
+  `is_violating_eu_siep` and `eu_transparency` — the DSA disclosure:
+  `eu_total_reach`, `gender_audience`, `age_audience_min` /
+  `age_audience_max`, `location_audience[]` (`{name, type, excluded,
+  num_obfuscated}`) and `age_country_gender_reach_breakdown[]` (per-country
+  `age_gender_breakdowns[]` with `age_range`, `male`, `female`, `unknown`
+  reach).
 </ResponseField>
 <ResponseField name="count" type="integer">Number of ads in this page.</ResponseField>
 <ResponseField name="end_cursor" type="string">Pass as `after` for the next page. Search only.</ResponseField>
@@ -137,8 +154,60 @@ data = res.json()
 }
 ```
 
+## Example — EU transparency
+
+Look an ad up with an EU `country` to get the DSA `transparency` block:
+
+```bash cURL
+curl "https://scrapebadger.com/v1/facebook/ads/1284772093418206?country=DE" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```json Response (transparency excerpt)
+{
+  "ads": [
+    {
+      "ad_archive_id": "1284772093418206",
+      "page_name": "Nike",
+      "transparency": {
+        "payer_beneficiary": [
+          { "payer": "Nike Retail B.V.", "beneficiary": "Nike Retail B.V." }
+        ],
+        "targets_eu": true,
+        "has_violating_payer_beneficiary": false,
+        "is_ad_taken_down": false,
+        "is_violating_eu_siep": false,
+        "eu_transparency": {
+          "targets_eu": true,
+          "eu_total_reach": 1834920,
+          "gender_audience": "All",
+          "age_audience_min": 18,
+          "age_audience_max": 65,
+          "location_audience": [
+            { "name": "Germany", "type": "country", "excluded": false, "num_obfuscated": 0 }
+          ],
+          "age_country_gender_reach_breakdown": [
+            {
+              "country": "DE",
+              "age_gender_breakdowns": [
+                { "age_range": "18-24", "male": 141203, "female": 152884, "unknown": 4102 },
+                { "age_range": "25-34", "male": 289441, "female": 301276, "unknown": 8817 }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "count": 1,
+  "query": "1284772093418206"
+}
+```
+
 <Tip>
   The Ad Library is country-partitioned. To size a competitor's full spend
   footprint, sweep `country` across the markets you care about rather than
-  paginating a single one deeper.
+  paginating a single one deeper. On the lookup endpoint, an EU `country`
+  additionally unlocks the DSA `transparency` block — reach, demographics and
+  payer/beneficiary — even for ads you first found via a `US` search.
 </Tip>

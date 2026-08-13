@@ -1068,7 +1068,8 @@
               "api-reference/endpoint/facebook/get-group",
               "api-reference/endpoint/facebook/get-post",
               "api-reference/endpoint/facebook/get-post-comments",
-              "api-reference/endpoint/facebook/ads-search"
+              "api-reference/endpoint/facebook/ads-search",
+              "api-reference/endpoint/facebook/ad-pages"
             ]
           }
         ]

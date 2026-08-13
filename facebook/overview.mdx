@@ -58,7 +58,9 @@ detail, Group metadata and feeds, post and comment threads, and the public
   author, reactions and reply counts.
 - **Ad Library** — competitive-intelligence search over Facebook's public ad
   archive: creative copy, snapshot URL, flight dates, `publisher_platforms[]`,
-  images/videos and the CTA.
+  images/videos and the CTA — plus advertiser Page search, Page transparency
+  info (owner, admin countries, history, political ad spend) and EU DSA
+  transparency (reach and demographics) on ad lookups with an EU `country`.
 
 ## Markets
 
@@ -90,6 +92,8 @@ need no market parameter.
 | Post comments | `GET /v1/facebook/posts/{post_id}/comments` | 10 |
 | Ad Library search | `GET /v1/facebook/ads/search` | 5 |
 | Get ad | `GET /v1/facebook/ads/{ad_archive_id}` | 5 |
+| Ad Library page search | `GET /v1/facebook/ads/pages/search` | 5 |
+| Ad Library page info | `GET /v1/facebook/ads/pages/{page_id}` | 5 |
 
 ## Quickstart
 
