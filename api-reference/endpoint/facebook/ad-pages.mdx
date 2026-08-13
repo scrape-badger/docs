@@ -1,0 +1,198 @@
+---
+title: "Ad Library Pages"
+api: "GET https://scrapebadger.com/v1/facebook/ads/pages/search"
+description: "Find advertiser Pages in Facebook's Ad Library and pull their transparency profile — likes, verification, Instagram handle, admin locations, page history and political ad spend."
+---
+
+Search for **advertiser Pages** in Facebook's Ad Library (the same typeahead
+the Library UI uses), then pull a Page's full **transparency profile** —
+ownership, admin country breakdown, creation/rename history, related Pages
+and, for political/issue advertisers, ad spend.
+
+| Endpoint | Returns |
+| -------- | ------- |
+| `GET /v1/facebook/ads/pages/search` | advertiser Page typeahead search |
+| `GET /v1/facebook/ads/pages/{page_id}` | one Page's info, transparency and ad spend |
+
+**Credits:** 5 (each)
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters — `/ads/pages/search`
+
+<ParamField query="query" type="string" required>
+  Advertiser name to search for.
+</ParamField>
+
+<ParamField query="country" type="string" default="US">
+  ISO 3166-1 alpha-2 country code. The Ad Library is partitioned by country.
+</ParamField>
+
+## Path Parameters — `/ads/pages/{page_id}`
+
+<ParamField path="page_id" type="string" required>
+  The numeric Page id, as returned in `page_id` on any search result.
+</ParamField>
+
+<ParamField query="country" type="string" default="US">
+  ISO 3166-1 alpha-2 country code.
+</ParamField>
+
+## Response — `/ads/pages/search`
+
+<ResponseField name="pages" type="AdLibraryPageResult[]">
+  Each result includes `page_id`, `name`, `page_alias`, `category`, `likes`,
+  `verification` (e.g. `BLUE_VERIFIED`), `entity_type` (e.g.
+  `PERSON_PROFILE`), `country`, `ig_username`, `ig_followers`,
+  `ig_verification`, `image_uri` and `page_is_deleted`.
+</ResponseField>
+<ResponseField name="keyword_suggestions" type="string[]">
+  Related search keywords the Ad Library suggests for the query.
+</ResponseField>
+<ResponseField name="count" type="integer">Number of pages returned.</ResponseField>
+<ResponseField name="query" type="string">Echoes the query.</ResponseField>
+
+## Response — `/ads/pages/{page_id}`
+
+<ResponseField name="page_id" type="string">Numeric Page id.</ResponseField>
+<ResponseField name="page_name" type="string">Page display name.</ResponseField>
+<ResponseField name="page_alias" type="string">Vanity handle (e.g. `nike`).</ResponseField>
+<ResponseField name="page_category" type="string">Facebook Page category.</ResponseField>
+<ResponseField name="entity_type" type="string">Ad Library entity type.</ResponseField>
+<ResponseField name="likes" type="integer">Page like count.</ResponseField>
+<ResponseField name="verification" type="string">Verification badge, e.g. `BLUE_VERIFIED`.</ResponseField>
+<ResponseField name="profile_photo" type="string">Profile photo URL.</ResponseField>
+<ResponseField name="about" type="string">The Page's about blurb.</ResponseField>
+<ResponseField name="page_is_deleted" type="boolean">Whether the Page has been deleted.</ResponseField>
+<ResponseField name="hidden_ads" type="boolean">Whether the Page has ads hidden from the Library.</ResponseField>
+<ResponseField name="ig_username" type="string">Linked Instagram username.</ResponseField>
+<ResponseField name="ig_followers" type="integer">Instagram follower count.</ResponseField>
+<ResponseField name="ig_verification" type="boolean">Whether the Instagram account is verified.</ResponseField>
+<ResponseField name="page_creation_utc" type="float">Page creation time, Unix seconds.</ResponseField>
+<ResponseField name="page_created_at" type="string">Page creation time, ISO 8601.</ResponseField>
+<ResponseField name="owner" type="object">
+  Confirmed Page owner: `id`, `name`, `phone_number` and `address` (`city`,
+  `state`, `postal_code`, `country`).
+</ResponseField>
+<ResponseField name="admin_country_counts" type="object[]">
+  Where the Page's admins are located — `{country, country_id, count}` per
+  country.
+</ResponseField>
+<ResponseField name="history" type="object[]">
+  Page transparency history — `{item_type, event_time_utc, event_at}` where
+  `item_type` is `CREATION` or `NAME_CHANGE`.
+</ResponseField>
+<ResponseField name="state_media_country_label" type="string">
+  State-controlled-media label, if Facebook applies one.
+</ResponseField>
+<ResponseField name="related_pages" type="object[]">
+  Pages the Library links to this one — `{page_id, page_name, country,
+  country_name, category_name, page_verification, profile_image_uri}`.
+</ResponseField>
+<ResponseField name="ad_spend" type="object">
+  Political/issue ad spend: `current_week`, `lifetime_by_disclaimer[]` and
+  `weekly_by_disclaimer[]`. Populated only for political/issue advertisers —
+  commercial advertisers return empty spend.
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/facebook/ads/pages/search?query=Nike&country=US" \
+  -H "X-API-Key: YOUR_API_KEY"
+
+curl "https://scrapebadger.com/v1/facebook/ads/pages/15087023444?country=US" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/facebook/ads/pages/15087023444?country=US",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const page = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/facebook/ads/pages/15087023444",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"country": "US"},
+)
+page = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "page_id": "15087023444",
+  "page_name": "Nike",
+  "page_alias": "nike",
+  "page_category": "Sportswear Store",
+  "entity_type": "BUSINESS",
+  "likes": 39571076,
+  "verification": "BLUE_VERIFIED",
+  "profile_photo": "https://scontent.xx.fbcdn.net/v/t39.30808-1/nike_profile.jpg",
+  "about": "Just Do It.",
+  "page_is_deleted": false,
+  "hidden_ads": false,
+  "ig_username": "nike",
+  "ig_followers": 302514886,
+  "ig_verification": true,
+  "page_creation_utc": 1211328000.0,
+  "page_created_at": "2008-05-21T00:00:00Z",
+  "owner": {
+    "id": "115941125123456",
+    "name": "NIKE, Inc.",
+    "phone_number": "+1 503-671-6453",
+    "address": {
+      "city": "Beaverton",
+      "state": "OR",
+      "postal_code": "97005",
+      "country": "US"
+    }
+  },
+  "admin_country_counts": [
+    { "country": "United States", "country_id": "US", "count": 105 },
+    { "country": "India", "country_id": "IN", "count": 31 }
+  ],
+  "history": [
+    { "item_type": "CREATION", "event_time_utc": 1211328000.0, "event_at": "2008-05-21T00:00:00Z" },
+    { "item_type": "NAME_CHANGE", "event_time_utc": 1367539200.0, "event_at": "2013-05-03T00:00:00Z" }
+  ],
+  "state_media_country_label": null,
+  "related_pages": [
+    {
+      "page_id": "24714361749",
+      "page_name": "Nike Football",
+      "country": "US",
+      "country_name": "United States",
+      "category_name": "Sportswear Store",
+      "page_verification": "BLUE_VERIFIED",
+      "profile_image_uri": "https://scontent.xx.fbcdn.net/v/t39.30808-1/nike_football.jpg"
+    }
+  ],
+  "ad_spend": {
+    "current_week": null,
+    "lifetime_by_disclaimer": [],
+    "weekly_by_disclaimer": []
+  }
+}
+```
+
+<Tip>
+  `ad_spend` is populated only for political and issue advertisers — Facebook
+  publishes spend for those, but not for commercial Pages like Nike, which
+  return empty spend. Pair `/ads/pages/search` with
+  [`/ads/search`](/api-reference/endpoint/facebook/ads-search) to go from an
+  advertiser name to their full creative inventory.
+</Tip>
