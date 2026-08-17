@@ -1,0 +1,353 @@
+---
+title: "Get Property Detail"
+api: "GET https://scrapebadger.com/v1/booking/properties/{country_code}/{slug}"
+description: "Full Booking.com property detail — description, address, GPS, score breakdown, facilities, room types, house rules, photos and guest Q&A."
+---
+
+Fetch a single property's complete detail. The two path parameters are the two
+segments of a Booking hotel URL:
+
+```
+https://www.booking.com/hotel/it/radisson-collection-roma-antica.html
+                              ^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        country_code                            slug
+```
+
+Both also come back on every
+[`/search`](/api-reference/endpoint/booking/search) result as `country_code`
+and `slug`.
+
+## Path Parameters
+
+<ParamField path="country_code" type="string" required>
+  ISO country code from the property URL, e.g. `it`.
+</ParamField>
+
+<ParamField path="slug" type="string" required>
+  Property slug from the property URL, e.g. `radisson-collection-roma-antica`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="photos" type="integer" default="40">
+  Photos to return. Maximum `100`.
+</ParamField>
+
+<ParamField query="questions" type="integer" default="10">
+  Guest Q&A pairs to return. Maximum `50`.
+</ParamField>
+
+<ParamField query="language" type="string" default="en-us">
+  Locale for text, e.g. `fr`, `de`.
+</ParamField>
+
+## Response
+
+<ResponseField name="property_id" type="string">Booking property id.</ResponseField>
+<ResponseField name="name" type="string">Property name.</ResponseField>
+<ResponseField name="slug" type="string">Echo of the requested slug.</ResponseField>
+<ResponseField name="url" type="string">Canonical property URL on booking.com.</ResponseField>
+<ResponseField name="accommodation_type" type="string">e.g. `Hotel`, `Apartment`.</ResponseField>
+<ResponseField name="accommodation_type_id" type="integer">Booking accommodation type id.</ResponseField>
+<ResponseField name="star_rating" type="number">Stars, e.g. `5`.</ResponseField>
+<ResponseField name="star_rating_symbol" type="string">How the rating is denoted, e.g. `stars`.</ResponseField>
+<ResponseField name="description" type="string">Full property description.</ResponseField>
+<ResponseField name="summary" type="string">Short summary line.</ResponseField>
+<ResponseField name="fine_print" type="string">Booking's "the fine print" notice, or `null`.</ResponseField>
+<ResponseField name="address" type="string">Street address.</ResponseField>
+<ResponseField name="formatted_address" type="string">Full single-line address.</ResponseField>
+<ResponseField name="city" type="string" />
+<ResponseField name="district" type="string">Neighbourhood, or `null`.</ResponseField>
+<ResponseField name="country" type="string" />
+<ResponseField name="country_code" type="string" />
+<ResponseField name="latitude" type="number" />
+<ResponseField name="longitude" type="number" />
+<ResponseField name="ufi" type="integer">Booking's internal city identifier.</ResponseField>
+<ResponseField name="is_city_centre" type="boolean" />
+<ResponseField name="is_old_town" type="boolean" />
+<ResponseField name="review_score" type="number">Overall score out of 10.</ResponseField>
+<ResponseField name="review_count" type="integer">Number of reviews.</ResponseField>
+<ResponseField name="score_breakdown" type="object">
+  Sub-scores keyed by category.
+
+  <Expandable title="score_breakdown">
+    <ResponseField name="hotel_staff" type="number" />
+    <ResponseField name="hotel_clean" type="number" />
+    <ResponseField name="hotel_comfort" type="number" />
+    <ResponseField name="hotel_value" type="number" />
+    <ResponseField name="hotel_location" type="number" />
+    <ResponseField name="hotel_free_wifi" type="number" />
+  </Expandable>
+</ResponseField>
+<ResponseField name="currency" type="string">Property's own currency.</ResponseField>
+<ResponseField name="languages_spoken" type="string[]">Languages spoken at reception.</ResponseField>
+<ResponseField name="meal_plans" type="string[]">Meal plans offered, e.g. `Breakfast`.</ResponseField>
+<ResponseField name="house_rules" type="object">
+  <Expandable title="house_rules">
+    <ResponseField name="checkin_from" type="string">e.g. `15:00`.</ResponseField>
+    <ResponseField name="checkin_until" type="string" />
+    <ResponseField name="checkout_from" type="string" />
+    <ResponseField name="checkout_until" type="string" />
+    <ResponseField name="min_checkin_age" type="integer">Minimum age to check in, or `null`.</ResponseField>
+    <ResponseField name="age_restriction" type="string">Age restriction note, or `null`.</ResponseField>
+    <ResponseField name="group_limit" type="integer">Maximum guests in one booking, or `null`.</ResponseField>
+    <ResponseField name="smoking" type="boolean">Smoking permitted.</ResponseField>
+    <ResponseField name="quiet_hours" type="boolean">Quiet hours enforced.</ResponseField>
+    <ResponseField name="quiet_hours_from" type="string" />
+    <ResponseField name="quiet_hours_until" type="string" />
+    <ResponseField name="parties" type="boolean">Parties or events allowed.</ResponseField>
+    <ResponseField name="curfew" type="string">Curfew note, or `null`.</ResponseField>
+    <ResponseField name="city_regulations" type="string">Local regulation notice, or `null`.</ResponseField>
+    <ResponseField name="pets_allowed" type="boolean" />
+    <ResponseField name="pets_charge_mode" type="string">e.g. `free`, `charges_may_apply`.</ResponseField>
+    <ResponseField name="children_allowed" type="boolean" />
+    <ResponseField name="min_children_age" type="integer" />
+    <ResponseField name="cribs_allowed" type="boolean" />
+    <ResponseField name="extra_beds_allowed" type="boolean" />
+  </Expandable>
+</ResponseField>
+<ResponseField name="facilities_count" type="integer">Number of facilities returned.</ResponseField>
+<ResponseField name="facilities" type="Facility[]">
+  Every facility Booking lists — typically 60–110 per hotel.
+
+  <Expandable title="Facility">
+    <ResponseField name="name" type="string">e.g. `Free WiFi`.</ResponseField>
+    <ResponseField name="facility_id" type="integer">Booking facility id — usable as a `hotelfacility=` search filter.</ResponseField>
+    <ResponseField name="group_id" type="integer">Facility group id.</ResponseField>
+    <ResponseField name="slug" type="string">e.g. `free-wifi`.</ResponseField>
+    <ResponseField name="is_offsite" type="boolean">Facility is off the property.</ResponseField>
+    <ResponseField name="charge_mode" type="string">e.g. `free`, `paid`.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="highlights" type="string[]">Property highlights, e.g. `Top location: Highly rated by recent guests`.</ResponseField>
+<ResponseField name="rooms" type="Room[]">
+  Room types offered.
+
+  <Expandable title="Room">
+    <ResponseField name="room_id" type="string">Room id — matches `blocks[].room_id` on [`/search`](/api-reference/endpoint/booking/search).</ResponseField>
+    <ResponseField name="room_type_id" type="integer" />
+    <ResponseField name="name" type="string">e.g. `Deluxe Double Room`.</ResponseField>
+    <ResponseField name="description" type="string" />
+    <ResponseField name="size_m2" type="number">Room size in square metres, or `null`.</ResponseField>
+    <ResponseField name="bathrooms" type="integer" />
+    <ResponseField name="is_smoking" type="boolean" />
+    <ResponseField name="max_persons" type="integer" />
+    <ResponseField name="max_guests" type="integer" />
+    <ResponseField name="max_children" type="integer" />
+    <ResponseField name="beds" type="Bed[]">
+      <Expandable title="Bed">
+        <ResponseField name="count" type="integer" />
+        <ResponseField name="bed_type" type="string">e.g. `King bed`.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="photos" type="string[]">Room photo URLs.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="photos" type="string[]">Property photo URLs, up to `photos`.</ResponseField>
+<ResponseField name="questions" type="Question[]">
+  Guest Q&A pairs, up to `questions`.
+
+  <Expandable title="Question">
+    <ResponseField name="question_id" type="string" />
+    <ResponseField name="question" type="string" />
+    <ResponseField name="answer" type="string">Property's answer, or `null`.</ResponseField>
+    <ResponseField name="asked_at" type="string">ISO 8601 timestamp.</ResponseField>
+    <ResponseField name="answered_at" type="string">ISO 8601 timestamp, or `null`.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="is_newly_opened" type="boolean" />
+<ResponseField name="is_sustainable" type="boolean" />
+<ResponseField name="sustainability_certifications" type="string[]" />
+
+<Note>
+  A property that does not exist returns `404`.
+</Note>
+
+## Example
+
+<CodeGroup>
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/booking/properties/it/radisson-collection-roma-antica?photos=60&questions=20",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const property = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/booking/properties/it/radisson-collection-roma-antica",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"photos": 60, "questions": 20},
+)
+property = res.json()
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/booking/properties/it/radisson-collection-roma-antica?photos=60&questions=20" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "property_id": "1284937",
+  "name": "Radisson Collection Hotel, Roma Antica",
+  "slug": "radisson-collection-roma-antica",
+  "url": "https://www.booking.com/hotel/it/radisson-collection-roma-antica.html",
+  "accommodation_type": "Hotel",
+  "accommodation_type_id": 204,
+  "star_rating": 5,
+  "star_rating_symbol": "stars",
+  "description": "Set 400 metres from the Colosseum in the Centro Storico district, Radisson Collection Hotel, Roma Antica offers a rooftop restaurant, a fitness centre and air-conditioned rooms with free WiFi. Termini Station is a 15-minute walk away.",
+  "summary": "5-star hotel in Centro Storico, 1.2 km from the centre",
+  "fine_print": "Guests are required to show a photo ID and credit card at check-in. The city tax of EUR 7 per person per night is not included in the room rate.",
+  "address": "Via Labicana 144",
+  "formatted_address": "Via Labicana 144, Centro Storico, 00184 Rome, Italy",
+  "city": "Rome",
+  "district": "Centro Storico",
+  "country": "Italy",
+  "country_code": "it",
+  "latitude": 41.8902,
+  "longitude": 12.4964,
+  "ufi": -126693,
+  "is_city_centre": true,
+  "is_old_town": true,
+  "review_score": 8.9,
+  "review_count": 1499,
+  "score_breakdown": {
+    "hotel_staff": 9.2,
+    "hotel_clean": 9.1,
+    "hotel_comfort": 9.0,
+    "hotel_value": 8.1,
+    "hotel_location": 9.4,
+    "hotel_free_wifi": 9.3
+  },
+  "currency": "EUR",
+  "languages_spoken": ["Italian", "English", "Spanish", "French"],
+  "meal_plans": ["Breakfast", "Half board"],
+  "house_rules": {
+    "checkin_from": "15:00",
+    "checkin_until": "00:00",
+    "checkout_from": "07:00",
+    "checkout_until": "11:00",
+    "min_checkin_age": 18,
+    "age_restriction": null,
+    "group_limit": 8,
+    "smoking": false,
+    "quiet_hours": true,
+    "quiet_hours_from": "23:00",
+    "quiet_hours_until": "07:00",
+    "parties": false,
+    "curfew": null,
+    "city_regulations": "A city tax of EUR 7 per person per night applies.",
+    "pets_allowed": true,
+    "pets_charge_mode": "charges_may_apply",
+    "children_allowed": true,
+    "min_children_age": 0,
+    "cribs_allowed": true,
+    "extra_beds_allowed": true
+  },
+  "facilities_count": 87,
+  "facilities": [
+    {
+      "name": "Free WiFi",
+      "facility_id": 107,
+      "group_id": 15,
+      "slug": "free-wifi",
+      "is_offsite": false,
+      "charge_mode": "free"
+    },
+    {
+      "name": "Fitness centre",
+      "facility_id": 11,
+      "group_id": 5,
+      "slug": "fitness-centre",
+      "is_offsite": false,
+      "charge_mode": "free"
+    },
+    {
+      "name": "Airport shuttle",
+      "facility_id": 17,
+      "group_id": 3,
+      "slug": "airport-shuttle",
+      "is_offsite": true,
+      "charge_mode": "paid"
+    }
+  ],
+  "highlights": [
+    "Top location: Highly rated by recent guests (9.4)",
+    "Breakfast info: Continental, Italian, Buffet",
+    "Free private parking available on site"
+  ],
+  "rooms": [
+    {
+      "room_id": "128493701",
+      "room_type_id": 8,
+      "name": "Deluxe Double Room with Colosseum View",
+      "description": "This air-conditioned double room features a seating area, a minibar and a private bathroom with a rain shower. The room looks onto the Colosseum.",
+      "size_m2": 32,
+      "bathrooms": 1,
+      "is_smoking": false,
+      "max_persons": 2,
+      "max_guests": 2,
+      "max_children": 1,
+      "beds": [{ "count": 1, "bed_type": "King bed" }],
+      "photos": [
+        "https://cf.bstatic.com/xdata/images/hotel/max1024x768/1284937-deluxe-double.jpg"
+      ]
+    },
+    {
+      "room_id": "128493705",
+      "room_type_id": 9,
+      "name": "Junior Suite",
+      "description": "A suite with a separate living area, a terrace and a private bathroom with a bathtub.",
+      "size_m2": 48,
+      "bathrooms": 1,
+      "is_smoking": false,
+      "max_persons": 3,
+      "max_guests": 3,
+      "max_children": 2,
+      "beds": [
+        { "count": 1, "bed_type": "King bed" },
+        { "count": 1, "bed_type": "Sofa bed" }
+      ],
+      "photos": [
+        "https://cf.bstatic.com/xdata/images/hotel/max1024x768/1284937-junior-suite.jpg"
+      ]
+    }
+  ],
+  "photos": [
+    "https://cf.bstatic.com/xdata/images/hotel/max1024x768/1284937-rooftop.jpg",
+    "https://cf.bstatic.com/xdata/images/hotel/max1024x768/1284937-lobby.jpg",
+    "https://cf.bstatic.com/xdata/images/hotel/max1024x768/1284937-facade.jpg"
+  ],
+  "questions": [
+    {
+      "question_id": "9182736",
+      "question": "Is the rooftop restaurant open to guests staying on a room-only rate?",
+      "answer": "Yes, the rooftop restaurant is open to all in-house guests from 18:00 to 23:00.",
+      "asked_at": "2026-06-04T11:22:00Z",
+      "answered_at": "2026-06-05T08:14:00Z"
+    },
+    {
+      "question_id": "9182811",
+      "question": "Do you have connecting rooms for a family of four?",
+      "answer": null,
+      "asked_at": "2026-08-01T16:40:00Z",
+      "answered_at": null
+    }
+  ],
+  "is_newly_opened": false,
+  "is_sustainable": true,
+  "sustainability_certifications": ["Green Key"]
+}
+```
+
+<Note>
+  Each property-detail request costs **5 credits**. Failed requests are not charged.
+</Note>

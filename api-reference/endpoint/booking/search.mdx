@@ -1,0 +1,387 @@
+---
+title: "Search Properties"
+api: "GET https://scrapebadger.com/v1/booking/search"
+description: "Search Booking.com stays by destination — with dates, occupancy, sorting and Booking's own filter ids, returning numeric prices alongside display strings."
+---
+
+Search Booking.com for stays. Target an area either with free-text `location`
+(geocoded by Booking) **or** with an exact `dest_id` + `dest_type` pair from
+[`/destinations`](/api-reference/endpoint/booking/search-destinations). Page
+through results with `offset` against `total_results`.
+
+## Query Parameters
+
+<ParamField query="location" type="string">
+  Free-text destination, geocoded by Booking — e.g. `Rome, Italy`, `Amsterdam`,
+  `Trastevere`. Provide either `location` **or** `dest_id` + `dest_type`.
+</ParamField>
+
+<ParamField query="dest_id" type="string">
+  Exact Booking destination id from
+  [`/destinations`](/api-reference/endpoint/booking/search-destinations).
+  Requires `dest_type`.
+</ParamField>
+
+<ParamField query="dest_type" type="string">
+  Destination type that goes with `dest_id` — `CITY`, `DISTRICT`, `AIRPORT`,
+  `LANDMARK` or `REGION`.
+</ParamField>
+
+<ParamField query="checkin" type="string">
+  Check-in date, `YYYY-MM-DD`. Pass both `checkin` and `checkout`, or neither.
+</ParamField>
+
+<ParamField query="checkout" type="string">
+  Check-out date, `YYYY-MM-DD`.
+</ParamField>
+
+<ParamField query="adults" type="integer" default="2">
+  Number of adults, `1`–`30`.
+</ParamField>
+
+<ParamField query="children" type="string">
+  Comma-separated children's ages, e.g. `4,9`.
+</ParamField>
+
+<ParamField query="rooms" type="integer" default="1">Number of rooms.</ParamField>
+
+<ParamField query="offset" type="integer" default="0">
+  Number of properties to skip.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="25">
+  Properties per page. Maximum `100`.
+</ParamField>
+
+<ParamField query="sort" type="string">
+  Sort order. One of `popularity`, `price`, `class_descending`,
+  `class_ascending`, `distance_from_search`, `bayesian_review_score`,
+  `review_score_and_price`, `upsort_bh`. An unrecognised value is rejected with
+  a `400`.
+</ParamField>
+
+<ParamField query="filters" type="string">
+  Semicolon-separated Booking filter ids, e.g. `class=5;mealplan=1`. See
+  [Filters](#filters) below.
+</ParamField>
+
+<ParamField query="currency" type="string" default="USD">
+  Currency for prices, e.g. `EUR`, `GBP`.
+</ParamField>
+
+<ParamField query="language" type="string" default="en-us">
+  Locale for text and price formatting, e.g. `fr`, `de`.
+</ParamField>
+
+## Filters
+
+`filters` takes Booking's own filter ids, joined with `;`. These are the
+verified ones, with their effect on a Rome search that returns **5,982**
+properties unfiltered:
+
+| `filters` value | Meaning | Results |
+|-----------------|---------|---------|
+| `class=5` | 5-star properties | 67 |
+| `class=5;hotelfacility=107` | 5-star with a specific facility | 64 |
+| `price=EUR-50-100-1` | €50–100 per night | 410 |
+| `review_score=80` | Review score 8.0+ | 4,552 |
+| `ht_id=204` | Apartments | 705 |
+| `mealplan=1` | Breakfast included | 1,074 |
+| `fc=2` | Free cancellation | 5,370 |
+| `distance=1000` | Within 1 km of the centre | 629 |
+
+<Note>
+  An unknown filter id is ignored by Booking rather than rejected — the search
+  succeeds and simply returns the unfiltered count. Check `total_results` to
+  confirm a filter actually applied.
+</Note>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested destination.</ResponseField>
+<ResponseField name="destination" type="object">
+  The destination Booking resolved the search to.
+
+  <Expandable title="destination">
+    <ResponseField name="dest_id" type="string">Booking destination id.</ResponseField>
+    <ResponseField name="dest_type" type="string">e.g. `CITY`.</ResponseField>
+    <ResponseField name="name" type="string">e.g. `Rome`.</ResponseField>
+    <ResponseField name="label" type="string">e.g. `Rome, Lazio, Italy`.</ResponseField>
+    <ResponseField name="country_code" type="string">ISO country code, e.g. `it`.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="checkin" type="string">Echo of the check-in date, or `null`.</ResponseField>
+<ResponseField name="checkout" type="string">Echo of the check-out date, or `null`.</ResponseField>
+<ResponseField name="currency" type="string">Currency the prices are quoted in.</ResponseField>
+<ResponseField name="total_results" type="integer">
+  Total matching properties across all pages, after `filters`.
+</ResponseField>
+<ResponseField name="offset" type="integer">Echo of the requested offset.</ResponseField>
+<ResponseField name="count" type="integer">Properties returned on this page.</ResponseField>
+<ResponseField name="properties" type="Property[]">
+  Property cards for this page.
+
+  <Expandable title="Property">
+    <ResponseField name="property_id" type="string">Booking property id.</ResponseField>
+    <ResponseField name="name" type="string">Property name.</ResponseField>
+    <ResponseField name="slug" type="string">URL slug — feed to [`/properties/{country_code}/{slug}`](/api-reference/endpoint/booking/get-property).</ResponseField>
+    <ResponseField name="url" type="string">Canonical property URL on booking.com.</ResponseField>
+    <ResponseField name="accommodation_type_id" type="integer">Booking accommodation type id, e.g. `204` for apartments.</ResponseField>
+    <ResponseField name="description" type="string">Short property blurb.</ResponseField>
+    <ResponseField name="address" type="string" />
+    <ResponseField name="city" type="string" />
+    <ResponseField name="country_code" type="string">ISO country code — the first path segment for the detail endpoints.</ResponseField>
+    <ResponseField name="latitude" type="number" />
+    <ResponseField name="longitude" type="number" />
+    <ResponseField name="ufi" type="integer">Booking's internal city identifier.</ResponseField>
+    <ResponseField name="display_location" type="string">Location line as shown on the card, e.g. `Centro Storico, Rome`.</ResponseField>
+    <ResponseField name="distance_to_centre" type="string">Formatted distance, e.g. `0.6 km from centre`.</ResponseField>
+    <ResponseField name="distance_to_centre_metres" type="integer">Same distance in metres.</ResponseField>
+    <ResponseField name="is_centrally_located" type="boolean" />
+    <ResponseField name="public_transport_distance" type="string">Distance to the nearest public transport, or `null`.</ResponseField>
+    <ResponseField name="beach_distance" type="string">Distance to the nearest beach, or `null`.</ResponseField>
+    <ResponseField name="review_score" type="number">Review score out of 10.</ResponseField>
+    <ResponseField name="review_count" type="integer">Number of reviews.</ResponseField>
+    <ResponseField name="review_score_word" type="string">Localized score word, e.g. `Fabulous`.</ResponseField>
+    <ResponseField name="star_rating" type="number">Stars, e.g. `5`.</ResponseField>
+    <ResponseField name="is_preferred" type="boolean" />
+    <ResponseField name="is_preferred_plus" type="boolean" />
+    <ResponseField name="is_genius_rate_available" type="boolean" />
+    <ResponseField name="is_newly_opened" type="boolean" />
+    <ResponseField name="is_closed" type="boolean" />
+    <ResponseField name="is_sold_out" type="boolean" />
+    <ResponseField name="sold_out_messages" type="string[]">Why the property is unavailable, when it is.</ResponseField>
+    <ResponseField name="is_sustainable" type="boolean" />
+    <ResponseField name="sustainability_certifications" type="string[]" />
+    <ResponseField name="badges" type="string[]">Booking badges, e.g. `["Genius"]`.</ResponseField>
+    <ResponseField name="wishlist_count" type="integer">How many travellers saved the property.</ResponseField>
+    <ResponseField name="free_cancellation" type="boolean" />
+    <ResponseField name="no_prepayment" type="boolean" />
+    <ResponseField name="pets_allowed_free" type="boolean" />
+    <ResponseField name="meal_plan" type="string">Meal plan on the quoted rate, e.g. `Breakfast included`.</ResponseField>
+    <ResponseField name="charges_info" type="string">Taxes and charges line, e.g. `+€36 taxes and charges`.</ResponseField>
+    <ResponseField name="price" type="object">
+      Total price for the requested stay.
+
+      <Expandable title="price">
+        <ResponseField name="display" type="string">Booking's localized string, e.g. `€ 265,09`.</ResponseField>
+        <ResponseField name="amount" type="number">Numeric value, e.g. `265.09`.</ResponseField>
+        <ResponseField name="currency" type="string">e.g. `EUR`.</ResponseField>
+        <ResponseField name="rounded" type="integer">Rounded numeric value, e.g. `265`.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="price_before_discount" type="object">
+      Struck-through price when discounted, same shape as `price`, else `null`.
+    </ResponseField>
+    <ResponseField name="price_per_night" type="object">
+      Per-night price, same shape as `price`.
+    </ResponseField>
+    <ResponseField name="room" type="object">
+      The room the quoted price is for.
+
+      <Expandable title="room">
+        <ResponseField name="name" type="string">e.g. `Deluxe Double Room`.</ResponseField>
+        <ResponseField name="unit_types" type="string[]">e.g. `["Bedroom", "Bathroom"]`.</ResponseField>
+        <ResponseField name="beds" type="string[]">Bed configuration lines, e.g. `["1 king bed"]`.</ResponseField>
+        <ResponseField name="total_beds" type="integer" />
+        <ResponseField name="bedrooms" type="integer" />
+        <ResponseField name="bathrooms" type="integer" />
+        <ResponseField name="kitchens" type="integer" />
+        <ResponseField name="living_rooms" type="integer" />
+        <ResponseField name="area" type="number">Room size.</ResponseField>
+        <ResponseField name="area_unit" type="string">e.g. `m2`.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="blocks" type="Block[]">
+      The bookable rate blocks on the card.
+
+      <Expandable title="Block">
+        <ResponseField name="room_id" type="string">Room id — matches `rooms[].room_id` on [`/properties`](/api-reference/endpoint/booking/get-property).</ResponseField>
+        <ResponseField name="occupancy" type="integer">Guests the block sleeps.</ResponseField>
+        <ResponseField name="meal_plan_id" type="integer" />
+        <ResponseField name="meal_plan" type="string">e.g. `Breakfast included`.</ResponseField>
+        <ResponseField name="price" type="object">Same shape as `price`.</ResponseField>
+        <ResponseField name="original_price" type="object">Pre-discount price, or `null`.</ResponseField>
+        <ResponseField name="free_cancellation_until" type="string">ISO 8601 deadline, or `null`.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="photo" type="string">Full-size photo URL.</ResponseField>
+    <ResponseField name="thumbnail" type="string">Thumbnail photo URL.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<Tip>
+  Every price is returned both as Booking's localized display string
+  (`"€ 265,09"`) and as a numeric `amount` + `currency`. The display string is
+  locale-formatted — comma decimal separators, currency symbol placement — so
+  always do arithmetic on `amount`, never on `display`.
+</Tip>
+
+## Example
+
+<CodeGroup>
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/booking/search?" +
+    new URLSearchParams({
+      location: "Rome, Italy",
+      checkin: "2026-09-12",
+      checkout: "2026-09-15",
+      adults: "2",
+      children: "4,9",
+      sort: "bayesian_review_score",
+      filters: "class=5;mealplan=1",
+      currency: "EUR",
+      limit: "25",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/booking/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "location": "Rome, Italy",
+        "checkin": "2026-09-12",
+        "checkout": "2026-09-15",
+        "adults": 2,
+        "children": "4,9",
+        "sort": "bayesian_review_score",
+        "filters": "class=5;mealplan=1",
+        "currency": "EUR",
+        "limit": 25,
+    },
+)
+data = res.json()
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/booking/search?location=Rome%2C%20Italy&checkin=2026-09-12&checkout=2026-09-15&adults=2&children=4%2C9&sort=bayesian_review_score&filters=class%3D5%3Bmealplan%3D1&currency=EUR&limit=25" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "Rome, Italy",
+  "destination": {
+    "dest_id": "-126693",
+    "dest_type": "CITY",
+    "name": "Rome",
+    "label": "Rome, Lazio, Italy",
+    "country_code": "it"
+  },
+  "checkin": "2026-09-12",
+  "checkout": "2026-09-15",
+  "currency": "EUR",
+  "total_results": 1074,
+  "offset": 0,
+  "count": 25,
+  "properties": [
+    {
+      "property_id": "1284937",
+      "name": "Radisson Collection Hotel, Roma Antica",
+      "slug": "radisson-collection-roma-antica",
+      "url": "https://www.booking.com/hotel/it/radisson-collection-roma-antica.html",
+      "accommodation_type_id": 204,
+      "description": "Set 400 metres from the Colosseum, this 5-star hotel offers a rooftop restaurant and air-conditioned rooms with free WiFi.",
+      "address": "Via Labicana 144",
+      "city": "Rome",
+      "country_code": "it",
+      "latitude": 41.8902,
+      "longitude": 12.4964,
+      "ufi": -126693,
+      "display_location": "Centro Storico, Rome",
+      "distance_to_centre": "1.2 km from centre",
+      "distance_to_centre_metres": 1204,
+      "is_centrally_located": true,
+      "public_transport_distance": "300 m from Colosseo metro",
+      "beach_distance": null,
+      "review_score": 8.9,
+      "review_count": 1499,
+      "review_score_word": "Fabulous",
+      "star_rating": 5,
+      "is_preferred": true,
+      "is_preferred_plus": false,
+      "is_genius_rate_available": true,
+      "is_newly_opened": false,
+      "is_closed": false,
+      "is_sold_out": false,
+      "sold_out_messages": [],
+      "is_sustainable": true,
+      "sustainability_certifications": ["Green Key"],
+      "badges": ["Genius"],
+      "wishlist_count": 3812,
+      "free_cancellation": true,
+      "no_prepayment": true,
+      "pets_allowed_free": false,
+      "meal_plan": "Breakfast included",
+      "charges_info": "+€36 taxes and charges",
+      "price": {
+        "display": "€ 795,27",
+        "amount": 795.27,
+        "currency": "EUR",
+        "rounded": 795
+      },
+      "price_before_discount": {
+        "display": "€ 946,75",
+        "amount": 946.75,
+        "currency": "EUR",
+        "rounded": 947
+      },
+      "price_per_night": {
+        "display": "€ 265,09",
+        "amount": 265.09,
+        "currency": "EUR",
+        "rounded": 265
+      },
+      "room": {
+        "name": "Deluxe Double Room with Colosseum View",
+        "unit_types": ["Bedroom", "Bathroom"],
+        "beds": ["1 king bed"],
+        "total_beds": 1,
+        "bedrooms": 1,
+        "bathrooms": 1,
+        "kitchens": 0,
+        "living_rooms": 0,
+        "area": 32,
+        "area_unit": "m2"
+      },
+      "blocks": [
+        {
+          "room_id": "128493701",
+          "occupancy": 2,
+          "meal_plan_id": 1,
+          "meal_plan": "Breakfast included",
+          "price": {
+            "display": "€ 795,27",
+            "amount": 795.27,
+            "currency": "EUR",
+            "rounded": 795
+          },
+          "original_price": {
+            "display": "€ 946,75",
+            "amount": 946.75,
+            "currency": "EUR",
+            "rounded": 947
+          },
+          "free_cancellation_until": "2026-09-10T23:59:00Z"
+        }
+      ],
+      "photo": "https://cf.bstatic.com/xdata/images/hotel/max1024x768/1284937-rooftop.jpg",
+      "thumbnail": "https://cf.bstatic.com/xdata/images/hotel/square200/1284937-rooftop.jpg"
+    }
+  ]
+}
+```
+
+<Note>
+  Each search request costs **5 credits**. Failed requests are not charged.
+</Note>

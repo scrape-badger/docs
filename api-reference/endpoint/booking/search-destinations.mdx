@@ -1,0 +1,140 @@
+---
+title: "Search Destinations"
+api: "GET https://scrapebadger.com/v1/booking/destinations"
+description: "Resolve free text to Booking.com destination ids — cities, districts, airports, landmarks and regions, with GPS and country."
+---
+
+Turn free text into exact Booking destinations. Works on prefixes, so
+`amsterd` already resolves. Each result carries a `dest_id` and `dest_type`
+pair you can pass to [`/search`](/api-reference/endpoint/booking/search) to
+target an exact area instead of relying on free-text geocoding.
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Free-text destination, including prefixes — e.g. `amsterd`, `Rome`,
+  `Charles de Gaulle`.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="8">
+  Destinations to return. Maximum `20`.
+</ParamField>
+
+<ParamField query="language" type="string" default="en-us">
+  Locale for names and labels, e.g. `fr`, `de`.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested text.</ResponseField>
+<ResponseField name="count" type="integer">Destinations returned.</ResponseField>
+<ResponseField name="destinations" type="Destination[]">
+  Matching destinations, best match first.
+
+  <Expandable title="Destination">
+    <ResponseField name="dest_id" type="string">Booking destination id — pass to [`/search`](/api-reference/endpoint/booking/search) with `dest_type`.</ResponseField>
+    <ResponseField name="dest_type" type="string">One of `CITY`, `DISTRICT`, `AIRPORT`, `LANDMARK`, `REGION`.</ResponseField>
+    <ResponseField name="name" type="string">Destination name, e.g. `Amsterdam`.</ResponseField>
+    <ResponseField name="label" type="string">Full label, e.g. `Amsterdam, Noord-Holland, Netherlands`.</ResponseField>
+    <ResponseField name="city" type="string">Parent city, or `null`.</ResponseField>
+    <ResponseField name="region" type="string">Region or province, or `null`.</ResponseField>
+    <ResponseField name="country" type="string">Country name.</ResponseField>
+    <ResponseField name="country_code" type="string">ISO country code, e.g. `nl`.</ResponseField>
+    <ResponseField name="latitude" type="number" />
+    <ResponseField name="longitude" type="number" />
+    <ResponseField name="image_url" type="string">Destination photo URL, or `null`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<Tip>
+  The two-step workflow: resolve here once, cache the `dest_id` + `dest_type`,
+  then pass both to [`/search`](/api-reference/endpoint/booking/search) on every
+  subsequent query. That pins the search to exactly the city, district or
+  airport you meant — free-text `location` re-geocodes each time and can drift
+  to a same-named place in another country.
+</Tip>
+
+## Example
+
+<CodeGroup>
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/booking/destinations?" +
+    new URLSearchParams({ query: "amsterd", limit: "5" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { destinations } = await res.json();
+const city = destinations.find((d) => d.dest_type === "CITY");
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/booking/destinations",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "amsterd", "limit": 5},
+)
+destinations = res.json()["destinations"]
+city = next(d for d in destinations if d["dest_type"] == "CITY")
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/booking/destinations?query=amsterd&limit=5" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "amsterd",
+  "count": 3,
+  "destinations": [
+    {
+      "dest_id": "-2140479",
+      "dest_type": "CITY",
+      "name": "Amsterdam",
+      "label": "Amsterdam, Noord-Holland, Netherlands",
+      "city": "Amsterdam",
+      "region": "Noord-Holland",
+      "country": "Netherlands",
+      "country_code": "nl",
+      "latitude": 52.3731,
+      "longitude": 4.8922,
+      "image_url": "https://cf.bstatic.com/xdata/images/city/600x600/688884-amsterdam.jpg"
+    },
+    {
+      "dest_id": "-2140558",
+      "dest_type": "AIRPORT",
+      "name": "Amsterdam Schiphol Airport",
+      "label": "Amsterdam Schiphol Airport, Netherlands",
+      "city": "Haarlemmermeer",
+      "region": "Noord-Holland",
+      "country": "Netherlands",
+      "country_code": "nl",
+      "latitude": 52.3105,
+      "longitude": 4.7683,
+      "image_url": null
+    },
+    {
+      "dest_id": "1926",
+      "dest_type": "DISTRICT",
+      "name": "Amsterdam City Centre",
+      "label": "Amsterdam City Centre, Amsterdam, Netherlands",
+      "city": "Amsterdam",
+      "region": "Noord-Holland",
+      "country": "Netherlands",
+      "country_code": "nl",
+      "latitude": 52.3728,
+      "longitude": 4.8936,
+      "image_url": null
+    }
+  ]
+}
+```
+
+<Note>
+  Each destinations request costs **3 credits**. Failed requests are not charged.
+</Note>

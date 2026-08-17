@@ -856,6 +856,31 @@
         ]
       },
       {
+        "tab": "Booking.com",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "booking/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/booking/search",
+              "api-reference/endpoint/booking/search-destinations"
+            ]
+          },
+          {
+            "group": "Properties",
+            "pages": [
+              "api-reference/endpoint/booking/get-property",
+              "api-reference/endpoint/booking/get-reviews"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Apartments.com",
         "groups": [
           {

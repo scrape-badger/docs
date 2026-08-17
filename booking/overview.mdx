@@ -1,0 +1,152 @@
+---
+title: "Booking.com Scraper Overview"
+description: "Scrape Booking.com hotel search with filters and sorting, destination autocomplete, full property detail, and paginated guest reviews — worldwide, with structured JSON responses."
+---
+
+# Booking.com Scraper API
+
+Search hotels, apartments and every other stay type Booking.com sells, resolve
+free-text destinations to exact ids, pull a property's full detail — facilities,
+rooms, house rules, score breakdown, photos and guest Q&A — and page through
+guest reviews with language and guest-type filters. ScrapeBadger handles
+sessions and parsing automatically — no Booking.com account or API key required.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="Global Hotel Search" icon="earth-americas">
+    Free-text [`location`](/api-reference/endpoint/booking/search) or an exact `dest_id`, with dates, occupancy, sorting and Booking's own filter ids.
+  </Card>
+  <Card title="Destination Autocomplete" icon="magnifying-glass">
+    Resolve a prefix like `amsterd` to cities, districts, airports, landmarks and regions — each with an id you can pass straight to search.
+  </Card>
+  <Card title="Full Property Detail" icon="hotel">
+    Description, address, GPS, star rating, score breakdown by category, 60-110 facilities, room types with beds and photos, house rules and guest Q&A.
+  </Card>
+  <Card title="Paginated Reviews" icon="star">
+    Positive and negative text, per-review score, stay dates, guest type, room stayed in, partner reply and photos.
+  </Card>
+  <Card title="Numeric Prices" icon="tag">
+    Every price comes back as both Booking's localized display string and a numeric `amount` + `currency`, so you never parse `"€ 265,09"`.
+  </Card>
+  <Card title="SDK Support" icon="code">
+    First-class support via the ScrapeBadger Node.js and Python SDKs.
+  </Card>
+</CardGroup>
+
+<Note>
+  Coverage is global — every country Booking.com sells in is reachable. Every
+  endpoint accepts `currency` and `language`, defaulting to `USD` and `en-us`,
+  so you can request prices and text in the market's own currency and language
+  without changing anything else. `language` also localizes review-score words,
+  room type names and price formatting.
+</Note>
+
+## Coverage & Defaults
+
+| Parameter | Default | Notes |
+|-----------|---------|-------|
+| `currency` | `USD` | Any Booking-supported currency, e.g. `EUR`, `GBP`, `JPY`. |
+| `language` | `en-us` | Any Booking locale, e.g. `fr`, `de`, `es`, `it`. |
+| Geography | Worldwide | Free-text `location` is geocoded by Booking; an exact `dest_id` + `dest_type` pair is also accepted. |
+
+<Tip>
+  Resolve a destination once with
+  [`/destinations`](/api-reference/endpoint/booking/search-destinations), then
+  pass its `dest_id` + `dest_type` to
+  [`/search`](/api-reference/endpoint/booking/search) for an exact area instead
+  of free-text geocoding. Every search result carries `country_code` and `slug`
+  — the two path segments for
+  [`/properties/{country_code}/{slug}`](/api-reference/endpoint/booking/get-property)
+  and [`/reviews`](/api-reference/endpoint/booking/get-reviews).
+</Tip>
+
+## Quick Start
+
+<CodeGroup>
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/booking/search?" +
+    new URLSearchParams({
+      location: "Rome, Italy",
+      checkin: "2026-09-12",
+      checkout: "2026-09-15",
+      adults: "2",
+      filters: "class=5;mealplan=1",
+      currency: "EUR",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+console.log(data.total_results, "properties");
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/booking/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "location": "Rome, Italy",
+        "checkin": "2026-09-12",
+        "checkout": "2026-09-15",
+        "adults": 2,
+        "filters": "class=5;mealplan=1",
+        "currency": "EUR",
+    },
+)
+data = res.json()
+print(data["total_results"], "properties")
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/booking/search?location=Rome%2C%20Italy&checkin=2026-09-12&checkout=2026-09-15&adults=2&filters=class%3D5%3Bmealplan%3D1&currency=EUR" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+## Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/booking/search`](/api-reference/endpoint/booking/search) | GET | Search properties by destination, with filters and sorting |
+| [`/v1/booking/destinations`](/api-reference/endpoint/booking/search-destinations) | GET | Resolve free text to Booking destination ids |
+| [`/v1/booking/properties/{country_code}/{slug}`](/api-reference/endpoint/booking/get-property) | GET | Full detail for a single property |
+| [`/v1/booking/properties/{country_code}/{slug}/reviews`](/api-reference/endpoint/booking/get-reviews) | GET | Paginated guest reviews |
+
+## Credit Costs
+
+| Endpoint | Cost |
+|----------|------|
+| Search properties | 5 credits |
+| Search destinations | 3 credits |
+| Get property detail | 5 credits |
+| Get reviews | 10 credits |
+| Health check | 0 credits |
+| Failed requests | 0 credits |
+
+## Authentication
+
+All requests require your API key in the `X-API-Key` header:
+
+```bash
+curl "https://scrapebadger.com/v1/booking/search?location=Rome%2C%20Italy" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+Credits are charged per request (see the table above) and reported on the
+`X-Credits-Used` response header.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Search Properties" icon="magnifying-glass" href="/api-reference/endpoint/booking/search">
+    Full API reference for searching Booking.com stays
+  </Card>
+  <Card title="Get Property Detail" icon="hotel" href="/api-reference/endpoint/booking/get-property">
+    Retrieve a property's complete detail by country code and slug
+  </Card>
+</CardGroup>

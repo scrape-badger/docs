@@ -1,0 +1,245 @@
+---
+title: "Get Reviews"
+api: "GET https://scrapebadger.com/v1/booking/properties/{country_code}/{slug}/reviews"
+description: "Paginated Booking.com guest reviews — positive and negative text, per-review score, stay dates, guest type, room stayed in, partner reply and photos."
+---
+
+Page through a property's guest reviews. Booking splits each review into a
+`positive` and a `negative` half, either of which can be empty. Filter by
+review language or guest type, sort five ways, and paginate with `limit` and
+`offset` against `total_count`.
+
+## Path Parameters
+
+<ParamField path="country_code" type="string" required>
+  ISO country code from the property URL, e.g. `it`.
+</ParamField>
+
+<ParamField path="slug" type="string" required>
+  Property slug from the property URL, e.g. `radisson-collection-roma-antica`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="limit" type="integer" default="25">
+  Reviews per page. Maximum `100`.
+</ParamField>
+
+<ParamField query="offset" type="integer" default="0">
+  Number of reviews to skip.
+</ParamField>
+
+<ParamField query="sort" type="string" default="MOST_RELEVANT">
+  Sort order. One of `MOST_RELEVANT`, `NEWEST_FIRST`, `OLDEST_FIRST`,
+  `SCORE_DESC`, `SCORE_ASC`.
+</ParamField>
+
+<ParamField query="review_language" type="string">
+  Only reviews written in this language, as an ISO code, e.g. `fr`.
+</ParamField>
+
+<ParamField query="guest_type" type="string">
+  Only reviews from this guest type. One of `FAMILIES`, `COUPLES`,
+  `GROUP_OF_FRIENDS`, `SOLO_TRAVELLERS`, `BUSINESS_TRAVELLERS`.
+</ParamField>
+
+<ParamField query="language" type="string" default="en-us">
+  Locale for category names and other text, e.g. `fr`, `de`.
+</ParamField>
+
+## Response
+
+<ResponseField name="property_id" type="string">Booking property id.</ResponseField>
+<ResponseField name="total_count" type="integer">
+  Total reviews matching the request — reflects `review_language` and
+  `guest_type` when they are set.
+</ResponseField>
+<ResponseField name="score_breakdown" type="object">
+  Sub-scores keyed by translated category name, e.g. `Staff`, `Facilities`,
+  `Cleanliness`, `Comfort`, `Value for money`, `Location`, `Free Wifi`.
+</ResponseField>
+<ResponseField name="language_counts" type="object">
+  Map of language code to review count, e.g. `{"en": 812, "fr": 111}`.
+</ResponseField>
+<ResponseField name="guest_type_counts" type="object">
+  Map of guest type to review count, e.g. `{"FAMILIES": 382}`.
+</ResponseField>
+<ResponseField name="limit" type="integer">Echo of the requested page size.</ResponseField>
+<ResponseField name="offset" type="integer">Echo of the requested offset.</ResponseField>
+<ResponseField name="sort" type="string">Echo of the requested sort order.</ResponseField>
+<ResponseField name="reviews" type="Review[]">
+  Reviews for this page.
+
+  <Expandable title="Review">
+    <ResponseField name="review_id" type="string">Booking review id.</ResponseField>
+    <ResponseField name="title" type="string">Review headline.</ResponseField>
+    <ResponseField name="positive" type="string">What the guest liked, or `null`.</ResponseField>
+    <ResponseField name="negative" type="string">What the guest disliked, or `null`.</ResponseField>
+    <ResponseField name="score" type="number">Guest score out of 10.</ResponseField>
+    <ResponseField name="date" type="string">Publication timestamp (ISO 8601, UTC).</ResponseField>
+    <ResponseField name="date_utc" type="integer">Same timestamp as Unix seconds.</ResponseField>
+    <ResponseField name="stay_date" type="string">Month of stay, e.g. `2026-07`.</ResponseField>
+    <ResponseField name="checkin_date" type="string">`YYYY-MM-DD`, or `null`.</ResponseField>
+    <ResponseField name="checkout_date" type="string">`YYYY-MM-DD`, or `null`.</ResponseField>
+    <ResponseField name="length_of_stay" type="integer">Nights stayed.</ResponseField>
+    <ResponseField name="guest_name" type="string" />
+    <ResponseField name="guest_country" type="string" />
+    <ResponseField name="guest_country_code" type="string">ISO country code, e.g. `ie`.</ResponseField>
+    <ResponseField name="guest_avatar" type="string">Avatar URL, or `null`.</ResponseField>
+    <ResponseField name="guest_type" type="string">e.g. `COUPLES`.</ResponseField>
+    <ResponseField name="room_id" type="string">Room the guest stayed in — matches `rooms[].room_id` on [`/properties`](/api-reference/endpoint/booking/get-property).</ResponseField>
+    <ResponseField name="room_name" type="string" />
+    <ResponseField name="language" type="string">Language the review was written in.</ResponseField>
+    <ResponseField name="review_url" type="string">Permalink to the review on booking.com.</ResponseField>
+    <ResponseField name="is_approved" type="boolean" />
+    <ResponseField name="is_anonymous" type="boolean" />
+    <ResponseField name="helpful_votes" type="integer">Guests who marked the review helpful.</ResponseField>
+    <ResponseField name="photos" type="string[]">Photo URLs attached to the review.</ResponseField>
+    <ResponseField name="partner_reply" type="string">The property's public reply, or `null`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<Tip>
+  `language_counts` and `guest_type_counts` let you size a filtered subset
+  before you page it. A Rome hotel with **1,499** total reviews returns **111**
+  with `review_language=fr` and **382** with `guest_type=FAMILIES` — read the
+  counts once, then decide how many pages the filtered set actually needs.
+</Tip>
+
+## Example
+
+<CodeGroup>
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/booking/properties/it/radisson-collection-roma-antica/reviews?" +
+    new URLSearchParams({
+      limit: "100",
+      offset: "0",
+      sort: "NEWEST_FIRST",
+      guest_type: "FAMILIES",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+console.log(data.total_count, "family reviews");
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/booking/properties/it/radisson-collection-roma-antica/reviews",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "limit": 100,
+        "offset": 0,
+        "sort": "NEWEST_FIRST",
+        "guest_type": "FAMILIES",
+    },
+)
+data = res.json()
+print(data["total_count"], "family reviews")
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/booking/properties/it/radisson-collection-roma-antica/reviews?limit=100&offset=0&sort=NEWEST_FIRST&guest_type=FAMILIES" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "property_id": "1284937",
+  "total_count": 382,
+  "score_breakdown": {
+    "Staff": 9.2,
+    "Facilities": 8.8,
+    "Cleanliness": 9.1,
+    "Comfort": 9.0,
+    "Value for money": 8.1,
+    "Location": 9.4,
+    "Free Wifi": 9.3
+  },
+  "language_counts": {
+    "en": 812,
+    "it": 246,
+    "fr": 111,
+    "de": 98,
+    "es": 74
+  },
+  "guest_type_counts": {
+    "FAMILIES": 382,
+    "COUPLES": 611,
+    "GROUP_OF_FRIENDS": 152,
+    "SOLO_TRAVELLERS": 204,
+    "BUSINESS_TRAVELLERS": 150
+  },
+  "limit": 100,
+  "offset": 0,
+  "sort": "NEWEST_FIRST",
+  "reviews": [
+    {
+      "review_id": "1284739201",
+      "title": "Perfect base for a family week in Rome",
+      "positive": "Ten minutes on foot to the Colosseum and the staff held our bags for four hours after checkout without being asked twice. The junior suite fitted all four of us comfortably.",
+      "negative": "Breakfast gets very busy between 8 and 9 — go early or wait.",
+      "score": 9.2,
+      "date": "2026-08-12T09:41:22Z",
+      "date_utc": 1786520482,
+      "stay_date": "2026-07",
+      "checkin_date": "2026-07-28",
+      "checkout_date": "2026-08-02",
+      "length_of_stay": 5,
+      "guest_name": "Daniel",
+      "guest_country": "Ireland",
+      "guest_country_code": "ie",
+      "guest_avatar": "https://q-xx.bstatic.com/xdata/images/avatar/1284739201.jpg",
+      "guest_type": "FAMILIES",
+      "room_id": "128493705",
+      "room_name": "Junior Suite",
+      "language": "en",
+      "review_url": "https://www.booking.com/reviews/it/hotel/radisson-collection-roma-antica.html#1284739201",
+      "is_approved": true,
+      "is_anonymous": false,
+      "helpful_votes": 14,
+      "photos": [
+        "https://q-xx.bstatic.com/xdata/images/xphoto/1284739201-terrace.jpg"
+      ],
+      "partner_reply": "Thank you Daniel — we are glad the junior suite worked well for the family, and we have passed your breakfast note to the restaurant team."
+    },
+    {
+      "review_id": "1281002934",
+      "title": "Emplacement idéal",
+      "positive": "Chambre spacieuse et très propre, vue sur le Colisée depuis la fenêtre.",
+      "negative": null,
+      "score": 8.8,
+      "date": "2026-07-30T18:02:10Z",
+      "date_utc": 1785434530,
+      "stay_date": "2026-07",
+      "checkin_date": "2026-07-21",
+      "checkout_date": "2026-07-24",
+      "length_of_stay": 3,
+      "guest_name": "Camille",
+      "guest_country": "France",
+      "guest_country_code": "fr",
+      "guest_avatar": null,
+      "guest_type": "FAMILIES",
+      "room_id": "128493701",
+      "room_name": "Deluxe Double Room with Colosseum View",
+      "language": "fr",
+      "review_url": "https://www.booking.com/reviews/it/hotel/radisson-collection-roma-antica.html#1281002934",
+      "is_approved": true,
+      "is_anonymous": false,
+      "helpful_votes": 3,
+      "photos": [],
+      "partner_reply": null
+    }
+  ]
+}
+```
+
+<Note>
+  Each reviews request costs **10 credits**. Failed requests are not charged.
+</Note>
