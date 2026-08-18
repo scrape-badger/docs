@@ -875,6 +875,7 @@
             "group": "Properties",
             "pages": [
               "api-reference/endpoint/booking/get-property",
+              "api-reference/endpoint/booking/get-rooms",
               "api-reference/endpoint/booking/get-reviews"
             ]
           }

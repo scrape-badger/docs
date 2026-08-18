@@ -1,0 +1,532 @@
+---
+title: "Get Rooms & Rates"
+api: "GET https://scrapebadger.com/v1/booking/properties/{country_code}/{slug}/rooms"
+description: "The full Booking.com rate table for one property and one set of dates — every room type with its per-room facilities, bed layouts and every bookable rate, plus meal plans and the child and bed policy."
+---
+
+Fetch the **entire** rate table for a property on given dates.
+[`/search`](/api-reference/endpoint/booking/search) returns only the single
+cheapest rate per property; this endpoint returns every rate on every room
+type in one call — 30 rates across 5 priced room types for a Rome five-star,
+68 rates across 11 room types for a Barcelona hotel.
+
+The two path parameters are the two segments of a Booking hotel URL:
+
+```
+https://www.booking.com/hotel/it/radisson-collection-roma-antica.html
+                              ^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                        country_code                            slug
+```
+
+Both also come back on every
+[`/search`](/api-reference/endpoint/booking/search) result as `country_code`
+and `slug`.
+
+## Path Parameters
+
+<ParamField path="country_code" type="string" required>
+  ISO country code from the property URL, e.g. `it`.
+</ParamField>
+
+<ParamField path="slug" type="string" required>
+  Property slug from the property URL, e.g. `radisson-collection-roma-antica`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="checkin" type="string" required>
+  Check-in date, `YYYY-MM-DD`.
+</ParamField>
+
+<ParamField query="checkout" type="string" required>
+  Check-out date, `YYYY-MM-DD`.
+</ParamField>
+
+<ParamField query="adults" type="integer" default="2">
+  Number of adults, `1`–`30`.
+</ParamField>
+
+<ParamField query="children" type="string">
+  Comma-separated children's ages, e.g. `4,9`.
+</ParamField>
+
+<ParamField query="rooms" type="integer" default="1">
+  Number of rooms, `1`–`30`.
+</ParamField>
+
+<ParamField query="currency" type="string" default="USD">
+  Currency for prices, e.g. `EUR`, `GBP`.
+</ParamField>
+
+<ParamField query="language" type="string" default="en-us">
+  Locale for text and price formatting, e.g. `fr`, `de`. Also decides whether
+  room sizes come back in square metres or square feet — see `area_unit`.
+</ParamField>
+
+## Response
+
+<ResponseField name="property_id" type="string">Booking property id.</ResponseField>
+<ResponseField name="name" type="string">Property name.</ResponseField>
+<ResponseField name="slug" type="string">Echo of the requested slug.</ResponseField>
+<ResponseField name="url" type="string">Canonical property URL on booking.com.</ResponseField>
+<ResponseField name="checkin" type="string">Echo of the check-in date.</ResponseField>
+<ResponseField name="checkout" type="string">Echo of the check-out date.</ResponseField>
+<ResponseField name="adults" type="integer">Echo of the requested adults.</ResponseField>
+<ResponseField name="children" type="string">Echo of the requested children's ages, or `null`.</ResponseField>
+<ResponseField name="rooms_requested" type="integer">Echo of the requested number of rooms.</ResponseField>
+<ResponseField name="currency" type="string">Currency the prices are quoted in.</ResponseField>
+<ResponseField name="is_sold_out" type="boolean">
+  No availability for these dates. The room catalogue is still returned — see
+  the note below.
+</ResponseField>
+<ResponseField name="area_unit" type="string">
+  Unit for `rooms[].size_m2` — `SQUARE_METER` or `SQUARE_FEET`. Locale-driven:
+  it follows the requested `language`.
+</ResponseField>
+<ResponseField name="rate_count" type="integer">Total rates across every room.</ResponseField>
+<ResponseField name="rooms" type="Room[]">
+  Every room type at the property.
+
+  <Expandable title="Room">
+    <ResponseField name="room_id" type="string">Room id — matches `rooms[].room_id` on [`/properties`](/api-reference/endpoint/booking/get-property) and `blocks[].room_id` on [`/search`](/api-reference/endpoint/booking/search).</ResponseField>
+    <ResponseField name="room_type_id" type="integer" />
+    <ResponseField name="name" type="string">e.g. `Deluxe Double Room`.</ResponseField>
+    <ResponseField name="description" type="string" />
+    <ResponseField name="size_m2" type="number">Room size in `area_unit`, or `null`.</ResponseField>
+    <ResponseField name="floors" type="integer[]">Floors this room type is on.</ResponseField>
+    <ResponseField name="bathrooms" type="integer" />
+    <ResponseField name="is_smoking" type="boolean" />
+    <ResponseField name="is_bigger_than_average" type="boolean">Larger than the property's typical room.</ResponseField>
+    <ResponseField name="cribs_free" type="boolean">Cribs supplied free in this room.</ResponseField>
+    <ResponseField name="max_persons" type="integer" />
+    <ResponseField name="max_guests" type="integer" />
+    <ResponseField name="max_children" type="integer" />
+    <ResponseField name="privacy_level" type="string">e.g. `ENTIRE_UNIT`.</ResponseField>
+    <ResponseField name="bed_options" type="BedOption[]">
+      **Alternative** bed layouts for the same room — 2 single beds *or* 1 large
+      double, not one flat list.
+
+      <Expandable title="BedOption">
+        <ResponseField name="configuration_id" type="integer">Id of this layout.</ResponseField>
+        <ResponseField name="beds" type="Bed[]">
+          <Expandable title="Bed">
+            <ResponseField name="count" type="integer" />
+            <ResponseField name="bed_type" type="string">e.g. `Large double bed`.</ResponseField>
+          </Expandable>
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="facilities" type="FacilityGroup[]">
+      Facilities **of this room**, grouped by category — a single five-star room
+      returned 33 across the three categories.
+      [`/properties`](/api-reference/endpoint/booking/get-property) only carries
+      property-level facilities.
+
+      <Expandable title="FacilityGroup">
+        <ResponseField name="category" type="string">One of `BATHROOM_PRIVATE`, `VIEW`, `OTHER`.</ResponseField>
+        <ResponseField name="facilities" type="string[]">Facility names, e.g. `Rain shower`.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="highlights" type="string[]">Room highlights, e.g. `Colosseum view`.</ResponseField>
+    <ResponseField name="photos" type="string[]">Room photo URLs.</ResponseField>
+    <ResponseField name="rates" type="Rate[]">
+      Every bookable rate for this room. Empty when the room has no
+      availability for the dates.
+
+      <Expandable title="Rate">
+        <ResponseField name="block_id" type="string">Booking's rate identifier, `<room_id>_<rate_id>_<occupancy>_<meal_plan_index>_0` — already split into the four fields below.</ResponseField>
+        <ResponseField name="room_id" type="string">Room this rate belongs to.</ResponseField>
+        <ResponseField name="rate_id" type="integer" />
+        <ResponseField name="occupancy" type="integer">Guests the rate is priced for.</ResponseField>
+        <ResponseField name="meal_plan_index" type="integer">Index into `meal_plans[]`.</ResponseField>
+        <ResponseField name="price" type="object">
+          Total price for the requested stay.
+
+          <Expandable title="price">
+            <ResponseField name="display" type="string">Booking's localized string, e.g. `€ 1.170`.</ResponseField>
+            <ResponseField name="amount" type="number">Numeric value, e.g. `1170.4`.</ResponseField>
+            <ResponseField name="currency" type="string">e.g. `EUR`.</ResponseField>
+            <ResponseField name="rounded" type="integer">Rounded numeric value, e.g. `1170`.</ResponseField>
+          </Expandable>
+        </ResponseField>
+        <ResponseField name="price_before_discount" type="object">Struck-through price when discounted, same shape as `price`, else `null`.</ResponseField>
+        <ResponseField name="price_per_night" type="object">Per-night price, same shape as `price`.</ResponseField>
+        <ResponseField name="charges_info" type="string">Taxes and charges line, e.g. `+€36 taxes and charges`.</ResponseField>
+        <ResponseField name="info_message" type="string">Booking's note on the rate, e.g. `Only 2 rooms left at this price`, or `null`.</ResponseField>
+        <ResponseField name="discounts" type="Discount[]">
+          <Expandable title="Discount">
+            <ResponseField name="name" type="string">e.g. `Genius discount`.</ResponseField>
+            <ResponseField name="description" type="string" />
+            <ResponseField name="item_type" type="string">What the discount applies to.</ResponseField>
+            <ResponseField name="amount" type="number">Numeric discount value.</ResponseField>
+            <ResponseField name="currency" type="string">e.g. `EUR`.</ResponseField>
+          </Expandable>
+        </ResponseField>
+        <ResponseField name="badges" type="string[]">Rate badges, e.g. `9% off`.</ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="meal_plans" type="MealPlan[]">
+  Meal plans referenced by `rates[].meal_plan_index`.
+
+  <Expandable title="MealPlan">
+    <ResponseField name="meal_plan_id" type="integer" />
+    <ResponseField name="name" type="string">e.g. `Breakfast included`.</ResponseField>
+    <ResponseField name="meal_type" type="string">e.g. `BREAKFAST`.</ResponseField>
+    <ResponseField name="breakfast_included" type="boolean" />
+    <ResponseField name="breakfast_price" type="number">Price when not included, or `null`.</ResponseField>
+    <ResponseField name="lunch_included" type="boolean" />
+    <ResponseField name="lunch_price" type="number" />
+    <ResponseField name="dinner_included" type="boolean" />
+    <ResponseField name="dinner_price" type="number" />
+  </Expandable>
+</ResponseField>
+<ResponseField name="child_and_bed_policy" type="object">
+  Children and extra-bed rules, with priced age bands.
+
+  <Expandable title="child_and_bed_policy">
+    <ResponseField name="children_allowed" type="boolean" />
+    <ResponseField name="min_children_age" type="integer" />
+    <ResponseField name="cribs_allowed" type="boolean" />
+    <ResponseField name="extra_beds_allowed" type="boolean" />
+    <ResponseField name="cribs_guaranteed" type="boolean">Crib availability is guaranteed rather than on request.</ResponseField>
+    <ResponseField name="rules" type="Rule[]">
+      <Expandable title="Rule">
+        <ResponseField name="rule_id" type="integer" />
+        <ResponseField name="age_from" type="integer">Lower bound of the age band.</ResponseField>
+        <ResponseField name="age_to" type="integer">Upper bound of the age band.</ResponseField>
+        <ResponseField name="rule_type" type="string">e.g. `CRIB`, `EXTRA_BED`.</ResponseField>
+        <ResponseField name="price_type" type="string">e.g. `FREE`, `FIXED`.</ResponseField>
+        <ResponseField name="price_mode" type="string">e.g. `PER_NIGHT`, `PER_STAY`.</ResponseField>
+        <ResponseField name="price" type="number">Numeric charge, or `null` when free.</ResponseField>
+        <ResponseField name="localized_price" type="string">Formatted charge, e.g. `€ 35`, or `null`.</ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<Tip>
+  Every price is returned both as Booking's localized display string
+  (`"€ 1.170"`) and as a numeric `amount` + `currency`. Always do arithmetic on
+  `amount`, never on `display`.
+</Tip>
+
+<Note>
+  **Not every room is priced.** Rooms with no availability for the dates still
+  come back with full detail — description, facilities, bed options, photos —
+  but an empty `rates[]`. On one Rome five-star, 5 of 7 rooms were priced; on a
+  Barcelona hotel, 11 of 16.
+</Note>
+
+<Warning>
+  **Sold out is a `200`, not an error.** When Booking has no availability at
+  all for the dates you get `is_sold_out: true`, `rate_count: 0` and an empty
+  `rates[]` on every room — the room catalogue, facilities and highlights are
+  still returned. The same Rome guesthouse returns `is_sold_out: true` with 0
+  rates for `2026-09-10` and `is_sold_out: false` with 22 rates for
+  `2026-12-05`. Branch on `is_sold_out`, not on a failed request.
+</Warning>
+
+<Note>
+  A property that does not exist returns `404`. Missing `checkin`/`checkout`,
+  or a malformed `children` value, returns `400`.
+</Note>
+
+## Example
+
+<CodeGroup>
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/booking/properties/it/radisson-collection-roma-antica/rooms?" +
+    new URLSearchParams({
+      checkin: "2026-12-05",
+      checkout: "2026-12-08",
+      adults: "2",
+      children: "4,9",
+      currency: "EUR",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+console.log(data.rate_count, "rates across", data.rooms.length, "room types");
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/booking/properties/it/radisson-collection-roma-antica/rooms",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "checkin": "2026-12-05",
+        "checkout": "2026-12-08",
+        "adults": 2,
+        "children": "4,9",
+        "currency": "EUR",
+    },
+)
+data = res.json()
+print(data["rate_count"], "rates across", len(data["rooms"]), "room types")
+```
+
+```bash cURL
+curl "https://scrapebadger.com/v1/booking/properties/it/radisson-collection-roma-antica/rooms?checkin=2026-12-05&checkout=2026-12-08&adults=2&children=4%2C9&currency=EUR" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+</CodeGroup>
+
+Trimmed to 2 of 7 rooms and 3 of 30 rates:
+
+```json Response
+{
+  "property_id": "1284937",
+  "name": "Radisson Collection Hotel, Roma Antica",
+  "slug": "radisson-collection-roma-antica",
+  "url": "https://www.booking.com/hotel/it/radisson-collection-roma-antica.html",
+  "checkin": "2026-12-05",
+  "checkout": "2026-12-08",
+  "adults": 2,
+  "children": "4,9",
+  "rooms_requested": 1,
+  "currency": "EUR",
+  "is_sold_out": false,
+  "area_unit": "SQUARE_METER",
+  "rate_count": 30,
+  "rooms": [
+    {
+      "room_id": "128493701",
+      "room_type_id": 8,
+      "name": "Deluxe Double Room with Colosseum View",
+      "description": "This air-conditioned double room features a seating area, a minibar and a private bathroom with a rain shower. The room looks onto the Colosseum.",
+      "size_m2": 32,
+      "floors": [3, 4, 5],
+      "bathrooms": 1,
+      "is_smoking": false,
+      "is_bigger_than_average": true,
+      "cribs_free": true,
+      "max_persons": 3,
+      "max_guests": 3,
+      "max_children": 1,
+      "privacy_level": "ENTIRE_UNIT",
+      "bed_options": [
+        {
+          "configuration_id": 1,
+          "beds": [{ "count": 1, "bed_type": "Large double bed" }]
+        },
+        {
+          "configuration_id": 2,
+          "beds": [{ "count": 2, "bed_type": "Single bed" }]
+        }
+      ],
+      "facilities": [
+        {
+          "category": "BATHROOM_PRIVATE",
+          "facilities": ["Rain shower", "Bathrobe", "Free toiletries", "Hairdryer"]
+        },
+        {
+          "category": "VIEW",
+          "facilities": ["Landmark view", "City view"]
+        },
+        {
+          "category": "OTHER",
+          "facilities": ["Air conditioning", "Minibar", "Safety deposit box", "Free WiFi"]
+        }
+      ],
+      "highlights": ["Colosseum view", "32 m²", "Air conditioning"],
+      "photos": [
+        "https://cf.bstatic.com/xdata/images/hotel/max1024x768/1284937-deluxe-double.jpg"
+      ],
+      "rates": [
+        {
+          "block_id": "128493701_412880094_2_0_0",
+          "room_id": "128493701",
+          "rate_id": 412880094,
+          "occupancy": 2,
+          "meal_plan_index": 0,
+          "price": {
+            "display": "€ 1.170",
+            "amount": 1170.4,
+            "currency": "EUR",
+            "rounded": 1170
+          },
+          "price_before_discount": {
+            "display": "€ 1.286",
+            "amount": 1286.15,
+            "currency": "EUR",
+            "rounded": 1286
+          },
+          "price_per_night": {
+            "display": "€ 390",
+            "amount": 390.13,
+            "currency": "EUR",
+            "rounded": 390
+          },
+          "charges_info": "+€ 63 taxes and charges",
+          "info_message": "Only 2 rooms left at this price",
+          "discounts": [
+            {
+              "name": "Genius discount",
+              "description": "You are getting a reduced rate because you are a Genius member.",
+              "item_type": "ROOM",
+              "amount": 115.75,
+              "currency": "EUR"
+            }
+          ],
+          "badges": ["9% off"]
+        },
+        {
+          "block_id": "128493701_412880094_2_1_0",
+          "room_id": "128493701",
+          "rate_id": 412880094,
+          "occupancy": 2,
+          "meal_plan_index": 1,
+          "price": {
+            "display": "€ 1.320",
+            "amount": 1320.4,
+            "currency": "EUR",
+            "rounded": 1320
+          },
+          "price_before_discount": null,
+          "price_per_night": {
+            "display": "€ 440",
+            "amount": 440.13,
+            "currency": "EUR",
+            "rounded": 440
+          },
+          "charges_info": "+€ 63 taxes and charges",
+          "info_message": null,
+          "discounts": [],
+          "badges": []
+        },
+        {
+          "block_id": "128493701_412880102_3_0_0",
+          "room_id": "128493701",
+          "rate_id": 412880102,
+          "occupancy": 3,
+          "meal_plan_index": 0,
+          "price": {
+            "display": "€ 1.455",
+            "amount": 1455.0,
+            "currency": "EUR",
+            "rounded": 1455
+          },
+          "price_before_discount": null,
+          "price_per_night": {
+            "display": "€ 485",
+            "amount": 485.0,
+            "currency": "EUR",
+            "rounded": 485
+          },
+          "charges_info": "+€ 63 taxes and charges",
+          "info_message": null,
+          "discounts": [],
+          "badges": []
+        }
+      ]
+    },
+    {
+      "room_id": "128493709",
+      "room_type_id": 12,
+      "name": "Classic Single Room",
+      "description": "A compact air-conditioned single room with a private bathroom and a courtyard outlook.",
+      "size_m2": 18,
+      "floors": [1, 2],
+      "bathrooms": 1,
+      "is_smoking": false,
+      "is_bigger_than_average": false,
+      "cribs_free": false,
+      "max_persons": 1,
+      "max_guests": 1,
+      "max_children": 0,
+      "privacy_level": "ENTIRE_UNIT",
+      "bed_options": [
+        {
+          "configuration_id": 1,
+          "beds": [{ "count": 1, "bed_type": "Single bed" }]
+        }
+      ],
+      "facilities": [
+        {
+          "category": "BATHROOM_PRIVATE",
+          "facilities": ["Shower", "Free toiletries", "Hairdryer"]
+        },
+        {
+          "category": "OTHER",
+          "facilities": ["Air conditioning", "Free WiFi", "Desk"]
+        }
+      ],
+      "highlights": ["18 m²", "Air conditioning"],
+      "photos": [
+        "https://cf.bstatic.com/xdata/images/hotel/max1024x768/1284937-classic-single.jpg"
+      ],
+      "rates": []
+    }
+  ],
+  "meal_plans": [
+    {
+      "meal_plan_id": 1,
+      "name": "Breakfast included",
+      "meal_type": "BREAKFAST",
+      "breakfast_included": true,
+      "breakfast_price": null,
+      "lunch_included": false,
+      "lunch_price": null,
+      "dinner_included": false,
+      "dinner_price": null
+    },
+    {
+      "meal_plan_id": 3,
+      "name": "Half board",
+      "meal_type": "HALF_BOARD",
+      "breakfast_included": true,
+      "breakfast_price": null,
+      "lunch_included": false,
+      "lunch_price": null,
+      "dinner_included": true,
+      "dinner_price": null
+    }
+  ],
+  "child_and_bed_policy": {
+    "children_allowed": true,
+    "min_children_age": 0,
+    "cribs_allowed": true,
+    "extra_beds_allowed": true,
+    "cribs_guaranteed": false,
+    "rules": [
+      {
+        "rule_id": 1,
+        "age_from": 0,
+        "age_to": 2,
+        "rule_type": "CRIB",
+        "price_type": "FREE",
+        "price_mode": "PER_NIGHT",
+        "price": null,
+        "localized_price": null
+      },
+      {
+        "rule_id": 2,
+        "age_from": 3,
+        "age_to": 17,
+        "rule_type": "EXTRA_BED",
+        "price_type": "FIXED",
+        "price_mode": "PER_NIGHT",
+        "price": 35.0,
+        "localized_price": "€ 35"
+      }
+    ]
+  }
+}
+```
+
+<Tip>
+  The usual flow: [`/search`](/api-reference/endpoint/booking/search) for the
+  shortlist, take `country_code` + `slug` off any result, then call `/rooms`
+  for that property's full rate table.
+</Tip>
+
+<Note>
+  Each rooms request costs **10 credits**. Failed requests are not charged.
+</Note>
