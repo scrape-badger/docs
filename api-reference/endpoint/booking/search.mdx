@@ -385,3 +385,15 @@ curl "https://scrapebadger.com/v1/booking/search?location=Rome%2C%20Italy&checki
 <Note>
   Each search request costs **5 credits**. Failed requests are not charged.
 </Note>
+
+<Warning>
+  **Two pagination traps.** `total_results` is Booking's own *estimate* — the
+  same query returns a slightly different number between calls (we measured
+  5,974-5,977 for one Rome search), so never use it as a loop bound or a
+  completeness check. And an `offset` past the real end returns a **full page of
+  tail results**, not an empty page — so a naive "loop until empty" never
+  terminates. Page by deduplicating on `property_id` and stop when a page adds
+  nothing new. For sizing a crawl up front, use `property_count` from
+  [`/destinations`](/api-reference/endpoint/booking/search-destinations), which
+  is an exact inventory count.
+</Warning>
