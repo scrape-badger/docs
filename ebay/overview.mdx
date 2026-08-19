@@ -1,11 +1,18 @@
 ---
 title: "eBay Scraper Overview"
-description: "Scrape eBay active listings, sold-price history, item details, reviews, and seller data across 18 marketplaces with structured JSON responses."
+description: "Scrape eBay active listings, item details, reviews, and seller data across 18 marketplaces with structured JSON responses."
 ---
 
 # eBay Scraper API
 
-Search active listings, pull **completed/sold-price history**, fetch full item detail, list reviews, and retrieve seller profiles, storefronts, and feedback from eBay — one of the world's largest online marketplaces. The API handles authentication, anti-bot bypass, and marketplace routing automatically.
+Search active listings, fetch full item detail, list reviews, and retrieve seller profiles, storefronts, and feedback from eBay — one of the world's largest online marketplaces. The API handles authentication, anti-bot bypass, and marketplace routing automatically.
+
+<Warning>
+  **Completed/sold listings were withdrawn by eBay in August 2026.** Viewing sold
+  prices now requires a signed-in eBay account, so
+  [`/v1/ebay/completed`](/api-reference/endpoint/ebay/completed) returns HTTP 410 and is
+  not billed. Every other eBay endpoint is unaffected.
+</Warning>
 
 ## Key Features
 
@@ -13,8 +20,9 @@ Search active listings, pull **completed/sold-price history**, fetch full item d
   <Card title="18 Marketplaces" icon="earth-americas">
     Access all major eBay marketplaces including US, UK, DE, FR, IT, ES, AU, CA, and more.
   </Card>
-  <Card title="Sold-Price History" icon="clock-rotate-left">
-    The [`/v1/ebay/completed`](/api-reference/endpoint/ebay/completed) endpoint returns real **sold** listings — the closing prices buyers actually paid.
+  <Card title="18 Marketplaces, One API" icon="globe">
+    Search, item detail, reviews and seller data resolve across every supported
+    marketplace from a single `domain` parameter.
   </Card>
   <Card title="Anti-Bot Bypass" icon="shield-halved">
     Automatic session management, Chrome TLS impersonation, and fingerprint rotation to avoid blocks.
@@ -34,7 +42,7 @@ Search active listings, pull **completed/sold-price history**, fetch full item d
 </CardGroup>
 
 <Note>
-  eBay no longer exposes public **watcher counts**, so the `watchers` field is often `null` on search, seller-items, and item-detail responses. **Sold counts** (`sold_count`, and the `/v1/ebay/completed` sold-price history) remain available and are the reliable signal for demand.
+  eBay no longer exposes public **watcher counts**, so the `watchers` field is often `null` on search, seller-items, and item-detail responses. `sold_count` remains available on item detail and is the reliable signal for demand. Completed/sold **price history** is no longer obtainable anonymously — see the note below.
 </Note>
 
 ## Supported Marketplaces
@@ -101,7 +109,7 @@ curl "https://scrapebadger.com/v1/ebay/search?query=nintendo+switch+oled&domain=
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | [`/v1/ebay/search`](/api-reference/endpoint/ebay/search) | GET | Search a marketplace for active listings |
-| [`/v1/ebay/completed`](/api-reference/endpoint/ebay/completed) | GET | Completed / sold listings (sold-price history) |
+| [`/v1/ebay/completed`](/api-reference/endpoint/ebay/completed) | GET | **Deprecated** — returns 410, not billed |
 | [`/v1/ebay/items/{item_id}`](/api-reference/endpoint/ebay/get-item-detail) | GET | Full detail for a single listing |
 | [`/v1/ebay/items/{item_id}/reviews`](/api-reference/endpoint/ebay/get-item-reviews) | GET | Catalog product reviews for a listing |
 | [`/v1/ebay/sellers/{username}`](/api-reference/endpoint/ebay/get-seller) | GET | Seller public profile |
@@ -117,7 +125,7 @@ curl "https://scrapebadger.com/v1/ebay/search?query=nintendo+switch+oled&domain=
 | Endpoint | Cost |
 |----------|------|
 | Search | 5 credits |
-| Completed / sold | 5 credits |
+| Completed / sold | *deprecated — not billed* |
 | Get item detail | 5 credits |
 | Get item reviews | 10 credits |
 | Get seller | 5 credits |
@@ -167,7 +175,7 @@ For non-auction (fixed-price) listings, `current_bid`, `end_time_utc`, and `end_
   <Card title="Search Listings" icon="magnifying-glass" href="/api-reference/endpoint/ebay/search">
     Full API reference for searching the eBay catalog
   </Card>
-  <Card title="Sold-Price History" icon="clock-rotate-left" href="/api-reference/endpoint/ebay/completed">
-    Retrieve the closing prices of completed/sold listings
+  <Card title="Item Detail" icon="tag" href="/api-reference/endpoint/ebay/get-item-detail">
+    Full listing detail including price, condition, specifics and seller
   </Card>
 </CardGroup>
