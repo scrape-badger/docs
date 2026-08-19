@@ -547,8 +547,8 @@
     "/v1/ebay/completed": {
       "get": {
         "operationId": "searchEbayCompleted",
-        "summary": "Completed / Sold Listings",
-        "description": "Search completed/sold listings - eBay's real sold-price history.",
+        "summary": "Completed / Sold Listings (deprecated — returns 410)",
+        "description": "**Deprecated and no longer available.** eBay requires a signed-in account to view completed/sold listings, which this API intentionally does not provide. Every request returns HTTP 410 with an `endpoint_deprecated` body and is **not billed**.\n\nUse `/v1/ebay/search` for current active-listing prices.",
         "tags": [
           "eBay Search"
         ],
@@ -651,402 +651,36 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Completed/sold listings",
+          "410": {
+            "description": "Endpoint deprecated — eBay now requires a signed-in account. Not billed.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "query": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
+                    "error": {
+                      "type": "string",
+                      "example": "endpoint_deprecated"
                     },
-                    "domain": {
-                      "type": "string"
+                    "endpoint": {
+                      "type": "string",
+                      "example": "completed"
                     },
-                    "category_id": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
+                    "deprecated": {
+                      "type": "boolean",
+                      "example": true
                     },
-                    "sold": {
-                      "type": "boolean"
-                    },
-                    "results": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "position": {
-                            "type": "integer"
-                          },
-                          "item_id": {
-                            "type": [
-                              "string",
-                              "null"
-                            ]
-                          },
-                          "product_id": {
-                            "type": [
-                              "string",
-                              "null"
-                            ]
-                          },
-                          "title": {
-                            "type": [
-                              "string",
-                              "null"
-                            ]
-                          },
-                          "url": {
-                            "type": [
-                              "string",
-                              "null"
-                            ]
-                          },
-                          "image": {
-                            "type": [
-                              "string",
-                              "null"
-                            ]
-                          },
-                          "price": {
-                            "type": "object",
-                            "properties": {
-                              "value": {
-                                "type": [
-                                  "number",
-                                  "null"
-                                ]
-                              },
-                              "currency": {
-                                "type": [
-                                  "string",
-                                  "null"
-                                ]
-                              },
-                              "symbol": {
-                                "type": [
-                                  "string",
-                                  "null"
-                                ]
-                              },
-                              "raw": {
-                                "type": [
-                                  "string",
-                                  "null"
-                                ]
-                              }
-                            }
-                          },
-                          "original_price": {
-                            "type": "object",
-                            "properties": {
-                              "value": {
-                                "type": [
-                                  "number",
-                                  "null"
-                                ]
-                              },
-                              "currency": {
-                                "type": [
-                                  "string",
-                                  "null"
-                                ]
-                              },
-                              "symbol": {
-                                "type": [
-                                  "string",
-                                  "null"
-                                ]
-                              },
-                              "raw": {
-                                "type": [
-                                  "string",
-                                  "null"
-                                ]
-                              }
-                            }
-                          },
-                          "discount_percent": {
-                            "type": [
-                              "number",
-                              "null"
-                            ]
-                          },
-                          "currency": {
-                            "type": [
-                              "string",
-                              "null"
-                            ]
-                          },
-                          "condition": {
-                            "type": [
-                              "string",
-                              "null"
-                            ]
-                          },
-                          "brand": {
-                            "type": [
-                              "string",
-                              "null"
-                            ]
-                          },
-                          "buying_format": {
-                            "type": [
-                              "string",
-                              "null"
-                            ]
-                          },
-                          "is_auction": {
-                            "type": "boolean"
-                          },
-                          "bids": {
-                            "type": [
-                              "integer",
-                              "null"
-                            ]
-                          },
-                          "time_left": {
-                            "type": [
-                              "string",
-                              "null"
-                            ]
-                          },
-                          "current_bid": {
-                            "type": [
-                              "object",
-                              "null"
-                            ],
-                            "description": "Current high bid for auction listings; mirrors `price`. Null for non-auction (fixed-price) listings.",
-                            "properties": {
-                              "value": {
-                                "type": [
-                                  "number",
-                                  "null"
-                                ]
-                              },
-                              "currency": {
-                                "type": [
-                                  "string",
-                                  "null"
-                                ]
-                              },
-                              "symbol": {
-                                "type": [
-                                  "string",
-                                  "null"
-                                ]
-                              },
-                              "raw": {
-                                "type": [
-                                  "string",
-                                  "null"
-                                ]
-                              }
-                            }
-                          },
-                          "shipping": {
-                            "type": [
-                              "string",
-                              "null"
-                            ]
-                          },
-                          "shipping_cost": {
-                            "type": "object",
-                            "properties": {
-                              "value": {
-                                "type": [
-                                  "number",
-                                  "null"
-                                ]
-                              },
-                              "currency": {
-                                "type": [
-                                  "string",
-                                  "null"
-                                ]
-                              },
-                              "symbol": {
-                                "type": [
-                                  "string",
-                                  "null"
-                                ]
-                              },
-                              "raw": {
-                                "type": [
-                                  "string",
-                                  "null"
-                                ]
-                              }
-                            }
-                          },
-                          "free_shipping": {
-                            "type": [
-                              "boolean",
-                              "null"
-                            ]
-                          },
-                          "location": {
-                            "type": [
-                              "string",
-                              "null"
-                            ]
-                          },
-                          "returns": {
-                            "type": [
-                              "string",
-                              "null"
-                            ]
-                          },
-                          "sold_count": {
-                            "type": [
-                              "integer",
-                              "null"
-                            ]
-                          },
-                          "sold_date": {
-                            "type": [
-                              "string",
-                              "null"
-                            ],
-                            "description": "Sale date text as rendered by eBay on the sold card, e.g. \"2 Jul 2026\". Localized on non-English marketplaces (e.g. \"Verkauft 5. Okt. 2024\"). Null on active listings.",
-                            "examples": [
-                              "2 Jul 2026"
-                            ]
-                          },
-                          "sold_date_at": {
-                            "type": [
-                              "string",
-                              "null"
-                            ],
-                            "description": "Best-effort ISO 8601 date parsed from sold_date, e.g. \"2026-07-02\". Null when the marketplace's date format is not English.",
-                            "examples": [
-                              "2026-07-02"
-                            ]
-                          },
-                          "watchers": {
-                            "type": [
-                              "integer",
-                              "null"
-                            ]
-                          },
-                          "coupon": {
-                            "type": [
-                              "string",
-                              "null"
-                            ]
-                          },
-                          "rating": {
-                            "type": [
-                              "number",
-                              "null"
-                            ]
-                          },
-                          "ratings_total": {
-                            "type": [
-                              "integer",
-                              "null"
-                            ]
-                          },
-                          "seller_name": {
-                            "type": [
-                              "string",
-                              "null"
-                            ]
-                          },
-                          "seller_feedback_percent": {
-                            "type": [
-                              "number",
-                              "null"
-                            ]
-                          },
-                          "seller_feedback_score": {
-                            "type": [
-                              "integer",
-                              "null"
-                            ]
-                          },
-                          "program_badge": {
-                            "type": [
-                              "string",
-                              "null"
-                            ]
-                          },
-                          "is_sponsored": {
-                            "type": [
-                              "boolean",
-                              "null"
-                            ],
-                            "description": "Always null — eBay renders its Sponsored badge into every card as anti-scraping bait, so promoted placements cannot be distinguished from organic results."
-                          }
-                        }
-                      }
-                    },
-                    "facets": {
-                      "type": "object",
-                      "additionalProperties": {
-                        "type": "array",
-                        "items": {
-                          "type": "string"
-                        }
-                      }
-                    },
-                    "pagination": {
-                      "type": "object",
-                      "properties": {
-                        "current_page": {
-                          "type": "integer"
-                        },
-                        "per_page": {
-                          "type": [
-                            "integer",
-                            "null"
-                          ]
-                        },
-                        "total_pages": {
-                          "type": [
-                            "integer",
-                            "null"
-                          ]
-                        },
-                        "total_results": {
-                          "type": [
-                            "integer",
-                            "null"
-                          ]
-                        },
-                        "has_more": {
-                          "type": [
-                            "boolean",
-                            "null"
-                          ],
-                          "description": "True while eBay still offers a next page — the stop signal for bulk extraction. total_pages/total_results are null on the completed/sold grid, and past the last page eBay re-serves that page, so looping until the results are empty never terminates."
-                        }
-                      }
-                    },
-                    "scraped_utc": {
-                      "type": [
-                        "number",
-                        "null"
-                      ]
-                    },
-                    "scraped_at": {
-                      "type": [
-                        "string",
-                        "null"
-                      ]
+                    "message": {
+                      "type": "string",
+                      "example": "This endpoint is deprecated and no longer available. eBay now requires a signed-in account to view completed/sold listings, which the ScrapeBadger eBay API intentionally does not provide. Active-listing endpoints (search, items, sellers, categories, autocomplete) remain fully supported — use /v1/ebay/search for current prices."
                     }
                   }
                 }
               }
             }
           }
-        }
+        },
+        "deprecated": true
       }
     },
     "/v1/ebay/items/{item_id}": {

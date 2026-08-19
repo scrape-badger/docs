@@ -1,10 +1,51 @@
 ---
-title: "Completed / Sold Listings"
+title: "Completed / Sold Listings (deprecated)"
 openapi: "GET /v1/ebay/completed"
-description: "Search completed/sold listings — eBay's real sold-price history."
+description: "Deprecated — eBay requires a signed-in account for sold listings. This endpoint returns 410."
 ---
 
-The completed-listings endpoint returns **sold** items — the closing prices buyers actually paid — making it the source of truth for eBay sold-price history and market valuation. Every result has `sold` set to `true` on the response envelope.
+<Warning>
+  **This endpoint is deprecated and no longer available.**
+
+  eBay requires a signed-in account to view completed/sold listings. The desktop
+  results page has required one since 25 July 2026, and the mobile page that still
+  served them closed on 19 August 2026 across every marketplace. There is no
+  anonymous path left, so this API does not provide one.
+
+  Every request now returns **HTTP 410** with an `endpoint_deprecated` body, and
+  **is not billed**. Active-listing endpoints — [`/v1/ebay/search`](/api-reference/endpoint/ebay/search),
+  item detail, sellers, categories and autocomplete — are unaffected and fully supported.
+</Warning>
+
+## What to use instead
+
+For current prices, use [`/v1/ebay/search`](/api-reference/endpoint/ebay/search), which
+returns active listings with the same result shape. It does not carry closing prices —
+eBay no longer exposes those anonymously — so sold-price history is not available through
+this API by any route.
+
+## Response
+
+```json
+{
+  "error": "endpoint_deprecated",
+  "endpoint": "completed",
+  "deprecated": true,
+  "message": "This endpoint is deprecated and no longer available. eBay now requires a signed-in account to view completed/sold listings, which the ScrapeBadger eBay API intentionally does not provide. Active-listing endpoints (search, items, sellers, categories, autocomplete) remain fully supported — use /v1/ebay/search for current prices."
+}
+```
+
+The response also carries `Deprecation: true` and a `Sunset` header.
+
+---
+
+<Note>
+  The reference below describes the endpoint as it behaved before 19 August 2026 and is
+  retained so existing integrations can identify what they were calling. None of it is
+  served any more.
+</Note>
+
+The completed-listings endpoint returned **sold** items — the closing prices buyers actually paid. Every result had `sold` set to `true` on the response envelope.
 
 ## Query Parameters
 
@@ -131,7 +172,7 @@ Identical shape to [`/v1/ebay/search`](/api-reference/endpoint/ebay/search), exc
 }
 ```
 
-## Fetching every sold listing
+## Fetching every sold listing (historical)
 
 `has_more` is the stop signal for bulk extraction. Increment `page` while it is `true`:
 
@@ -168,5 +209,5 @@ size, so `per_page=240` is about 8x cheaper per listing than the default.
 </Note>
 
 <Note>
-  Each completed-listings request costs **5 credits**. Failed requests are not charged.
+  Historical pricing: each request cost **5 credits**. The endpoint now returns 410 and is not billed at all.
 </Note>
