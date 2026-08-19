@@ -151,10 +151,14 @@ description: "Full detail for a single YouTube video (metadata, engagement, chap
 | Endpoint | Description |
 |----------|-------------|
 | `GET /v1/youtube/videos/{video_id}/related` | Related / recommended videos (returns `results` + `continuation`). |
-| `GET /v1/youtube/videos/{video_id}/streams` | Streaming formats (muxed + adaptive); `client` selects `ANDROID_VR`/`IOS`. **15 credits.** |
+| `GET /v1/youtube/videos/{video_id}/streams` | Streaming formats (muxed + adaptive); `client` selects `IOS` (default), `ANDROID`, or `WEB`. **15 credits.** |
 | `GET /v1/youtube/videos/{video_id}/live_chat` | Live chat / chat replay messages (`continuation` paginated). |
 | `POST /v1/youtube/videos/batch` | Up to 50 video ids in one request (body `{ "video_ids": [...] }`); billed **10 credits per video**. |
 
 <Note>
   A video-detail request costs **10 credits**. The `/streams` sub-endpoint costs **15 credits**; `/related` and `/live_chat` cost **5 credits** each. Failed requests are not charged.
 </Note>
+
+<Warning>
+  **Stream URLs are best-effort and exit-bound.** YouTube signs each media URL with the IP that fetched it (`ip=` in the query string) and enforces that binding on some CDN nodes, so a URL that plays from one host may return `403` from another. Fetch promptly — they carry a short `expires_in_seconds` — and treat a `403` as "re-request the streams", not as an outage. Videos YouTube serves no playable formats for (unavailable, private, or app-gated) return `404`, and are not charged.
+</Warning>
