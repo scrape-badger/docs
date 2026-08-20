@@ -7,13 +7,6 @@ description: "Scrape eBay active listings, item details, reviews, and seller dat
 
 Search active listings, fetch full item detail, list reviews, and retrieve seller profiles, storefronts, and feedback from eBay — one of the world's largest online marketplaces. The API handles authentication, anti-bot bypass, and marketplace routing automatically.
 
-<Warning>
-  **Completed/sold listings were withdrawn by eBay in August 2026.** Viewing sold
-  prices now requires a signed-in eBay account, so
-  [`/v1/ebay/completed`](/api-reference/endpoint/ebay/completed) returns HTTP 410 and is
-  not billed. Every other eBay endpoint is unaffected.
-</Warning>
-
 ## Key Features
 
 <CardGroup cols={3}>
@@ -42,7 +35,7 @@ Search active listings, fetch full item detail, list reviews, and retrieve selle
 </CardGroup>
 
 <Note>
-  eBay no longer exposes public **watcher counts**, so the `watchers` field is often `null` on search, seller-items, and item-detail responses. `sold_count` remains available on item detail and is the reliable signal for demand. Completed/sold **price history** is no longer obtainable anonymously — see the note below.
+  eBay no longer exposes public **watcher counts**, so the `watchers` field is often `null` on search, seller-items, and item-detail responses. `sold_count` remains available on item detail and is the reliable signal for demand. Completed/sold **price history** is available via [`/v1/ebay/completed`](/api-reference/endpoint/ebay/completed), which returns items that have sold with their sale price and date.
 </Note>
 
 ## Supported Marketplaces
@@ -109,7 +102,7 @@ curl "https://scrapebadger.com/v1/ebay/search?query=nintendo+switch+oled&domain=
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | [`/v1/ebay/search`](/api-reference/endpoint/ebay/search) | GET | Search a marketplace for active listings |
-| [`/v1/ebay/completed`](/api-reference/endpoint/ebay/completed) | GET | **Deprecated** — returns 410, not billed |
+| [`/v1/ebay/completed`](/api-reference/endpoint/ebay/completed) | GET | Search completed (sold) listings — sold-price history |
 | [`/v1/ebay/items/{item_id}`](/api-reference/endpoint/ebay/get-item-detail) | GET | Full detail for a single listing |
 | [`/v1/ebay/items/{item_id}/reviews`](/api-reference/endpoint/ebay/get-item-reviews) | GET | Catalog product reviews for a listing |
 | [`/v1/ebay/sellers/{username}`](/api-reference/endpoint/ebay/get-seller) | GET | Seller public profile |
@@ -125,7 +118,7 @@ curl "https://scrapebadger.com/v1/ebay/search?query=nintendo+switch+oled&domain=
 | Endpoint | Cost |
 |----------|------|
 | Search | 5 credits |
-| Completed / sold | *deprecated — not billed* |
+| Completed / sold | 5 credits |
 | Get item detail | 5 credits |
 | Get item reviews | 10 credits |
 | Get seller | 5 credits |

@@ -1,51 +1,13 @@
 ---
-title: "Completed / Sold Listings (deprecated)"
+title: "Completed / Sold Listings"
 openapi: "GET /v1/ebay/completed"
-description: "Deprecated — eBay requires a signed-in account for sold listings. This endpoint returns 410."
+description: "Search eBay completed (sold) listings — the closing prices buyers actually paid."
 ---
 
-<Warning>
-  **This endpoint is deprecated and no longer available.**
-
-  eBay requires a signed-in account to view completed/sold listings. The desktop
-  results page has required one since 25 July 2026, and the mobile page that still
-  served them closed on 19 August 2026 across every marketplace. There is no
-  anonymous path left, so this API does not provide one.
-
-  Every request now returns **HTTP 410** with an `endpoint_deprecated` body, and
-  **is not billed**. Active-listing endpoints — [`/v1/ebay/search`](/api-reference/endpoint/ebay/search),
-  item detail, sellers, categories and autocomplete — are unaffected and fully supported.
-</Warning>
-
-## What to use instead
-
-For current prices, use [`/v1/ebay/search`](/api-reference/endpoint/ebay/search), which
-returns active listings with the same result shape. It does not carry closing prices —
-eBay no longer exposes those anonymously — so sold-price history is not available through
-this API by any route.
-
-## Response
-
-```json
-{
-  "error": "endpoint_deprecated",
-  "endpoint": "completed",
-  "deprecated": true,
-  "message": "This endpoint is deprecated and no longer available. eBay now requires a signed-in account to view completed/sold listings, which the ScrapeBadger eBay API intentionally does not provide. Active-listing endpoints (search, items, sellers, categories, autocomplete) remain fully supported — use /v1/ebay/search for current prices."
-}
-```
-
-The response also carries `Deprecation: true` and a `Sunset` header.
-
----
-
-<Note>
-  The reference below describes the endpoint as it behaved before 19 August 2026 and is
-  retained so existing integrations can identify what they were calling. None of it is
-  served any more.
-</Note>
-
-The completed-listings endpoint returned **sold** items — the closing prices buyers actually paid. Every result had `sold` set to `true` on the response envelope.
+The completed-listings endpoint returns **sold** items — the closing prices buyers
+actually paid, with the date each item sold. Every result has `sold` set to `true`
+on the response envelope. This is the data resellers, flippers and pricing tools
+rely on, since asking prices alone don't reflect what items actually sell for.
 
 ## Query Parameters
 
@@ -65,15 +27,13 @@ The completed-listings endpoint returned **sold** items — the closing prices b
 
 <ParamField query="page" type="integer" default={1}>
   Page number for paginated results. Range: `1` - `1000`.
+
+  Use `pagination.has_more` to know when to stop — eBay re-serves its last
+  page if you ask past the end, so this API returns an empty page there.
 </ParamField>
 
 <ParamField query="per_page" type="integer">
   Results per page. Clamped to one of `60`, `120`, or `240`.
-
-  Completed/sold results are served from eBay's mobile listing grid, which
-  returns fewer cards per page than the requested value — roughly `25` when
-  `per_page` is omitted, and about 5/6 of the requested value otherwise. Treat
-  it as an upper bound and read the actual count from `results`.
 </ParamField>
 
 <ParamField query="sort_by" type="string" default="best_match">
@@ -102,7 +62,7 @@ The completed-listings endpoint returned **sold** items — the closing prices b
 
 ## Response
 
-Identical shape to [`/v1/ebay/search`](/api-reference/endpoint/ebay/search), except `sold` is `true` and each result's `price` reflects the **final sold price**.
+Identical shape to [`/v1/ebay/search`](/api-reference/endpoint/ebay/search), except `sold` is `true`, each result's `price` reflects the **final sold price**, and each result carries a `sold_date`.
 
 <ResponseField name="query" type="string">The search query that was executed.</ResponseField>
 <ResponseField name="domain" type="string">Marketplace domain that was searched.</ResponseField>
@@ -121,58 +81,56 @@ Identical shape to [`/v1/ebay/search`](/api-reference/endpoint/ebay/search), exc
     <ResponseField name="buying_format" type="string">`Buy It Now`, `Auction`, or `Best Offer`.</ResponseField>
     <ResponseField name="is_auction" type="boolean">Whether the listing was an auction.</ResponseField>
     <ResponseField name="bids" type="integer">Number of bids the auction received (nullable).</ResponseField>
-    <ResponseField name="time_left" type="string">Relative time remaining, e.g. `12h 16m` (auctions only, nullable).</ResponseField>
-    <ResponseField name="current_bid" type="object">Current high bid for auction listings with `value`, `currency`, `symbol`, `raw`; mirrors `price`. Null for non-auction (fixed-price) listings.</ResponseField>
+    <ResponseField name="current_bid" type="object">Winning bid for auction listings with `value`, `currency`, `symbol`, `raw`; mirrors `price`. Null for fixed-price listings.</ResponseField>
     <ResponseField name="shipping" type="string">Shipping text.</ResponseField>
     <ResponseField name="location" type="string">Item location text.</ResponseField>
-    <ResponseField name="sold_date" type="string">Sale date text as rendered by eBay, e.g. `2 Jul 2026`. Localized on non-English marketplaces (e.g. `Verkauft 5. Okt. 2024`), nullable.</ResponseField>
-    <ResponseField name="sold_date_at" type="string">Best-effort ISO date parsed from `sold_date`, e.g. `2026-07-02`. Null when the marketplace's date format is not English.</ResponseField>
+    <ResponseField name="sold_date" type="string">Sale date text as rendered by eBay, e.g. `Aug 19, 2026`. Localized on non-English marketplaces (e.g. `Verkauft 5. Okt. 2024`), nullable.</ResponseField>
+    <ResponseField name="sold_date_at" type="string">Best-effort ISO date parsed from `sold_date`, e.g. `2026-08-19`. Null when the marketplace's date format is not English.</ResponseField>
     <ResponseField name="seller_name" type="string">Seller username (nullable).</ResponseField>
     <ResponseField name="is_sponsored" type="boolean">Always `null`. eBay renders its "Sponsored" badge into every card as anti-scraping bait, so promoted placements cannot be distinguished from organic results.</ResponseField>
   </Expandable>
 </ResponseField>
 <ResponseField name="facets" type="object">Available filter facets keyed by name.</ResponseField>
-<ResponseField name="pagination" type="object">Pagination metadata with `current_page`, `per_page`, `total_pages`, `total_results`, `has_more`.
+<ResponseField name="pagination" type="object">Pagination metadata with `current_page`, `per_page`, `total_results`, `has_more`.
 
-`total_pages` and `total_results` are always `null` on this endpoint — eBay's completed-listings grid reports neither a result count nor a true page total. Use `has_more` to page instead (see below).</ResponseField>
+`total_results` is populated (the sold results page carries a match count). `total_pages` may be `null` — page with `has_more` rather than a fixed page total.</ResponseField>
 <ResponseField name="scraped_at" type="string">ISO 8601 timestamp when the results were scraped.</ResponseField>
 
 ### Example Response
 
 ```json
 {
-  "query": "nintendo switch oled",
+  "query": "nintendo switch",
   "domain": "com",
   "sold": true,
   "results": [
     {
       "position": 1,
       "item_id": "256987654321",
-      "title": "Nintendo Switch OLED Model White - Used",
+      "title": "Nintendo Switch (OLED Model) - Used",
       "url": "https://www.ebay.com/itm/256987654321",
       "image": "https://i.ebayimg.com/images/g/xyz/s-l500.jpg",
-      "price": { "value": 215.5, "currency": "USD", "symbol": "$", "raw": "$215.50" },
-      "condition": "Used",
+      "price": { "value": 260.0, "currency": "USD", "symbol": "$", "raw": "$260.00" },
+      "condition": "Pre-Owned",
       "buying_format": "Auction",
       "is_auction": true,
       "bids": 14,
-      "time_left": null,
-      "current_bid": { "value": 215.5, "currency": "USD", "symbol": "$", "raw": "$215.50" },
+      "current_bid": { "value": 260.0, "currency": "USD", "symbol": "$", "raw": "$260.00" },
       "shipping": "Free shipping",
       "location": "United States",
-      "sold_date": "18 Jun 2026",
-      "sold_date_at": "2026-06-18",
+      "sold_date": "Aug 19, 2026",
+      "sold_date_at": "2026-08-19",
       "seller_name": "gamerdeals99",
       "is_sponsored": null
     }
   ],
   "facets": {},
-  "pagination": { "current_page": 1, "per_page": 60, "total_pages": null, "total_results": null },
-  "scraped_at": "2026-06-21T12:00:00Z"
+  "pagination": { "current_page": 1, "per_page": 60, "total_pages": null, "total_results": 34000, "has_more": true },
+  "scraped_at": "2026-08-20T12:00:00Z"
 }
 ```
 
-## Fetching every sold listing (historical)
+## Fetching every sold listing
 
 `has_more` is the stop signal for bulk extraction. Increment `page` while it is `true`:
 
@@ -203,11 +161,5 @@ Use the largest `per_page` you can: each request costs 5 credits regardless of p
 size, so `per_page=240` is about 8x cheaper per listing than the default.
 
 <Note>
-  `per_page` is an upper bound. eBay's sold grid returns about 5/6 of the requested
-  value (≈200 for `240`, ≈50 for `60`) and ≈25 when omitted. Pages are contiguous —
-  no listings are skipped between them.
-</Note>
-
-<Note>
-  Historical pricing: each request cost **5 credits**. The endpoint now returns 410 and is not billed at all.
+  Each completed/sold request costs **5 credits**. Failed requests are not charged.
 </Note>
