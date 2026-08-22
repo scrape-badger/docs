@@ -150,6 +150,13 @@ The search endpoints support Reddit's full query syntax:
 
 ## Response Fields
 
+<Note>
+  These tables list every field the API returns. Fields Reddit only populates
+  for the account that owns the content (`saved`, `clicked`, `likes`, ...) and
+  moderator-only fields are deliberately omitted — they are meaningless for a
+  scraping API.
+</Note>
+
 ### Post Object
 
 | Field | Type | Description |
@@ -157,109 +164,266 @@ The search endpoints support Reddit's full query syntax:
 | `id` | string | Reddit post ID (e.g. `1obwkbb`) |
 | `fullname` | string | Reddit fullname with `t3_` prefix |
 | `title` | string | Post title |
+| `author` | string | Author username (`[deleted]` if removed) |
+| `author_fullname` | string \| null | Author fullname (`t2_...`) |
 | `selftext` | string | Plain-text body (empty for link posts) |
 | `selftext_html` | string \| null | HTML-rendered body |
-| `url` | string | Final URL (link target or self-post URL) |
-| `permalink` | string | Full Reddit permalink |
+| `url` | string | Link target, or the gallery/self-post URL |
+| `permalink` | string | Reddit permalink path (e.g. `/r/python/comments/...`) |
 | `domain` | string | Link domain (e.g. `github.com`, `self.python`) |
-| `author` | string | Author username |
-| `author_fullname` | string \| null | Author fullname (`t2_...`) |
-| `author_flair_text` | string \| null | Author's flair on this subreddit |
 | `subreddit` | string | Subreddit name (no prefix) |
-| `subreddit_name_prefixed` | string | Subreddit with prefix (e.g. `r/python`) |
-| `subreddit_id` | string | Subreddit fullname (`t5_...`) |
+| `subreddit_id` | string \| null | Subreddit fullname (`t5_...`) |
+| `subreddit_name_prefixed` | string \| null | Subreddit with prefix (e.g. `r/python`) |
+| `subreddit_type` | string \| null | `public`, `private`, `restricted`, `archived` |
 | `subreddit_subscribers` | number | Subscriber count at time of fetch |
 | `score` | number | Net score (ups − downs) |
 | `ups` | number | Upvote count |
+| `downs` | number | Downvote count (Reddit reports 0) |
 | `upvote_ratio` | number | Ratio of upvotes (0.0–1.0) |
 | `num_comments` | number | Total comment count |
 | `num_crossposts` | number | Number of cross-posts |
-| `created_utc` | number | Unix timestamp |
-| `created_at` | string | ISO 8601 UTC timestamp (e.g. `2025-10-20T22:56:45Z`) |
-| `edited` | number \| boolean | False or edit Unix timestamp |
-| `edited_at` | string \| null | ISO 8601 UTC if edited |
+| `total_awards_received` | number | Total awards received |
+| `view_count` | number \| null | View count (null unless the account owns the post) |
+| `gilded` | number | Number of times gilded |
+| `created_utc` | number | Creation Unix timestamp |
+| `created_at` | string \| null | ISO 8601 UTC timestamp (e.g. `2025-10-20T22:56:45+00:00`) |
+| `edited` | number \| boolean | `false`, or the edit Unix timestamp |
 | `is_self` | boolean | True for text posts |
 | `is_video` | boolean | True for native Reddit video |
-| `is_gallery` | boolean | True for image galleries |
-| `is_nsfw` | boolean | NSFW flag |
-| `is_spoiler` | boolean | Spoiler flag |
-| `is_locked` | boolean | Locked from new comments |
-| `is_stickied` | boolean | Pinned to top of subreddit |
-| `is_archived` | boolean | Older than 6 months (no new comments) |
+| `is_gallery` | boolean | True for multi-image galleries — see [Post images](#post-images) |
+| `is_meta` | boolean | True for Reddit meta posts |
 | `is_original_content` | boolean | OC tag |
-| `is_robot_indexable` | boolean | Whether search engines can index |
+| `is_robot_indexable` | boolean | Whether search engines can index the post |
 | `is_crosspostable` | boolean | Allowed to be cross-posted |
+| `is_reddit_media_domain` | boolean | Media is hosted on Reddit's own CDN |
+| `media_only` | boolean | Post body is media with no text |
+| `is_nsfw` | boolean | NSFW flag (Reddit's `over_18`) |
+| `is_spoiler` | boolean | Spoiler flag |
+| `is_stickied` | boolean | Pinned to top of subreddit |
+| `locked` | boolean | Locked from new comments |
+| `archived` | boolean | Older than 6 months (no new comments) |
+| `pinned` | boolean | Pinned to the author's profile |
+| `quarantine` | boolean | Subreddit is quarantined |
+| `hide_score` | boolean | Score hidden by subreddit settings |
+| `contest_mode` | boolean | Comments randomised, scores hidden |
+| `allow_live_comments` | boolean | Live comment updates enabled |
 | `send_replies` | boolean | Author receives inbox replies |
+| `distinguished` | string \| null | `moderator`, `admin`, or null |
+| `removed_by_category` | string \| null | Removal reason category (e.g. `moderator`, `deleted`) |
+| `suggested_sort` | string \| null | Subreddit's suggested comment sort |
+| `discussion_type` | string \| null | `CHAT` for live chat posts, else null |
+| `top_awarded_type` | string \| null | Highest award tier received |
 | `link_flair_text` | string \| null | Post flair text |
+| `link_flair_type` | string \| null | `text` or `richtext` |
+| `link_flair_css_class` | string \| null | Flair CSS class |
+| `link_flair_template_id` | string \| null | Reddit's flair template UUID |
 | `link_flair_background_color` | string \| null | Flair background hex |
 | `link_flair_text_color` | string \| null | `light` or `dark` |
-| `link_flair_template_id` | string \| null | Reddit's flair template UUID |
-| `distinguished` | string \| null | `moderator`, `admin`, or null |
-| `thumbnail` | string \| null | Thumbnail URL |
-| `preview_images` | array | Preview images with `url`, `width`, `height` |
-| `media` | object \| null | Embedded media (video, oEmbed) |
-| `gallery_data` | array \| null | Gallery item metadata |
-| `total_awards` | number | Total awards received |
-| `awards` | array | Award objects (id, name, count, icon_url) |
-| `gilded` | number | Number of times gilded |
-| `removed_by_category` | string \| null | Removal reason category |
+| `author_flair_text` | string \| null | Author's flair on this subreddit |
+| `author_flair_type` | string \| null | `text` or `richtext` |
+| `author_flair_css_class` | string \| null | Author flair CSS class |
+| `author_flair_template_id` | string \| null | Author flair template UUID |
+| `author_flair_background_color` | string \| null | Author flair background hex |
+| `author_flair_text_color` | string \| null | `light` or `dark` |
+| `author_premium` | boolean | Author has Reddit Premium |
+| `author_patreon_flair` | boolean | Author shows Patreon flair |
+| `thumbnail` | string \| null | Thumbnail URL (~140px), or `self`/`default`/`nsfw` |
+| `thumbnail_width` | number \| null | Thumbnail width in pixels |
+| `thumbnail_height` | number \| null | Thumbnail height in pixels |
+| `media` | object \| null | Embedded media (Reddit video, oEmbed payload) |
+| `media_embed` | object \| null | Embed HTML and dimensions |
+| `secure_media` | object \| null | HTTPS variant of `media` |
+| `secure_media_embed` | object \| null | HTTPS variant of `media_embed` |
+| `gallery_images` | array | Gallery images in poster order — see [Post images](#post-images) |
+| `all_awardings` | array | Award objects (`id`, `name`, `count`, `icon_url`, …) |
+| `gildings` | object | Gilding counts by tier |
 
 ### Comment Object
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `id`, `fullname` | string | Comment ID and `t1_*` fullname |
-| `body`, `body_html` | string | Comment text (plain & rendered) |
-| `author`, `author_fullname` | string | Author info |
-| `subreddit`, `subreddit_name_prefixed` | string | Subreddit context |
-| `post_id`, `post_title` | string | Parent post |
-| `parent_id` | string | Parent thing fullname |
-| `score`, `ups`, `controversiality` | number | Engagement |
+| `id` | string | Comment ID |
+| `fullname` | string | Comment fullname with `t1_` prefix |
+| `body` | string | Comment text (plain) |
+| `body_html` | string \| null | Comment text (HTML-rendered) |
+| `author` | string | Author username |
+| `author_fullname` | string \| null | Author fullname (`t2_...`) |
+| `subreddit` | string | Subreddit name |
+| `subreddit_id` | string \| null | Subreddit fullname (`t5_...`) |
+| `subreddit_name_prefixed` | string \| null | Subreddit with prefix |
+| `subreddit_type` | string \| null | `public`, `private`, `restricted` |
+| `post_id` | string \| null | Parent post fullname (Reddit's `link_id`) |
+| `parent_id` | string \| null | Parent thing fullname (post or comment) |
+| `permalink` | string | Reddit permalink path |
+| `score` | number | Net score |
+| `ups` | number | Upvote count |
+| `downs` | number | Downvote count (Reddit reports 0) |
+| `controversiality` | number | 1 if contested, else 0 |
+| `total_awards_received` | number | Total awards received |
+| `gilded` | number | Number of times gilded |
+| `score_hidden` | boolean | Score hidden (new or contest-mode comment) |
 | `depth` | number | Nesting level (0 = top-level) |
-| `created_utc`, `created_at` | number, string | Unix + ISO 8601 |
-| `edited`, `edited_at` | number/bool, string | Edit timestamps |
-| `is_submitter` | boolean | True if author is post author (OP) |
-| `is_stickied`, `is_locked` | boolean | Moderation state |
-| `distinguished` | string \| null | Mod/admin badge |
-| `replies` | array | Nested comments (recursive) |
+| `created_utc` | number | Creation Unix timestamp |
+| `created_at` | string \| null | ISO 8601 UTC timestamp |
+| `edited` | number \| boolean | `false`, or the edit Unix timestamp |
+| `is_submitter` | boolean | True if the author is the post's author (OP) |
+| `is_stickied` | boolean | Pinned to top of the thread |
+| `locked` | boolean | Locked from replies |
+| `archived` | boolean | Older than 6 months |
+| `collapsed` | boolean | Collapsed by default |
+| `collapsed_reason` | string \| null | Why it was collapsed |
+| `send_replies` | boolean | Author receives inbox replies |
+| `distinguished` | string \| null | `moderator`, `admin`, or null |
+| `comment_type` | string \| null | Comment type, if any |
+| `author_flair_text` | string \| null | Author's flair on this subreddit |
+| `author_flair_type` | string \| null | `text` or `richtext` |
+| `author_flair_css_class` | string \| null | Author flair CSS class |
+| `author_flair_template_id` | string \| null | Author flair template UUID |
+| `author_flair_background_color` | string \| null | Author flair background hex |
+| `author_flair_text_color` | string \| null | `light` or `dark` |
+| `author_premium` | boolean | Author has Reddit Premium |
+| `all_awardings` | array | Award objects |
+| `gildings` | object | Gilding counts by tier |
+| `replies` | array | Nested comments (recursive, to the requested depth) |
 
 ### Subreddit Object
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `id`, `fullname`, `name` | string | Identifiers |
-| `display_name_prefixed` | string | E.g. `r/python` |
-| `title`, `header_title` | string | Display names |
-| `description`, `description_html` | string | Long description (sidebar) |
-| `public_description`, `public_description_html` | string | Short description |
-| `subscribers`, `active_users` | number | Member counts |
-| `created_utc`, `created_at` | number, string | When created |
-| `type` | string | `public`, `private`, `restricted` |
-| `submission_type` | string | `any`, `link`, `self` |
+| `id` | string | Subreddit ID |
+| `fullname` | string | Subreddit fullname with `t5_` prefix |
+| `name` | string | Subreddit name (no prefix) |
+| `display_name_prefixed` | string \| null | E.g. `r/python` |
+| `title` | string | Short display title |
+| `description` | string | Sidebar description (markdown) |
+| `description_html` | string \| null | Sidebar description (HTML) |
+| `public_description` | string | Short public description (markdown) |
+| `public_description_html` | string \| null | Short public description (HTML) |
+| `url` | string | Subreddit path (e.g. `/r/python/`) |
+| `subscribers` | number | Member count |
+| `created_utc` | number | Creation Unix timestamp |
+| `created_at` | string \| null | ISO 8601 UTC timestamp |
+| `subreddit_type` | string \| null | `public`, `private`, `restricted`, `archived` |
+| `lang` | string \| null | Primary language code |
+| `is_nsfw` | boolean | NSFW subreddit (Reddit's `over18`) |
+| `quarantine` | boolean | Subreddit is quarantined |
+| `wiki_enabled` | boolean | Wiki is enabled |
+| `over18` | boolean | Raw Reddit NSFW flag (mirrors `is_nsfw`) |
+| `submission_type` | string \| null | `any`, `link`, `self` |
+| `submit_text` | string \| null | Submit-page guidance (markdown) |
+| `submit_text_html` | string \| null | Submit-page guidance (HTML) |
+| `submit_text_label` | string \| null | Text-post button label |
+| `submit_link_label` | string \| null | Link-post button label |
+| `allow_images` | boolean | Image posts allowed |
+| `allow_videos` | boolean | Video posts allowed |
+| `allow_galleries` | boolean | Gallery posts allowed |
+| `allow_polls` | boolean | Poll posts allowed |
+| `spoilers_enabled` | boolean | Spoiler tagging enabled |
+| `original_content_tag_enabled` | boolean | OC tagging enabled |
+| `all_original_content` | boolean | All posts must be OC |
+| `restrict_posting` | boolean | Posting is restricted |
+| `restrict_commenting` | boolean | Commenting is restricted |
+| `free_form_reports` | boolean | Free-form reports allowed |
+| `show_media` | boolean | Thumbnails shown by default |
+| `accept_followers` | boolean | Followers accepted |
+| `link_flair_enabled` | boolean | Post flair enabled |
+| `link_flair_position` | string \| null | `left`, `right`, or empty |
+| `comment_score_hide_mins` | number | Minutes before comment scores show |
+| `suggested_comment_sort` | string \| null | Default comment sort |
 | `advertiser_category` | string \| null | Ad category |
-| `is_nsfw`, `is_quarantined` | boolean | Content flags |
-| `icon_url`, `banner_url`, `header_url` | string | Images |
-| `primary_color`, `key_color`, `banner_background_color` | string | Theme |
-| `wiki_enabled`, `allow_images`, `allow_videos`, `allow_galleries`, `allow_polls` | boolean | Content permissions |
-| `spoilers_enabled`, `emojis_enabled`, `free_form_reports` | boolean | Features |
-| `comment_score_hide_mins` | number | Minutes before scores show |
-| `should_archive_posts` | boolean | Auto-archive after 6mo |
-| `allowed_media_in_comments` | array | E.g. `["video"]` |
+| `community_icon` | string \| null | Redesign community icon URL |
+| `icon_img` | string \| null | Subreddit icon URL |
+| `banner_img` | string \| null | Banner image URL |
+| `banner_background_image` | string \| null | Redesign banner image URL |
+| `header_img` | string \| null | Legacy header image URL |
+| `header_title` | string \| null | Header hover title |
+| `primary_color` | string \| null | Theme primary colour hex |
+| `key_color` | string \| null | Theme key colour hex |
+| `banner_background_color` | string \| null | Banner background hex |
 
 ### User Object
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `id`, `fullname`, `name` | string | Identifiers |
-| `display_name_prefixed` | string | E.g. `u/spez` |
-| `description`, `profile_title` | string | Bio |
-| `icon_url`, `snoovatar_url`, `banner_url` | string | Images |
-| `profile_url` | string | Profile page URL |
-| `link_karma`, `comment_karma`, `awardee_karma`, `awarder_karma`, `total_karma` | number | Karma breakdown |
-| `created_utc`, `created_at` | number, string | Account age |
-| `verified`, `has_verified_email`, `is_employee`, `is_mod`, `is_gold`, `is_suspended` | boolean | Account flags |
-| `accepts_followers`, `has_subscribed` | boolean | Settings |
-| `is_nsfw` | boolean | NSFW profile |
+| `id` | string | User ID (no `t2_` prefix) |
+| `name` | string | Username |
+| `display_name_prefixed` | string \| null | E.g. `u/spez` |
+| `link_karma` | number | Post karma |
+| `comment_karma` | number | Comment karma |
+| `awardee_karma` | number | Karma from awards received |
+| `awarder_karma` | number | Karma from awards given |
+| `total_karma` | number | Sum of all karma types |
+| `created_utc` | number | Account creation Unix timestamp |
+| `created_at` | string \| null | ISO 8601 UTC timestamp |
+| `is_gold` | boolean | Has Reddit Premium |
+| `is_employee` | boolean | Reddit employee |
+| `is_mod` | boolean | Moderates at least one subreddit |
+| `is_friend` | boolean | Friend of the requesting account (always false) |
+| `verified` | boolean | Account is verified |
+| `has_verified_email` | boolean | Email is verified |
+| `hide_from_robots` | boolean | Opted out of search engine indexing |
+| `accept_followers` | boolean | Accepts followers |
+| `icon_img` | string \| null | Avatar URL |
+| `snoovatar_img` | string \| null | Snoovatar URL (empty if unset) |
+| `subreddit` | object \| null | The user's profile subreddit (`u/<name>`) |
+
+## Post images
+
+Reddit stores a post's images in two different places depending on the post
+type, so ScrapeBadger surfaces both.
+
+### Galleries
+
+When `is_gallery` is `true`, every image is listed in `gallery_images` **in the
+order the poster arranged them**, at full source resolution. Deleted or
+still-processing slots are omitted.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `media_id` | string | Reddit's identifier for the image within the gallery |
+| `url` | string | Full-resolution source URL (the `.gif` for animated items) |
+| `width` | number \| null | Source width in pixels |
+| `height` | number \| null | Source height in pixels |
+| `mime_type` | string \| null | E.g. `image/jpg`, `image/png`, `image/gif` |
+| `mp4_url` | string \| null | Animated items only: Reddit's mp4 transcode; null for stills |
+
+```json
+{
+  "post": {
+    "id": "1vbjcq5",
+    "is_gallery": true,
+    "url": "https://www.reddit.com/gallery/1vbjcq5",
+    "gallery_images": [
+      {
+        "media_id": "uaq38k4ojigh1",
+        "url": "https://preview.redd.it/uaq38k4ojigh1.jpg?width=4712&format=pjpg&auto=webp&s=...",
+        "width": 4712,
+        "height": 2668,
+        "mime_type": "image/jpg",
+        "mp4_url": null
+      }
+    ]
+  }
+}
+```
+
+<Note>
+  A gallery post's `url` points at `reddit.com/gallery/<id>` and its `thumbnail`
+  is only ~140px wide. Use `gallery_images` for the actual images.
+</Note>
+
+### Single image, video and link posts
+
+Non-gallery posts are not affected: a single-image post's `url` is already the
+direct, full-resolution image on `i.redd.it`, and `thumbnail` holds the ~140px
+version. Native Reddit video lives under `media` / `secure_media`. Only
+galleries needed a dedicated field, because their `url` points at a gallery
+page rather than at any image.
+
+<Note>
+  `preview.redd.it` URLs are signed. Use them exactly as returned — stripping or
+  re-ordering the query string invalidates the signature.
+</Note>
 
 ## Rate Limits
 
