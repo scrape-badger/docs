@@ -91,9 +91,11 @@ Identical shape to [`/v1/ebay/search`](/api-reference/endpoint/ebay/search), exc
   </Expandable>
 </ResponseField>
 <ResponseField name="facets" type="object">Available filter facets keyed by name.</ResponseField>
-<ResponseField name="pagination" type="object">Pagination metadata with `current_page`, `per_page`, `total_results`, `has_more`.
+<ResponseField name="pagination" type="object">
+  Pagination metadata with `current_page`, `per_page`, `total_results`, `has_more`.
 
-`total_results` is populated (the sold results page carries a match count). `total_pages` may be `null` — page with `has_more` rather than a fixed page total.</ResponseField>
+  `total_results` is populated (the sold results page carries a match count). `total_pages` may be `null` — page with `has_more` rather than a fixed page total.
+</ResponseField>
 <ResponseField name="scraped_at" type="string">ISO 8601 timestamp when the results were scraped.</ResponseField>
 
 ### Example Response
