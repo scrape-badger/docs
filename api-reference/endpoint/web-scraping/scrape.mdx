@@ -10,15 +10,70 @@ openapi: POST /v1/web/scrape
   The URL to scrape. Must be a valid HTTP or HTTPS URL. Private IPs and cloud metadata endpoints are blocked for security.
 </ParamField>
 
+<ParamField body="method" type="string" default="GET">
+  HTTP method for the request: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`
+  or `OPTIONS`. `POST`, `PUT` and `PATCH` require `request_body`.
+</ParamField>
+
+<ParamField body="request_body" type="string">
+  Raw body to send with a `POST`/`PUT`/`PATCH`. Pass it as a **string**, and
+  set `content_type` to match — there is no `form_data` parameter.
+
+  ```json Submit a form
+  {
+    "url": "https://example.com/login",
+    "method": "POST",
+    "request_body": "username=alice&password=hunter2",
+    "content_type": "application/x-www-form-urlencoded"
+  }
+  ```
+  ```json Call a JSON API
+  {
+    "url": "https://example.com/api/search",
+    "method": "POST",
+    "request_body": "{\"q\":\"shoes\"}",
+    "content_type": "application/json"
+  }
+  ```
+</ParamField>
+
+<ParamField body="content_type" type="string">
+  `Content-Type` header for `request_body`. Defaults to
+  `application/json` when a body is present.
+</ParamField>
+
 <ParamField body="engine" type="string" default="auto">
   Scraping engine tier to use. ScrapeBadger automatically selects the best approach.
 
-  | Value | Description | Cost |
-  |-------|-------------|------|
-  | `auto` | Automatically picks the best engine for the target site (recommended) | From 1 credit |
-  | `browser` | Force headless browser with full JavaScript rendering | 5 credits |
+  | Value | Engine cost | Description |
+  |-------|-------------|-------------|
+  | `auto` | from 1 credit | Automatically picks the best engine for the target site (recommended) |
+  | `browser` | 5 credits | Force headless browser with full JavaScript rendering |
 
-  In `auto` mode, simple pages use fast HTTP (1 credit) and JavaScript-heavy pages use a browser (5 credits). When `escalate` is enabled, the system can further escalate to premium browsers (10 credits) for heavily protected sites.
+  In `auto` mode, simple pages use fast HTTP (1 credit) and JavaScript-heavy
+  pages use a browser (5 credits).
+
+  <Warning>
+  **The engine cost is not the total.** Every request also pays the
+  [`proxy_tier`](#param-proxy-tier) surcharge, so the cheapest possible scrape
+  is **2 credits**, not 1, and a browser scrape is **6**, not 5. See
+  [Credit costs](#credit-costs) for the full arithmetic.
+  </Warning>
+</ParamField>
+
+<ParamField body="proxy_tier" type="string" default="simple">
+  Proxy quality to route the request through. **This surcharge is added to every
+  request**, on top of the engine cost.
+
+  | Value | Pool | Surcharge |
+  |-------|------|-----------|
+  | `simple` | Datacenter | **+1 credit** |
+  | `premium` | Residential | **+8 credits** |
+  | `ultra` | Premium residential / mobile | **+8 credits** |
+
+  Stay on `simple` unless the target actually blocks datacenter IPs — moving to
+  `premium` makes a browser scrape 13 credits instead of 6. Use
+  [`max_cost`](#param-max-cost) if you want a hard ceiling.
 </ParamField>
 
 <ParamField body="format" type="string" default="html">
@@ -46,6 +101,26 @@ openapi: POST /v1/web/scrape
   ```json
   { "wait_for": "//div[@class='results']" }
   ```
+
+  <Warning>
+  **`render_js` alone is often not enough.** It returns the DOM once the page
+  has loaded — which for anything drawn by a third-party widget (an embedded
+  login form, a consent gate, a chat panel, a payment iframe) is the empty
+  container, not the content. Those widgets fetch and paint seconds after load.
+
+  If a form or list is missing from your result, name it in `wait_for` rather
+  than raising `wait_after_load`; the selector returns as soon as the element
+  exists instead of always paying a fixed dwell.
+
+  ```json
+  {
+    "url": "https://example.com/login",
+    "render_js": true,
+    "wait_for": "#login-container input[type=password]",
+    "wait_timeout": 30000
+  }
+  ```
+  </Warning>
 </ParamField>
 
 <ParamField body="wait_timeout" type="integer" default={30000}>
@@ -118,12 +193,41 @@ openapi: POST /v1/web/scrape
   ```
 </ParamField>
 
+<ParamField body="eval_js" type="string">
+  JavaScript to evaluate in the loaded page after navigation and all waits
+  complete. Its return value replaces the page HTML in `content` (objects are
+  JSON-serialised). May be an async arrow function. Browser engines only —
+  forces the `browser` engine. No extra credits.
+
+  Use it to pull something out of the live page that the HTML does not carry:
+
+  ```json Read the page's cookies
+  { "url": "https://example.com", "render_js": true, "eval_js": "document.cookie" }
+  ```
+  ```json Read a value the page computed
+  {
+    "url": "https://example.com",
+    "render_js": true,
+    "eval_js": "(async () => JSON.stringify({ id: window.__APP_STATE__.id }))()"
+  }
+  ```
+
+  <Note>
+  `document.cookie` returns only non-`HttpOnly` cookies — that is a browser
+  rule, not a ScrapeBadger limit. Anti-bot vendors' session cookies are also
+  bound to the IP and TLS fingerprint that minted them, so replaying them from
+  a different machine does not carry the session. To keep a session alive
+  across several scrapes, use [`session_id`](#param-session-id) instead and
+  keep the whole flow on our side.
+  </Note>
+</ParamField>
+
 <ParamField body="screenshot" type="boolean" default={false}>
   Capture a full-page screenshot (PNG). Forces the browser engine. Returned as base64 in the `screenshot_url` response field.
 </ParamField>
 
 <ParamField body="video" type="boolean" default={false}>
-  Record a video of the browser session (animated GIF). Forces the browser engine. Returned as base64 in the `video_url` response field. Adds **+3 credits**. Useful for debugging, visual verification, or monitoring how a page loads.
+  Record a video of the browser session (animated GIF). Forces the browser engine. Returned as base64 in the `video_url` response field. No extra charge — you pay the browser engine cost you were already paying. Useful for debugging, visual verification, or monitoring how a page loads.
 </ParamField>
 
 <ParamField body="anti_bot" type="boolean" default={false}>
@@ -156,7 +260,7 @@ openapi: POST /v1/web/scrape
 </ParamField>
 
 <ParamField body="ai_extract" type="boolean" default={false}>
-  Run AI-powered extraction on the scraped content using the instruction in `ai_prompt`. Adds **+2 credits** to the request cost. The scrape result is still returned even if AI extraction fails.
+  Run AI-powered extraction on the scraped content using the instruction in `ai_prompt`. Adds **+10 credits** to the request cost. The scrape result is still returned even if AI extraction fails, and a failed extraction is not charged.
 </ParamField>
 
 <ParamField body="ai_prompt" type="string">
@@ -169,6 +273,39 @@ openapi: POST /v1/web/scrape
   }
   ```
 </ParamField>
+
+## Credit costs
+
+Every request is billed as **engine + proxy tier + options**. The proxy tier is
+charged on every request, which is why nothing costs 1 credit in practice.
+
+| Component | Credits |
+|-----------|---------|
+| HTTP engine (`curl_cffi`/`httpcloak`) | 1 |
+| Browser engine (`browser`) | 5 |
+| `proxy_tier: simple` (default) | +1 |
+| `proxy_tier: premium` / `ultra` | +8 |
+| `ai_extract` | +10 |
+| `anti_bot`, when a solver is actually invoked | +5 |
+| `screenshot`, `video`, `js_scenario`, `eval_js`, `wait_for` | +0 |
+
+Common totals:
+
+| Request | Total |
+|---------|-------|
+| Simple page, default tier | **2** |
+| JS-rendered page, default tier | **6** |
+| JS-rendered page, `premium` tier | **13** |
+| Simple page + `ai_extract` | **12** |
+
+The exact amount charged is always in the `X-Credits-Used` response header and
+the `credits_used` body field — trust those over any estimate. A request
+rejected before scraping (`400`, `422`) is charged **0**.
+
+<Tip>
+Set [`max_cost`](#param-max-cost) to put a hard ceiling on a request. It is
+checked against the estimate *including* the proxy surcharge.
+</Tip>
 
 ## Response
 
@@ -213,7 +350,9 @@ openapi: POST /v1/web/scrape
 </ResponseField>
 
 <ResponseField name="credits_used" type="integer">
-  Total credits charged for this request, including engine cost, solver, and AI extraction.
+  Total credits charged for this request: engine cost + `proxy_tier` surcharge,
+  plus solver and AI extraction when used. See [Credit costs](#credit-costs).
+  This is the authoritative figure and matches the `X-Credits-Used` header.
 </ResponseField>
 
 <ResponseField name="duration_ms" type="integer">
@@ -517,9 +656,29 @@ console.log(data.content);
 |--------|-------------|
 | `400` | Invalid URL, cost exceeds `max_cost`, or requested engine not available |
 | `402` | Insufficient credits |
-| `422` | Blocking detected after all retries exhausted (`success: false`, `blocking_details` populated) |
+| `422` | Blocking detected after all retries exhausted (`success: false`, `blocking_details` populated), or the body contained an unknown field (`error: "unknown_request_field"`) |
 | `429` | Rate limit exceeded |
 | `500` | Unexpected server error |
+
+### Unknown request fields
+
+A field this endpoint does not define is rejected rather than ignored, so a
+request never looks like it succeeded at something it did not do. The response
+names the offending field and lists everything the endpoint accepts, and
+nothing is charged.
+
+```json 422 — Unknown request field
+{
+  "error": "unknown_request_field",
+  "detail": "Unknown request field(s): return_cookies. These were silently ignored by older versions; they are now rejected so a request never appears to succeed at something it did not do.",
+  "unknown_fields": ["return_cookies"],
+  "accepted_fields": ["ai_extract", "ai_prompt", "anti_bot", "..."]
+}
+```
+
+There is no `return_cookies` or `form_data` parameter. To read cookies use
+[`eval_js`](#param-eval-js); to send a request body use
+[`method`](#param-method) with `request_body`.
 
 <ResponseExample>
 
@@ -531,7 +690,7 @@ console.log(data.content);
   "content": "# Example Domain\n\nThis domain is for use in illustrative examples...",
   "format": "markdown",
   "engine_used": "http",
-  "credits_used": 1,
+  "credits_used": 2,
   "duration_ms": 342,
   "retries_used": 0,
   "content_length": 1256,
@@ -560,7 +719,7 @@ console.log(data.content);
   "content": "# Products\n\n...",
   "format": "markdown",
   "engine_used": "http",
-  "credits_used": 3,
+  "credits_used": 12,
   "duration_ms": 2150,
   "retries_used": 0,
   "content_length": 8432,
