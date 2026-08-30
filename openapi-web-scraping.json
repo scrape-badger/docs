@@ -34,6 +34,30 @@
                     "type": "string",
                     "description": "The URL to scrape. Must be a valid HTTP or HTTPS URL."
                   },
+                  "method": {
+                    "type": "string",
+                    "default": "GET",
+                    "enum": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
+                    "description": "HTTP method. POST/PUT/PATCH require request_body."
+                  },
+                  "request_body": {
+                    "type": "string",
+                    "description": "Raw body for POST/PUT/PATCH, as a string. There is no form_data parameter \u2014 set content_type to match."
+                  },
+                  "content_type": {
+                    "type": "string",
+                    "description": "Content-Type for request_body. Defaults to application/json when a body is present."
+                  },
+                  "proxy_tier": {
+                    "type": "string",
+                    "default": "simple",
+                    "enum": ["simple", "premium", "ultra"],
+                    "description": "Proxy pool to route through. Its surcharge is added to EVERY request: simple +1, premium +8, ultra +8 credits."
+                  },
+                  "eval_js": {
+                    "type": "string",
+                    "description": "JavaScript evaluated in the loaded page after navigation and waits; its return value replaces the page HTML in content. Browser engines only. Use it to read what the HTML does not carry, e.g. document.cookie (non-HttpOnly cookies only, and anti-bot cookies are bound to the IP and TLS fingerprint that minted them)."
+                  },
                   "engine": {
                     "type": "string",
                     "default": "auto",
@@ -101,7 +125,7 @@
                   "video": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Record browser session as animated GIF (+3 credits)."
+                    "description": "Record browser session as animated GIF. No extra charge."
                   },
                   "anti_bot": {
                     "type": "boolean",
