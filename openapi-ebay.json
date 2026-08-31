@@ -99,10 +99,12 @@
                 "open_box",
                 "refurbished",
                 "used",
-                "for_parts"
+                "for_parts",
+                "graded",
+                "ungraded"
               ]
             },
-            "description": "Item condition filter."
+            "description": "Item condition. `graded` / `ungraded` are eBay's trading-card conditions — slabbed (PSA/BGS/CGC) vs raw — so a card can be priced separately from its slabs."
           },
           {
             "name": "buying_format",
@@ -143,6 +145,19 @@
               "default": false
             },
             "description": "Only return listings with free shipping."
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "required": false,
+            "description": "Item location. `domestic` returns only items located in this marketplace's own country (`domain=fr` → France only); `worldwide` widens to every country. Foreign listings are priced in the marketplace's currency after eBay CONVERTS them, so `domestic` is also how you get untouched native sale prices.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "domestic",
+                "worldwide"
+              ]
+            }
           }
         ],
         "responses": {
@@ -626,10 +641,12 @@
                 "open_box",
                 "refurbished",
                 "used",
-                "for_parts"
+                "for_parts",
+                "graded",
+                "ungraded"
               ]
             },
-            "description": "Item condition filter."
+            "description": "Item condition. `graded` / `ungraded` are eBay's trading-card conditions — slabbed (PSA/BGS/CGC) vs raw — so a card can be priced separately from its slabs."
           },
           {
             "name": "min_price",
@@ -648,6 +665,19 @@
               "minimum": 0
             },
             "description": "Maximum price filter in the marketplace's local currency."
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "required": false,
+            "description": "Item location. `domestic` returns only items located in this marketplace's own country (`domain=fr` → France only); `worldwide` widens to every country. Foreign listings are priced in the marketplace's currency after eBay CONVERTS them, so `domestic` is also how you get untouched native sale prices.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "domestic",
+                "worldwide"
+              ]
+            }
           }
         ],
         "responses": {

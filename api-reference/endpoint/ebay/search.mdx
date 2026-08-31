@@ -53,6 +53,12 @@ description: "Search an eBay marketplace for active listings."
   | `refurbished` | Refurbished (any grade) |
   | `used` | Pre-owned |
   | `for_parts` | For parts or not working |
+  | `graded` | Trading cards: slabbed (PSA / BGS / CGC) |
+  | `ungraded` | Trading cards: raw |
+
+  `graded` / `ungraded` are eBay's card-specific conditions. Pricing a raw card
+  against sales that include slabs skews the average badly — price the two
+  separately.
 </ParamField>
 
 <ParamField query="buying_format" type="string">
@@ -75,6 +81,21 @@ description: "Search an eBay marketplace for active listings."
 
 <ParamField query="free_shipping" type="boolean" default={false}>
   Only return listings with free shipping.
+</ParamField>
+
+<ParamField query="location" type="string">
+  Item location.
+
+  | Value | Description |
+  |-------|-------------|
+  | `domestic` | Only items located in this marketplace's own country (`domain=fr` → France only) |
+  | `worldwide` | Items from every country |
+
+  Omit it and you get eBay's default, which mixes foreign listings into a national
+  marketplace. Two things follow, and both matter for price research: a national
+  price series picks up sales that never happened in that country, and a foreign
+  listing's price is shown **converted** into the marketplace's currency rather
+  than the amount it actually sold for. `location=domestic` removes both.
 </ParamField>
 
 ## Response

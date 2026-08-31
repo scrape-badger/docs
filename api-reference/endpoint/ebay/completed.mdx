@@ -50,7 +50,26 @@ rely on, since asking prices alone don't reflect what items actually sell for.
 
 <ParamField query="condition" type="string">
   Item condition filter (`new`, `open_box`, `refurbished`, `used`, `for_parts`).
+
+  Trading cards also accept `graded` and `ungraded` — eBay's card conditions for
+  slabbed (PSA / BGS / CGC) versus raw cards. Pricing a raw card against sales
+  that include slabs skews the average badly, so price the two separately.
 </ParamField>
+<ParamField query="location" type="string">
+  Item location.
+
+  | Value | Description |
+  |-------|-------------|
+  | `domestic` | Only items located in this marketplace's own country (`domain=fr` → France only) |
+  | `worldwide` | Items from every country |
+
+  Omit it and you get eBay's default, which mixes foreign listings into a national
+  marketplace. Two things follow from that, and both matter for price research:
+  a national price series picks up sales that never happened in that country, and
+  a foreign listing's price is shown **converted** into the marketplace's currency
+  rather than the amount it actually sold for. `location=domestic` removes both.
+</ParamField>
+
 
 <ParamField query="min_price" type="number">
   Minimum sold-price filter in the marketplace's local currency.
