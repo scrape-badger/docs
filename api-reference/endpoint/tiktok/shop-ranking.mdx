@@ -1,0 +1,17 @@
+---
+title: "Shop Best Sellers"
+openapi: "GET /v1/tiktok/shop/ranking"
+description: "TikTok Shop's official best sellers of the past 30 days, ranked, with price, discount, rating, sold count and seller."
+---
+
+<Note>
+  The storefront's own **"Best sellers in past 30 days"** ranking — `rank` is the 1-based position and `promo` carries the active deal label (`Flash sale`, `Limited time deal`) when there is one.
+</Note>
+
+<Note>
+  **US market only** — TikTok Shop resolves the market from the visitor's location and these endpoints read the US storefront (prices in USD). Lists return what the storefront page renders; there is no further pagination.
+</Note>
+
+<Note>
+  Each request costs **5 credits**. Failed requests are not charged.
+</Note>

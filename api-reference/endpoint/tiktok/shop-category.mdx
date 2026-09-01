@@ -1,0 +1,17 @@
+---
+title: "Shop Category Products"
+openapi: "GET /v1/tiktok/shop/categories/{category_id}"
+description: "A TikTok Shop category's subcategories and the top products the storefront shows for it."
+---
+
+<Note>
+  `children` are the direct subcategories (empty on a leaf), `products` the top products the storefront renders for the category (about 15–25).
+</Note>
+
+<Note>
+  **US market only** — TikTok Shop resolves the market from the visitor's location and these endpoints read the US storefront (prices in USD). Lists return what the storefront page renders; there is no further pagination.
+</Note>
+
+<Note>
+  Each request costs **5 credits**. Failed requests are not charged.
+</Note>

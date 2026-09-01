@@ -1,0 +1,17 @@
+---
+title: "Shop Root Categories"
+openapi: "GET /v1/tiktok/shop/categories"
+description: "Top-level TikTok Shop categories (US) — drill down with the category endpoint."
+---
+
+<Note>
+  Returns the ~28 top-level categories with their ids. Pass an id to [Shop Category Products](/api-reference/endpoint/tiktok/shop-category) for subcategories and top products.
+</Note>
+
+<Note>
+  **US market only** — TikTok Shop resolves the market from the visitor's location and these endpoints read the US storefront (prices in USD). Lists return what the storefront page renders; there is no further pagination.
+</Note>
+
+<Note>
+  Each request costs **5 credits**. Failed requests are not charged.
+</Note>

@@ -1,0 +1,21 @@
+---
+title: "Shop Product Detail"
+openapi: "GET /v1/tiktok/shop/products/{product_id}"
+description: "Full TikTok Shop product page: description, images, price, SKUs with stock, reviews, shop stats and TikTok's AI summary."
+---
+
+<Note>
+  `skus` carry per-variant `properties`, `price`, `available_quantity` and `in_stock`; `reviews` ship with `rating_breakdown` and `shop` with the store's sold/follower/review counts. Unknown ids return `404`.
+</Note>
+
+<Note>
+  On some promoted products TikTok masks the page price (it ships `"1*"`): `price.amount` is then `null` while `price.discount` is set. The list endpoints carry the real price.
+</Note>
+
+<Note>
+  **US market only** — TikTok Shop resolves the market from the visitor's location and these endpoints read the US storefront (prices in USD). Lists return what the storefront page renders; there is no further pagination.
+</Note>
+
+<Note>
+  Each request costs **8 credits**. Failed requests are not charged.
+</Note>

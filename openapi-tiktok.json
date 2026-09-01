@@ -2579,6 +2579,582 @@
           }
         }
       }
+    },
+    "/v1/tiktok/shop/ranking": {
+      "get": {
+        "operationId": "getTikTokShopRanking",
+        "summary": "Shop Best Sellers",
+        "description": "TikTok Shop's own ranking of the best-selling products of the past 30 days, with price, discount, rating, sold count, seller and deal labels. US market only (prices in USD); lists carry what the storefront page renders, with no further pagination.",
+        "tags": [
+          "TikTok Shop"
+        ],
+        "parameters": [
+          {
+            "name": "count",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 50
+            },
+            "description": "Maximum number of products to return (the page carries about 18)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Shop Best Sellers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShopRankingResponse"
+                },
+                "example": {
+                  "products": [
+                    {
+                      "product_id": "1729448464509734958",
+                      "title": "Toplux Magnesium Complex 8 Essential Magnesium Supplement",
+                      "url": "https://shop.tiktok.com/us/pdp/magnesium-complex-by-toplux-8-essential-magnesium-forms-in-one-capsule/1729448464509734958",
+                      "image": "https://p16-oec-general-useast5.ttcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0b7d3556b58d451da...",
+                      "price": {
+                        "amount": 16.97,
+                        "original": 49.97,
+                        "discount": "66%",
+                        "currency": "USD",
+                        "symbol": "$"
+                      },
+                      "rating": 4.6,
+                      "review_count": null,
+                      "sold_count": 2000000,
+                      "seller": {
+                        "id": null,
+                        "name": "Toplux Nutrition",
+                        "logo": null
+                      },
+                      "brand": null,
+                      "labels": [
+                        "Free shipping"
+                      ],
+                      "promo": "Limited time deal",
+                      "video": null,
+                      "rank": 1
+                    },
+                    {
+                      "product_id": "1731997246433955867",
+                      "title": "[Dr.Melaxin Official] Gifted Collagen Boost Set Pore Spot Skin Care Calcium Collagen Volume Firming Balm for Enhanced Skin Health routine",
+                      "url": "https://shop.tiktok.com/us/pdp/gifted-collagen-boost-set-for-enhanced-skin-health-routine/1731997246433955867",
+                      "image": "https://p16-oec-general-useast5.ttcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/60593f61e24149a78...",
+                      "price": {
+                        "amount": 58.5,
+                        "original": 273.0,
+                        "discount": "79%",
+                        "currency": "USD",
+                        "symbol": "$"
+                      },
+                      "rating": 4.5,
+                      "review_count": null,
+                      "sold_count": 471700,
+                      "seller": {
+                        "id": null,
+                        "name": "Dr.Melaxin",
+                        "logo": null
+                      },
+                      "brand": null,
+                      "labels": [
+                        "Free shipping"
+                      ],
+                      "promo": null,
+                      "video": null,
+                      "rank": 2
+                    }
+                  ],
+                  "period": "past_30_days",
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/shop/categories": {
+      "get": {
+        "operationId": "getTikTokShopCategories",
+        "summary": "Shop Root Categories",
+        "description": "Top-level TikTok Shop categories. Drill down with /v1/tiktok/shop/categories/{category_id}. US market only (prices in USD); lists carry what the storefront page renders, with no further pagination.",
+        "tags": [
+          "TikTok Shop"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Shop Root Categories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShopCategoryResponse"
+                },
+                "example": {
+                  "category": null,
+                  "children": [
+                    {
+                      "id": "601450",
+                      "name": "Beauty & Personal Care",
+                      "slug": "beauty-personal-care",
+                      "level": 1,
+                      "is_leaf": false,
+                      "parent_id": "0",
+                      "image": "https://lf16-tiktok-common.tiktokcdn-us.com/obj/tiktok-web-common-tx/i18n_ecom_fe/tiktok_shop_web_mono/apps/homepage_desktop/static/image/beauty-personal.fdbc446c.png",
+                      "url": "https://shop.tiktok.com/us/c/beauty-personal-care/601450"
+                    },
+                    {
+                      "id": "601152",
+                      "name": "Womenswear & Underwear",
+                      "slug": "womenswear-underwear",
+                      "level": 1,
+                      "is_leaf": false,
+                      "parent_id": "0",
+                      "image": "https://lf16-tiktok-common.tiktokcdn-us.com/obj/tiktok-web-common-tx/i18n_ecom_fe/tiktok_shop_web_mono/apps/homepage_desktop/static/image/womenswear-underwear.87b928c5.png",
+                      "url": "https://shop.tiktok.com/us/c/womenswear-underwear/601152"
+                    },
+                    {
+                      "id": "824328",
+                      "name": "Menswear & Underwear",
+                      "slug": "menswear-underwear",
+                      "level": 1,
+                      "is_leaf": false,
+                      "parent_id": "0",
+                      "image": "https://lf16-tiktok-common.tiktokcdn-us.com/obj/tiktok-web-common-tx/i18n_ecom_fe/tiktok_shop_web_mono/apps/homepage_desktop/static/image/menswear-underwear.fb7cf64f.png",
+                      "url": "https://shop.tiktok.com/us/c/menswear-underwear/824328"
+                    }
+                  ],
+                  "products": [],
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/shop/categories/{category_id}": {
+      "get": {
+        "operationId": "getTikTokShopCategory",
+        "summary": "Shop Category Products",
+        "description": "A category's subcategories and the top products the storefront shows for it. US market only (prices in USD); lists carry what the storefront page renders, with no further pagination.",
+        "tags": [
+          "TikTok Shop"
+        ],
+        "parameters": [
+          {
+            "name": "category_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Category id from a previous response (e.g. 700645 = Health)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Shop Category Products",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShopCategoryResponse"
+                },
+                "example": {
+                  "category": {
+                    "id": "601534",
+                    "name": "Lipstick & Lip Gloss",
+                    "slug": "lipstick-lip-gloss",
+                    "level": 3,
+                    "is_leaf": true,
+                    "parent_id": "848648",
+                    "image": "https://p16-oec-ttp.tiktokcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/1943e1962b4540d1a1613ed2c6ea9658~tplv-omjb5zjo8w-resize-jpeg:200:200.image?",
+                    "url": "https://shop.tiktok.com/us/c/lipstick-lip-gloss/601534"
+                  },
+                  "children": [],
+                  "products": [
+                    {
+                      "product_id": "1731944294735319801",
+                      "title": "Glamlite Horror Lip Kits",
+                      "url": "https://shop.tiktok.com/us/pdp/saw-x-glamlite-lip-duo-stylish-makeup-accessory-perfect-gift/1731944294735319801",
+                      "image": "https://p16-oec-general-useast5.ttcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/24558a187a9544adb...",
+                      "price": {
+                        "amount": 26.96,
+                        "original": null,
+                        "discount": null,
+                        "currency": "USD",
+                        "symbol": "$"
+                      },
+                      "rating": 4.8,
+                      "review_count": 734,
+                      "sold_count": 5974,
+                      "seller": {
+                        "id": "7495142756016753401",
+                        "name": "Glamlite",
+                        "logo": "https://p19-oec-general-useast5.ttcdn-us.com/tos-useast5-i-o..."
+                      },
+                      "brand": "Glamlite Cosmetics",
+                      "labels": [],
+                      "promo": null,
+                      "video": null,
+                      "rank": null
+                    },
+                    {
+                      "product_id": "1729385968334181331",
+                      "title": "6 Shades Velvet Matte Lip Gloss Set, Lip Products Makeup, Waterproof Sweatproof Long Lasting Liquid Lipstick, Easy to Apply Non-Drying Lip Makeup Gift Kit for All Occasions #GLOBAL PICKS",
+                      "url": "https://shop.tiktok.com/us/pdp/matte-lipstick-set-by-velvet-6pcs-waterproof-long-lasting-balm-kit/1729385968334181331",
+                      "image": "https://p16-oec-general-useast5.ttcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/61fe9f440c814128b...",
+                      "price": {
+                        "amount": 4.47,
+                        "original": 8.59,
+                        "discount": "48%",
+                        "currency": "USD",
+                        "symbol": "$"
+                      },
+                      "rating": 4.4,
+                      "review_count": 52,
+                      "sold_count": 578,
+                      "seller": {
+                        "id": "8646928167584175059",
+                        "name": "YOUNGVISION Beauty",
+                        "logo": "https://p16-oec-general.ttcdn-us.com/tos-alisg-i-aphluv4xwc-..."
+                      },
+                      "brand": "young vision",
+                      "labels": [],
+                      "promo": null,
+                      "video": null,
+                      "rank": null
+                    }
+                  ],
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/shop/search": {
+      "get": {
+        "operationId": "searchTikTokShop",
+        "summary": "Shop Search",
+        "description": "Keyword search over TikTok Shop products: products with the TikTok video they are bound to and their brand, matching shops, related searches and related categories. US market only (prices in USD); lists carry what the storefront page renders, with no further pagination.",
+        "tags": [
+          "TikTok Shop"
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Keyword, e.g. wireless earbuds."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Shop Search",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShopSearchResponse"
+                },
+                "example": {
+                  "products": [
+                    {
+                      "product_id": "1729470894545670276",
+                      "title": "【2026 New Production】CMF Buds 2a Wireless Bluetooth Earbuds, 12.4 mm Custom Dynamic Driver, 42 dB Active Noise Cancellation, 4 HD Mics with Clear Voice Technology,summerwins tiktokshopbacktoschool,back to school,back to school haul",
+                      "url": "https://shop.tiktok.com/us/pdp/cmf-buds-wireless-bluetooth-earbuds-with-42db-noise-cancelling-35-5h-playtime/1729470894545670276",
+                      "image": "https://p16-oec-general-useast5.ttcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/b736159635ac4933b...",
+                      "price": {
+                        "amount": 49.0,
+                        "original": null,
+                        "discount": null,
+                        "currency": "USD",
+                        "symbol": "$"
+                      },
+                      "rating": 4.7,
+                      "review_count": 3383,
+                      "sold_count": 26801,
+                      "seller": {
+                        "id": "7495669706651568260",
+                        "name": "CMF by Nothing",
+                        "logo": "https://p19-oec-general-useast5.ttcdn-us.com/tos-useast5-i-o..."
+                      },
+                      "brand": "CMF by Nothing",
+                      "labels": [
+                        "Limited time deal"
+                      ],
+                      "promo": null,
+                      "video": {
+                        "id": "7639063434667101470",
+                        "title": "Replying to @Goldfishing24 Jlab vs CMF @Nothing #music #headphones #tiktokshop #tiktokmarketplace #tiktokmademebuyit ",
+                        "author_name": "Isaac",
+                        "play_count": 10168636,
+                        "like_count": 112959,
+                        "cover_url": "https://p16-common-sign.tiktokcdn-us.com/tos-useast8-p-0068-...",
+                        "video_url": "https://v16m-default.tiktokcdn-us.com/3931ad4a6475e6c6240056..."
+                      },
+                      "rank": null
+                    }
+                  ],
+                  "shops": [
+                    {
+                      "id": "7495669706651568260",
+                      "name": "CMF by Nothing",
+                      "logo": "https://p19-oec-general-useast5.ttcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/d83d7b129a314d90b95e583429db51cf~tplv-fhlh96nyum-resize-png:300:300.png?dr=12184&t=555f072d&ps=933b5bde&shp=905da467&shcp=d9d491bf&idc=useast5&from=2422056039"
+                    },
+                    {
+                      "id": "7494161853719414088",
+                      "name": "JBL",
+                      "logo": "https://p16-oec-general-useast5.ttcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/2eae32bc80744404a8809b3fdc7e5a50~tplv-fhlh96nyum-resize-png:300:300.png?dr=12184&t=555f072d&ps=933b5bde&shp=905da467&shcp=d9d491bf&idc=useast5&from=2422056039"
+                    }
+                  ],
+                  "related_searches": [
+                    "WirelessEarbuds",
+                    "Affordable Wireless Earbuds",
+                    "Wireless esrbuds",
+                    "earbuds wireless",
+                    "Earbuds",
+                    "Wireless gaming earbuds",
+                    "Earphone wireless earbuds",
+                    "earbuds wireless Airbuds",
+                    "Wireless earbud adaptor"
+                  ],
+                  "related_categories": [
+                    {
+                      "id": "601990",
+                      "name": "Headphones, Earphones & Accessories",
+                      "slug": "headphones-earphones-accessories",
+                      "level": null,
+                      "is_leaf": null,
+                      "parent_id": null,
+                      "image": null,
+                      "url": "https://shop.tiktok.com/us/c/headphones-earphones-accessories/601990"
+                    },
+                    {
+                      "id": "602083",
+                      "name": "Smart Watches",
+                      "slug": "smart-watches",
+                      "level": null,
+                      "is_leaf": null,
+                      "parent_id": null,
+                      "image": null,
+                      "url": "https://shop.tiktok.com/us/c/smart-watches/602083"
+                    }
+                  ],
+                  "query": "wireless earbuds",
+                  "region": "US"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/tiktok/shop/products/{product_id}": {
+      "get": {
+        "operationId": "getTikTokShopProduct",
+        "summary": "Shop Product Detail",
+        "description": "Full product page: description, images, price, SKUs with stock, reviews with rating breakdown, shop stats, seller business identity and TikTok's AI summary. On some promoted products TikTok masks the page price (price.amount is null while price.discount is set); the list endpoints carry the real price. US market only (prices in USD); lists carry what the storefront page renders, with no further pagination.",
+        "tags": [
+          "TikTok Shop"
+        ],
+        "parameters": [
+          {
+            "name": "product_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Numeric TikTok Shop product id (from ranking, category or search results)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Shop Product Detail",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShopProductResponse"
+                },
+                "example": {
+                  "product": {
+                    "product_id": "1729448464509734958",
+                    "title": "Toplux Magnesium Complex 8 Essential Magnesium Supplement",
+                    "url": "https://shop.tiktok.com/us/pdp/magnesium-complex-by-toplux-8-essential-magnesium-forms-in-one-capsule/1729448464509734958",
+                    "description": "Boost your wellness routine with Magnesium Complex, an essential supplement for your health. \n\n\nDesigned to provide you ...",
+                    "description_images": [
+                      "https://p16-oec-general-useast8.ttcdn-us.com/tos-useast8-i-rt0ujvrtvp-tx2/81918e8144f0419f9591088c770a9d34~tplv-fhlh96nyum-origin-jpeg.jpeg?dr=12178&t=555f072d&ps=933b5bde&shp=a3510d86&shcp=6ce186a1&idc=useast5&from=2739998086"
+                    ],
+                    "images": [
+                      "https://p16-oec-general-useast5.ttcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/0b7d3556b58d451daa2fab65d1eedf91~tplv-fhlh96nyum-crop-webp:2000:2000.webp?dr=12190&t=555f072d&ps=933b5bde&shp=8dbd94bf&shcp=607f11de&idc=useast5&from=2378011839",
+                      "https://p16-oec-general-useast5.ttcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/b0d48a39d1a74e819f72533190b841bf~tplv-fhlh96nyum-crop-webp:2200:2200.webp?dr=12190&t=555f072d&ps=933b5bde&shp=8dbd94bf&shcp=607f11de&idc=useast5&from=2378011839"
+                    ],
+                    "price": {
+                      "amount": null,
+                      "original": null,
+                      "discount": "66%",
+                      "currency": "USD",
+                      "symbol": "$"
+                    },
+                    "rating": 4.6,
+                    "review_count": 157838,
+                    "sold_count": 2023642,
+                    "categories": [
+                      {
+                        "id": "700645",
+                        "name": "Health",
+                        "slug": "all",
+                        "level": 1,
+                        "is_leaf": false,
+                        "parent_id": "0",
+                        "image": null,
+                        "url": "https://shop.tiktok.com/us/c/all/700645"
+                      },
+                      {
+                        "id": "700646",
+                        "name": "Nutrition & Wellness",
+                        "slug": "all",
+                        "level": 2,
+                        "is_leaf": false,
+                        "parent_id": "700645",
+                        "image": null,
+                        "url": "https://shop.tiktok.com/us/c/all/700646"
+                      },
+                      {
+                        "id": "700650",
+                        "name": "Vitamins, Minerals & Wellness Supplements",
+                        "slug": "all",
+                        "level": 3,
+                        "is_leaf": false,
+                        "parent_id": "700646",
+                        "image": null,
+                        "url": "https://shop.tiktok.com/us/c/all/700650"
+                      },
+                      {
+                        "id": "1299984",
+                        "name": "Mineral Supplements",
+                        "slug": "all",
+                        "level": 4,
+                        "is_leaf": true,
+                        "parent_id": "700650",
+                        "image": null,
+                        "url": "https://shop.tiktok.com/us/c/all/1299984"
+                      }
+                    ],
+                    "sale_properties": {
+                      "Specifications": [
+                        "Default"
+                      ]
+                    },
+                    "attributes": {
+                      "CA Prop 65: Repro. Chems": "No",
+                      "CA Prop 65: Carcinogens": "No",
+                      "Dietary Supplement Disclaimer": "Yes"
+                    },
+                    "skus": [
+                      {
+                        "sku_id": "1729448464509800494",
+                        "properties": {
+                          "Specifications": "Default"
+                        },
+                        "price": {
+                          "amount": null,
+                          "original": null,
+                          "discount": "66%",
+                          "currency": "USD",
+                          "symbol": "$"
+                        },
+                        "available_quantity": 938,
+                        "in_stock": true,
+                        "image": null
+                      }
+                    ],
+                    "reviews": [
+                      {
+                        "review_id": "7636473773830670093",
+                        "rating": 2,
+                        "text": "Es muy bueno, el magnesio para el dolor en el cuerpo",
+                        "reviewer_name": "Ⓜ**3",
+                        "created_utc": 1778005121,
+                        "is_verified_purchase": true,
+                        "is_incentivized": false,
+                        "sku": "Default",
+                        "images": [
+                          "https://p16-oec-general-useast5.ttcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/9f460e5abeb840169cce1f0fea3849b0~tplv-fhlh96nyum-crop-webp:300:300.webp?dr=12190&t=555f072d&ps=933b5bde&shp=8dbd94bf&shcp=607f11de&idc=useast5&from=2378011839"
+                        ],
+                        "created_at": "2026-05-05T18:18:41Z",
+                        "country": "US"
+                      }
+                    ],
+                    "rating_breakdown": {
+                      "1": 9870,
+                      "2": 2689,
+                      "3": 6561,
+                      "4": 13687,
+                      "5": 125031
+                    },
+                    "shop": {
+                      "id": "7495620301677955118",
+                      "name": "Toplux Nutrition",
+                      "logo": "https://p16-oec-general-useast5.ttcdn-us.com/tos-useast5-i-omjb5zjo8w-tx/35e90bd8b9764783a6b730c75daebc18~tplv-fhlh96nyum-resize-webp:300:300.webp?dr=12185&t=555f072d&ps=933b5bde&shp=905da467&shcp=607f11de&idc=useast5&from=2422056039",
+                      "url": "https://shop.tiktok.com/us/store/toplux-nutrition/7495620301677955118",
+                      "rating": 4.5,
+                      "sold_count": 3655070,
+                      "product_count": 22,
+                      "review_count": 268574,
+                      "followers_count": 134963,
+                      "video_count": 1397
+                    },
+                    "seller_business_name": "Lux Global Inc",
+                    "seller_business_address": "1146 N Central Ave, Glendale, California, 91202, The United States of America",
+                    "ai_summary": {
+                      "aigc_title": "Toplux Magnesium Complex Capsules, 8 Forms...",
+                      "aigc_description": "Toplux Magnesium Complex delivers eight essential forms of magnesium in one capsule to support muscl...",
+                      "aigc_keywords": [
+                        {
+                          "keyword": "magnesium complex capsules"
+                        },
+                        {
+                          "keyword": "Toplux magnesium supplement"
+                        },
+                        {
+                          "keyword": "8 forms of magnesium"
+                        },
+                        {
+                          "keyword": "magnesium supplement for sleep"
+                        },
+                        {
+                          "keyword": "magnesium for bone health"
+                        },
+                        {
+                          "keyword": "vegan magnesium capsules"
+                        },
+                        {
+                          "keyword": "GMO-free magnesium supplement"
+                        }
+                      ]
+                    },
+                    "is_available": true
+                  },
+                  "region": "US"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown product id"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -4229,6 +4805,1045 @@
           "targeting",
           "region"
         ]
+      },
+      "ShopPrice": {
+        "properties": {
+          "amount": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Amount"
+          },
+          "original": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Original"
+          },
+          "discount": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Discount"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Currency"
+          },
+          "symbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Symbol"
+          }
+        },
+        "title": "ShopPrice",
+        "type": "object"
+      },
+      "ShopProduct": {
+        "properties": {
+          "product_id": {
+            "title": "Product Id",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Title"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Image"
+          },
+          "price": {
+            "$ref": "#/components/schemas/ShopPrice"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Rating"
+          },
+          "review_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Review Count"
+          },
+          "sold_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Sold Count"
+          },
+          "seller": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ShopSeller"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "brand": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Brand"
+          },
+          "labels": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Labels",
+            "type": "array"
+          },
+          "promo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Promo"
+          },
+          "video": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ShopVideo"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "rank": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Rank"
+          }
+        },
+        "required": [
+          "product_id",
+          "url"
+        ],
+        "title": "ShopProduct",
+        "type": "object"
+      },
+      "ShopSeller": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Name"
+          },
+          "logo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Logo"
+          }
+        },
+        "title": "ShopSeller",
+        "type": "object"
+      },
+      "ShopVideo": {
+        "description": "The TikTok video a product card is bound to (search results only).",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Title"
+          },
+          "author_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Author Name"
+          },
+          "play_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Play Count"
+          },
+          "like_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Like Count"
+          },
+          "cover_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cover Url"
+          },
+          "video_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Video Url"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "ShopVideo",
+        "type": "object"
+      },
+      "ShopRankingResponse": {
+        "properties": {
+          "products": {
+            "items": {
+              "$ref": "#/components/schemas/ShopProduct"
+            },
+            "title": "Products",
+            "type": "array"
+          },
+          "period": {
+            "default": "past_30_days",
+            "title": "Period",
+            "type": "string"
+          },
+          "region": {
+            "default": "US",
+            "title": "Region",
+            "type": "string"
+          }
+        },
+        "title": "ShopRankingResponse",
+        "type": "object"
+      },
+      "ShopCategory": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Name"
+          },
+          "slug": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Slug"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Level"
+          },
+          "is_leaf": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Is Leaf"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Parent Id"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Image"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "ShopCategory",
+        "type": "object"
+      },
+      "ShopCategoryResponse": {
+        "properties": {
+          "category": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ShopCategory"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "children": {
+            "items": {
+              "$ref": "#/components/schemas/ShopCategory"
+            },
+            "title": "Children",
+            "type": "array"
+          },
+          "products": {
+            "items": {
+              "$ref": "#/components/schemas/ShopProduct"
+            },
+            "title": "Products",
+            "type": "array"
+          },
+          "region": {
+            "default": "US",
+            "title": "Region",
+            "type": "string"
+          }
+        },
+        "title": "ShopCategoryResponse",
+        "type": "object"
+      },
+      "ShopSearchResponse": {
+        "properties": {
+          "products": {
+            "items": {
+              "$ref": "#/components/schemas/ShopProduct"
+            },
+            "title": "Products",
+            "type": "array"
+          },
+          "shops": {
+            "items": {
+              "$ref": "#/components/schemas/ShopSeller"
+            },
+            "title": "Shops",
+            "type": "array"
+          },
+          "related_searches": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Related Searches",
+            "type": "array"
+          },
+          "related_categories": {
+            "items": {
+              "$ref": "#/components/schemas/ShopCategory"
+            },
+            "title": "Related Categories",
+            "type": "array"
+          },
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "region": {
+            "default": "US",
+            "title": "Region",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "ShopSearchResponse",
+        "type": "object"
+      },
+      "ShopProductDetail": {
+        "properties": {
+          "product_id": {
+            "title": "Product Id",
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Title"
+          },
+          "url": {
+            "title": "Url",
+            "type": "string"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "description_images": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Description Images",
+            "type": "array"
+          },
+          "images": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Images",
+            "type": "array"
+          },
+          "price": {
+            "$ref": "#/components/schemas/ShopPrice"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Rating"
+          },
+          "review_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Review Count"
+          },
+          "sold_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Sold Count"
+          },
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/ShopCategory"
+            },
+            "title": "Categories",
+            "type": "array"
+          },
+          "sale_properties": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Sale Properties",
+            "type": "object"
+          },
+          "attributes": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Attributes",
+            "type": "object"
+          },
+          "skus": {
+            "items": {
+              "$ref": "#/components/schemas/ShopSku"
+            },
+            "title": "Skus",
+            "type": "array"
+          },
+          "reviews": {
+            "items": {
+              "$ref": "#/components/schemas/ShopReview"
+            },
+            "title": "Reviews",
+            "type": "array"
+          },
+          "rating_breakdown": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Rating Breakdown",
+            "type": "object"
+          },
+          "shop": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ShopStore"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "seller_business_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Seller Business Name"
+          },
+          "seller_business_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Seller Business Address"
+          },
+          "ai_summary": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Ai Summary"
+          },
+          "is_available": {
+            "default": true,
+            "title": "Is Available",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "product_id",
+          "url"
+        ],
+        "title": "ShopProductDetail",
+        "type": "object"
+      },
+      "ShopReview": {
+        "properties": {
+          "review_id": {
+            "title": "Review Id",
+            "type": "string"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Rating"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Text"
+          },
+          "reviewer_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Reviewer Name"
+          },
+          "created_utc": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Created Utc"
+          },
+          "is_verified_purchase": {
+            "default": false,
+            "title": "Is Verified Purchase",
+            "type": "boolean"
+          },
+          "is_incentivized": {
+            "default": false,
+            "title": "Is Incentivized",
+            "type": "boolean"
+          },
+          "sku": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Sku"
+          },
+          "images": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Images",
+            "type": "array"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Created At"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Country"
+          }
+        },
+        "required": [
+          "review_id"
+        ],
+        "title": "ShopReview",
+        "type": "object"
+      },
+      "ShopSku": {
+        "properties": {
+          "sku_id": {
+            "title": "Sku Id",
+            "type": "string"
+          },
+          "properties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Properties"
+          },
+          "price": {
+            "$ref": "#/components/schemas/ShopPrice"
+          },
+          "available_quantity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Available Quantity"
+          },
+          "in_stock": {
+            "default": false,
+            "title": "In Stock",
+            "type": "boolean"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Image"
+          }
+        },
+        "required": [
+          "sku_id"
+        ],
+        "title": "ShopSku",
+        "type": "object"
+      },
+      "ShopStore": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Name"
+          },
+          "logo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Logo"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Url"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Rating"
+          },
+          "sold_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Sold Count"
+          },
+          "product_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Product Count"
+          },
+          "review_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Review Count"
+          },
+          "followers_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Followers Count"
+          },
+          "video_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Video Count"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "ShopStore",
+        "type": "object"
+      },
+      "ShopProductResponse": {
+        "properties": {
+          "product": {
+            "$ref": "#/components/schemas/ShopProductDetail"
+          },
+          "region": {
+            "default": "US",
+            "title": "Region",
+            "type": "string"
+          }
+        },
+        "required": [
+          "product"
+        ],
+        "title": "ShopProductResponse",
+        "type": "object"
       }
     }
   }
