@@ -338,6 +338,12 @@
             "in": "query",
             "schema": { "type": "string" },
             "description": "Delivery postal/zip code for localized offers and delivery estimates."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1, "minimum": 1 },
+            "description": "Offer page. Amazon lists 10 seller offers per page; page 1 also carries the Buy Box offer. Use total_offers to know how many pages exist."
           }
         ],
         "responses": {
@@ -350,15 +356,26 @@
                   "properties": {
                     "asin": { "type": "string" },
                     "domain": { "type": "string" },
+                    "buybox": {
+                      "$ref": "#/components/schemas/Offer",
+                      "nullable": true,
+                      "description": "The Buy Box offer (page 1 only); also included as the first entry of offers."
+                    },
                     "offers": {
                       "type": "array",
                       "items": { "$ref": "#/components/schemas/Offer" }
+                    },
+                    "total_offers": {
+                      "type": "integer",
+                      "nullable": true,
+                      "description": "Amazon's total offer count across all pages, including the Buy Box offer. Can exceed the length of offers when more pages exist; null on pages after the first."
                     }
                   }
                 },
                 "example": {
                   "asin": "B08N5WRWNW",
                   "domain": "com",
+                  "total_offers": 2,
                   "offers": [
                     {
                       "position": 1,
