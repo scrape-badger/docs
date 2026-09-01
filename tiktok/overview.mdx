@@ -1,11 +1,11 @@
 ---
 title: "TikTok Scraper Overview"
-description: "Scrape TikTok user profiles, videos, comments, transcripts, hashtags, music, search, trending, and the EU ad library with structured JSON responses."
+description: "Scrape TikTok user profiles, videos, comments, transcripts, hashtags, music, search, trending, TikTok Shop e-commerce (best sellers, categories, product search and detail), and the EU ad library with structured JSON responses."
 ---
 
 # TikTok Scraper API
 
-Fetch full user profiles, posted videos, comments and replies, video transcripts, hashtag and music detail, run keyword search across videos/users/hashtags, pull trending videos/hashtags/songs, and query TikTok's EU Commercial Content (ad transparency) library. The API handles request signing, anti-bot bypass, and regional proxy routing automatically.
+Fetch full user profiles, posted videos, comments and replies, video transcripts, hashtag and music detail, run keyword search across videos/users/hashtags, pull trending videos/hashtags/songs, read TikTok Shop's best sellers, categories, product search and product detail, and query TikTok's EU Commercial Content (ad transparency) library. The API handles request signing, anti-bot bypass, and regional proxy routing automatically.
 
 ## Key Features
 
@@ -99,6 +99,11 @@ curl "https://scrapebadger.com/v1/tiktok/users/charlidamelio?region=US" \
 | [`/v1/tiktok/trending/videos`](/api-reference/endpoint/tiktok/trending-videos) | GET | Trending Explore-feed videos |
 | [`/v1/tiktok/trending/hashtags`](/api-reference/endpoint/tiktok/trending-hashtags) | GET | Trending hashtags by usage |
 | [`/v1/tiktok/trending/songs`](/api-reference/endpoint/tiktok/trending-songs) | GET | Trending songs/sounds by usage |
+| [`/v1/tiktok/shop/ranking`](/api-reference/endpoint/tiktok/shop-ranking) | GET | TikTok Shop best sellers of the past 30 days (US) |
+| [`/v1/tiktok/shop/categories`](/api-reference/endpoint/tiktok/shop-categories) | GET | TikTok Shop root categories |
+| [`/v1/tiktok/shop/categories/{category_id}`](/api-reference/endpoint/tiktok/shop-category) | GET | Subcategories + top products of a category |
+| [`/v1/tiktok/shop/search`](/api-reference/endpoint/tiktok/shop-search) | GET | Keyword product search (products, shops, related) |
+| [`/v1/tiktok/shop/products/{product_id}`](/api-reference/endpoint/tiktok/shop-product) | GET | Product detail: SKUs, prices, reviews, shop |
 | [`/v1/tiktok/ads/search`](/api-reference/endpoint/tiktok/search-ads) | GET | Search the EU ad library |
 | [`/v1/tiktok/ads/advertisers`](/api-reference/endpoint/tiktok/search-advertisers) | GET | Look up advertiser business ids by name |
 | [`/v1/tiktok/ads/{ad_id}`](/api-reference/endpoint/tiktok/get-ad-detail) | GET | Single-ad detail: advertiser + targeting/impression breakdown |
@@ -128,6 +133,11 @@ curl "https://scrapebadger.com/v1/tiktok/users/charlidamelio?region=US" \
 | Trending videos | 5 credits |
 | Trending hashtags | 5 credits |
 | Trending songs | 5 credits |
+| Shop best sellers | 5 credits |
+| Shop root categories | 5 credits |
+| Shop category products | 5 credits |
+| Shop search | 5 credits |
+| Shop product detail | 8 credits |
 | Ad library search | 5 credits |
 | Search advertisers | 5 credits |
 | Get ad detail | 8 credits |
