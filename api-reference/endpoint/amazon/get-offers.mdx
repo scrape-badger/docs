@@ -22,10 +22,17 @@ description: "All third-party offers for an ASIN, including the Buy Box winner."
   Delivery postal/zip code for localized offers and delivery estimates.
 </ParamField>
 
+<ParamField query="page" type="integer" default="1">
+  Offer page. Amazon lists 10 seller offers per page; page 1 also carries the Buy Box offer.
+  Compare `total_offers` with the number of offers returned to know whether more pages exist.
+</ParamField>
+
 ## Response
 
 <ResponseField name="asin" type="string">The ASIN the offers belong to.</ResponseField>
 <ResponseField name="domain" type="string">Marketplace domain.</ResponseField>
+<ResponseField name="buybox" type="object">The Buy Box offer (page 1 only). Same shape as an offer; also the first entry of `offers`.</ResponseField>
+<ResponseField name="total_offers" type="integer">Amazon's total offer count across all pages, including the Buy Box offer. Larger than the number of offers returned when more pages exist; `null` on pages after the first.</ResponseField>
 <ResponseField name="offers" type="array">
   Array of seller offers, ordered with the Buy Box winner first.
 
@@ -48,6 +55,7 @@ description: "All third-party offers for an ASIN, including the Buy Box winner."
 {
   "asin": "B08N5WRWNW",
   "domain": "com",
+  "total_offers": 2,
   "offers": [
     {
       "position": 1,
