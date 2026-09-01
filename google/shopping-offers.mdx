@@ -1,13 +1,70 @@
 ---
-title: "Shopping Offers by Barcode"
-description: "Get multi-seller Google Shopping prices for a product looked up by its barcode (GTIN/UPC/EAN)."
+title: "Shopping Offers by Barcode or Catalog ID"
+description: "Get multi-seller Google Shopping prices for a product looked up by its barcode (GTIN/UPC/EAN) or by its Google Shopping catalog ID."
 ---
 
-# Shopping Offers by Barcode
+# Shopping Offers by Barcode or Catalog ID
 
-Google Shopping no longer matches raw barcodes — pasting a GTIN/UPC/EAN into Shopping returns nothing. The `/v1/google/shopping/offers` endpoint bridges that gap: it **resolves the barcode to a product** via a Google web search, then returns that product's Google Shopping **seller offers** — one entry per merchant `source`, each with its own `price`.
+`/v1/google/shopping/offers` returns a product's Google Shopping **seller offers** — one entry per merchant `source`, each with its own `price` and merchant `link`. Identify the product one of two ways (exactly one is required):
 
-## How It Works
+- **`barcode`** — Google Shopping no longer matches raw GTIN/UPC/EAN codes, so the barcode is first **resolved to a product** via a Google web search, then the Shopping seller list is fetched.
+- **`catalog_id`** — Google's own Shopping catalog identifier. It is the `catalog_id` field on every [Shopping Search](/google/shopping-search) tile, and it is what a Google Shopping URL carries as `prds=catalogid:<id>` (for example `https://www.google.com/search?ibp=oshop&prds=catalogid:762120719996356571&gl=de&hl=de`). The seller list is read straight off Google's product page, every page of sellers fetched in parallel, so there is no resolve hop and no ambiguity about which product you get.
+
+## Offers by Catalog ID
+
+<CodeGroup>
+```bash cURL
+curl "https://scrapebadger.com/v1/google/shopping/offers?catalog_id=762120719996356571&gl=de&hl=de" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+```python Python
+from scrapebadger import ScrapeBadger
+
+async with ScrapeBadger(api_key="YOUR_API_KEY") as client:
+    result = await client.google.shopping.offers(catalog_id="762120719996356571", gl="de", hl="de")
+    print(result["product_title"], result["total_offers"])
+    for offer in result["offers"]:
+        print(offer["source"], offer["price"]["extracted"], offer["link"])
+```
+
+```javascript Node.js
+const result = await client.google.shopping.offers({
+  catalog_id: "762120719996356571",
+  gl: "de",
+  hl: "de",
+});
+console.log(result.product_title, result.total_offers);
+```
+</CodeGroup>
+
+```json
+{
+  "catalog_id": "762120719996356571",
+  "total_offers": 19,
+  "product_title": "Fehn Mini-Spieluhr Schaf",
+  "offers": [
+    {
+      "position": 1,
+      "title": "Fehn Spieluhr Schaf Baby Love 18 cm natur",
+      "source": "babymarkt.com de",
+      "price": { "value": 12.6, "currency": "EUR", "extracted": "12,60 €" },
+      "extracted_price": 12.6,
+      "link": "https://www.babymarkt.com/de/p/fehn-spieluhr-schaf-baby-love-18-cm-105648/?variant=105648",
+      "delivery": "Lieferung: 4,99 €",
+      "extensions": ["Online auf Lager", "Lieferung: 4,99 €", "Rücknahme innerhalb von 14 Tagen"]
+    }
+  ]
+}
+```
+
+`total_offers` is the number of sellers Google lists for the catalog entry; up to 60 are returned.
+
+<Tip>
+Chain it from Shopping Search: every tile there carries a `catalog_id`, so search once, then call this endpoint for the full seller list of the tile you care about.
+</Tip>
+
+## How Barcode Lookup Works
 
 1. The barcode is validated (length + check digit). GTIN-8, UPC-A, EAN-13, and GTIN-14 are accepted.
 2. A Google **web search** resolves the barcode to a product (the matched product name is returned as `resolved_query` / `product_title`).
@@ -17,10 +74,16 @@ Because this performs **two Google fetches**, each call costs **14 credits**.
 
 ## Query Parameters
 
-<ParamField query="barcode" type="string" required>
-  Product barcode to look up. Accepts GTIN-8, UPC-A (12 digits), EAN-13, or GTIN-14. The check digit is validated — a malformed or checksum-failing barcode returns `422`.
+<ParamField query="barcode" type="string">
+  Product barcode to look up. Accepts GTIN-8, UPC-A (12 digits), EAN-13, or GTIN-14. The check digit is validated — a malformed or checksum-failing barcode returns `422`. Exactly one of `barcode` / `catalog_id` is required.
 
   Example: `0711719541028`
+</ParamField>
+
+<ParamField query="catalog_id" type="string">
+  Google Shopping catalog ID — the `catalog_id` on Shopping Search tiles, or `prds=catalogid:<id>` in a Google Shopping URL. Exactly one of `barcode` / `catalog_id` is required.
+
+  Example: `762120719996356571`
 </ParamField>
 
 <ParamField query="gl" type="string">
@@ -117,7 +180,9 @@ const result = await client.google.shopping.offers({
 
 | Field | Description |
 |---|---|
-| `barcode` | The barcode you passed in, echoed back. |
+| `barcode` | The barcode you passed in, echoed back (barcode mode). |
+| `catalog_id` | The catalog ID you passed in (catalog mode). |
+| `total_offers` | Total sellers Google lists for the catalog entry (catalog mode). |
 | `resolved_query` | The product query the barcode resolved to via Google web search. |
 | `product_title` | The matched product's title. |
 | `offers` | List of per-merchant Shopping offers. |
@@ -127,18 +192,21 @@ const result = await client.google.shopping.offers({
 | `offers[].price.currency` | ISO currency code. |
 | `offers[].price.extracted` | The price as displayed, including symbol. |
 | `offers[].link` | Link to the merchant's listing. |
+| `offers[].delivery` | Shipping line as Google shows it (catalog mode). |
+| `offers[].extensions` | Availability / shipping / returns lines (catalog mode). |
 | `offers[].rating` | Product rating on that merchant, if shown. |
 
 ## Pricing
 
-Each call costs **14 credits** — it runs two Google fetches (one web search to resolve the barcode, one Shopping fetch for the offers).
+Each call costs **14 credits**, whichever identifier you pass.
 
 ## Errors
 
 | Status | Meaning |
 |---|---|
+| `400` | Neither or both of `barcode` / `catalog_id` were passed. |
 | `422` | The `barcode` is malformed or fails its check-digit validation. |
-| `404` | The barcode is valid but could not be resolved to a product (no Google web-search match). |
+| `404` | The barcode could not be resolved to a product (no Google web-search match), or the catalog ID has no sellers. |
 
 ## Why This Exists
 
