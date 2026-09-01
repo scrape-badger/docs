@@ -93,7 +93,7 @@ openapi: POST /v1/web/scrape
 </ParamField>
 
 <ParamField body="wait_for" type="string">
-  CSS selector or XPath expression to wait for before extracting content. Only works with browser engines (`browser`, `patchright`, `windows_chrome`). If `render_js` is `false` and this is set, JS rendering is forced automatically.
+  CSS selector or XPath expression to wait for before extracting content. Only works with the `browser` engine. If `render_js` is `false` and this is set, JS rendering is forced automatically.
 
   ```json
   { "wait_for": "#main-content" }
@@ -237,7 +237,7 @@ openapi: POST /v1/web/scrape
 <ParamField body="escalate" type="boolean" default={false}>
   Allow automatic escalation to more powerful engines when the initial engine is blocked.
 
-  Escalation path: `curl_cffi` → `browser` → `windows_chrome`
+  Escalation path: `http` → `browser`
 
   You only pay for the engine that succeeds — costs are **not cumulative**. Without this flag, only the selected engine is tried.
 </ParamField>
@@ -281,7 +281,7 @@ charged on every request, which is why nothing costs 1 credit in practice.
 
 | Component | Credits |
 |-----------|---------|
-| HTTP engine (`curl_cffi`/`httpcloak`) | 1 |
+| HTTP engine (`http`) | 1 |
 | Browser engine (`browser`) | 5 |
 | `proxy_tier: simple` (default) | +1 |
 | `proxy_tier: premium` / `ultra` | +8 |
