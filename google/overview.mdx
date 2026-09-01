@@ -63,9 +63,9 @@ Programmatic access to **16 Google product APIs** with structured JSON responses
 
 Google deployed **SearchGuard** in January 2025 — a JS challenge that blocks raw HTTP. The ScrapeBadger Google Scraper bypasses it with a cookie-warmup pattern:
 
-1. First request attempts **curl_cffi** with cached cookies (~0.2s fast path)
-2. If a SearchGuard challenge is detected, a **patchright browser warmup** solves it
-3. Subsequent requests reuse the warm cookies via curl_cffi for speed
+1. First request attempts a **fast HTTP fetch** with cached cookies (~0.2s fast path)
+2. If a SearchGuard challenge is detected, a **browser warmup** solves it
+3. Subsequent requests reuse the warm cookies over HTTP for speed
 4. On **429 or CAPTCHA**, the cached residential proxy session is invalidated to rotate the exit IP, then the retry loop continues (up to 3 IP rotations per request)
 
 ## 185 Google Domains
@@ -167,7 +167,7 @@ curl "https://scrapebadger.com/v1/google/shopping/product/click?title=Lenovo+Ide
     |---|---|
     | `GET /v1/google/shopping/search` | Product search with filters + ads |
     | `GET /v1/google/shopping/product` | Product detail with seller list |
-    | `GET /v1/google/shopping/product/click` | Resolve merchant URL per product (lightweight curl_cffi lookup) |
+    | `GET /v1/google/shopping/product/click` | Resolve merchant URL per product (lightweight HTTP lookup) |
   </Tab>
   <Tab title="News & Content">
     | Endpoint | Description |
