@@ -8,7 +8,7 @@ description: "Get multi-seller Google Shopping prices for a product looked up by
 `/v1/google/shopping/offers` returns a product's Google Shopping **seller offers** — one entry per merchant `source`, each with its own `price` and merchant `link`. Identify the product one of two ways (exactly one is required):
 
 - **`barcode`** — Google Shopping no longer matches raw GTIN/UPC/EAN codes, so the barcode is first **resolved to a product** via a Google web search, then the Shopping seller list is fetched.
-- **`catalog_id`** — Google's own Shopping catalog identifier. It is the `catalog_id` field on every [Shopping Search](/google/shopping-search) tile, and it is what a Google Shopping URL carries as `prds=catalogid:<id>` (for example `https://www.google.com/search?ibp=oshop&prds=catalogid:762120719996356571&gl=de&hl=de`). The seller list is read straight off Google's product page, every page of sellers fetched in parallel, so there is no resolve hop and no ambiguity about which product you get.
+- **`catalog_id`** — Google's own Shopping catalog identifier: what a Google Shopping product URL carries as `prds=catalogid:<id>`, and the `catalog_id` field on [Shopping Search](/google/shopping-search) tiles when Google exposes it there (for example `https://www.google.com/search?ibp=oshop&prds=catalogid:762120719996356571&gl=de&hl=de`). The seller list is read straight off Google's product page, every page of sellers fetched in parallel, so there is no resolve hop and no ambiguity about which product you get.
 
 ## Offers by Catalog ID
 
@@ -61,7 +61,7 @@ console.log(result.product_title, result.total_offers);
 `total_offers` is the number of sellers Google lists for the catalog entry; up to 60 are returned.
 
 <Tip>
-Chain it from Shopping Search: every tile there carries a `catalog_id`, so search once, then call this endpoint for the full seller list of the tile you care about.
+The most reliable way to get a `catalog_id` is from a Google Shopping product URL (`prds=catalogid:<id>`). Shopping Search tiles carry it as `catalog_id` only when Google ships the identifier block on that SERP, so treat that field as optional.
 </Tip>
 
 ## How Barcode Lookup Works
@@ -81,7 +81,7 @@ Because this performs **two Google fetches**, each call costs **14 credits**.
 </ParamField>
 
 <ParamField query="catalog_id" type="string">
-  Google Shopping catalog ID — the `catalog_id` on Shopping Search tiles, or `prds=catalogid:<id>` in a Google Shopping URL. Exactly one of `barcode` / `catalog_id` is required.
+  Google Shopping catalog ID — `prds=catalogid:<id>` in a Google Shopping product URL (or the `catalog_id` on a Shopping Search tile when present). Exactly one of `barcode` / `catalog_id` is required.
 
   Example: `762120719996356571`
 </ParamField>
