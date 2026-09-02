@@ -95,6 +95,14 @@ openapi: POST /v1/web/scrape
 <ParamField body="wait_for" type="string">
   CSS selector or XPath expression to wait for before extracting content. Only works with the `browser` engine. If `render_js` is `false` and this is set, JS rendering is forced automatically.
 
+  The wait runs **after** `js_scenario`, so a login flow can fill the form,
+  submit, and then wait for an element that only exists on the post-login page.
+  The wait is a precondition, not a hint: if the selector has not appeared
+  within `wait_timeout`, the request fails with `422 wait_for_timeout`, nothing
+  is charged, and the response carries `js_scenario_report` so you can see how
+  far the flow got. A successful response reports `wait_for_found: true`. For a
+  best-effort dwell that never fails, use `wait_after_load` instead.
+
   ```json
   { "wait_for": "#main-content" }
   ```
@@ -132,26 +140,40 @@ openapi: POST /v1/web/scrape
 </ParamField>
 
 <ParamField body="js_scenario" type="array">
-  A list of browser actions to perform before extracting content. Forces the `browser` engine. Each action is an object with a `type` and action-specific parameters.
+  A list of browser actions to perform, in order, after the page loads and
+  before `wait_for` is awaited and content is extracted. Forces the `browser`
+  engine. Each step is an object with an `action` and action-specific
+  parameters.
 
   **Supported actions:**
 
-  | Type | Parameters | Description |
-  |------|-----------|-------------|
+  | Action | Parameters | Description |
+  |--------|-----------|-------------|
   | `click` | `selector` | Click an element |
-  | `fill` | `selector`, `value` | Fill an input field |
-  | `scroll` | `direction`, `amount` | Scroll the page |
-  | `wait` | `milliseconds` | Wait for a duration |
+  | `fill` | `selector`, `value` | Click into an input and type `value` with real key events |
+  | `scroll` | `amount` (optional, px) | Scroll down; a random 300–700 px when `amount` is omitted |
+  | `wait` | `timeout` (ms) | Pause for a fixed duration |
+  | `evaluate` | `script` | Run JavaScript in the page |
 
   ```json
   {
     "js_scenario": [
-      { "type": "click", "selector": "#load-more" },
-      { "type": "wait", "milliseconds": 2000 },
-      { "type": "scroll", "direction": "down", "amount": 500 }
+      { "action": "fill", "selector": "#username", "value": "me@example.com" },
+      { "action": "fill", "selector": "#password", "value": "hunter2" },
+      { "action": "click", "selector": "button[type=submit]" },
+      { "action": "wait", "timeout": 2000 }
     ]
   }
   ```
+
+  Steps run one after another and stop at the first one that fails (a selector
+  that never becomes actionable, a script that throws). A failed step fails the
+  request with `422 js_scenario_failed` and nothing is charged. Every response
+  that ran a scenario includes `js_scenario_report`, one entry per executed step
+  with its outcome and the page URL after it — the log to read when a flow does
+  not end where you expected. An unknown action is rejected up front with a
+  validation error rather than skipped. (`type` and `milliseconds` are accepted
+  as aliases of `action` and `timeout`.)
 </ParamField>
 
 <ParamField body="session_id" type="string">
@@ -442,6 +464,39 @@ checked against the estimate *including* the proxy surcharge.
   Name of the solver that successfully bypassed the block. `null` if no solver was used.
 </ResponseField>
 
+<ResponseField name="wait_for_found" type="boolean">
+  Whether the `wait_for` selector appeared within `wait_timeout`. `null` when no
+  `wait_for` was requested. A miss never reaches you as a `200` — it is a
+  `422 wait_for_timeout`.
+</ResponseField>
+
+<ResponseField name="js_scenario_report" type="array">
+  One entry per executed `js_scenario` step, in order. `null` when no scenario
+  ran. Execution stops at the first failed step, so a report shorter than the
+  scenario means a step broke.
+
+  <Expandable>
+    <ResponseField name="step" type="integer">
+      Zero-based index of the step in your `js_scenario`.
+    </ResponseField>
+    <ResponseField name="action" type="string">
+      The step's action, as you sent it.
+    </ResponseField>
+    <ResponseField name="selector" type="string">
+      The step's selector, if it had one.
+    </ResponseField>
+    <ResponseField name="ok" type="boolean">
+      Whether the step completed.
+    </ResponseField>
+    <ResponseField name="error" type="string">
+      Why the step failed (e.g. `TimeoutError: waiting for locator("#go")`). `null` on success.
+    </ResponseField>
+    <ResponseField name="url" type="string">
+      The page URL right after the step — the quickest way to see whether a submit actually navigated.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
 <ResponseField name="ai_extraction" type="object | string | array">
   Structured data extracted by the LLM based on `ai_prompt`. The shape depends on your prompt. `null` when `ai_extract` is `false` or extraction failed.
 </ResponseField>
@@ -637,15 +692,34 @@ console.log(data.content);
 
 ### Browser automation scenario
 
+Log in, then wait for an element that only exists once the login succeeded.
+If the flow never gets there you receive a free `422` with the step-by-step
+report instead of a billed copy of the login page.
+
+```json
+{
+  "url": "https://example.com/login",
+  "js_scenario": [
+    { "action": "fill", "selector": "#username", "value": "me@example.com" },
+    { "action": "fill", "selector": "#password", "value": "hunter2" },
+    { "action": "click", "selector": "button[type=submit]" }
+  ],
+  "wait_for": "#account-dashboard",
+  "wait_timeout": 60000
+}
+```
+
+Infinite scroll:
+
 ```json
 {
   "url": "https://scrapebadger.com/infinite-scroll",
   "format": "text",
   "js_scenario": [
-    { "type": "scroll", "direction": "down", "amount": 1000 },
-    { "type": "wait", "milliseconds": 2000 },
-    { "type": "scroll", "direction": "down", "amount": 1000 },
-    { "type": "wait", "milliseconds": 2000 }
+    { "action": "scroll", "amount": 1000 },
+    { "action": "wait", "timeout": 2000 },
+    { "action": "scroll", "amount": 1000 },
+    { "action": "wait", "timeout": 2000 }
   ]
 }
 ```
@@ -656,7 +730,7 @@ console.log(data.content);
 |--------|-------------|
 | `400` | Invalid URL, cost exceeds `max_cost`, or requested engine not available |
 | `402` | Insufficient credits |
-| `422` | Blocking detected after all retries exhausted (`success: false`, `blocking_details` populated), or the body contained an unknown field (`error: "unknown_request_field"`) |
+| `422` | Blocking detected after all retries exhausted (`success: false`, `blocking_details` populated); the `wait_for` selector never appeared (`error: "wait_for_timeout"`); a `js_scenario` step failed (`error: "js_scenario_failed"`); or the body contained an unknown field (`error: "unknown_request_field"`). Never charged. |
 | `429` | Rate limit exceeded |
 | `500` | Unexpected server error |
 
