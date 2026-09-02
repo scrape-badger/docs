@@ -1,15 +1,15 @@
 ---
 title: "Shop Search"
 openapi: "GET /v1/tiktok/shop/search"
-description: "Keyword search over TikTok Shop products, with the TikTok video each listing is bound to, matching shops and related searches."
+description: "Paginated keyword search over TikTok Shop products, 30 per page, with the TikTok video each listing is bound to, matching shops and related searches."
 ---
 
 <Note>
-  Search results carry `video` — the TikTok video driving the listing (`play_count`, `like_count`, `author_name`) — plus `brand`, matching `shops`, `related_searches` and `related_categories`.
+  Pages hold 30 products: pass back `pagination.next_offset` as `offset` until `has_more` is false. The first page also carries `shops`, `related_searches`, `related_categories`, and each product's `video` (`play_count`, `like_count`, `author_name`) and `brand`. US only.
 </Note>
 
 <Note>
-  **US market only** — TikTok Shop resolves the market from the visitor's location and these endpoints read the US storefront (prices in USD). Lists return what the storefront page renders; there is no further pagination.
+  **Markets** — `region=US` (default) serves everything; `GB` and `ID` (Tokopedia) serve categories, category products and product detail in GBP/IDR. SG, MY, PH, TH, VN, MX, BR and JP sit behind a puzzle our exits do not clear and return `400`.
 </Note>
 
 <Note>

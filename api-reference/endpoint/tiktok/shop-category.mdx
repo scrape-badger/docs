@@ -1,15 +1,15 @@
 ---
 title: "Shop Category Products"
 openapi: "GET /v1/tiktok/shop/categories/{category_id}"
-description: "A TikTok Shop category's subcategories and the top products the storefront shows for it."
+description: "A TikTok Shop category's subcategories and the top products the storefront shows for it, in the market's currency."
 ---
 
 <Note>
-  `children` are the direct subcategories (empty on a leaf), `products` the top products the storefront renders for the category (about 15–25).
+  `children` are the direct subcategories (empty on a leaf), `products` the top products the storefront renders for the category (10–25). Works in `US`, `GB` and `ID`.
 </Note>
 
 <Note>
-  **US market only** — TikTok Shop resolves the market from the visitor's location and these endpoints read the US storefront (prices in USD). Lists return what the storefront page renders; there is no further pagination.
+  **Markets** — `region=US` (default) serves everything; `GB` and `ID` (Tokopedia) serve categories, category products and product detail in GBP/IDR. SG, MY, PH, TH, VN, MX, BR and JP sit behind a puzzle our exits do not clear and return `400`.
 </Note>
 
 <Note>

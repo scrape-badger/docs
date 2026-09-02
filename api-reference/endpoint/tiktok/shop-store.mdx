@@ -1,0 +1,17 @@
+---
+title: "Shop Store"
+openapi: "GET /v1/tiktok/shop/stores/{seller_id}"
+description: "A TikTok Shop store's stats and its full product catalogue, cursor-paginated up to 50 per page."
+---
+
+<Note>
+  `store` carries sold count, followers, rating and product count; `products` is one page of the catalogue (`count` up to 50) — pass back `next_cursor` as `cursor` until `has_more` is false. Any product's `seller.id` is the `seller_id`. US only.
+</Note>
+
+<Note>
+  **Markets** — `region=US` (default) serves everything; `GB` and `ID` (Tokopedia) serve categories, category products and product detail in GBP/IDR. SG, MY, PH, TH, VN, MX, BR and JP sit behind a puzzle our exits do not clear and return `400`.
+</Note>
+
+<Note>
+  Each request costs **5 credits**. Failed requests are not charged.
+</Note>

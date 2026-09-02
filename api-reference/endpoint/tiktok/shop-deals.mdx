@@ -1,0 +1,17 @@
+---
+title: "Shop Deals Feed"
+openapi: "GET /v1/tiktok/shop/deals/{deal}"
+description: "Curated TikTok Shop feeds — recommended-for-you and premium-offers — about 40 products each."
+---
+
+<Note>
+  `recommended-for-you` and `premium-offers` are the storefront's curated deal feeds (about 40 products each). US only.
+</Note>
+
+<Note>
+  **Markets** — `region=US` (default) serves everything; `GB` and `ID` (Tokopedia) serve categories, category products and product detail in GBP/IDR. SG, MY, PH, TH, VN, MX, BR and JP sit behind a puzzle our exits do not clear and return `400`.
+</Note>
+
+<Note>
+  Each request costs **5 credits**. Failed requests are not charged.
+</Note>

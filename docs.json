@@ -1163,10 +1163,13 @@
             "group": "Shop",
             "pages": [
               "api-reference/endpoint/tiktok/shop-ranking",
+              "api-reference/endpoint/tiktok/shop-deals",
               "api-reference/endpoint/tiktok/shop-categories",
               "api-reference/endpoint/tiktok/shop-category",
               "api-reference/endpoint/tiktok/shop-search",
-              "api-reference/endpoint/tiktok/shop-product"
+              "api-reference/endpoint/tiktok/shop-store",
+              "api-reference/endpoint/tiktok/shop-product",
+              "api-reference/endpoint/tiktok/shop-reviews"
             ]
           },
           {
