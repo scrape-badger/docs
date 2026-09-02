@@ -1,11 +1,10 @@
 ---
 title: "Get User Profile"
 api: "GET https://scrapebadger.com/v1/instagram/users/{username}"
-description: "Full public Instagram profile by username — bio, links, counts, verification and business metadata. Plus /related."
+description: "Full public Instagram profile by username — bio, links, counts, verification and business metadata."
 ---
 
-Fetch a single public Instagram profile by its `username` (handle). The same
-path also exposes a `/related` similar-accounts list.
+Fetch a single public Instagram profile by its `username` (handle).
 
 **Credits:** 5
 
@@ -24,7 +23,8 @@ path also exposes a `/related` similar-accounts list.
 ## Related paths
 
 - `GET /v1/instagram/users/{username}/related` — similar / suggested accounts.
-  **5 credits.**
+  **Temporarily unavailable** — needs the authenticated tier, currently returns
+  `503 temporarily_unavailable` (not billed). See the [overview](/instagram/overview).
 
 ## Response
 
