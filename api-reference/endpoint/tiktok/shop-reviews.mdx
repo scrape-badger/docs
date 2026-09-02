@@ -1,0 +1,17 @@
+---
+title: "Shop Product Reviews"
+openapi: "GET /v1/tiktok/shop/products/{product_id}/reviews"
+description: "Paginated TikTok Shop product reviews with the total and rating breakdown; sort by recommended or recent, filter by star rating, media or verified purchase."
+---
+
+<Note>
+  `page`/`count` paginate (up to 50 per page); `sort=recent` for the newest; `rating=1..5`, `with_media=true` or `verified=true` narrow the set — `total` reflects the filter, `rating_breakdown` the whole product. US only.
+</Note>
+
+<Note>
+  **Markets** — `region=US` (default) serves everything; `GB` and `ID` (Tokopedia) serve categories, category products and product detail in GBP/IDR. SG, MY, PH, TH, VN, MX, BR and JP sit behind a puzzle our exits do not clear and return `400`.
+</Note>
+
+<Note>
+  Each request costs **5 credits**. Failed requests are not charged.
+</Note>
