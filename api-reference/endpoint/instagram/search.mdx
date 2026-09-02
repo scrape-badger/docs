@@ -1,8 +1,18 @@
 ---
 title: "Search"
 api: "GET https://scrapebadger.com/v1/instagram/search/top"
-description: "Search Instagram across hashtags and blended top results."
+description: "Search Instagram across hashtags and blended top results. Temporarily unavailable."
+tag: "UNAVAILABLE"
 ---
+
+<Warning>
+  **Temporarily unavailable.** This endpoint needs the authenticated Instagram
+  tier, which is offline while we scale the account pool. Every call currently
+  returns `503 {"error": "temporarily_unavailable"}` with a `Retry-After`
+  header and is **not billed**. The public endpoints — [profile](/api-reference/endpoint/instagram/get-user),
+  [posts](/api-reference/endpoint/instagram/user-posts), [media detail](/api-reference/endpoint/instagram/get-media)
+  and [comments](/api-reference/endpoint/instagram/media-comments) — are live.
+</Warning>
 
 Search Instagram by keyword. Both typed endpoints share one query shape.
 

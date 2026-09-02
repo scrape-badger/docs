@@ -1,8 +1,18 @@
 ---
 title: "Hashtag Info & Feeds"
 api: "GET https://scrapebadger.com/v1/instagram/hashtags/{tag}"
-description: "Hashtag metadata by name, plus a paginated recent feed for the tag."
+description: "Hashtag metadata by name, plus a paginated recent feed for the tag. Temporarily unavailable."
+tag: "UNAVAILABLE"
 ---
+
+<Warning>
+  **Temporarily unavailable.** This endpoint needs the authenticated Instagram
+  tier, which is offline while we scale the account pool. Every call currently
+  returns `503 {"error": "temporarily_unavailable"}` with a `Retry-After`
+  header and is **not billed**. The public endpoints — [profile](/api-reference/endpoint/instagram/get-user),
+  [posts](/api-reference/endpoint/instagram/user-posts), [media detail](/api-reference/endpoint/instagram/get-media)
+  and [comments](/api-reference/endpoint/instagram/media-comments) — are live.
+</Warning>
 
 Fetch a hashtag's metadata by `tag` (no `#`), then page its `recent` media feed.
 

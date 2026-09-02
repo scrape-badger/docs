@@ -1,22 +1,27 @@
 ---
 title: "Instagram API Overview"
-description: "Pull public Instagram data — profiles, posts, media, comments, hashtags and search — as clean JSON, with no Instagram login or API key required."
+description: "Pull public Instagram data — profiles, posts, media detail and comments — as clean JSON, with no Instagram login or API key required."
 ---
 
 ## Overview
 
 The ScrapeBadger **Instagram API** turns `instagram.com`'s public surface into a
-clean JSON feed: user profiles and their `related` accounts and `posts`, media
-detail with `oembed`, comments and comment-likers, hashtag info and `recent`
-feeds, and search (hashtags + blended top).
+clean JSON feed: user profiles and their `posts`, media detail by shortcode, and
+paginated `comments`.
 
-<Note>
-  Authenticated (account-pool) endpoints — stories, highlights,
-  followers/following, locations, audio, and the user about/videos/reels/tagged/pinned,
-  hashtag top/reels, media likers, comment replies and search
-  users/places/reels/music/autocomplete variants — are **temporarily
-  unavailable** and not documented while offline.
-</Note>
+<Warning>
+  Every other Instagram endpoint needs the **authenticated (account-pool) tier**,
+  which is **temporarily unavailable** while we scale the pool: related
+  profiles, user about/videos/reels/tagged/pinned, followers/following,
+  stories/highlights, media `oembed`, media and comment likers, comment replies,
+  all hashtag endpoints (info, `top`, `recent`, `reels`), all locations, audio,
+  and all search variants (`hashtags`, `top`, users/places/reels/music/autocomplete).
+  They currently return `503 {"error": "temporarily_unavailable"}` with a
+  `Retry-After` header and are **not billed**. The
+  [hashtag](/api-reference/endpoint/instagram/get-hashtag) and
+  [search](/api-reference/endpoint/instagram/search) pages stay published,
+  flagged, so the request shape is known when they return.
+</Warning>
 
 <Info>
   All endpoints are `GET`, live under `https://scrapebadger.com/v1/instagram/*`,
@@ -30,12 +35,9 @@ feeds, and search (hashtags + blended top).
 ## Features
 
 - **Profiles** — full public profile by `username`: bio, links, counts,
-  verification, business/professional metadata, plus `related` accounts and
-  paginated `posts`.
-- **Media** — media detail by shortcode `code`, oEmbed, paginated `comments`,
-  and per-comment `likers`.
-- **Hashtags** — hashtag info by `tag`, plus a paginated `recent` feed.
-- **Search** — `hashtags` and blended `top` results.
+  verification, business/professional metadata, plus paginated `posts`.
+- **Media** — media detail by shortcode `code` and paginated `comments`.
+- **Hashtags & search** — temporarily unavailable (see above).
 
 ## Honesty caveat
 
@@ -62,14 +64,13 @@ feeds, and search (hashtags + blended top).
 | Endpoint group | Example path | Credits |
 | -------------- | ------------ | ------- |
 | Health / reference | `GET /v1/instagram/health` | 0 |
-| oEmbed / search hashtags | `GET /v1/instagram/media/{code}/oembed` | 2 |
 | Standard read | `GET /v1/instagram/users/{username}` | 5 |
 | Paginated listings | `GET /v1/instagram/users/{username}/posts` | 8 |
 
 <Info>
-  Standard read (5) covers profile, `related`, media detail, hashtag info and
-  search `top`. Paginated listings (8) cover `posts`, hashtag `recent`,
-  comments and comment-likers.
+  Standard read (5) covers profile and media detail. Paginated listings (8)
+  cover `posts` and `comments`. A `503 temporarily_unavailable` from a gated
+  endpoint costs 0 credits.
 </Info>
 
 ## Quickstart

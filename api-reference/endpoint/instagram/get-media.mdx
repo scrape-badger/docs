@@ -1,14 +1,13 @@
 ---
 title: "Get Media"
 api: "GET https://scrapebadger.com/v1/instagram/media/{code}"
-description: "Full media detail by shortcode — photo, video, reel or carousel — with caption, counts, resources, usertags and location. Plus oEmbed."
+description: "Full media detail by shortcode — photo, video, reel or carousel — with caption, counts, resources, usertags and location."
 ---
 
 Fetch a single piece of media by its shortcode `code` (the token in a
-`/p/…`, `/reel/…` or `/tv/…` URL). An `oembed` variant returns Instagram's
-embed payload.
+`/p/…`, `/reel/…` or `/tv/…` URL).
 
-**Credits:** 5 (media detail) · 2 (`oembed`)
+**Credits:** 5
 
 ## Authorization
 
@@ -24,7 +23,9 @@ embed payload.
 
 ## Related paths
 
-- `GET /v1/instagram/media/{code}/oembed` — Instagram oEmbed payload. **2 credits.**
+- `GET /v1/instagram/media/{code}/oembed` — Instagram oEmbed payload.
+  **Temporarily unavailable** — needs the authenticated tier, currently returns
+  `503 temporarily_unavailable` (not billed). See the [overview](/instagram/overview).
 
 ## Response
 
