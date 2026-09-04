@@ -1,0 +1,177 @@
+---
+title: "Search by Image"
+openapi: "POST /v1/ebay/search/by-image"
+description: "Search eBay with a photo instead of keywords, using eBay's own visual search."
+---
+
+Search active listings **by image**. This is what the camera icon in eBay's own
+search bar does: the picture is uploaded to eBay, eBay answers with a handle for
+it, and that handle is searched like a keyword.
+
+What comes back is ordinary listings, in exactly the same shape as
+[`/v1/ebay/search`](/api-reference/endpoint/ebay/search), with `query` set to
+`null`. Every filter below behaves the way it does there.
+
+**Credits:** 10 — twice a keyword search, because each call is two round trips
+to eBay: one to upload the image, one to fetch the results.
+
+## Body Parameters
+
+Send exactly one of `image_url` or `image_base64`. Sending both, or neither, is
+a `422`.
+
+<ParamField body="image_url" type="string">
+  Public http(s) URL of the image to search with. We download it for you.
+
+  The URL is fetched through the same egress-isolated path that serves the Web
+  Scraping API, so private addresses, cloud metadata endpoints and non-HTTP
+  schemes are refused.
+</ParamField>
+
+<ParamField body="image_base64" type="string">
+  The image itself, base64-encoded — use this when the picture is on your own
+  disk and has no public URL.
+
+  A bare base64 payload and a `data:image/jpeg;base64,...` URL are both
+  accepted, so you can paste one straight out of a browser. JPEG and PNG are
+  verified; the decoded image must be at most **10 MB**.
+</ParamField>
+
+<ParamField body="domain" type="string" default="com">
+  eBay marketplace domain TLD or alias. See
+  [`/v1/ebay/markets`](/api-reference/endpoint/ebay/list-markets) for all
+  supported values.
+
+  Examples: `com`, `co.uk`, `de`, `fr`, `com.au`
+</ParamField>
+
+<ParamField body="category_id" type="string">
+  Restrict results to an eBay category id. Use
+  [`/v1/ebay/categories`](/api-reference/endpoint/ebay/list-categories) to look
+  up ids.
+</ParamField>
+
+<ParamField body="page" type="integer" default={1}>
+  Page number for paginated results. Range: `1` - `1000`.
+
+  Use `pagination.has_more` to know when to stop.
+</ParamField>
+
+<ParamField body="per_page" type="integer">
+  Results per page. Clamped to one of `60`, `120`, or `240`.
+</ParamField>
+
+<ParamField body="condition" type="string">
+  Item condition filter.
+
+  | Value | Description |
+  |-------|-------------|
+  | `new` | Brand new |
+  | `open_box` | New (other) / open box |
+  | `refurbished` | Refurbished (any grade) |
+  | `used` | Pre-owned |
+  | `for_parts` | For parts or not working |
+  | `graded` | Trading cards: slabbed (PSA / BGS / CGC) |
+  | `ungraded` | Trading cards: raw |
+</ParamField>
+
+<ParamField body="buying_format" type="string">
+  Buying format filter: `auction`, `buy_it_now` or `best_offer`.
+</ParamField>
+
+<ParamField body="min_price" type="number">
+  Minimum price, in the marketplace's own currency.
+</ParamField>
+
+<ParamField body="max_price" type="number">
+  Maximum price, in the marketplace's own currency.
+</ParamField>
+
+<ParamField body="free_shipping" type="boolean" default={false}>
+  Only return listings with free shipping.
+</ParamField>
+
+<ParamField body="location" type="string">
+  Item location. `domestic` keeps only items located in that marketplace's own
+  country; `worldwide` widens to every country.
+</ParamField>
+
+<ParamField body="language" type="string">
+  Filter by the item's Language aspect: `english`, `japanese`, `chinese` or
+  `korean`. Resolved to each marketplace's own localized aspect name, so one
+  value works on all 18.
+</ParamField>
+
+## There is no `sort_by`
+
+eBay ignores sorting on a visual results page — asking for
+`price_low_to_high` returns the same first row as best match. Rather than accept
+a parameter that quietly does nothing, this endpoint does not have one.
+
+To order by price, use `min_price` / `max_price` to narrow the band and sort the
+returned rows yourself.
+
+## Errors
+
+A picture eBay cannot read is an error, never an empty result list — so a bad
+upload is always distinguishable from a genuine no-match.
+
+| Status | Meaning |
+|--------|---------|
+| `400` `invalid_image` | The bytes are not a readable image, the image is over 10 MB, `image_url` did not return an image, or the URL was refused. |
+| `422` | Both `image_url` and `image_base64` were sent, or neither was. |
+| `422` `blocking_page_detected` | eBay refused the request. Retry. |
+| `503` `upstream_unavailable` | Our own fetch layer timed out before eBay answered. Retry; you are not charged. |
+
+## Examples
+
+<CodeGroup>
+
+```bash By image URL
+curl -X POST https://scrapebadger.com/v1/ebay/search/by-image \
+  -H "X-API-Key: $SCRAPEBADGER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"image_url": "https://example.com/sneaker.jpg", "domain": "com"}'
+```
+
+```bash By upload
+curl -X POST https://scrapebadger.com/v1/ebay/search/by-image \
+  -H "X-API-Key: $SCRAPEBADGER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d "{\"image_base64\": \"$(base64 -w0 sneaker.jpg)\", \"domain\": \"com\"}"
+```
+
+```python Python
+from scrapebadger import ScrapeBadger
+
+async with ScrapeBadger(api_key="YOUR_KEY") as client:
+    results = await client.ebay.search.search_by_image(
+        image_url="https://example.com/sneaker.jpg",
+        domain="com",
+    )
+    for item in results.results:
+        print(item.title, item.price.value, item.price.currency)
+```
+
+```typescript Node
+import { ScrapeBadger } from 'scrapebadger'
+
+const client = new ScrapeBadger({ apiKey: 'YOUR_KEY' })
+
+const results = await client.ebay.search.searchByImage({
+  imageUrl: 'https://example.com/sneaker.jpg',
+  domain: 'com',
+})
+```
+
+```bash CLI
+scrapebadger ebay search-by-image --image ./sneaker.jpg --domain com
+```
+
+</CodeGroup>
+
+## Response
+
+Identical to [`/v1/ebay/search`](/api-reference/endpoint/ebay/search): `results`,
+`facets`, `pagination`, `domain` and the scrape timestamps. `query` is `null`,
+since the search was made from a picture rather than words.

@@ -5,7 +5,7 @@ description: "Scrape eBay active listings, item details, reviews, and seller dat
 
 # eBay Scraper API
 
-Search active listings, fetch full item detail, list reviews, and retrieve seller profiles, storefronts, and feedback from eBay — one of the world's largest online marketplaces. The API handles authentication, anti-bot bypass, and marketplace routing automatically.
+Search active listings by keyword or by image, fetch full item detail, list reviews, and retrieve seller profiles, storefronts, and feedback from eBay — one of the world's largest online marketplaces. The API handles authentication, anti-bot bypass, and marketplace routing automatically.
 
 ## Key Features
 
@@ -102,6 +102,7 @@ curl "https://scrapebadger.com/v1/ebay/search?query=nintendo+switch+oled&domain=
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | [`/v1/ebay/search`](/api-reference/endpoint/ebay/search) | GET | Search a marketplace for active listings |
+| [`/v1/ebay/search/by-image`](/api-reference/endpoint/ebay/search-by-image) | POST | Search active listings by image — eBay's own visual search |
 | [`/v1/ebay/completed`](/api-reference/endpoint/ebay/completed) | GET | Search completed (sold) listings — sold-price history |
 | [`/v1/ebay/items/{item_id}`](/api-reference/endpoint/ebay/get-item-detail) | GET | Full detail for a single listing |
 | [`/v1/ebay/items/{item_id}/reviews`](/api-reference/endpoint/ebay/get-item-reviews) | GET | Catalog product reviews for a listing |
@@ -118,6 +119,7 @@ curl "https://scrapebadger.com/v1/ebay/search?query=nintendo+switch+oled&domain=
 | Endpoint | Cost |
 |----------|------|
 | Search | 5 credits |
+| Search by image | 10 credits |
 | Completed / sold | 5 credits |
 | Get item detail | 5 credits |
 | Get item reviews | 10 credits |

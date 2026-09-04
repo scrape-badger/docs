@@ -584,6 +584,7 @@
             "group": "Search",
             "pages": [
               "api-reference/endpoint/ebay/search",
+              "api-reference/endpoint/ebay/search-by-image",
               "api-reference/endpoint/ebay/completed",
               "api-reference/endpoint/ebay/autocomplete"
             ]
