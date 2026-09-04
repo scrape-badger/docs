@@ -45,13 +45,16 @@ sees, answered by the anonymous surface's **Gemini Flash-Lite** model.
   domain was cited. No separate subscription.
 - **Country control** — `country` picks the egress country, so you can compare
   the answer a user in `DE` gets against the one in `US`.
+- **Ask about an image** — attach a picture with `image_url` or `image_base64`
+  and Gemini answers about it (JPEG/PNG/GIF/WEBP/BMP, up to 5 MB). Image
+  *generation* is not available: anonymous gemini.google.com gates that behind a login.
 
 ## Honesty caveat
 
 <Warning>
   Each request is a **single, fresh, anonymous question**. There is no
   conversation memory, no multi-turn follow-up, no model selection, no
-  streaming, and no image input — `conversation_id` and `message_id` identify
+  streaming, and no image OUTPUT — `conversation_id` and `message_id` identify
   the one-shot exchange, they are not handles you can continue from. The
   anonymous surface always answers with a **Gemini Flash-Lite** model; the
   `model` field reports which build answered, it is **not** a request

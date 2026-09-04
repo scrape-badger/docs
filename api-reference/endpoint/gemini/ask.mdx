@@ -45,6 +45,32 @@ Accepts `GET` (query params) or `POST` (JSON body) with identical fields.
   Check `web_search_triggered` in the response for what actually happened.
 </ParamField>
 
+<ParamField query="image_url" type="string">
+  Public `http(s)` URL of an image to attach to the prompt. Gemini looks at the
+  picture and answers about it. JPEG, PNG, GIF, WEBP and BMP; up to 5 MB.
+
+  Supply the picture **either** as `image_url` **or** as `image_base64` — sending
+  both is a `400`.
+</ParamField>
+
+<ParamField body="image_base64" type="string">
+  The image itself, base64-encoded — **`POST` only**, since a whole image does
+  not belong in a query string. A bare base64 payload and a
+  `data:image/png;base64,...` URL are both accepted.
+</ParamField>
+
+<Note>
+  An image ask is slower than a text one: Gemini uploads the picture before it
+  starts answering. Allow **90-150 s**.
+</Note>
+
+<Warning>
+  This is image **input** only. Anonymous gemini.google.com will not GENERATE an image — its
+  own logged-out page gates that behind a login — so no request to this endpoint
+  can return a picture it drew. `images` in the response is what the answer
+  *displayed*.
+</Warning>
+
 ## Response
 
 <ResponseField name="prompt" type="string">Echo of the prompt you sent.</ResponseField>
@@ -77,6 +103,17 @@ Accepts `GET` (query params) or `POST` (JSON body) with identical fields.
     <ResponseField name="domain" type="string | null">Hostname.</ResponseField>
     <ResponseField name="attribution" type="string | null">Publisher/attribution label.</ResponseField>
     <ResponseField name="cited" type="boolean">Whether this result made it into `citations`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="images" type="MediaItem[]">
+  Images the answer displayed — product shots, article art and other pictures a
+  web-grounded answer pulls in. Favicon-sized assets are excluded. Never a
+  generated image: see the warning above.
+
+  <Expandable title="MediaItem">
+    <ResponseField name="url" type="string">Image URL.</ResponseField>
+    <ResponseField name="title" type="string | null">Alt text, when Gemini supplied one.</ResponseField>
   </Expandable>
 </ResponseField>
 
@@ -218,6 +255,71 @@ for c in data["citations"]:
   it into the answer. When `web_search_triggered` is `false`, both are empty and
   Gemini answered from its own knowledge — that is a valid response, not an
   error.
+</Note>
+
+
+## Asking about an image
+
+Attach a picture and Gemini answers about it. `image_url` works on `GET` and
+`POST`; `image_base64` is `POST` only.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://scrapebadger.com/v1/gemini/ask" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "prompt": "What product is in this photo, and what is it usually used for?",
+    "image_url": "https://example.com/product.jpg"
+  }' \
+  --max-time 150
+```
+
+```python Python
+import base64, requests
+
+with open("product.jpg", "rb") as fh:
+    encoded = base64.b64encode(fh.read()).decode()
+
+res = requests.post(
+    "https://scrapebadger.com/v1/gemini/ask",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    json={
+        "prompt": "What product is in this photo, and what is it usually used for?",
+        "image_base64": encoded,
+    },
+    timeout=150,
+)
+print(res.json()["answer"])
+```
+
+```javascript Node.js
+import { readFile } from "node:fs/promises";
+
+const encoded = (await readFile("product.jpg")).toString("base64");
+
+const res = await fetch("https://scrapebadger.com/v1/gemini/ask", {
+  method: "POST",
+  headers: {
+    "X-API-Key": process.env.SCRAPEBADGER_API_KEY,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    prompt: "What product is in this photo, and what is it usually used for?",
+    image_base64: encoded,
+  }),
+  signal: AbortSignal.timeout(150_000),
+});
+console.log((await res.json()).answer);
+```
+
+</CodeGroup>
+
+<Note>
+  An image Gemini cannot read is a `400` with `"code": "invalid_image"`, raised
+  before the request reaches a browser — so a broken picture never costs you
+  credits. Sending both `image_url` and `image_base64` is also a `400`.
 </Note>
 
 <Warning>
