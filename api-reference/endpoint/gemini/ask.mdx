@@ -45,30 +45,21 @@ Accepts `GET` (query params) or `POST` (JSON body) with identical fields.
   Check `web_search_triggered` in the response for what actually happened.
 </ParamField>
 
-<ParamField query="image_url" type="string">
-  Public `http(s)` URL of an image to attach to the prompt. Gemini looks at the
-  picture and answers about it. JPEG, PNG, GIF, WEBP and BMP; up to 5 MB.
-
-  Supply the picture **either** as `image_url` **or** as `image_base64` — sending
-  both is a `400`.
+<ParamField query="image_url" type="string" deprecated>
+  **Not supported — returns `422`.** Signed-out Gemini refuses image questions,
+  so this fails immediately and is never billed. Use
+  [ChatGPT `/ask`](/api-reference/endpoint/chatgpt/ask) for image input.
 </ParamField>
 
-<ParamField body="image_base64" type="string">
-  The image itself, base64-encoded — **`POST` only**, since a whole image does
-  not belong in a query string. A bare base64 payload and a
-  `data:image/png;base64,...` URL are both accepted.
+<ParamField body="image_base64" type="string" deprecated>
+  **Not supported — returns `422`.** Same as `image_url` above.
 </ParamField>
-
-<Note>
-  An image ask is slower than a text one: Gemini uploads the picture before it
-  starts answering. Allow **90-150 s**.
-</Note>
 
 <Warning>
-  This is image **input** only. Anonymous gemini.google.com will not GENERATE an image — its
-  own logged-out page gates that behind a login — so no request to this endpoint
-  can return a picture it drew. `images` in the response is what the answer
-  *displayed*.
+  Anonymous gemini.google.com neither reads nor GENERATES images — its
+  logged-out page gates both behind a login — so no request to this endpoint can
+  answer about a picture or return one it drew. `images` in the response is what
+  the answer *displayed*.
 </Warning>
 
 ## Response
@@ -260,67 +251,34 @@ for c in data["citations"]:
 
 ## Asking about an image
 
-Attach a picture and Gemini answers about it. `image_url` works on `GET` and
-`POST`; `image_base64` is `POST` only.
+<Warning>
+  **Gemini cannot answer about an image, and this endpoint no longer tries.**
 
-<CodeGroup>
+  Passing `image_url` or `image_base64` returns `422` with
+  `"code": "image_not_supported"`. Nothing is billed and no browser is spent.
 
-```bash cURL
+  The upload itself works — the picture reaches Google and the prompt reaches
+  the conversation — but signed-out sessions get `PERMISSION_DENIED` back from
+  Gemini's own answer-generation call, so no answer is ever produced. The same
+  request without a picture answers normally in a few seconds. This is a Google
+  restriction on anonymous sessions, not a limit we impose, and there is no
+  request shape that works around it.
+
+  **Use [ChatGPT `/ask`](/api-reference/endpoint/chatgpt/ask) instead** — it
+  takes `image_url` or `image_base64` and answers about the picture.
+</Warning>
+
+```bash Returns 422
 curl -X POST "https://scrapebadger.com/v1/gemini/ask" \
   -H "X-API-Key: YOUR_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{
-    "prompt": "What product is in this photo, and what is it usually used for?",
-    "image_url": "https://example.com/product.jpg"
-  }' \
-  --max-time 150
+  -d '{"prompt": "What is in this photo?", "image_url": "https://example.com/a.jpg"}'
+
+# {"detail":{"code":"image_not_supported",
+#            "message":"Gemini refuses image questions for signed-out sessions
+#                       (PERMISSION_DENIED on its own generate RPC).
+#                       Use /v1/chatgpt/ask for image input."}}
 ```
-
-```python Python
-import base64, requests
-
-with open("product.jpg", "rb") as fh:
-    encoded = base64.b64encode(fh.read()).decode()
-
-res = requests.post(
-    "https://scrapebadger.com/v1/gemini/ask",
-    headers={"X-API-Key": "YOUR_API_KEY"},
-    json={
-        "prompt": "What product is in this photo, and what is it usually used for?",
-        "image_base64": encoded,
-    },
-    timeout=150,
-)
-print(res.json()["answer"])
-```
-
-```javascript Node.js
-import { readFile } from "node:fs/promises";
-
-const encoded = (await readFile("product.jpg")).toString("base64");
-
-const res = await fetch("https://scrapebadger.com/v1/gemini/ask", {
-  method: "POST",
-  headers: {
-    "X-API-Key": process.env.SCRAPEBADGER_API_KEY,
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    prompt: "What product is in this photo, and what is it usually used for?",
-    image_base64: encoded,
-  }),
-  signal: AbortSignal.timeout(150_000),
-});
-console.log((await res.json()).answer);
-```
-
-</CodeGroup>
-
-<Note>
-  An image Gemini cannot read is a `400` with `"code": "invalid_image"`, raised
-  before the request reaches a browser — so a broken picture never costs you
-  credits. Sending both `image_url` and `image_base64` is also a `400`.
-</Note>
 
 <Warning>
   Gemini is non-deterministic. The same prompt can return different wording and
