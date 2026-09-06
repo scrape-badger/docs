@@ -59,19 +59,30 @@ You only pay for the method that succeeds — escalation costs are **not cumulat
 
 ## Credit Costs
 
+Every request pays an **engine cost plus a `proxy_tier` surcharge**. The engine cost alone is never the total.
+
 | Component | Cost |
 |-----------|------|
-| Basic HTTP scrape | 1 credit |
-| Browser rendering (`render_js: true`) | 5 credits |
-| Premium browser (via escalation) | 10 credits |
-| Anti-bot solver (`anti_bot: true`) | +5 credits |
-| AI extraction (`ai_extract: true`) | +2 credits |
-| Video recording (`video: true`) | +3 credits |
+| HTTP engine — simple pages in `engine: auto` | 1 credit |
+| Browser engine — `render_js`, `anti_bot`, `video`, or auto-escalation | 5 credits |
+| Proxy tier `simple` (default) | +1 credit |
+| Proxy tier `premium` | +8 credits |
+| Proxy tier `ultra` | +8 credits |
+| AI extraction (`ai_extract: true`) | +10 credits |
 | Retries | Free |
 | Failed requests | 0 credits |
 
+The anti-bot solver and video recording are not billed on top — they force the browser engine, so they cost the 5-credit engine rate. Common totals:
+
+| Request | Total |
+|---------|-------|
+| HTTP page, `simple` proxy (cheapest possible scrape) | 2 credits |
+| Browser render, `simple` proxy | 6 credits |
+| HTTP page, `premium` proxy | 9 credits |
+| Browser render, `premium` proxy | 13 credits |
+
 <Tip>
-  Use the `max_cost` parameter to set a credit budget per request. The request will fail rather than exceed your budget.
+  Use the `max_cost` parameter to set a credit budget per request. The request will fail rather than exceed your budget. The exact charge is returned in `credits_used` and the `X-Credits-Used` response header.
 </Tip>
 
 ## Caching

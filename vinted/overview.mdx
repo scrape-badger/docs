@@ -167,15 +167,19 @@ curl "https://scrapebadger.com/v1/vinted/search?query=nike+air+force+1&market=fr
 
 | Endpoint | Cost |
 |----------|------|
-| Search items | 1 credit |
-| Get item detail | 1 credit |
-| Get user profile | 1 credit |
-| Get user items | 1 credit |
-| Search brands | 1 credit |
+| Search items | 5 credits |
+| Get item detail | 10 credits |
+| Get user profile | 3 credits |
+| Get user items | 3 credits |
+| Search brands | 3 credits |
 | List colors | 1 credit |
 | List statuses | 1 credit |
-| List markets | 1 credit |
+| List markets | 0 credits |
 | Failed requests | 0 credits |
+
+<Tip>
+  Per-endpoint pricing is returned live from `GET https://scrapebadger.com/api/public/pricing`. Query it in your integration rather than hardcoding credit numbers — they can be adjusted. The exact charge for any call is returned in the `X-Credits-Used` response header.
+</Tip>
 
 ## Next Steps
 

@@ -1,0 +1,26 @@
+name: Credit costs match production
+
+# SB-001084: Vinted was repriced in the admin UI and the docs were never
+# touched, so the drift arrived with no docs PR to catch it. The schedule is
+# the trigger that would actually have caught it; the PR trigger just stops
+# a new page from shipping wrong.
+on:
+  pull_request:
+    paths:
+      - "**/*.mdx"
+      - "scripts/check_credit_costs.py"
+      - ".github/workflows/credit-costs.yml"
+  schedule:
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python3 scripts/check_credit_costs.py --selftest
+      - run: python3 scripts/check_credit_costs.py
