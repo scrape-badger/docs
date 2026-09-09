@@ -32,7 +32,12 @@ This page also documents the two free reference endpoints that list the valid
 ## Query Parameters
 
 <ParamField query="location" type="string" default="nyc">
-  Marketplace location slug, e.g. `nyc`, `la`, `london`.
+  A Facebook Marketplace **location slug** (`nyc`, `la`, `london`) or a numeric
+  Facebook place id. Human-readable names such as `Durham, UK` return a `400
+  invalid_location` rather than silently browsing Facebook's San Francisco
+  default — see
+  [Location targeting](/api-reference/endpoint/facebook/marketplace-search#location-targeting).
+  Facebook honours `radius` on search only, so there is no `radius` here.
 </ParamField>
 
 <ParamField query="min_price" type="integer">Minimum price.</ParamField>
@@ -53,7 +58,7 @@ This page also documents the two free reference endpoints that list the valid
   Same shape as
   [`/marketplace/search`](/api-reference/endpoint/facebook/marketplace-search) —
   `id`, `title`, `url`, `price_formatted`, `price_amount`, `currency`,
-  `primary_photo`, `creation_time_utc`, `created_at`, `location_text`, `city`,
+  `primary_photo`, `creation_time_utc`, `created_at`, `location_text`, `city_page_id`, `city`,
   `state`, `latitude`, `longitude`, `subtitles[]`, `delivery_types[]`,
   `attributes`, `is_sold`, `is_pending`, `is_live` and `seller`.
 </ResponseField>
@@ -61,7 +66,11 @@ This page also documents the two free reference endpoints that list the valid
 <ResponseField name="end_cursor" type="string">Pass as `after` for the next page.</ResponseField>
 <ResponseField name="has_next_page" type="boolean">Whether more listings are reachable.</ResponseField>
 <ResponseField name="query" type="string">Echoes the category slug that was browsed.</ResponseField>
-<ResponseField name="location" type="string">The location slug that was browsed.</ResponseField>
+<ResponseField name="location" type="string">The location value you sent.</ResponseField>
+<ResponseField name="resolved_location" type="ResolvedLocation">
+  The location Facebook actually browsed: `slug`, `latitude`, `longitude` and
+  `radius`. Verify it against your target geography before ingesting.
+</ResponseField>
 
 <Note>
   Vertical categories fill `attributes` with vertical-specific keys — vehicle
