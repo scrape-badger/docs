@@ -44,11 +44,20 @@ Returns a single `MarketplaceListing` object (not wrapped in an envelope).
 <ResponseField name="photos" type="string[]">Full gallery of image URLs.</ResponseField>
 <ResponseField name="creation_time_utc" type="number">Listing creation time, Unix seconds.</ResponseField>
 <ResponseField name="created_at" type="string">Listing creation time, ISO 8601 UTC.</ResponseField>
-<ResponseField name="location_text" type="string">Display location string.</ResponseField>
-<ResponseField name="city" type="string">City.</ResponseField>
-<ResponseField name="state" type="string">State / region.</ResponseField>
-<ResponseField name="latitude" type="number">Approximate latitude.</ResponseField>
-<ResponseField name="longitude" type="number">Approximate longitude.</ResponseField>
+<ResponseField name="location_text" type="string">Display location string, e.g. `Whitley Bay, Tyne and Wear`.</ResponseField>
+<ResponseField name="city" type="string">City. Populated on feed cards only — `null` here; read `location_text`.</ResponseField>
+<ResponseField name="state" type="string">State / region. Populated on feed cards only — `null` here; read `location_text`.</ResponseField>
+<ResponseField name="city_page_id" type="string">
+  Canonical Facebook place id for the listing's city. Pass it back as a
+  `location` on
+  [`/marketplace/search`](/api-reference/endpoint/facebook/marketplace-search)
+  to search that town directly.
+</ResponseField>
+<ResponseField name="latitude" type="number">
+  Approximate latitude, straight from Facebook's own listing data — never
+  geocoded by us. Facebook coarsens it to the seller's area, not the address.
+</ResponseField>
+<ResponseField name="longitude" type="number">Approximate longitude, same source and precision as `latitude`.</ResponseField>
 <ResponseField name="category_id" type="string">Marketplace category the listing sits in.</ResponseField>
 <ResponseField name="subtitles" type="string[]">Facebook's own metadata bullets — condition, mileage, beds/baths.</ResponseField>
 <ResponseField name="delivery_types" type="string[]">`local_pick_up` and/or `shipping`.</ResponseField>
@@ -111,8 +120,9 @@ listing = res.json()
   "creation_time_utc": 1785312840.0,
   "created_at": "2026-07-27T14:54:00Z",
   "location_text": "Brooklyn, NY",
-  "city": "Brooklyn",
-  "state": "NY",
+  "city": null,
+  "state": null,
+  "city_page_id": "108424145849621",
   "latitude": 40.6782,
   "longitude": -73.9442,
   "category_id": "electronics",
@@ -134,6 +144,13 @@ listing = res.json()
   "description": "Selling my 14\" MacBook Pro (M3 Pro, 18GB RAM, 512GB SSD). AppleCare until March 2027, 61 battery cycles, no scratches. Comes with the original box and 96W charger. Cash or Zelle, pickup in Park Slope."
 }
 ```
+
+<Note>
+  `latitude`/`longitude` are the strongest listing-level location evidence and
+  come from Facebook, not from any geocoding of ours. If Facebook omits them for
+  a listing, `location_text` and `city_page_id` remain authoritative for that
+  listing's place.
+</Note>
 
 <Note>
   A listing that has been deleted or is region-restricted returns `404`. Sold

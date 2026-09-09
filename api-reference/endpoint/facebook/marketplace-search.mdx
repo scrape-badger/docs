@@ -5,8 +5,8 @@ description: "Keyword-search Facebook Marketplace with price, age, condition, de
 ---
 
 Search Facebook Marketplace by keyword in one location. Returns structured
-listings with price and currency, photos, geo coordinates, condition
-subtitles, delivery types, sold/pending state and the seller actor.
+listings with price and currency, photos, place, condition subtitles, delivery
+types, sold/pending state and the seller actor.
 
 Marketplace has **no public Facebook API** — this endpoint is the only
 structured access to that inventory.
@@ -26,10 +26,15 @@ structured access to that inventory.
 </ParamField>
 
 <ParamField query="location" type="string" default="nyc">
-  Marketplace location slug, e.g. `nyc`, `la`, `london`, `sydney`. Any city
-  slug Facebook accepts works — see
-  [`/marketplace/locations`](/api-reference/endpoint/facebook/marketplace-category)
-  for the common set.
+  A Facebook Marketplace **location slug** (`nyc`, `la`, `london`,
+  `newcastleupontyne`) or a **numeric Facebook place id** (`107486895947382`).
+  Human-readable names such as `Durham, UK` are **not** accepted and return a
+  `400` — see [Location targeting](#location-targeting) below.
+</ParamField>
+
+<ParamField query="radius" type="integer">
+  Search radius around the location, `1`–`500`. Facebook's own unit: kilometres
+  in metric locales, miles in the US. Defaults to Facebook's 65 km / 40 mi.
 </ParamField>
 
 <ParamField query="min_price" type="integer">Minimum price, in the location's currency.</ParamField>
@@ -64,15 +69,60 @@ structured access to that inventory.
   `price_formatted`, `price_amount`, `amount_with_offset`,
   `strikethrough_price`, `min_price`, `max_price`, `currency`,
   `primary_photo`, `photos[]`, `creation_time_utc`, `created_at`,
-  `location_text`, `city`, `state`, `latitude`, `longitude`, `category_id`,
-  `subtitles[]`, `delivery_types[]`, `attributes`, `is_sold`, `is_pending`,
-  `is_live`, `is_hidden`, `seller` and `description`.
+  `location_text`, `city`, `state`, `city_page_id`, `latitude`, `longitude`,
+  `category_id`, `subtitles[]`, `delivery_types[]`, `attributes`, `is_sold`,
+  `is_pending`, `is_live`, `is_hidden`, `seller` and `description`.
+
+  `city_page_id` is the canonical Facebook place id for the listing's city, and
+  can be passed straight back as a `location`.
+
+  Facebook does **not** put coordinates on feed cards: `latitude` and
+  `longitude` are `null` here for every listing, and the listing's place is
+  carried by `location_text`, `city`, `state` and `city_page_id`. Coordinates
+  come from
+  [`/marketplace/item/{item_id}`](/api-reference/endpoint/facebook/marketplace-item).
 </ResponseField>
 <ResponseField name="count" type="integer">Number of listings in this page.</ResponseField>
 <ResponseField name="end_cursor" type="string">Pass as `after` for the next page.</ResponseField>
 <ResponseField name="has_next_page" type="boolean">Whether more listings are reachable.</ResponseField>
 <ResponseField name="query" type="string">The query that was searched.</ResponseField>
-<ResponseField name="location" type="string">The location slug that was searched.</ResponseField>
+<ResponseField name="location" type="string">The location value you sent.</ResponseField>
+<ResponseField name="resolved_location" type="ResolvedLocation">
+  The location Facebook actually searched: `slug` (the slug or place id it
+  resolved to), `latitude`, `longitude` and `radius`. Check these against your
+  own geography before ingesting the listings.
+</ResponseField>
+
+## Location targeting
+
+Facebook does not error on an unknown `{location}` — it silently searches its
+own **San Francisco** default and returns HTTP 200. This endpoint detects that
+fallback and returns a `400 invalid_location` instead, so you are never billed
+for wrong-country inventory:
+
+```json 400 invalid_location
+{
+  "error": "invalid_location",
+  "detail": "'Durham, UK' is not a Facebook Marketplace location. Pass a location slug (e.g. london, newcastleupontyne) or a numeric Facebook place id — the city_page_id on any listing is one. Human-readable names such as 'Durham, UK' are not accepted."
+}
+```
+
+Only places Facebook itself has minted a slug for resolve: `london` and
+`newcastleupontyne` do, `durham` and `sunderland` do not. To cover a town with
+no slug, search a nearby location that does have one and read `city_page_id`
+off the listings — those numeric place ids are valid `location` values:
+
+```bash
+# 1. search from a slug that resolves
+curl ".../marketplace/search?query=nintendo&location=newcastleupontyne" -H "X-API-Key: ..."
+#    -> listings[].city_page_id: "107486895947382" (Whitley Bay), "112404765441676" (Sunderland), ...
+
+# 2. target that town directly, with your own radius
+curl ".../marketplace/search?query=nintendo&location=107486895947382&radius=10" -H "X-API-Key: ..."
+```
+
+Every response echoes `resolved_location` so you can assert the coordinates fall
+inside your target geography before ingesting.
 
 <Note>
   Feed cards are truncated by Facebook: `description`, the full `photos[]`
@@ -143,8 +193,9 @@ data = res.json()
       "location_text": "Brooklyn, NY",
       "city": "Brooklyn",
       "state": "NY",
-      "latitude": 40.6782,
-      "longitude": -73.9442,
+      "city_page_id": "108424145849621",
+      "latitude": null,
+      "longitude": null,
       "category_id": "electronics",
       "subtitles": ["Used - Like New"],
       "delivery_types": ["local_pick_up", "shipping"],
@@ -168,7 +219,13 @@ data = res.json()
   "end_cursor": "AQHRb2xkX2N1cnNvcl9leGFtcGxlXzAwMQ==",
   "has_next_page": true,
   "query": "macbook pro",
-  "location": "nyc"
+  "location": "nyc",
+  "resolved_location": {
+    "slug": "nyc",
+    "latitude": 40.7142,
+    "longitude": -74.0064,
+    "radius": 65
+  }
 }
 ```
 
