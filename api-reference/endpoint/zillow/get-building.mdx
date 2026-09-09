@@ -1,0 +1,172 @@
+---
+title: "Get Multifamily Building"
+openapi: "GET /v1/zillow/building"
+description: "A Zillow apartment community — floor plans, per-unit rents, availability dates, amenities, schools and walk/transit scores."
+---
+
+Zillow serves multi-unit rentals as **buildings**, not homes: they live on `/apartments/...` and `/b/...` URLs and embed a different data blob, so [Get Property Detail](/api-reference/endpoint/zillow/get-property) cannot read them (it answers `400 building_url` if you pass one).
+
+Pass the `detail_url` of any [search](/api-reference/endpoint/zillow/search) result whose `home_type` is `BUILDING` — `GET /v1/zillow/search?location=Kansas+City,+MO&status=for_rent` returns them.
+
+## Query Parameters
+
+<ParamField query="url" type="string" required>
+  Full Zillow building URL, e.g. `https://www.zillow.com/apartments/kansas-city-mo/brookside-51/CkBJqt/`. A `/homedetails/...` URL is rejected with `400 not_a_building_url`.
+</ParamField>
+
+## Response
+
+The response wraps a single `Building` object under a `building` key.
+
+<ResponseField name="building" type="object">
+  <Expandable title="Building object">
+    <ResponseField name="url" type="string">Canonical building URL (nullable).</ResponseField>
+    <ResponseField name="lot_id" type="string">Zillow's building id (nullable).</ResponseField>
+    <ResponseField name="zpid" type="string">Zillow id of the building's primary unit (nullable).</ResponseField>
+    <ResponseField name="name" type="string">Community name, e.g. `Brookside 51` (nullable).</ResponseField>
+    <ResponseField name="building_type" type="string">`FOR_RENT` (nullable).</ResponseField>
+    <ResponseField name="home_types" type="string[]">e.g. `["apartment"]`.</ResponseField>
+    <ResponseField name="provider_listing_id" type="string">Feed provider's listing id — joins to a search card's `provider_listing_id` (nullable).</ResponseField>
+    <ResponseField name="street_address" type="string">Street address (nullable).</ResponseField>
+    <ResponseField name="full_address" type="string">Full one-line address (nullable).</ResponseField>
+    <ResponseField name="city" type="string">City (nullable).</ResponseField>
+    <ResponseField name="state" type="string">State code (nullable).</ResponseField>
+    <ResponseField name="zipcode" type="string">ZIP code (nullable).</ResponseField>
+    <ResponseField name="county" type="string">County (nullable).</ResponseField>
+    <ResponseField name="country" type="string">Country (nullable).</ResponseField>
+    <ResponseField name="neighborhood" type="string">Neighborhood (nullable).</ResponseField>
+    <ResponseField name="latitude" type="number">Latitude (nullable).</ResponseField>
+    <ResponseField name="longitude" type="number">Longitude (nullable).</ResponseField>
+    <ResponseField name="time_zone" type="string">IANA time zone (nullable).</ResponseField>
+    <ResponseField name="phone" type="string">Leasing-office phone (nullable).</ResponseField>
+    <ResponseField name="contact_name" type="string">Property manager, e.g. `Greystar` (nullable).</ResponseField>
+    <ResponseField name="rental_applications_accepted" type="string">Whether Zillow accepts applications for this building (nullable).</ResponseField>
+    <ResponseField name="currency" type="string">ISO 4217 currency code (nullable).</ResponseField>
+    <ResponseField name="rent_min" type="integer">Cheapest advertised total monthly price across the live inventory (nullable).</ResponseField>
+    <ResponseField name="rent_max" type="integer">Most expensive advertised total monthly price (nullable).</ResponseField>
+    <ResponseField name="base_rent_min" type="integer">Cheapest base rent — excludes mandatory monthly fees (nullable).</ResponseField>
+    <ResponseField name="base_rent_max" type="integer">Most expensive base rent (nullable).</ResponseField>
+    <ResponseField name="list_price_includes_required_fees" type="boolean">Whether the headline price already includes the required monthly fees (nullable).</ResponseField>
+    <ResponseField name="units_available" type="integer">Units Zillow reports as available (nullable).</ResponseField>
+    <ResponseField name="unit_count" type="integer">Units in the building's feed (nullable).</ResponseField>
+    <ResponseField name="description" type="string">Marketing description (nullable).</ResponseField>
+    <ResponseField name="building_details" type="string[]">Verbatim summary facts, e.g. `["170 units", "built in 2018"]`.</ResponseField>
+    <ResponseField name="amenities" type="string[]">Building amenities.</ResponseField>
+    <ResponseField name="unit_features" type="string[]">In-unit features.</ResponseField>
+    <ResponseField name="policies" type="string[]">Parking and other policies.</ResponseField>
+    <ResponseField name="special_features" type="string[]">Highlighted features.</ResponseField>
+    <ResponseField name="special_offers" type="string[]">Current move-in concessions.</ResponseField>
+    <ResponseField name="office_hours" type="string[]">Leasing-office hours.</ResponseField>
+    <ResponseField name="allowed_pets" type="string[]">Pet types allowed.</ResponseField>
+    <ResponseField name="walk_score" type="integer">Walk Score (nullable).</ResponseField>
+    <ResponseField name="transit_score" type="integer">Transit Score (nullable).</ResponseField>
+    <ResponseField name="bike_score" type="integer">Bike Score (nullable).</ResponseField>
+    <ResponseField name="is_waitlisted" type="boolean">Building is waitlisted (nullable).</ResponseField>
+    <ResponseField name="is_low_income" type="boolean">Income-restricted housing (nullable).</ResponseField>
+    <ResponseField name="is_senior_housing" type="boolean">Senior housing (nullable).</ResponseField>
+    <ResponseField name="is_student_housing" type="boolean">Student housing (nullable).</ResponseField>
+    <ResponseField name="floor_plans" type="FloorPlan[]">
+      Floor-plan models: `name`, `beds`, `baths`, `sqft`, `price_min`/`price_max`, `base_rent_min`/`base_rent_max`, `required_monthly_fee_min`/`max`, `available_from_at`, `lease_term`, `description`, `photos[]`, `units[]`, `units_available`.
+    </ResponseField>
+    <ResponseField name="units" type="Unit[]">
+      Every unit across every floor plan, flattened: `unit_number`, `zpid`, `beds`, `baths`, `sqft`, `price`, `base_rent`, `required_monthly_fee_min`/`max`, `list_price_includes_required_fees`, `available_from_at`, `allowed_pets[]`.
+    </ResponseField>
+    <ResponseField name="schools" type="School[]">`name`, `rating`, `grades`, `level`, `type`, `distance`.</ResponseField>
+    <ResponseField name="photos" type="Photo[]">`url`, `caption`, responsive `sources[]`.</ResponseField>
+    <ResponseField name="scraped_at" type="string">Scrape time, ISO-8601 (nullable).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<Tip>
+  `price` is the total monthly leasing price Zillow advertises; `base_rent` excludes the mandatory monthly fees, which are carried in `required_monthly_fee_min`/`max`. For rent comps, compare `base_rent` across buildings — the fee bundle differs by operator.
+</Tip>
+
+<Note>
+  Some buildings — typically landlord-managed ones — publish floor-plan pricing without enumerating individual units. There `units` is empty and `rent_min`/`rent_max` come from the floor plans.
+</Note>
+
+## Example
+
+```json Response
+{
+  "building": {
+    "url": "https://www.zillow.com/apartments/kansas-city-mo/brookside-51/CkBJqt/",
+    "lot_id": "2750786886",
+    "zpid": "2062673170",
+    "name": "Brookside 51",
+    "building_type": "FOR_RENT",
+    "home_types": ["apartment"],
+    "street_address": "5100 Oak St",
+    "full_address": "5100 Oak St, Kansas City, MO 64112",
+    "city": "Kansas City",
+    "state": "MO",
+    "zipcode": "64112",
+    "county": "Jackson County",
+    "neighborhood": "South Plaza",
+    "latitude": 39.03416,
+    "longitude": -94.58333,
+    "phone": "(816) 608-6275",
+    "contact_name": "Greystar",
+    "currency": "USD",
+    "rent_min": 2015,
+    "rent_max": 2580,
+    "base_rent_min": 1734,
+    "base_rent_max": 2299,
+    "list_price_includes_required_fees": true,
+    "units_available": 5,
+    "unit_count": 5,
+    "building_details": ["170 units", "built in 2018"],
+    "floor_plans": [
+      {
+        "name": "B2 (1BR)",
+        "beds": 1,
+        "baths": 1,
+        "sqft": 795,
+        "price_min": 2015,
+        "price_max": 2045,
+        "base_rent_min": 1734,
+        "base_rent_max": 1764,
+        "available_from_at": "2026-09-26T07:00:00Z",
+        "lease_term": "Available months 6,7,8,9,10,11,12,13,14,15",
+        "units_available": 2,
+        "units": [
+          {
+            "unit_number": "Unit 243",
+            "zpid": "2062673170",
+            "beds": 1,
+            "baths": 1,
+            "sqft": 795,
+            "price": 2015,
+            "base_rent": 1734,
+            "required_monthly_fee_min": 281,
+            "required_monthly_fee_max": 281,
+            "list_price_includes_required_fees": true,
+            "available_from_at": "2026-10-28T07:00:00Z",
+            "allowed_pets": ["Dogs", "Cats"]
+          }
+        ]
+      }
+    ],
+    "amenities": ["Club House", "Fitness Center", "Lounge: TV Lounge", "In Unit: In-Home Washers & Dryers"],
+    "unit_features": ["Dryer", "Washer", "High End Stainless Steel Appliances"],
+    "policies": ["Covered Parking", "Surface Lot"],
+    "special_offers": ["Preferred Employer Discount: Receive $340 off move-in costs."],
+    "office_hours": ["Mon - Fri: 9:00AM - 6:00PM", "Sat: 10:00AM - 2:00PM", "Sun: Closed"],
+    "allowed_pets": ["Cats", "Large dogs", "Small dogs"],
+    "walk_score": 85,
+    "transit_score": 56,
+    "bike_score": 42,
+    "schools": [
+      { "name": "Hale Cook Elementary", "rating": 8, "grades": "PK-6", "type": "PUBLIC", "distance": 2.8 }
+    ],
+    "photos": [
+      { "url": "https://photos.zillowstatic.com/fp/84cf-cc_ft_1536.webp", "caption": "Community photo" }
+    ],
+    "scraped_at": "2026-09-09T08:12:44Z"
+  }
+}
+```
+
+<Note>
+  Each building request costs **5 credits**. Failed requests are not charged.
+</Note>

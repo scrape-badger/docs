@@ -10,6 +10,9 @@ Search for-sale, for-rent, and sold listings, pull **maximal property detail** w
 ## Key Features
 
 <CardGroup cols={3}>
+  <Card title="Multifamily Buildings" icon="building">
+    Zillow's for-rent inventory is mostly apartment communities (`home_type: "BUILDING"`), which have no single price or zpid. The [`/v1/zillow/building`](/api-reference/endpoint/zillow/get-building) endpoint returns their floor plans and **every available unit** with rent, sqft, and move-in date, plus amenities, office hours, pet policy, schools, and walk/transit/bike scores.
+  </Card>
   <Card title="Deep Property Detail" icon="house">
     ~99 top-level fields per property plus a nested `home_facts` block distilled from Zillow's `resoFacts` MLS record — beds, baths, sqft, lot size, systems, features, HOA, parcel, and more.
   </Card>
@@ -90,6 +93,7 @@ curl "https://scrapebadger.com/v1/zillow/search?location=Austin,+TX&status=for_s
 |----------|--------|-------------|
 | [`/v1/zillow/search`](/api-reference/endpoint/zillow/search) | GET | Search Zillow for listings |
 | [`/v1/zillow/property/{zpid}`](/api-reference/endpoint/zillow/get-property) | GET | Full detail for a single property |
+| [`/v1/zillow/building`](/api-reference/endpoint/zillow/get-building) | GET | Multifamily building — floor plans and per-unit rents |
 | [`/v1/zillow/agent`](/api-reference/endpoint/zillow/get-agent) | GET | Agent profile, reviews, past sales, listings |
 | [`/v1/zillow/autocomplete`](/api-reference/endpoint/zillow/autocomplete) | GET | Location autocomplete suggestions |
 | [`/v1/zillow/markets`](/api-reference/endpoint/zillow/list-markets) | GET | List advertised coverage markets |
@@ -100,6 +104,7 @@ curl "https://scrapebadger.com/v1/zillow/search?location=Austin,+TX&status=for_s
 |----------|------|
 | Search | 5 credits |
 | Get property detail | 5 credits |
+| Get multifamily building | 5 credits |
 | Get agent profile | 5 credits |
 | Autocomplete | 2 credits |
 | List markets | 0 credits |
@@ -146,6 +151,9 @@ Search returns each result as a `Listing` (~50 fields); the [property detail](/a
   </Card>
   <Card title="Property Detail" icon="house" href="/api-reference/endpoint/zillow/get-property">
     Retrieve full detail, home facts, price/tax/Zestimate history, schools, and agent for a property
+  </Card>
+  <Card title="Multifamily Building" icon="building" href="/api-reference/endpoint/zillow/get-building">
+    Apartment communities — floor plans, per-unit rents, availability, amenities, and schools
   </Card>
 </CardGroup>
 
