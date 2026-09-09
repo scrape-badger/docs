@@ -95,15 +95,17 @@ structured access to that inventory.
 
 ## Location targeting
 
-Facebook does not error on an unknown `{location}` — it silently searches its
-own **San Francisco** default and returns HTTP 200. This endpoint detects that
-fallback and returns a `400 invalid_location` instead, so you are never billed
-for wrong-country inventory:
+Facebook does not error on an unknown `{location}` — it silently searches a
+**different place** and returns HTTP 200. Which place depends on the exit the
+request went out on, so the same bad input can come back as San Francisco,
+Maryland or Delaware inventory. This endpoint compares the location Facebook
+echoes back against the one you asked for and returns a `400 invalid_location`
+whenever they differ, so you are never billed for wrong-country inventory:
 
 ```json 400 invalid_location
 {
   "error": "invalid_location",
-  "detail": "'Durham, UK' is not a Facebook Marketplace location. Pass a location slug (e.g. london, newcastleupontyne) or a numeric Facebook place id — the city_page_id on any listing is one. Human-readable names such as 'Durham, UK' are not accepted."
+  "detail": "'Durham, UK' is not a Facebook Marketplace location — Facebook searched '103787802993414' (39.2713, -76.735) instead. Pass a location slug (e.g. london, newcastleupontyne) or a numeric Facebook place id — the city_page_id on any listing is one. Human-readable names such as 'Durham, UK' are not accepted."
 }
 ```
 
@@ -121,8 +123,9 @@ curl ".../marketplace/search?query=nintendo&location=newcastleupontyne" -H "X-AP
 curl ".../marketplace/search?query=nintendo&location=107486895947382&radius=10" -H "X-API-Key: ..."
 ```
 
-Every response echoes `resolved_location` so you can assert the coordinates fall
-inside your target geography before ingesting.
+A location Facebook recognises echoes back verbatim in `resolved_location.slug`
+(`newcastleupontyne` → `newcastleupontyne`), so you can also assert the
+coordinates fall inside your target geography before ingesting.
 
 <Note>
   Feed cards are truncated by Facebook: `description`, the full `photos[]`
