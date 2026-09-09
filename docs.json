@@ -953,7 +953,8 @@
           {
             "group": "Properties",
             "pages": [
-              "api-reference/endpoint/zillow/get-property"
+              "api-reference/endpoint/zillow/get-property",
+              "api-reference/endpoint/zillow/get-building"
             ]
           },
           {
