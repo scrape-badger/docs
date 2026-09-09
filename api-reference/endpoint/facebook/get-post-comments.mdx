@@ -4,9 +4,10 @@ api: "GET https://scrapebadger.com/v1/facebook/posts/{post_id}/comments"
 description: "The comment thread on a Facebook post — author, message, reactions and reply counts, cursor-paginated."
 ---
 
-Fetch the comment thread on a post. The first page comes from the post's own
-server-rendered shell; deeper pages replay Facebook's comment-list GraphQL
-query — which is why this endpoint costs double.
+Fetch the comment thread on a post. Every page — the first included — replays
+Facebook's own comment-list GraphQL query, which is why this endpoint costs
+double. Facebook serves **10 comments per page**; follow `end_cursor` while
+`has_next_page` is true to walk the whole thread.
 
 **Credits:** 10
 
@@ -34,7 +35,10 @@ query — which is why this endpoint costs double.
 </ParamField>
 
 <ParamField query="sort" type="string" default="relevance">
-  One of `relevance`, `newest`, `most_relevant`.
+  One of `relevance` (Facebook's ranked order), `newest` (reverse
+  chronological), or `most_relevant` (an alias of `relevance`). The sort applies
+  from the first page on, so do not mix orders across a single traversal — the
+  cursors are not interchangeable.
 </ParamField>
 
 ## Response

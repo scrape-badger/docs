@@ -7,6 +7,11 @@ description: "A Facebook Page or profile timeline — posts with attachments, re
 Fetch the timeline of a Page or profile. Both endpoints return the same post
 feed envelope and paginate with the same Relay cursor.
 
+Facebook decides the page size and currently serves about **3 posts per page**
+to a logged-out client, regardless of how many are asked for. To collect a date
+range, follow `end_cursor` while `has_next_page` is true and stop when
+`created_at` passes your cut-off — the feed is returned newest-first.
+
 | Endpoint | Use for |
 | -------- | ------- |
 | `GET /v1/facebook/pages/{identifier}/posts` | Page timelines |
@@ -124,7 +129,7 @@ data = res.json()
 ```
 
 <Note>
-  A timeline that returns an empty `posts[]` with `has_next_page: false` means
-  Facebook served no feed units for that entity — typically a locked-down
-  profile rather than an error.
+  Personal profiles that Facebook shows only to signed-in visitors return
+  **503** with a message saying so, not an empty `posts[]`. An empty `posts[]`
+  with `has_next_page: false` means the end of the feed.
 </Note>
