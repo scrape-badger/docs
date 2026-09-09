@@ -10,8 +10,9 @@ Not exhaustive, and **not guessable**: only places Facebook itself has minted a
 slug for resolve. `london` and `newcastleupontyne` do; `durham` and `sunderland`
 do not, and
 [`/marketplace/search`](/api-reference/endpoint/facebook/marketplace-search)
-returns a `400 invalid_location` for those rather than silently searching
-Facebook's San Francisco default.
+returns a `400 invalid_location` for those rather than silently searching a
+different place (which place depends on the exit — San Francisco, Maryland and
+Delaware have all been observed for the same bad input).
 
 To cover a town that has no slug, search a nearby location that does have one
 and read `city_page_id` off the listings — those numeric Facebook place ids are
