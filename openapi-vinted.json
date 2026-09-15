@@ -715,7 +715,7 @@
         },
         "security": [
           {
-            "ApiKeyAuth": []
+            "apiKeyAuth": []
           }
         ]
       }
@@ -773,7 +773,7 @@
         },
         "security": [
           {
-            "ApiKeyAuth": []
+            "apiKeyAuth": []
           }
         ]
       }
@@ -784,13 +784,19 @@
           "Vinted"
         ],
         "summary": "Search by image",
-        "description": "Find active Vinted listings from a photo. 10 credits per successful request. Returns the usual items, pagination and\nmarket envelope. Visual ranking; no similarity score. Resend the same image\nand pagination time for subsequent pages. Structured brand data may be null.",
+        "description": "Supply exactly one of image_url or image_base64 (JPEG/PNG/WebP, at most 5 MiB decoded). Find active Vinted listings from a photo. 10 credits per successful request. Returns the usual items, pagination and\nmarket envelope. Visual ranking; no similarity score. Resend the same image\nand pagination time for subsequent pages. Structured brand data may be null.",
         "operationId": "vinted_search_by_image",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/VintedImageSearchRequest"
+              },
+              "example": {
+                "image_url": "https://example.com/photo.jpg",
+                "market": "nl",
+                "per_page": 20,
+                "price_to": 50
               }
             }
           },
@@ -798,11 +804,31 @@
         },
         "responses": {
           "200": {
-            "description": "Successful Response",
+            "description": "Successful search",
             "content": {
               "application/json": {
                 "schema": {
-                  "title": "Response Search By Image V1 Vinted Search By Image Post"
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/VintedItemSummary"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/VintedPagination"
+                    },
+                    "market": {
+                      "type": "string",
+                      "description": "Echo of the market that was searched."
+                    },
+                    "seller_country": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Echo of the normalized seller_country filter that was applied (uppercase, comma-separated ISO-2 codes, e.g. \"FR,BE\"), or null when no filter was requested."
+                    }
+                  }
                 }
               }
             }
@@ -820,7 +846,7 @@
         },
         "security": [
           {
-            "ApiKeyAuth": []
+            "apiKeyAuth": []
           }
         ]
       }
@@ -1085,7 +1111,7 @@
           },
           "total_entries": {
             "type": "integer",
-            "description": "Total matching items. Vinted caps this at 960 on deep result sets — treat it as an upper bound."
+            "description": "Total matching items. Vinted caps this at 960 on deep result sets \u2014 treat it as an upper bound."
           },
           "time": {
             "anyOf": [
@@ -1116,12 +1142,12 @@
               "catalog_id": {
                 "type": "integer",
                 "nullable": true,
-                "description": "Vinted catalog (category) ID — the value to pass as catalog_ids on search."
+                "description": "Vinted catalog (category) ID \u2014 the value to pass as catalog_ids on search."
               },
               "brand_id": {
                 "type": "integer",
                 "nullable": true,
-                "description": "Vinted brand ID — the value to pass as brand_ids on search."
+                "description": "Vinted brand ID \u2014 the value to pass as brand_ids on search."
               },
               "category": {
                 "type": "array",
@@ -1153,7 +1179,7 @@
               "upload_date": {
                 "type": "string",
                 "nullable": true,
-                "description": "Vinted's relative \"listed\" label, localized (e.g. \"Il y a une semaine\") — not an ISO timestamp."
+                "description": "Vinted's relative \"listed\" label, localized (e.g. \"Il y a une semaine\") \u2014 not an ISO timestamp."
               },
               "can_buy": {
                 "type": "boolean"
