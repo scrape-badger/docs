@@ -263,3 +263,7 @@ results = client.vinted.search(
 <Note>
   A search costs **5 credits**, whatever filters you pass — including `seller_country`, whose seller lookups are not billed on top. Failed requests are not charged. The exact charge for any call is returned in the `X-Credits-Used` response header.
 </Note>
+
+## Mobile search additions
+
+`size_ids` and `material_ids` accept comma-separated filter IDs. Reuse the returned pagination `time` and a shared `search_session_id` across pages. Search item `display_title` / `display_subtitle` preserve presentation labels; `brand_title` can be null. Use item details for verified brand, category and condition IDs. See [mobile data](/vinted/mobile-api).

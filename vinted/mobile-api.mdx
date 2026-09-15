@@ -1,0 +1,214 @@
+---
+title: "Vinted mobile data"
+description: "Read listings, seller reviews, sold comparables, prices, categories, shipping references and help data through 76 public operations."
+---
+
+The Vinted API now uses mobile JSON requests for search, item details, seller
+profiles, wardrobes, brands, colors and conditions. You do not need a Vinted account.
+The existing endpoints keep their response envelopes and pricing.
+
+For the wider data set, use **76 public read operations**. These include sold
+comparables, suggested prices, reviews, followers, related listings, category trees,
+homepage feeds, ISBN metadata, package sizes, and help articles.
+
+## Discover operations
+
+```bash
+curl 'https://scrapebadger.com/v1/vinted/mobile/operations' \
+  -H 'X-API-Key: YOUR_API_KEY'
+```
+
+Discovery is free. Each entry includes its name, parameter types, required fields,
+example request parameters and expected response keys. The playground loads this
+same catalog and provides a form for each operation.
+
+## Read data
+
+All operation calls use `POST /v1/vinted/mobile/{operation}` with a JSON body:
+
+```json
+{
+  "market": "fr",
+  "parameters": {
+    "catalog_id": "1242",
+    "brand_id": "53",
+    "status_id": "2"
+  }
+}
+```
+
+For example, retrieve comparable sold listings:
+
+```bash
+curl 'https://scrapebadger.com/v1/vinted/mobile/sold-comparables' \
+  -H 'X-API-Key: YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{"market":"fr","parameters":{"catalog_id":"1242","brand_id":"53","status_id":"2"}}'
+```
+
+The response contains `operation`, `market`, and the upstream JSON in `data`.
+Each successful read costs **1 credit**. Failed requests are free. An empty
+collection can be a valid result; the operation description identifies inputs
+that returned empty or limited data during validation.
+
+<Note>
+  Sold comparables are a sample of similar sold listings, not an exhaustive sales
+  history. Their prices are not guaranteed final negotiated settlement prices.
+  The `price-suggestions` operation returns Vinted's suggested price and range.
+</Note>
+
+## CLI and MCP
+
+CLI version 0.14.0 or later:
+
+```bash
+scrapebadger vinted mobile-operations
+scrapebadger vinted mobile sold-comparables --market fr \
+  --params '{"catalog_id":"1242","brand_id":"53","status_id":"2"}'
+scrapebadger vinted mobile user-feedback --market pl \
+  --params '{"user_id":94118559,"per_page":3}'
+```
+
+MCP clients use `vinted_mobile_operations` to discover inputs, then
+`vinted_mobile_read` with `operation`, `market`, and `parameters`. Existing Vinted
+MCP tools remain available.
+
+## Search and field changes
+
+- `/v1/vinted/search` also accepts `size_ids`, `material_ids`, `time`, and
+  `search_session_id`. Reuse the returned pagination `time` and your search session
+  across pages. Live results can overlap; deduplicate by item ID.
+- `market` selects the locale and catalog region. It does not limit listings to
+  sellers physically located in that country. Use the existing `seller_country`
+  filter on `/search` when you need that restriction.
+- Search URLs are absolute. `display_title` and `display_subtitle` retain Vinted's
+  presentation labels. `brand_title` is null when the response does not provide a
+  reliable brand field; a display label can include a model name.
+- Item details return descriptions, brand/category/condition IDs and photos.
+  Unavailable fields remain null. A size-guide or condition FAQ link ID is not an
+  item attribute ID.
+- These operations read public data. They do not perform purchases, payments,
+  messages, account changes or listing publication.
+
+## Operation catalog
+
+The tables below list every operation. Use discovery for full parameter types,
+optional fields and runnable examples. Parameters belong inside `parameters`,
+including identifiers used to select an item, seller or category.
+
+### Discovery
+
+| Operation | Required parameters | Result |
+|---|---|---|
+| `catalog-search` | None | `items`, `pagination`, `search_tracking_params` |
+| `filters` | None | `filters`, `selected_filters` |
+| `filter-facets` | `filter_code` | `filter_code`, `options`, `total_count`, `total_count_max` |
+| `filter-search` | `filter_search_code`, `filter_search_text` | `is_selection_highlighted`, `options`, `selected_filters` |
+| `categories` | None | `catalogs` |
+| `suggestions` | `search_text` | `results` |
+| `homepage-configuration` | None | `homepage_session_id`, `staggered_homepage_enabled`, `verticals` |
+| `homepage` | `vertical`, `column_count`, `version` | `blocks`, `load_more_button`, `pagination` |
+| `promoted-closets` | None | `page_info`, `promoted_closets` |
+
+### Items
+
+| Operation | Required parameters | Result |
+|---|---|---|
+| `item-services` | `item_id` | `original_asking_amount`, `seller_original_asking_amount`, `services`, `total_amount` |
+| `item-details` | `item_id` | `item`, `plugins` |
+| `item-photos` | `item_id` | `photos` |
+| `public-photos` | `item_ids[]`, `photo_size` | `photos` |
+| `item-translatable` | `item_id` | `plugins` |
+| `related-items` | `item_id`, `content_source`, `screen` | `items`, `title`, `pagination` |
+| `item-shipping` | `item_id` | `shipping_details` |
+| `item-share` | `item_id` | `share_url` |
+
+### Sellers
+
+| Operation | Required parameters | Result |
+|---|---|---|
+| `user-profile` | `id` | `user` |
+| `user-search` | None | `users`, `pagination` |
+| `user-items` | `user_id` | `items`, `pagination` |
+| `user-followers` | `user_id` | `users`, `pagination` |
+| `user-following` | `user_id` | `users`, `pagination` |
+| `user-categories` | `user_id` | `catalogs` |
+| `user-feedback` | `user_id` | `user_feedbacks`, `pagination` |
+| `user-feedback-summary` | `user_id` | `user_feedback_summary` |
+| `seller-badges` | `sellerID`, `timeZone` | `badges` |
+
+### Reference
+
+| Operation | Required parameters | Result |
+|---|---|---|
+| `brands` | `keyword` | `brands`, `pagination` |
+| `brand-suggestions` | None | `brands`, `pagination` |
+| `size-groups` | `catalog_ids[]` | `size_groups` |
+| `catalog-filters` | None | `filters`, `selected_filters` |
+| `catalog-filter-facets` | `filter_code` | `filter_code`, `total_count`, `total_count_max` |
+| `catalog-filter-search` | `filter_search_code`, `filter_search_text` | `options`, `is_selection_highlighted`, `selected_filters` |
+| `wardrobe-categories` | None | `catalogs` |
+| `seller-filters` | None | `filters` |
+| `upload-categories` | None | `catalogs` |
+| `upload-category-search` | `keyword` | `catalog_ids` |
+| `upload-brands` | `keyword` | `brands`, `disable_custom_brands` |
+| `colors` | None | `colors` |
+| `book-isbn` | `isbn` | `isbn_records`, `attributes` |
+| `book-isbn-validate` | `isbn` | Success acknowledgement |
+| `upload-configuration` | None | `catalog_group_fields`, `max_custom_shipping_price`, `ab_tests`, `upload_session_id`, `currency`, `photo_tip`, `price_range`, `is_first_time_lister`, `category_suggestions_photo_count`, `attribute_suggestions_photo_count`, `suggestions_configuration`, `number_of_images_per_item`, `image_resizing`, `professional_seller_key`, `measurements`, `package_size_defining_item_attribute_codes_abTest` |
+| `upload-models` | `catalog_id`, `brand_id` | `sorting_type`, `models`, `pagination`, `disable_unknown_models` |
+| `upload-model-search` | `catalog_id`, `brand_id`, `search_text` | `models`, `disable_unknown_models` |
+| `authenticity-info` | `catalog_id` | `authenticity_modal` |
+| `photo-tips` | None | `photo_tips` |
+| `upload-banners` | `category_id` | `extra_section_banners` |
+| `countries` | None | `countries` |
+| `country-languages` | `country_id` | `languages`, `primary_language`, `country` |
+| `country-cities` | `country_id` | `cities` |
+| `nationalities` | None | `countries`, `suggested_countries` |
+| `languages` | None | `languages`, `country` |
+| `recommended-locale` | None | `recommended_locale`, `recommended_iso_locale` |
+| `upload-attributes` | `attributes` | `attributes` |
+| `upload-attribute-search` | `code`, `value` | `options` |
+
+### Shipping
+
+| Operation | Required parameters | Result |
+|---|---|---|
+| `category-package-sizes` | `catalog_id` | `package_sizes`, `parcel_measurements`, `xs_package_size_experiment_eligible`, `heavy_small_package_size_experiment_eligible` |
+| `bundle-package-sizes` | `item_ids[]` | `package_sizes`, `parcel_measurements` |
+| `largest-shipping-rates` | None | `shipping_rates` |
+
+### Help
+
+| Operation | Required parameters | Result |
+|---|---|---|
+| `help-tree` | `country`, `language` | `faq_entries`, `faq_entries_parent_code`, `faq_entries_parent_id`, `faq_entries_parent_title` |
+| `help-entry` | `faq_entry_id`, `country`, `language` | `faq_entry` |
+| `help-entry-core` | `faq_entry_id` | `faq_entry` |
+| `help-feedback-options` | `faq_entry_id` | `feedback_uuid`, `feedback_ratings` |
+| `terms` | None | `terms_and_conditions` |
+
+### Configuration
+
+| Operation | Required parameters | Result |
+|---|---|---|
+| `custom-shipment-configuration` | None | `custom_shipment_configuration` |
+| `session-defaults` | None | `session_defaults_configuration` |
+| `system-configuration` | None | `system_configuration` |
+| `features` | None | `features` |
+| `app-version` | None | `app_version` |
+| `ad-configuration` | None | `ads`, `partner_ids`, `reduce_ad_frequency` |
+| `consent-configuration` | None | `language_iso`, `cookie_consent_version` |
+| `ad-configuration-core` | None | `ads`, `partner_ids`, `reduce_ad_frequency` |
+| `consent-configuration-core` | None | `language_iso`, `cookie_consent_version` |
+| `banners` | None | `banners` |
+| `info-banners` | None | `info_banners` |
+| `catalog-banners` | None | Success acknowledgement |
+
+### Pricing
+
+| Operation | Required parameters | Result |
+|---|---|---|
+| `price-suggestions` | `catalog_id`, `brand_id`, `status_id` | `price_suggestion`, `similar_sold_items_present` |
+| `sold-comparables` | `catalog_id`, `brand_id`, `status_id` | `items` |
+

@@ -159,3 +159,7 @@ Vinted's public payload, so we cannot expose it.
 <Note>
   Each item detail request costs **10 credits**. Failed requests are not charged. The exact charge for any call is returned in the `X-Credits-Used` response header.
 </Note>
+
+## Mobile item details
+
+This endpoint reads mobile JSON for the description, photos, seller and item attributes. Fields unavailable upstream remain null. In particular, size-guide FAQ IDs are not size IDs. See [mobile data](/vinted/mobile-api) for raw plugins, related items and service prices.

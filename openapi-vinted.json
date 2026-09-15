@@ -27,61 +27,87 @@
             "name": "query",
             "in": "query",
             "required": true,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Search query string. Matches against item titles and descriptions."
           },
           {
             "name": "market",
             "in": "query",
-            "schema": { "type": "string", "default": "fr" },
+            "schema": {
+              "type": "string",
+              "default": "fr"
+            },
             "description": "Vinted market to search (e.g. fr, de, uk, it, es, pl, us)."
           },
           {
             "name": "page",
             "in": "query",
-            "schema": { "type": "integer", "default": 1, "minimum": 1 },
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
             "description": "Page number for paginated results."
           },
           {
             "name": "per_page",
             "in": "query",
-            "schema": { "type": "integer", "default": 20, "minimum": 1, "maximum": 96 },
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 96
+            },
             "description": "Number of items per page."
           },
           {
             "name": "price_from",
             "in": "query",
-            "schema": { "type": "number" },
+            "schema": {
+              "type": "number"
+            },
             "description": "Minimum price filter in the market's local currency."
           },
           {
             "name": "price_to",
             "in": "query",
-            "schema": { "type": "number" },
+            "schema": {
+              "type": "number"
+            },
             "description": "Maximum price filter in the market's local currency."
           },
           {
             "name": "catalog_ids",
             "in": "query",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Comma-separated Vinted catalog (category) IDs to restrict the search to (e.g. \"221\" or \"221,1242\"). Applied by Vinted before the search runs, and sub-categories are included. A catalog ID is the `catalog[]` value in a Vinted category URL (vinted.fr/catalog?catalog[]=221); IDs are per market."
           },
           {
             "name": "brand_ids",
             "in": "query",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Comma-separated list of brand IDs to filter by."
           },
           {
             "name": "color_ids",
             "in": "query",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Comma-separated list of color IDs to filter by."
           },
           {
             "name": "status_ids",
             "in": "query",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Comma-separated list of condition status IDs to filter by."
           },
           {
@@ -90,15 +116,95 @@
             "schema": {
               "type": "string",
               "default": "relevance",
-              "enum": ["relevance", "price_low_to_high", "price_high_to_low", "newest_first"]
+              "enum": [
+                "relevance",
+                "price_low_to_high",
+                "price_high_to_low",
+                "newest_first"
+              ]
             },
             "description": "Sort order for results."
           },
           {
             "name": "seller_country",
             "in": "query",
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Comma-separated ISO 3166-1 alpha-2 country codes (case-insensitive) to keep only items whose seller is physically located in one of those countries (e.g. \"fr\" or \"fr,be\"). Vinted markets federate cross-border listings; this filters on the seller's real location, which is a different axis from `market`. Note: pagination totals stay unfiltered, so a page may return fewer than `per_page` items after filtering. Billing: a search is a flat 5 credits whatever filters you pass; seller lookups are not billed on top."
+          },
+          {
+            "name": "size_ids",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Comma-separated size IDs",
+              "title": "Size Ids"
+            },
+            "description": "Comma-separated size IDs"
+          },
+          {
+            "name": "material_ids",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Comma-separated material IDs",
+              "title": "Material Ids"
+            },
+            "description": "Comma-separated material IDs"
+          },
+          {
+            "name": "time",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Pagination time returned by the preceding page",
+              "title": "Time"
+            },
+            "description": "Pagination time returned by the preceding page"
+          },
+          {
+            "name": "search_session_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Reuse across pages of one search",
+              "title": "Search Session Id"
+            },
+            "description": "Reuse across pages of one search"
           }
         ],
         "responses": {
@@ -111,11 +217,22 @@
                   "properties": {
                     "items": {
                       "type": "array",
-                      "items": { "$ref": "#/components/schemas/VintedItemSummary" }
+                      "items": {
+                        "$ref": "#/components/schemas/VintedItemSummary"
+                      }
                     },
-                    "pagination": { "$ref": "#/components/schemas/VintedPagination" },
-                    "market": { "type": "string", "description": "Echo of the market that was searched." },
-                    "seller_country": { "type": "string", "nullable": true, "description": "Echo of the normalized seller_country filter that was applied (uppercase, comma-separated ISO-2 codes, e.g. \"FR,BE\"), or null when no filter was requested." }
+                    "pagination": {
+                      "$ref": "#/components/schemas/VintedPagination"
+                    },
+                    "market": {
+                      "type": "string",
+                      "description": "Echo of the market that was searched."
+                    },
+                    "seller_country": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Echo of the normalized seller_country filter that was applied (uppercase, comma-separated ISO-2 codes, e.g. \"FR,BE\"), or null when no filter was requested."
+                    }
                   }
                 }
               }
@@ -134,13 +251,18 @@
             "name": "item_id",
             "in": "path",
             "required": true,
-            "schema": { "type": "integer" },
+            "schema": {
+              "type": "integer"
+            },
             "description": "The unique Vinted item ID."
           },
           {
             "name": "market",
             "in": "query",
-            "schema": { "type": "string", "default": "fr" },
+            "schema": {
+              "type": "string",
+              "default": "fr"
+            },
             "description": "Vinted market where the item is listed (e.g. fr, de, uk)."
           }
         ],
@@ -152,8 +274,13 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "item": { "$ref": "#/components/schemas/VintedItemDetail" },
-                    "market": { "type": "string", "description": "Echo of the requested market." }
+                    "item": {
+                      "$ref": "#/components/schemas/VintedItemDetail"
+                    },
+                    "market": {
+                      "type": "string",
+                      "description": "Echo of the requested market."
+                    }
                   }
                 }
               }
@@ -172,13 +299,18 @@
             "name": "user_id",
             "in": "path",
             "required": true,
-            "schema": { "type": "integer" },
+            "schema": {
+              "type": "integer"
+            },
             "description": "The unique Vinted user ID."
           },
           {
             "name": "market",
             "in": "query",
-            "schema": { "type": "string", "default": "fr" },
+            "schema": {
+              "type": "string",
+              "default": "fr"
+            },
             "description": "Vinted market where the user is registered (e.g. fr, de, uk)."
           }
         ],
@@ -190,28 +322,74 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "id": { "type": "integer", "description": "User ID." },
-                    "login": { "type": "string", "description": "Username." },
+                    "id": {
+                      "type": "integer",
+                      "description": "User ID."
+                    },
+                    "login": {
+                      "type": "string",
+                      "description": "Username."
+                    },
                     "photo": {
                       "type": "object",
                       "nullable": true,
                       "properties": {
-                        "url": { "type": "string" },
-                        "width": { "type": "integer" },
-                        "height": { "type": "integer" }
+                        "url": {
+                          "type": "string"
+                        },
+                        "width": {
+                          "type": "integer"
+                        },
+                        "height": {
+                          "type": "integer"
+                        }
                       },
                       "description": "Profile photo."
                     },
-                    "given_item_count": { "type": "integer", "description": "Number of items the user has sold." },
-                    "item_count": { "type": "integer", "description": "Number of items currently listed." },
-                    "followers_count": { "type": "integer", "description": "Number of followers." },
-                    "following_count": { "type": "integer", "description": "Number of users followed." },
-                    "feedback_reputation": { "type": "number", "description": "Reputation score between 0 and 1." },
-                    "feedback_count": { "type": "integer", "description": "Total number of feedback ratings received." },
-                    "city": { "type": "string", "nullable": true, "description": "User's city (if public)." },
-                    "country_title": { "type": "string", "nullable": true, "description": "User's country." },
-                    "last_loged_on": { "type": "string", "nullable": true, "description": "ISO 8601 timestamp of last login." },
-                    "created_at": { "type": "string", "nullable": true, "description": "ISO 8601 timestamp when the account was created." }
+                    "given_item_count": {
+                      "type": "integer",
+                      "description": "Number of items the user has sold."
+                    },
+                    "item_count": {
+                      "type": "integer",
+                      "description": "Number of items currently listed."
+                    },
+                    "followers_count": {
+                      "type": "integer",
+                      "description": "Number of followers."
+                    },
+                    "following_count": {
+                      "type": "integer",
+                      "description": "Number of users followed."
+                    },
+                    "feedback_reputation": {
+                      "type": "number",
+                      "description": "Reputation score between 0 and 1."
+                    },
+                    "feedback_count": {
+                      "type": "integer",
+                      "description": "Total number of feedback ratings received."
+                    },
+                    "city": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "User's city (if public)."
+                    },
+                    "country_title": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "User's country."
+                    },
+                    "last_loged_on": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "ISO 8601 timestamp of last login."
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "ISO 8601 timestamp when the account was created."
+                    }
                   }
                 }
               }
@@ -230,25 +408,39 @@
             "name": "user_id",
             "in": "path",
             "required": true,
-            "schema": { "type": "integer" },
+            "schema": {
+              "type": "integer"
+            },
             "description": "The unique Vinted user ID."
           },
           {
             "name": "market",
             "in": "query",
-            "schema": { "type": "string", "default": "fr" },
+            "schema": {
+              "type": "string",
+              "default": "fr"
+            },
             "description": "Vinted market where the user is registered (e.g. fr, de, uk)."
           },
           {
             "name": "page",
             "in": "query",
-            "schema": { "type": "integer", "default": 1, "minimum": 1 },
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            },
             "description": "Page number for paginated results."
           },
           {
             "name": "per_page",
             "in": "query",
-            "schema": { "type": "integer", "default": 24, "minimum": 1, "maximum": 96 },
+            "schema": {
+              "type": "integer",
+              "default": 24,
+              "minimum": 1,
+              "maximum": 96
+            },
             "description": "Number of items per page."
           }
         ],
@@ -262,11 +454,22 @@
                   "properties": {
                     "items": {
                       "type": "array",
-                      "items": { "$ref": "#/components/schemas/VintedItemSummary" }
+                      "items": {
+                        "$ref": "#/components/schemas/VintedItemSummary"
+                      }
                     },
-                    "total_entries": { "type": "integer", "description": "Total number of items listed by this user." },
-                    "current_page": { "type": "integer", "description": "Current page number." },
-                    "per_page": { "type": "integer", "description": "Number of items per page." }
+                    "total_entries": {
+                      "type": "integer",
+                      "description": "Total number of items listed by this user."
+                    },
+                    "current_page": {
+                      "type": "integer",
+                      "description": "Current page number."
+                    },
+                    "per_page": {
+                      "type": "integer",
+                      "description": "Number of items per page."
+                    }
                   }
                 }
               }
@@ -285,13 +488,18 @@
             "name": "query",
             "in": "query",
             "required": true,
-            "schema": { "type": "string" },
+            "schema": {
+              "type": "string"
+            },
             "description": "Brand name to search for. Partial matches are supported."
           },
           {
             "name": "market",
             "in": "query",
-            "schema": { "type": "string", "default": "fr" },
+            "schema": {
+              "type": "string",
+              "default": "fr"
+            },
             "description": "Vinted market to search brands in."
           }
         ],
@@ -308,11 +516,26 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "id": { "type": "integer", "description": "Brand ID." },
-                          "title": { "type": "string", "description": "Brand name." },
-                          "slug": { "type": "string", "description": "URL-friendly brand name." },
-                          "favourite_count": { "type": "integer", "description": "Number of users following this brand." },
-                          "item_count": { "type": "integer", "description": "Number of items listed under this brand." }
+                          "id": {
+                            "type": "integer",
+                            "description": "Brand ID."
+                          },
+                          "title": {
+                            "type": "string",
+                            "description": "Brand name."
+                          },
+                          "slug": {
+                            "type": "string",
+                            "description": "URL-friendly brand name."
+                          },
+                          "favourite_count": {
+                            "type": "integer",
+                            "description": "Number of users following this brand."
+                          },
+                          "item_count": {
+                            "type": "integer",
+                            "description": "Number of items listed under this brand."
+                          }
                         }
                       }
                     }
@@ -333,7 +556,10 @@
           {
             "name": "market",
             "in": "query",
-            "schema": { "type": "string", "default": "fr" },
+            "schema": {
+              "type": "string",
+              "default": "fr"
+            },
             "description": "Vinted market. Color names are localized to the market language."
           }
         ],
@@ -350,9 +576,18 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "id": { "type": "integer", "description": "Color ID." },
-                          "title": { "type": "string", "description": "Localized color name." },
-                          "hex": { "type": "string", "description": "Hex color code (e.g. \"#000000\")." }
+                          "id": {
+                            "type": "integer",
+                            "description": "Color ID."
+                          },
+                          "title": {
+                            "type": "string",
+                            "description": "Localized color name."
+                          },
+                          "hex": {
+                            "type": "string",
+                            "description": "Hex color code (e.g. \"#000000\")."
+                          }
                         }
                       }
                     }
@@ -373,7 +608,10 @@
           {
             "name": "market",
             "in": "query",
-            "schema": { "type": "string", "default": "fr" },
+            "schema": {
+              "type": "string",
+              "default": "fr"
+            },
             "description": "Vinted market. Status names are localized to the market language."
           }
         ],
@@ -390,8 +628,14 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "id": { "type": "integer", "description": "Status ID." },
-                          "title": { "type": "string", "description": "Localized condition label." }
+                          "id": {
+                            "type": "integer",
+                            "description": "Status ID."
+                          },
+                          "title": {
+                            "type": "string",
+                            "description": "Localized condition label."
+                          }
                         }
                       }
                     }
@@ -422,10 +666,22 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "code": { "type": "string", "description": "Market code (e.g. \"fr\", \"de\")." },
-                          "title": { "type": "string", "description": "Country name." },
-                          "domain": { "type": "string", "description": "Vinted domain for this market." },
-                          "currency": { "type": "string", "description": "ISO 4217 currency code." }
+                          "code": {
+                            "type": "string",
+                            "description": "Market code (e.g. \"fr\", \"de\")."
+                          },
+                          "title": {
+                            "type": "string",
+                            "description": "Country name."
+                          },
+                          "domain": {
+                            "type": "string",
+                            "description": "Vinted domain for this market."
+                          },
+                          "currency": {
+                            "type": "string",
+                            "description": "ISO 4217 currency code."
+                          }
                         }
                       }
                     }
@@ -435,6 +691,91 @@
             }
           }
         }
+      }
+    },
+    "/v1/vinted/mobile/operations": {
+      "get": {
+        "tags": [
+          "Vinted"
+        ],
+        "summary": "List public Vinted mobile operations",
+        "description": "Discover public read operations, parameters and runnable examples. Free.",
+        "operationId": "vinted_list_public_vinted_mobile_operations",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response List Mobile Operations V1 Vinted Mobile Operations Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/vinted/mobile/{operation}": {
+      "post": {
+        "tags": [
+          "Vinted"
+        ],
+        "summary": "Read Vinted mobile data",
+        "description": "Read catalog, listing, seller, review, sold-comparable, pricing, reference,\nshipping-reference, homepage or help data. No Vinted account is required.\nThis is an allowlisted read API, including read-only upstream POST queries.\nReturns operation, market, and the upstream JSON under data. One credit.\nSold comparable prices are not guaranteed final negotiated sale prices.",
+        "operationId": "vinted_read_vinted_mobile_data",
+        "parameters": [
+          {
+            "name": "operation",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Operation"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VintedMobileReadRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Read Mobile Data V1 Vinted Mobile  Operation  Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
       }
     }
   },
@@ -450,106 +791,393 @@
       "VintedItemSummary": {
         "type": "object",
         "properties": {
-          "id": { "type": "integer", "description": "Item ID." },
-          "title": { "type": "string", "description": "Item title." },
-          "price": { "$ref": "#/components/schemas/VintedPrice" },
-          "service_fee": { "type": "string", "nullable": true, "description": "Buyer-protection fee as a decimal string, in price.currency_code." },
-          "total_item_price": { "type": "string", "nullable": true, "description": "Price + buyer protection as a decimal string, in price.currency_code." },
-          "brand_title": { "type": "string", "nullable": true, "description": "Brand name." },
-          "size_title": { "type": "string", "nullable": true, "description": "Size label." },
-          "status": { "type": "string", "nullable": true, "description": "Item condition, localized to the market." },
-          "photo": { "$ref": "#/components/schemas/VintedPhoto" },
-          "photos": { "type": "array", "items": { "$ref": "#/components/schemas/VintedPhoto" } },
-          "url": { "type": "string", "description": "Full URL to the Vinted listing." },
-          "path": { "type": "string", "nullable": true, "description": "Path portion of the listing URL." },
-          "user": { "$ref": "#/components/schemas/VintedUserSummary" },
-          "favourite_count": { "type": "integer", "description": "Number of users who favourited this item." },
-          "view_count": { "type": "integer", "description": "Number of views." },
-          "is_visible": { "type": "boolean", "description": "Whether the listing is publicly visible." },
-          "promoted": { "type": "boolean", "description": "Whether the listing is a promoted/bumped placement." },
-          "content_source": { "type": "string", "nullable": true, "description": "Vinted's own label for where the result came from (e.g. \"search\")." },
-          "seller_country_code": { "type": "string", "nullable": true, "description": "ISO 3166-1 alpha-2 code of the seller's physical country (e.g. \"IT\"). Populated only when seller_country filtering was requested." }
+          "id": {
+            "type": "integer",
+            "description": "Item ID."
+          },
+          "title": {
+            "type": "string",
+            "description": "Item title."
+          },
+          "price": {
+            "$ref": "#/components/schemas/VintedPrice"
+          },
+          "service_fee": {
+            "type": "string",
+            "nullable": true,
+            "description": "Buyer-protection fee as a decimal string, in price.currency_code."
+          },
+          "total_item_price": {
+            "type": "string",
+            "nullable": true,
+            "description": "Price + buyer protection as a decimal string, in price.currency_code."
+          },
+          "brand_title": {
+            "type": "string",
+            "nullable": true,
+            "description": "Brand name."
+          },
+          "size_title": {
+            "type": "string",
+            "nullable": true,
+            "description": "Size label."
+          },
+          "status": {
+            "type": "string",
+            "nullable": true,
+            "description": "Item condition, localized to the market."
+          },
+          "photo": {
+            "$ref": "#/components/schemas/VintedPhoto"
+          },
+          "photos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VintedPhoto"
+            }
+          },
+          "url": {
+            "type": "string",
+            "description": "Full URL to the Vinted listing."
+          },
+          "path": {
+            "type": "string",
+            "nullable": true,
+            "description": "Path portion of the listing URL."
+          },
+          "user": {
+            "$ref": "#/components/schemas/VintedUserSummary"
+          },
+          "favourite_count": {
+            "type": "integer",
+            "description": "Number of users who favourited this item."
+          },
+          "view_count": {
+            "type": "integer",
+            "description": "Number of views."
+          },
+          "is_visible": {
+            "type": "boolean",
+            "description": "Whether the listing is publicly visible."
+          },
+          "promoted": {
+            "type": "boolean",
+            "description": "Whether the listing is a promoted/bumped placement."
+          },
+          "content_source": {
+            "type": "string",
+            "nullable": true,
+            "description": "Vinted's own label for where the result came from (e.g. \"search\")."
+          },
+          "seller_country_code": {
+            "type": "string",
+            "nullable": true,
+            "description": "ISO 3166-1 alpha-2 code of the seller's physical country (e.g. \"IT\"). Populated only when seller_country filtering was requested."
+          }
         }
       },
       "VintedPhoto": {
         "type": "object",
         "properties": {
-          "id": { "type": "integer", "description": "Photo ID." },
-          "url": { "type": "string", "description": "Photo URL." },
-          "full_size_url": { "type": "string", "nullable": true, "description": "Full-resolution photo URL." },
-          "width": { "type": "integer", "nullable": true, "description": "Width in pixels." },
-          "height": { "type": "integer", "nullable": true, "description": "Height in pixels." },
-          "dominant_color": { "type": "string", "nullable": true, "description": "Dominant colour as a hex string." },
-          "is_main": { "type": "boolean", "description": "Whether this is the listing's primary photo." }
+          "id": {
+            "type": "integer",
+            "description": "Photo ID."
+          },
+          "url": {
+            "type": "string",
+            "description": "Photo URL."
+          },
+          "full_size_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "Full-resolution photo URL."
+          },
+          "width": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Width in pixels."
+          },
+          "height": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Height in pixels."
+          },
+          "dominant_color": {
+            "type": "string",
+            "nullable": true,
+            "description": "Dominant colour as a hex string."
+          },
+          "is_main": {
+            "type": "boolean",
+            "description": "Whether this is the listing's primary photo."
+          }
         }
       },
       "VintedUserSummary": {
         "type": "object",
         "properties": {
-          "id": { "type": "integer", "description": "User ID." },
-          "login": { "type": "string", "description": "Username." },
-          "photo_url": { "type": "string", "nullable": true, "description": "Profile photo URL." },
-          "business": { "type": "boolean", "description": "Whether the seller is a business account." }
+          "id": {
+            "type": "integer",
+            "description": "User ID."
+          },
+          "login": {
+            "type": "string",
+            "description": "Username."
+          },
+          "photo_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "Profile photo URL."
+          },
+          "business": {
+            "type": "boolean",
+            "description": "Whether the seller is a business account."
+          }
         }
       },
       "VintedSellerSummary": {
         "type": "object",
         "properties": {
-          "id": { "type": "integer", "description": "Seller ID." },
-          "login": { "type": "string", "description": "Username." },
-          "photo_url": { "type": "string", "nullable": true, "description": "Profile photo URL." },
-          "business": { "type": "boolean", "description": "Whether the seller is a business account." },
-          "feedback_count": { "type": "integer", "description": "Number of reviews received." },
-          "feedback_reputation": { "type": "number", "description": "Reputation score between 0 and 1." },
-          "item_count": { "type": "integer", "description": "Number of items listed." },
-          "location": { "type": "string", "nullable": true, "description": "Seller location as shown on the listing." },
-          "last_seen": { "type": "string", "nullable": true, "description": "Vinted's relative last-seen label, localized." },
-          "badges": { "type": "array", "items": { "type": "string" }, "description": "Seller badges (e.g. ACTIVE_LISTER)." }
+          "id": {
+            "type": "integer",
+            "description": "Seller ID."
+          },
+          "login": {
+            "type": "string",
+            "description": "Username."
+          },
+          "photo_url": {
+            "type": "string",
+            "nullable": true,
+            "description": "Profile photo URL."
+          },
+          "business": {
+            "type": "boolean",
+            "description": "Whether the seller is a business account."
+          },
+          "feedback_count": {
+            "type": "integer",
+            "description": "Number of reviews received."
+          },
+          "feedback_reputation": {
+            "type": "number",
+            "description": "Reputation score between 0 and 1."
+          },
+          "item_count": {
+            "type": "integer",
+            "description": "Number of items listed."
+          },
+          "location": {
+            "type": "string",
+            "nullable": true,
+            "description": "Seller location as shown on the listing."
+          },
+          "last_seen": {
+            "type": "string",
+            "nullable": true,
+            "description": "Vinted's relative last-seen label, localized."
+          },
+          "badges": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Seller badges (e.g. ACTIVE_LISTER)."
+          }
         }
       },
       "VintedPrice": {
         "type": "object",
         "properties": {
-          "amount": { "type": "string", "description": "Decimal amount as a string (e.g. \"45.0\")." },
-          "currency_code": { "type": "string", "description": "ISO 4217 currency code (e.g. \"EUR\")." }
+          "amount": {
+            "type": "string",
+            "description": "Decimal amount as a string (e.g. \"45.0\")."
+          },
+          "currency_code": {
+            "type": "string",
+            "description": "ISO 4217 currency code (e.g. \"EUR\")."
+          }
         }
       },
       "VintedPagination": {
         "type": "object",
         "properties": {
-          "current_page": { "type": "integer", "description": "Current page number." },
-          "per_page": { "type": "integer", "description": "Number of items per page." },
-          "total_pages": { "type": "integer", "description": "Total number of pages." },
-          "total_entries": { "type": "integer", "description": "Total matching items. Vinted caps this at 960 on deep result sets — treat it as an upper bound." }
+          "current_page": {
+            "type": "integer",
+            "description": "Current page number."
+          },
+          "per_page": {
+            "type": "integer",
+            "description": "Number of items per page."
+          },
+          "total_pages": {
+            "type": "integer",
+            "description": "Total number of pages."
+          },
+          "total_entries": {
+            "type": "integer",
+            "description": "Total matching items. Vinted caps this at 960 on deep result sets — treat it as an upper bound."
+          }
         }
       },
       "VintedItemDetail": {
         "allOf": [
-          { "$ref": "#/components/schemas/VintedItemSummary" },
+          {
+            "$ref": "#/components/schemas/VintedItemSummary"
+          },
           {
             "type": "object",
             "properties": {
-              "description": { "type": "string", "nullable": true, "description": "Full item description text." },
-              "catalog_id": { "type": "integer", "nullable": true, "description": "Vinted catalog (category) ID — the value to pass as catalog_ids on search." },
-              "brand_id": { "type": "integer", "nullable": true, "description": "Vinted brand ID — the value to pass as brand_ids on search." },
-              "category": { "type": "array", "items": { "type": "string" }, "description": "Category breadcrumb, root first. Localized to the market." },
-              "size_id": { "type": "integer", "nullable": true, "description": "Vinted size ID." },
-              "status_id": { "type": "integer", "nullable": true, "description": "Vinted condition ID." },
-              "color1": { "type": "string", "nullable": true, "description": "Primary color, localized." },
-              "color2": { "type": "string", "nullable": true, "description": "Secondary color." },
-              "upload_date": { "type": "string", "nullable": true, "description": "Vinted's relative \"listed\" label, localized (e.g. \"Il y a une semaine\") — not an ISO timestamp." },
-              "can_buy": { "type": "boolean" },
-              "instant_buy": { "type": "boolean" },
-              "can_bundle": { "type": "boolean" },
-              "can_reserve": { "type": "boolean" },
-              "is_favourite": { "type": "boolean" },
-              "is_reserved": { "type": "boolean" },
-              "is_closed": { "type": "boolean" },
-              "is_hidden": { "type": "boolean" },
-              "seller": { "$ref": "#/components/schemas/VintedSellerSummary" }
+              "description": {
+                "type": "string",
+                "nullable": true,
+                "description": "Full item description text."
+              },
+              "catalog_id": {
+                "type": "integer",
+                "nullable": true,
+                "description": "Vinted catalog (category) ID — the value to pass as catalog_ids on search."
+              },
+              "brand_id": {
+                "type": "integer",
+                "nullable": true,
+                "description": "Vinted brand ID — the value to pass as brand_ids on search."
+              },
+              "category": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Category breadcrumb, root first. Localized to the market."
+              },
+              "size_id": {
+                "type": "integer",
+                "nullable": true,
+                "description": "Vinted size ID."
+              },
+              "status_id": {
+                "type": "integer",
+                "nullable": true,
+                "description": "Vinted condition ID."
+              },
+              "color1": {
+                "type": "string",
+                "nullable": true,
+                "description": "Primary color, localized."
+              },
+              "color2": {
+                "type": "string",
+                "nullable": true,
+                "description": "Secondary color."
+              },
+              "upload_date": {
+                "type": "string",
+                "nullable": true,
+                "description": "Vinted's relative \"listed\" label, localized (e.g. \"Il y a une semaine\") — not an ISO timestamp."
+              },
+              "can_buy": {
+                "type": "boolean"
+              },
+              "instant_buy": {
+                "type": "boolean"
+              },
+              "can_bundle": {
+                "type": "boolean"
+              },
+              "can_reserve": {
+                "type": "boolean"
+              },
+              "is_favourite": {
+                "type": "boolean"
+              },
+              "is_reserved": {
+                "type": "boolean"
+              },
+              "is_closed": {
+                "type": "boolean"
+              },
+              "is_hidden": {
+                "type": "boolean"
+              },
+              "seller": {
+                "$ref": "#/components/schemas/VintedSellerSummary"
+              }
             }
           }
         ]
+      },
+      "VintedMobileReadRequest": {
+        "properties": {
+          "market": {
+            "type": "string",
+            "title": "Market",
+            "description": "Vinted market code; uk aliases gb",
+            "default": "fr"
+          },
+          "parameters": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Parameters",
+            "description": "Operation-specific parameters. GET /v1/vinted/mobile/operations lists types, required fields and examples.",
+            "examples": [
+              {
+                "brand_id": "53",
+                "catalog_id": "1242",
+                "status_id": "2"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "VintedMobileReadRequest",
+        "description": "Parameters are validated against the discoverable operation catalog."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
       }
     }
   }
