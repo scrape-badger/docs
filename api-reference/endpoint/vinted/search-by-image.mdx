@@ -5,3 +5,7 @@ openapi: "POST /v1/vinted/search_by_image"
 
 Find active listings from one image URL or base64 photo. See the
 [image-search guide](/vinted/image-search) for local files, filters and client examples.
+
+<Note>
+Send exactly one of `image_url` or `image_base64`. JPEG, PNG and WebP images can be up to 5 MiB decoded. Authenticate with your `x-api-key` header.
+</Note>
