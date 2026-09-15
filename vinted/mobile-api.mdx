@@ -19,7 +19,8 @@ curl 'https://scrapebadger.com/v1/vinted/mobile/operations' \
 ```
 
 Discovery is free. Each entry includes its name, parameter types, required fields,
-example request parameters and expected response keys. The playground loads this
+example request parameters and expected response keys. The first data field is the
+primary result; additional configuration fields can vary by region. The playground loads this
 same catalog and provides a form for each operation.
 
 ## Read data
@@ -80,7 +81,8 @@ MCP tools remain available.
   across pages. Live results can overlap; deduplicate by item ID.
 - `market` selects the locale and catalog region. It does not limit listings to
   sellers physically located in that country. Use the existing `seller_country`
-  filter on `/search` when you need that restriction.
+  filter on `/search` when you need that restriction. Core reads use the requested
+  country so prices and region-specific wardrobes match that market.
 - Search URLs are absolute. `display_title` and `display_subtitle` retain Vinted's
   presentation labels. `brand_title` is null when the response does not provide a
   reliable brand field; a display label can include a model name.
@@ -199,7 +201,7 @@ including identifiers used to select an item, seller or category.
 | `app-version` | None | `app_version` |
 | `ad-configuration` | None | `ads`, `partner_ids`, `reduce_ad_frequency` |
 | `consent-configuration` | None | `language_iso`, `cookie_consent_version` |
-| `ad-configuration-core` | None | `ads`, `partner_ids`, `reduce_ad_frequency` |
+| `ad-configuration-core` | None | `ads`, `reduce_ad_frequency` |
 | `consent-configuration-core` | None | `language_iso`, `cookie_consent_version` |
 | `banners` | None | `banners` |
 | `info-banners` | None | `info_banners` |
