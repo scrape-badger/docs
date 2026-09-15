@@ -1,0 +1,13 @@
+---
+title: "Read mobile data"
+openapi: "POST /v1/vinted/mobile/{operation}"
+description: "Read public Vinted data, including sold comparables, pricing, reviews, categories and shipping references."
+---
+
+Send `market` and operation-specific `parameters` in the JSON body. Discover
+operation names, types and examples with [List mobile operations](/api-reference/endpoint/vinted/mobile-operations).
+
+The response contains `operation`, `market`, and upstream JSON in `data`.
+Each successful read costs one credit; failed requests are free.
+
+See [Vinted mobile data](/vinted/mobile-api) for every operation and CLI/MCP examples.

@@ -5,7 +5,7 @@ description: "Scrape Vinted listings, user profiles, and catalog data across 27 
 
 ## Scraper API for Vinted
 
-Search listings, fetch item details, and retrieve user profiles from Vinted — the largest European second-hand marketplace. The API handles authentication, anti-bot bypass, and market routing automatically.
+Search listings, fetch item details, and retrieve user profiles from Vinted — the largest European second-hand marketplace. The API handles anonymous mobile authentication and market routing automatically. Explore [76 mobile read operations](/vinted/mobile-api), including seller reviews, sold comparables and suggested prices.
 
 ## Key Features
 
@@ -14,16 +14,16 @@ Search listings, fetch item details, and retrieve user profiles from Vinted — 
     Access all Vinted markets including FR, DE, UK, IT, ES, PL, NL, BE, CZ, LT, and more.
   </Card>
   <Card title="Anti-Bot Bypass" icon="shield-halved">
-    Automatic session management and fingerprint rotation to avoid blocks.
+    Public mobile tokens and pooled HTTP connections; no Vinted account is required.
   </Card>
   <Card title="Fast Responses" icon="bolt">
-    Median response time under 2 seconds for search and item detail requests.
+    Mobile JSON reads avoid browser rendering and page extraction.
   </Card>
   <Card title="Structured Data" icon="database">
     Clean JSON responses with prices, photos, sizes, brands, conditions, and seller info.
   </Card>
-  <Card title="Country Proxies" icon="globe">
-    Requests are routed through proxies matching the target market for accurate results.
+  <Card title="Market Routing" icon="globe">
+    Choose the catalog region and locale with the market parameter; seller-country filtering is separate.
   </Card>
   <Card title="SDK Support" icon="code">
     First-class support via the ScrapeBadger Node.js and Python SDKs.

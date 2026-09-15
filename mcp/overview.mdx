@@ -50,7 +50,7 @@ ScrapeBadger provides a hosted MCP (Model Context Protocol) server at `mcp.scrap
 | **Leboncoin** | 10 | French classifieds search, ad detail, sellers, categories, regions |
 | **LinkedIn** | 10 | Job search, company jobs, companies, schools, profiles, posts, articles, courses |
 | **Walmart** | 10 | Product search, category browse, deals, PDP detail, reviews, sellers, stores (US) |
-| **Vinted** | 8 | Item search, details, seller profiles, brands, markets |
+| **Vinted** | 10 | Search, item details, sellers, reference data, and 76 mobile reads through `vinted_mobile_operations` / `vinted_mobile_read` |
 | **Idealista** | 8 | Location suggest, listing search, full-inventory search, property detail + stats, agencies (ES, IT, PT) |
 | **Immobiliare** | 7 | Listing search, detail, agencies, price insights (IT, ES, GR, LU) |
 | **DuckDuckGo** | 7 | Web/image/news/video search, autocomplete, instant answers, regions |
@@ -176,3 +176,7 @@ https://mcp.scrapebadger.com/mcp
 
 Health check: `https://mcp.scrapebadger.com/health`
 
+
+## Vinted mobile reads
+
+Call `vinted_mobile_operations` to discover parameters and examples, then call `vinted_mobile_read` with `operation`, `market`, and a `parameters` object. See the [mobile API catalog](/vinted/mobile-api) for pricing, sold comparables, seller reviews, shipping, and reference data.

@@ -409,6 +409,14 @@
             ]
           },
           {
+            "group": "Mobile data",
+            "pages": [
+              "vinted/mobile-api",
+              "api-reference/endpoint/vinted/mobile-operations",
+              "api-reference/endpoint/vinted/mobile-read"
+            ]
+          },
+          {
             "group": "Search",
             "pages": [
               "api-reference/endpoint/vinted/search-items"
