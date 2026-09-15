@@ -777,6 +777,53 @@
           }
         ]
       }
+    },
+    "/v1/vinted/search_by_image": {
+      "post": {
+        "tags": [
+          "Vinted"
+        ],
+        "summary": "Search by image",
+        "description": "Find active Vinted listings from a photo. 10 credits per successful request. Returns the usual items, pagination and\nmarket envelope. Visual ranking; no similarity score. Resend the same image\nand pagination time for subsequent pages. Structured brand data may be null.",
+        "operationId": "vinted_search_by_image",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VintedImageSearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Search By Image V1 Vinted Search By Image Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -1211,6 +1258,193 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "VintedImageSearchRequest": {
+        "properties": {
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 4096
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url",
+            "description": "Public HTTP(S) image URL. Supply exactly one of image_url or image_base64."
+          },
+          "image_base64": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 7100000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Base64",
+            "description": "JPEG, PNG or WebP, at most 5 MiB decoded. Bare base64 or a data:image/...;base64 URL."
+          },
+          "market": {
+            "type": "string",
+            "title": "Market",
+            "description": "Vinted market code; uk aliases gb",
+            "default": "fr"
+          },
+          "page": {
+            "type": "integer",
+            "minimum": 1.0,
+            "title": "Page",
+            "default": 1
+          },
+          "per_page": {
+            "type": "integer",
+            "maximum": 96.0,
+            "minimum": 1.0,
+            "title": "Per Page",
+            "default": 20
+          },
+          "price_from": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price From"
+          },
+          "price_to": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price To"
+          },
+          "brand_ids": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000,
+                "pattern": "^[1-9][0-9]*(,[1-9][0-9]*)*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Brand Ids",
+            "description": "Comma-separated brand IDs"
+          },
+          "catalog_ids": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000,
+                "pattern": "^[1-9][0-9]*(,[1-9][0-9]*)*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Catalog Ids",
+            "description": "Comma-separated category IDs"
+          },
+          "color_ids": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000,
+                "pattern": "^[1-9][0-9]*(,[1-9][0-9]*)*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Color Ids",
+            "description": "Comma-separated color IDs"
+          },
+          "size_ids": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000,
+                "pattern": "^[1-9][0-9]*(,[1-9][0-9]*)*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Size Ids",
+            "description": "Comma-separated size IDs"
+          },
+          "material_ids": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000,
+                "pattern": "^[1-9][0-9]*(,[1-9][0-9]*)*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Material Ids",
+            "description": "Comma-separated material IDs"
+          },
+          "status_ids": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000,
+                "pattern": "^[1-9][0-9]*(,[1-9][0-9]*)*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Ids",
+            "description": "Comma-separated condition IDs"
+          },
+          "time": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time",
+            "description": "Pagination time from the preceding page"
+          },
+          "search_session_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Search Session Id",
+            "description": "Reuse across pages of one search"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "VintedImageSearchRequest",
+        "description": "Search by exactly one public image URL or base64-encoded image."
       }
     }
   }

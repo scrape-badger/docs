@@ -1,197 +1,126 @@
 ---
-title: "Vinted Scraper by ScrapeBadger — Overview"
-description: "Scrape Vinted listings, user profiles, and catalog data across 27 markets with structured JSON responses."
+title: "Vinted Scraper API — Overview"
+description: "Search Vinted by text or photo, inspect listings and sellers, compare sold prices, and explore reference data."
 ---
 
-## Scraper API for Vinted
-
-Search listings, fetch item details, and retrieve user profiles from Vinted — the largest European second-hand marketplace. The API handles anonymous mobile authentication and market routing automatically. Explore [76 mobile read operations](/vinted/mobile-api), including seller reviews, sold comparables and suggested prices.
-
-## Key Features
+Search Vinted listings by **text or image**, inspect items and sellers, and compare
+sold listings and suggested prices. ScrapeBadger handles mobile authentication and
+market routing. You need a ScrapeBadger API key; no Vinted account is required.
 
 <CardGroup cols={3}>
-  <Card title="27 Markets" icon="earth-europe">
-    Access all Vinted markets including FR, DE, UK, IT, ES, PL, NL, BE, CZ, LT, and more.
+  <Card title="Search by image" icon="camera" href="/vinted/image-search">
+    Supply a photo URL or upload an image to find similar active listings.
   </Card>
-  <Card title="Anti-Bot Bypass" icon="shield-halved">
-    Public mobile tokens and pooled HTTP connections; no Vinted account is required.
+  <Card title="Text search" icon="magnifying-glass" href="/api-reference/endpoint/vinted/search-items">
+    Filter listings by category, brand, price, size, material, color and condition.
   </Card>
-  <Card title="Fast Responses" icon="bolt">
-    Mobile JSON reads avoid browser rendering and page extraction.
-  </Card>
-  <Card title="Structured Data" icon="database">
-    Clean JSON responses with prices, photos, sizes, brands, conditions, and seller info.
-  </Card>
-  <Card title="Market Routing" icon="globe">
-    Choose the catalog region and locale with the market parameter; seller-country filtering is separate.
-  </Card>
-  <Card title="SDK Support" icon="code">
-    First-class support via the ScrapeBadger Node.js and Python SDKs.
+  <Card title="76 read operations" icon="list" href="/vinted/mobile-api">
+    Explore sold comparables, suggested prices, seller feedback and reference data.
   </Card>
 </CardGroup>
 
-## Supported Markets
+## Explore the same sections as the playground
 
-Vinted operates across 27 country domains. Use the `market` query parameter to target a specific one.
+The [Vinted playground](https://scrapebadger.com/dashboard/vinted-scraper) groups
+endpoints by what they do. All Vinted requests use the mobile transport.
 
-`gb` is the canonical code for the UK; `uk` is accepted as an alias.
+| Section | Entries | What you can do |
+| --- | ---: | --- |
+| Search | 2 | Search active listings by text or image |
+| Items | 9 | Inspect listing details, photos, related items and item metadata |
+| Sellers | 11 | Read profiles, wardrobes, feedback and seller relationships |
+| Reference | 32 | Discover markets, brands, categories, colors, conditions and filters |
+| Discovery | 9 | Explore catalog results, navigation and discovery feeds |
+| Shipping | 3 | Read shipping reference information |
+| Help | 5 | Read help content and articles |
+| Configuration | 12 | Read public application and market configuration |
+| Pricing | 2 | Query sold comparables and suggested prices |
 
-| Market | Domain | Market | Domain |
-|--------|--------|--------|--------|
-| :fr: `fr` | vinted.fr | :de: `de` | vinted.de |
-| :gb: `gb` | vinted.co.uk | :it: `it` | vinted.it |
-| :es: `es` | vinted.es | :pl: `pl` | vinted.pl |
-| :nl: `nl` | vinted.nl | :be: `be` | vinted.be |
-| :czech_republic: `cz` | vinted.cz | :lithuania: `lt` | vinted.lt |
-| :portugal: `pt` | vinted.pt | :at: `at` | vinted.at |
-| :luxembourg: `lu` | vinted.lu | :sk: `sk` | vinted.sk |
-| :denmark: `dk` | vinted.dk | :finland: `fi` | vinted.fi |
-| :sweden: `se` | vinted.se | :romania: `ro` | vinted.ro |
-| :hungary: `hu` | vinted.hu | :croatia: `hr` | vinted.hr |
-| :greece: `gr` | vinted.gr | :ie: `ie` | vinted.ie |
-| :slovenia: `si` | vinted.si | :latvia: `lv` | vinted.lv |
-| :estonia: `ee` | vinted.ee | :us: `us` | vinted.com |
-| :australia: `au` | vinted.com.au | | |
+The 85 entries include the normalized endpoints and 76 discoverable read
+operations. [Get the operation catalog](/api-reference/endpoint/vinted/mobile-operations)
+for current names, required parameters and runnable examples. Image search is a
+separate endpoint, not one of those 76 read operations.
 
-<Tip>
-  If no `market` is specified, it defaults to `fr`. Use the [`/v1/vinted/markets`](/api-reference/endpoint/vinted/list-markets) endpoint to get the full list programmatically.
-</Tip>
-
-## Filtering by seller country (cross-border listings)
-
-Vinted markets **federate listings across borders**. A search on `vinted.fr` does not only return items from French sellers — it surfaces items from sellers physically located in IT, DE, NL, ES, and elsewhere. Vinted localizes the rendering (EUR prices, French labels), but the seller may be abroad.
-
-Vinted exposes **no native country facet** — its catalog filters cover only category, brand, status, color, price, size, and material, and the undocumented `country_ids` parameter is ignored. To solve this, [`/v1/vinted/search`](/api-reference/endpoint/vinted/search-items) accepts an optional `seller_country` parameter:
-
-```bash
-curl "https://scrapebadger.com/v1/vinted/search?query=nike+air+force+1&market=fr&seller_country=fr,be" \
-  -H "x-api-key: YOUR_API_KEY"
-```
-
-- **Value:** comma-separated ISO 3166-1 alpha-2 codes, case-insensitive (e.g. `fr` or `fr,be`).
-- **Behavior:** ScrapeBadger resolves each result item's seller country and drops items whose seller isn't in the requested set.
-- **Response additions:** each item gains a `seller_country_code` field (ISO-2 string or `null`), and the response gains a top-level `seller_country` echoing the normalized filter.
-
-<Note>
-  `market` and `seller_country` are **different axes**. `market` chooses which Vinted domain (catalog + currency) you search; `seller_country` filters on where the seller physically is. `market=fr&seller_country=it` searches the French catalog but returns only items shipped from Italy.
-</Note>
-
-<Warning>
-  Pagination (`total_entries` / `total_pages`) still reflects Vinted's **unfiltered** totals, so a filtered page may return fewer than `per_page` items. Keep requesting pages until you have collected enough matching items.
-</Warning>
-
-<Note>
-  Seller-country filtering costs nothing extra: a search is a flat **5 credits** whatever filters you pass. The exact charge for any call is returned in the `X-Credits-Used` response header.
-</Note>
-
-## Filtering by category (`catalog_ids`)
-
-[`/v1/vinted/search`](/api-reference/endpoint/vinted/search-items) accepts `catalog_ids` to
-restrict a search to one or more Vinted categories. Unlike `seller_country`, this is a
-**native Vinted filter** applied before the search runs — you get whole pages of
-in-category results rather than filtering them out client-side.
-
-```bash
-curl "https://scrapebadger.com/v1/vinted/search?query=nike&market=fr&catalog_ids=221" \
-  -H "x-api-key: YOUR_API_KEY"
-```
-
-- **Value:** comma-separated catalog IDs (e.g. `221` or `221,1242`).
-- **Where to find an ID:** browse to the category on the Vinted site and read the
-  `catalog[]` value off the URL — `vinted.fr/catalog?catalog[]=221` → `catalog_ids=221`.
-  A listing's own ID is also on [`/v1/vinted/items/{item_id}`](/api-reference/endpoint/vinted/get-item-detail)
-  as `catalog_id`, alongside a `category` breadcrumb.
-- **Sub-categories are included:** `catalog_ids=221` (Women's T-shirts) also matches the
-  brand-specific leaves beneath it.
-
-<Note>
-  Catalog IDs are **per market** — take the ID from the same market you pass as `market`.
-  Search results themselves do not carry `catalog_id` (Vinted's catalog endpoint doesn't
-  return it); use `catalog_ids` to narrow at search time, or the item endpoint to read the
-  exact category of a single listing.
-</Note>
-
-## Quick Start
+## Quick start
 
 <CodeGroup>
-
-```javascript Node.js
-import ScrapeBadger from "scrapebadger";
-
-const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" });
-
-const results = await client.vinted.search({
-  query: "nike air force 1",
-  market: "fr",
-  per_page: 20,
-});
-
-console.log(results.items);
+```bash Text search
+curl 'https://scrapebadger.com/v1/vinted/search?query=nike&market=nl&per_page=10' \
+  -H 'X-API-Key: YOUR_API_KEY'
 ```
 
-```python Python
-from scrapebadger import ScrapeBadger
-
-client = ScrapeBadger(api_key="YOUR_API_KEY")
-
-results = client.vinted.search(
-    query="nike air force 1",
-    market="fr",
-    per_page=20,
-)
-
-print(results.items)
+```bash Image search
+curl 'https://scrapebadger.com/v1/vinted/search_by_image' \
+  -H 'X-API-Key: YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{"image_url":"https://example.com/photo.jpg","market":"nl","per_page":10}'
 ```
 
-```bash cURL
-curl "https://scrapebadger.com/v1/vinted/search?query=nike+air+force+1&market=fr&per_page=20" \
-  -H "x-api-key: YOUR_API_KEY"
+```bash Sold comparables
+curl 'https://scrapebadger.com/v1/vinted/mobile/sold-comparables' \
+  -H 'X-API-Key: YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{"market":"fr","parameters":{"catalog_id":"1242","brand_id":"53","status_id":"2"}}'
 ```
-
 </CodeGroup>
 
-## Endpoints
+Replace the example image URL with a public JPEG, PNG or WebP photo. The
+[image-search guide](/vinted/image-search) covers base64, local files, filters,
+pagination, CLI, MCP and SDK usage.
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| [`/v1/vinted/search`](/api-reference/endpoint/vinted/search-items) | GET | Search Vinted catalog items with filters |
-| [`/v1/vinted/items/{item_id}`](/api-reference/endpoint/vinted/get-item-detail) | GET | Get detailed information about a single item |
-| [`/v1/vinted/users/{user_id}`](/api-reference/endpoint/vinted/get-user-profile) | GET | Get a user's profile information |
-| [`/v1/vinted/users/{user_id}/items`](/api-reference/endpoint/vinted/get-user-items) | GET | List items from a specific user |
-| [`/v1/vinted/brands`](/api-reference/endpoint/vinted/search-brands) | GET | Search for brand IDs by name |
-| [`/v1/vinted/colors`](/api-reference/endpoint/vinted/list-colors) | GET | List all available color filters |
-| [`/v1/vinted/statuses`](/api-reference/endpoint/vinted/list-statuses) | GET | List item condition statuses |
-| [`/v1/vinted/markets`](/api-reference/endpoint/vinted/list-markets) | GET | List all supported Vinted markets |
+## Choose a market
 
-## Credit Costs
+`market` defaults to `fr`. Supported codes:
+`fr`, `de`, `es`, `it`, `nl`, `be`, `pt`, `pl`, `lt`, `cz`, `at`, `sk`, `hu`, `ro`,
+`lu`, `fi`, `dk`, `se`, `gb`, `lv`, `hr`, `ee`, `gr`, `ie`, `si`, `us`, `au`.
+`uk` is accepted as an alias for `gb`.
 
-| Endpoint | Cost |
-|----------|------|
-| Search items | 5 credits |
-| Get item detail | 10 credits |
-| Get user profile | 3 credits |
-| Get user items | 3 credits |
-| Search brands | 3 credits |
-| List colors | 1 credit |
-| List statuses | 1 credit |
-| List markets | 0 credits |
-| Failed requests | 0 credits |
+[List markets](/api-reference/endpoint/vinted/list-markets) to get their domains,
+locales and currency codes. Market selects the catalog region and locale; it does
+not restrict the seller's physical country. European markets can contain listings
+from sellers across borders. Prices retain the market currency; ScrapeBadger does
+not perform currency conversion.
 
-<Tip>
-  Per-endpoint pricing is returned live from `GET https://scrapebadger.com/api/public/pricing`. Query it in your integration rather than hardcoding credit numbers — they can be adjusted. The exact charge for any call is returned in the `X-Credits-Used` response header.
-</Tip>
+Text search also supports `seller_country` to filter by seller location after
+retrieval. Its pagination totals describe the upstream results before that filter,
+so a returned page may contain fewer items than requested.
 
-## Next Steps
+## Filters and pagination
 
-<CardGroup cols={2}>
-  <Card title="Search Items" icon="magnifying-glass" href="/api-reference/endpoint/vinted/search-items">
-    Full API reference for searching the Vinted catalog
-  </Card>
-  <Card title="Get Item Details" icon="shirt" href="/api-reference/endpoint/vinted/get-item-detail">
-    Retrieve full details for a specific listing
-  </Card>
-</CardGroup>
+Both text and image search accept `brand_ids`, `catalog_ids`, `status_ids`,
+`color_ids`, `size_ids`, `material_ids`, `price_from`, `price_to`, `page` and
+`per_page` (1–96). IDs are comma-separated. Discover IDs in the reference endpoints
+or operation catalog. `catalog_ids` filters categories before retrieval.
 
----
+Text search accepts `order`; image search uses visual ranking. For subsequent
+pages, reuse `pagination.time` as `time` and keep `search_session_id` consistent.
+Image search also requires the same image source on each page. Deduplicate results
+by item ID because listings can change while you paginate.
 
-*ScrapeBadger is an independent tool and is not affiliated with, endorsed by, or sponsored by Vinted. "Vinted" is a trademark of Vinted UAB, used here only to describe the platform this scraper is designed to work with.*
+## Response formats and field availability
+
+- Normalized search returns `items`, `pagination` and `market`.
+- Read operations return `operation`, `market` and upstream JSON under `data`.
+- Listing summaries include prices, URLs, photos, display labels and available
+  size/condition information. Labels may be localized.
+- `brand_title` can be null when Vinted omits structured brand data. `display_title`
+  is a display label; do not treat it as a reliable brand ID.
+- Image search supplies no similarity or confidence score.
+- Sold comparables are a sample of sold listings, not exhaustive history. Their
+  displayed prices are not guaranteed final negotiated sale prices.
+
+## Pricing
+
+| Request | Credits per success |
+| --- | ---: |
+| Text search | 5 |
+| Image search | 10 |
+| Item details | 10 |
+| Seller profile or wardrobe | 3 |
+| Brand search | 3 |
+| Colors or conditions | 1 |
+| Any `/mobile/{operation}` read | 1 |
+| Markets or operation discovery | 0 |
+
+Failed requests are free. Check `X-Credits-Used` for the billed amount and the
+[live pricing page](https://scrapebadger.com/vinted-scraper#pricing) for current rates.
