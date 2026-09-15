@@ -431,7 +431,7 @@
             ]
           },
           {
-            "group": "Users",
+            "group": "Sellers",
             "pages": [
               "api-reference/endpoint/vinted/get-user-profile",
               "api-reference/endpoint/vinted/get-user-items"
