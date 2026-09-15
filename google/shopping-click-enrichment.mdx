@@ -1,8 +1,15 @@
 ---
 title: "Shopping Merchant URL Enrichment"
 description: "Resolve the real merchant URL for a Google Shopping product on demand."
---- # Shopping Merchant URL Enrichment Google has removed direct merchant links from organic Shopping HTML — every click in the real Shopping UI now routes through a JavaScript handler. The `/v1/google/shopping/product/click` endpoint materializes the direct merchant URL for any product title on demand. ## How It Works 1. Call `/v1/google/shopping/search?q=laptop` — you get product listings with title, price, source merchant, rating, thumbnail, and a per-product `click_link`.
-2. Call the product's `click_link` (or construct `/v1/google/shopping/product/click?title=...&source=...`) — the endpoint uses Google's "I'm Feeling Lucky" redirect (`btnI=1`), scoped to the card's `source` merchant via a `site:` operator, to return the direct product page URL. The `source`-scoped `site:` query guarantees the resolved URL matches the exact merchant whose price was shown in the card, not a generic top organic match. ## Two-Step Example <CodeGroup> ```javascript Node.js
+---
+
+# Shopping Merchant URL Enrichment Google has removed direct merchant links from organic Shopping HTML — every click in the real Shopping UI now routes through a JavaScript handler. The `/v1/google/shopping/product/click` endpoint materializes the direct merchant URL for any product title on demand. ## How It Works 1. Call `/v1/google/shopping/search?q=laptop` — you get product listings with title, price, source merchant, rating, thumbnail, and a per-product `click_link`.
+2. Call the product's `click_link` (or construct `/v1/google/shopping/product/click?title=...&source=...`) — the endpoint uses Google's "I'm Feeling Lucky" redirect (`btnI=1`), scoped to the card's `source` merchant via a `site:` operator, to return the direct product page URL. The `source`-scoped `site:` query guarantees the resolved URL matches the exact merchant whose price was shown in the card, not a generic top organic match. ## Two-Step Example 
+
+<CodeGroup>
+
+
+```javascript Node.js
 import { ScrapeBadger } from "scrapebadger"; const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" }); // Step 1: search shopping
 const products = await client.google.shopping.search({ q: "laptop" });
 const first = products.results[0];
@@ -12,16 +19,28 @@ const enriched = await client.google.shopping.click({ title: first.title, source
 });
 console.log(enriched.merchant_url);
 // "https://www.walmart.com/ip/Lenovo-IdeaPad-5-..."
-``` ```python Python
+```
+
+```python Python
 from scrapebadger import ScrapeBadger async with ScrapeBadger(api_key="YOUR_API_KEY") as client: # Step 1: search shopping products = await client.google.shopping.search("laptop") first = products["results"][0] print(first["title"], first["price"]["extracted"], first["source"]) # Step 2: resolve the merchant URL enriched = await client.google.shopping.click( title=first["title"], source=first["source"], ) print(enriched["merchant_url"])
-``` ```bash cURL
+```
+
+```bash cURL
 # Step 1
 curl "https://scrapebadger.com/v1/google/shopping/search?q=laptop" \ -H "x-api-key: YOUR_API_KEY" # Step 2 — use the click_link returned in the first response
 curl "https://scrapebadger.com/v1/google/shopping/product/click?title=Lenovo+IdeaPad+5+16IRU9+16%22+2-in-1+Laptop&source=Walmart&gl=us&hl=en" \ -H "x-api-key: YOUR_API_KEY"
-``` </CodeGroup> ## Response Shape ```json
+```
+
+
+</CodeGroup>
+ ## Response Shape
+
+```json
 { "product_id": "60c2e6fdb6b3", "title": "Lenovo IdeaPad 5 16IRU9 16\" 2-in-1 Laptop Computer", "merchant_url": "https://www.walmart.com/ip/Lenovo-IdeaPad-5-16IRU9-16-2-in-1-Laptop/12345", "merchant_domain": "www.walmart.com", "source_query": "Lenovo IdeaPad 5 16IRU9 16\" 2-in-1 Laptop Computer site:walmart.com"
 }
-``` | Field | Description |
+```
+
+| Field | Description |
 |---|---|
 | `product_id` | Stable MD5 hash of `(title, source, price)` — echoed back so you can correlate with the original search result. |
 | `title` | The product title you passed in. |

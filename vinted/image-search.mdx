@@ -1,0 +1,108 @@
+---
+title: "Vinted Image Search"
+description: "Find visually similar active Vinted listings from an image URL, base64 photo or local file."
+---
+
+`POST /v1/vinted/search_by_image` runs Vinted's native image search and returns
+ordinary active listings with prices, photos and URLs. No Vinted login is needed.
+A successful request costs **10 credits**; failed requests are free.
+
+## Image input
+
+Supply exactly one of:
+
+- `image_url`: a public HTTP(S) URL that returns an image.
+- `image_base64`: the image encoded as base64, either a bare payload or a
+  `data:image/jpeg;base64,...` URL.
+
+JPEG, PNG and WebP are supported, up to **5 MiB decoded**. Use a clear photo of one
+item. The [playground](https://scrapebadger.com/dashboard/vinted-scraper) also accepts
+a local file under **Search → Search by Image**.
+
+```bash
+curl 'https://scrapebadger.com/v1/vinted/search_by_image' \
+  -H 'X-API-Key: YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{"image_url":"https://example.com/photo.jpg","market":"nl","price_to":50,"per_page":20}'
+```
+
+Replace the example URL with your photo. An inaccessible URL, malformed base64,
+unsupported image or oversized decoded image returns an error, not a text-search
+fallback. Invalid parameter combinations return 422; invalid image input returns
+400; an upstream failure returns 502.
+
+## Filters
+
+| Parameter | Meaning |
+| --- | --- |
+| `market` | Market code, default `fr`; `uk` aliases `gb` |
+| `brand_ids`, `catalog_ids`, `status_ids` | Brand, category and condition IDs |
+| `color_ids`, `size_ids`, `material_ids` | Color, size and material IDs |
+| `price_from`, `price_to` | Nonnegative bounds in the selected market's currency |
+| `page`, `per_page` | Page number and page size (1–96; default 20) |
+| `time`, `search_session_id` | Pagination time and a consistent search session |
+
+Send ID filters as comma-separated positive integers, such as `"53,14"`. Image
+search uses Vinted's visual ranking; it has no `order` or `query` parameter.
+Resend the same image with the next page and the preceding response's
+`pagination.time`. Image search does not offer seller-country enrichment.
+
+## Clients
+
+Use Python/Node SDK **0.47.0+** or CLI **0.15.0+**.
+
+<CodeGroup>
+```python Python
+import asyncio
+from scrapebadger import ScrapeBadger
+
+async def main():
+    async with ScrapeBadger(api_key="YOUR_API_KEY") as client:
+        result = await client.vinted.search_by_image(payload={
+            "image_url": "https://example.com/photo.jpg",
+            "market": "nl",
+            "price_to": 50,
+        })
+        print(result["items"])
+
+asyncio.run(main())
+```
+
+```javascript Node.js
+import ScrapeBadger from "scrapebadger";
+
+const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" });
+const result = await client.vinted.searchByImage({
+  image_url: "https://example.com/photo.jpg",
+  market: "nl",
+  price_to: 50,
+});
+console.log(result.items);
+```
+
+```bash CLI
+scrapebadger vinted search-by-image --image photo.jpg --market nl --price-to 50
+scrapebadger vinted search-by-image --image-url https://example.com/photo.webp --brand-ids 53
+```
+
+```json MCP
+{
+  "name": "vinted_search_by_image",
+  "arguments": {
+    "image_url": "https://example.com/photo.jpg",
+    "market": "nl",
+    "price_to": 50
+  }
+}
+```
+</CodeGroup>
+
+## Results and limits
+
+The response uses the same `items`, `pagination` and `market` envelope as text
+search. Prices, photos, listing URLs and available size/condition labels are
+included. Structured `brand_title` may be null; `display_title` is a display label,
+not a guaranteed brand identifier. No similarity/confidence score is returned.
+
+These are **active asking prices**, not completed sale prices. For valuation,
+combine the matching listings with [sold comparables and price suggestions](/vinted/mobile-api).

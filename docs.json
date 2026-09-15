@@ -419,7 +419,9 @@
           {
             "group": "Search",
             "pages": [
-              "api-reference/endpoint/vinted/search-items"
+              "api-reference/endpoint/vinted/search-items",
+              "vinted/image-search",
+              "api-reference/endpoint/vinted/search-by-image"
             ]
           },
           {
