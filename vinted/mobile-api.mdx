@@ -212,3 +212,35 @@ including identifiers used to select an item, seller or category.
 | `price-suggestions` | `catalog_id`, `brand_id`, `status_id` | `price_suggestion`, `similar_sold_items_present` |
 | `sold-comparables` | `catalog_id`, `brand_id`, `status_id` | `items` |
 
+
+## Python and Node SDKs
+
+Use SDK version 0.46.0 or newer. Python takes a `payload` keyword; Node takes the JSON body as its second argument.
+
+```python
+import asyncio
+from scrapebadger import ScrapeBadger
+
+async def main():
+    async with ScrapeBadger(api_key="YOUR_API_KEY") as client:
+        operations = await client.vinted.list_public_vinted_mobile_operations()
+        result = await client.vinted.read_vinted_mobile_data(
+            "sold-comparables",
+            payload={"market": "fr", "parameters": {"catalog_id": "1242", "brand_id": "53", "status_id": "2"}},
+        )
+        print(result)
+
+asyncio.run(main())
+```
+
+```typescript
+import { ScrapeBadger } from "scrapebadger";
+
+const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" });
+const operations = await client.vinted.listPublicVintedMobileOperations();
+const result = await client.vinted.readVintedMobileData("sold-comparables", {
+  market: "fr",
+  parameters: { catalog_id: "1242", brand_id: "53", status_id: "2" },
+});
+console.log(result);
+```

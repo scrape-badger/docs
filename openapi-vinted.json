@@ -873,6 +873,28 @@
             "type": "string",
             "nullable": true,
             "description": "ISO 3166-1 alpha-2 code of the seller's physical country (e.g. \"IT\"). Populated only when seller_country filtering was requested."
+          },
+          "display_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Vinted display text; do not interpret it as a brand or size ID."
+          },
+          "display_subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Vinted display text; do not interpret it as a brand or size ID."
           }
         }
       },
@@ -1017,6 +1039,17 @@
           "total_entries": {
             "type": "integer",
             "description": "Total matching items. Vinted caps this at 960 on deep result sets — treat it as an upper bound."
+          },
+          "time": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Pass unchanged into the next catalog page request."
           }
         }
       },
