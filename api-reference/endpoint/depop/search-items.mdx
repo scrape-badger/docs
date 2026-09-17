@@ -51,7 +51,15 @@ description: "Search Depop for second-hand fashion items — filter by price, br
 </ParamField>
 
 <ParamField query="sort" type="string">
-  Result ordering, e.g. `relevance` (default), `newlyListed`, `priceAscending`, `priceDescending`.
+  Result ordering: `relevance` (default), `priceAscending` or `priceDescending`. Any other value
+  returns `422`.
+
+  <Note>
+    Depop removed sort-by-newest from its search in September 2026 — `newlyListed` is no longer
+    accepted and there is no equivalent. To watch new listings, poll
+    [`/v1/depop/users/{username}/products`](/api-reference/endpoint/depop/get-user-products), which
+    returns a seller's listings newest-first.
+  </Note>
 </ParamField>
 
 ## Response
