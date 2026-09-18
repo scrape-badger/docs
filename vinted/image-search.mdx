@@ -102,7 +102,19 @@ scrapebadger vinted search-by-image --image-url https://example.com/photo.webp -
 The response uses the same `items`, `pagination` and `market` envelope as text
 search. Prices, photos, listing URLs and available size/condition labels are
 included. Structured `brand_title` may be null; `display_title` is a display label,
-not a guaranteed brand identifier. No similarity/confidence score is returned.
+not a guaranteed brand identifier.
+
+Each item carries a `similarity_score`: visual similarity to the query image on a
+0–1 scale, where the query image's own listing scores `1.0`. Vinted returns a
+ranking on only some calls; on the rest `similarity_score` is `null` on every
+item. A `null` says nothing about the item — only that Vinted sent no score — and
+the result set is the same either way, so do not treat a missing score as a weak
+match. Filter on the score when it is present, and fall back to your own ranking
+when it is not.
+
+Searching with a listing's own photo returns that listing first at `1.0`. Drop it
+by `id` before computing a median, or it will bias the result toward its own
+asking price.
 
 These are **active asking prices**, not completed sale prices. For valuation,
 combine the matching listings with [sold comparables and price suggestions](/vinted/mobile-api).
