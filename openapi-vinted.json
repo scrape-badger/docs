@@ -784,7 +784,7 @@
           "Vinted"
         ],
         "summary": "Search by image",
-        "description": "Supply exactly one of image_url or image_base64 (JPEG/PNG/WebP, at most 5 MiB decoded). Find active Vinted listings from a photo. 10 credits per successful request. Returns the usual items, pagination and\nmarket envelope. Visual ranking; no similarity score. Resend the same image\nand pagination time for subsequent pages. Structured brand data may be null.",
+        "description": "Supply exactly one of image_url or image_base64 (JPEG/PNG/WebP, at most 5 MiB decoded). Find active Vinted listings from a photo. 10 credits per successful request. Returns the usual items, pagination and\nmarket envelope. Visual ranking. Each item carries similarity_score (0-1; the query image's own listing scores 1.0) on the calls where Vinted returns a ranking, and null on the ones where it does not. Resend the same image\nand pagination time for subsequent pages. Structured brand data may be null.",
         "operationId": "vinted_search_by_image",
         "requestBody": {
           "content": {
@@ -968,6 +968,11 @@
               }
             ],
             "description": "Vinted display text; do not interpret it as a brand or size ID."
+          },
+          "similarity_score": {
+            "type": "number",
+            "nullable": true,
+            "description": "Visual similarity to the query image, 0-1, where the query image's own listing scores 1.0. Populated only by search_by_image, and only on the calls where Vinted returns a ranking; null otherwise. A null says nothing about the item, only that Vinted sent no score."
           }
         }
       },
