@@ -104,17 +104,30 @@ search. Prices, photos, listing URLs and available size/condition labels are
 included. Structured `brand_title` may be null; `display_title` is a display label,
 not a guaranteed brand identifier.
 
-Each item carries a `similarity_score`: visual similarity to the query image on a
-0–1 scale, where the query image's own listing scores `1.0`. Vinted returns a
-ranking on only some calls; on the rest `similarity_score` is `null` on every
-item. A `null` says nothing about the item — only that Vinted sent no score — and
-the result set is the same either way, so do not treat a missing score as a weak
-match. Filter on the score when it is present, and fall back to your own ranking
-when it is not.
+Each item carries a `similarity_score`: Vinted's own measure of visual similarity
+to the query image. Vinted returns a ranking on only some calls; on the rest
+`similarity_score` is `null` on every item. A `null` says nothing about the item —
+only that Vinted sent no score — so do not treat a missing score as a weak match.
+Filter on the score when it is present, and fall back to your own ranking when it
+is not.
 
-Searching with a listing's own photo returns that listing first at `1.0`. Drop it
-by `id` before computing a median, or it will bias the result toward its own
-asking price.
+<Warning>
+  **The score is ordinal, not absolute.** It sits on an unbounded, undocumented
+  scale that Vinted changes without notice — it read `0`–`1` in September 2026 and
+  roughly `36`–`44` afterwards. Rank items against the others in the **same**
+  response; never compare a score to a fixed threshold, and never compare scores
+  between two responses.
+</Warning>
+
+Whether a given photo gets scored is close to fixed for that photo within a
+session — repeated calls on one image tend to be all scored or all unscored — so
+retrying to obtain a score is not worth the credits. An unscored response is
+billed the same as a scored one.
+
+Searching with a listing's own photo usually returns that listing at or near the
+top, but nothing guarantees it is first. Drop it by `id` before computing a
+median, or it will bias the result toward its own asking price. The result set
+is largely but not perfectly stable across repeated calls on the same photo.
 
 These are **active asking prices**, not completed sale prices. For valuation,
 combine the matching listings with [sold comparables and price suggestions](/vinted/mobile-api).
