@@ -134,7 +134,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Pagination cursor — pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page.",
+            "description": "Pagination cursor \u2014 pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page.",
             "required": false
           }
         ],
@@ -272,7 +272,7 @@
         ],
         "responses": {
           "410": {
-            "description": "Gone — endpoint deprecated",
+            "description": "Gone \u2014 endpoint deprecated",
             "content": {
               "application/json": {
                 "schema": {
@@ -332,7 +332,7 @@
         ],
         "responses": {
           "410": {
-            "description": "Gone — endpoint deprecated",
+            "description": "Gone \u2014 endpoint deprecated",
             "content": {
               "application/json": {
                 "schema": {
@@ -392,7 +392,7 @@
         ],
         "responses": {
           "410": {
-            "description": "Gone — endpoint deprecated",
+            "description": "Gone \u2014 endpoint deprecated",
             "content": {
               "application/json": {
                 "schema": {
@@ -706,7 +706,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Pagination cursor — pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page."
+            "description": "Pagination cursor \u2014 pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page."
           }
         ],
         "responses": {
@@ -1005,7 +1005,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Pagination cursor — pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page."
+            "description": "Pagination cursor \u2014 pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page."
           }
         ],
         "responses": {
@@ -1220,7 +1220,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Pagination cursor — pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page."
+            "description": "Pagination cursor \u2014 pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page."
           }
         ],
         "responses": {
@@ -1418,7 +1418,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Pagination cursor — pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page."
+            "description": "Pagination cursor \u2014 pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page."
           }
         ],
         "responses": {
@@ -1517,7 +1517,7 @@
       "get": {
         "operationId": "searchTikTok",
         "summary": "General Search",
-        "description": "General TikTok search — video results from the Top feed.",
+        "description": "General TikTok search \u2014 video results from the Top feed.",
         "tags": [
           "TikTok Search"
         ],
@@ -1558,7 +1558,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Pagination cursor — pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page. It is an opaque composite token."
+            "description": "Pagination cursor \u2014 pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page. It is an opaque composite token."
           }
         ],
         "responses": {
@@ -1698,7 +1698,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Pagination cursor — pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page. It is an opaque composite token."
+            "description": "Pagination cursor \u2014 pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page. It is an opaque composite token."
           }
         ],
         "responses": {
@@ -1785,7 +1785,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Pagination cursor — pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page. It is an opaque composite token."
+            "description": "Pagination cursor \u2014 pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page. It is an opaque composite token."
           }
         ],
         "responses": {
@@ -1925,7 +1925,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Pagination cursor — pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page. It is an opaque composite token."
+            "description": "Pagination cursor \u2014 pass the `pagination.cursor` value from a prior response to fetch the next page. Omit for the first page. It is an opaque composite token."
           }
         ],
         "responses": {
@@ -2089,7 +2089,7 @@
       "get": {
         "operationId": "getTikTokTrendingHashtags",
         "summary": "Trending Hashtags",
-        "description": "Trending hashtags ranked by usage (served via the on-device signer path — view counts and distinct-creator counts).",
+        "description": "Trending hashtags ranked by usage (served via the on-device signer path \u2014 view counts and distinct-creator counts).",
         "tags": [
           "TikTok Trending"
         ],
@@ -2161,7 +2161,7 @@
       "get": {
         "operationId": "getTikTokTrendingSongs",
         "summary": "Trending Songs",
-        "description": "Trending songs/sounds ranked by usage (served via the on-device signer path — hot-music feed).",
+        "description": "Trending songs/sounds ranked by usage (served via the on-device signer path \u2014 hot-music feed).",
         "tags": [
           "TikTok Trending"
         ],
@@ -2263,7 +2263,7 @@
               "type": "string",
               "default": "DE"
             },
-            "description": "EU region code — the Ad Library is EU-only (e.g. DE, FR, IE, NL)."
+            "description": "EU region code \u2014 the Ad Library is EU-only (e.g. DE, FR, IE, NL)."
           },
           {
             "name": "days",
@@ -2432,7 +2432,7 @@
               "type": "string",
               "default": "DE"
             },
-            "description": "EU region code — the Ad Library is EU-only."
+            "description": "EU region code \u2014 the Ad Library is EU-only."
           },
           {
             "name": "count",
@@ -2500,7 +2500,7 @@
               "type": "string",
               "default": "DE"
             },
-            "description": "EU region code — the Ad Library is EU-only."
+            "description": "EU region code \u2014 the Ad Library is EU-only."
           }
         ],
         "responses": {
@@ -2743,7 +2743,7 @@
                         "original": 2.29,
                         "discount": "6%",
                         "currency": "GBP",
-                        "symbol": "£"
+                        "symbol": "\u00a3"
                       },
                       "rating": 3.5,
                       "review_count": 20,
@@ -2768,7 +2768,7 @@
                         "original": null,
                         "discount": null,
                         "currency": "GBP",
-                        "symbol": "£"
+                        "symbol": "\u00a3"
                       },
                       "rating": 4.4,
                       "review_count": 28,
@@ -2822,7 +2822,7 @@
               "type": "string",
               "default": "US"
             },
-            "description": "Market — US only for this endpoint."
+            "description": "Market \u2014 US only for this endpoint."
           },
           {
             "name": "offset",
@@ -2894,6 +2894,85 @@
         }
       }
     },
+    "/v1/tiktok/shop/bestsellers": {
+      "get": {
+        "tags": [
+          "TikTok Shop"
+        ],
+        "summary": "Shop Bestsellers",
+        "description": "Sales-ranked best-selling TikTok Shop products for every operating market, ordered by real sold_count. Works for markets (SG/MY/JP\u2026) where TikTok exposes no curated rankings. Omit category_id for a market-wide list.",
+        "operationId": "tiktok_shop_bestsellers_v1_tiktok_shop_bestsellers_get",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "US",
+              "title": "Region"
+            },
+            "description": "Market: US, GB, ID, SG, MY, PH, TH, VN, JP."
+          },
+          {
+            "name": "category_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[1-9][0-9]{0,18}$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category Id"
+            },
+            "description": "Optional category to rank within; omit for a market-wide list."
+          },
+          {
+            "name": "pages",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 2,
+              "minimum": 1,
+              "maximum": 4,
+              "title": "Pages"
+            },
+            "description": "Category pages to aggregate (1-4)."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100,
+              "title": "Limit"
+            },
+            "description": "Max products to return (1-100)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShopBestsellersResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v1/tiktok/shop/stores/{seller_id}": {
       "get": {
         "operationId": "getTikTokShopStore",
@@ -2910,7 +2989,7 @@
             "schema": {
               "type": "string"
             },
-            "description": "Numeric seller id — any product's seller.id."
+            "description": "Numeric seller id \u2014 any product's seller.id."
           },
           {
             "name": "region",
@@ -2919,7 +2998,7 @@
               "type": "string",
               "default": "US"
             },
-            "description": "Market — US only for this endpoint."
+            "description": "Market \u2014 US only for this endpoint."
           },
           {
             "name": "cursor",
@@ -2965,7 +3044,7 @@
                   "products": [
                     {
                       "product_id": "1731601510632886937",
-                      "title": "MAC Nude Icons Lip Duo - Lip Pencil + M·A·Cximal Sleek Satin Lipstick",
+                      "title": "MAC Nude Icons Lip Duo - Lip Pencil + M\u00b7A\u00b7Cximal Sleek Satin Lipstick",
                       "url": "https://shop.tiktok.com/us/pdp/m-a-c-nude-icons-lip-duo-long-lasting-hydrating-formula/1731601510632886937",
                       "image": "https://p16-oec-general-useast5.ttcdn-us.com/tos-useast5-i-omjb5zjo8w-...",
                       "price": {
@@ -3174,7 +3253,7 @@
                         "review_id": "7636473773830670093",
                         "rating": 2,
                         "text": "Es muy bueno, el magnesio para el dolor en el cuerpo",
-                        "reviewer_name": "Ⓜ**3",
+                        "reviewer_name": "\u24c2**3",
                         "created_utc": 1778005121,
                         "is_verified_purchase": true,
                         "is_incentivized": false,
@@ -3275,7 +3354,7 @@
               "type": "string",
               "default": "US"
             },
-            "description": "Market — US only for this endpoint."
+            "description": "Market \u2014 US only for this endpoint."
           },
           {
             "name": "page",
@@ -3351,7 +3430,7 @@
                       "review_id": "7636473773830670093",
                       "rating": 2,
                       "text": "Es muy bueno, el magnesio para el dolor en el cuerpo",
-                      "reviewer_name": "Ⓜ**3",
+                      "reviewer_name": "\u24c2**3",
                       "created_utc": 1778005121,
                       "is_verified_purchase": true,
                       "is_incentivized": false,
@@ -3365,7 +3444,7 @@
                     {
                       "review_id": "7631572981256423181",
                       "rating": 5,
-                      "text": "Pwodwi sa vèman bon! Li fasil pou itilize, li bon kalite, epi li bay bon rezilta. Mwen satisfè 100% epi mwen rekòmande li bay tout moun . Pa ezite eseye li!”",
+                      "text": "Pwodwi sa v\u00e8man bon! Li fasil pou itilize, li bon kalite, epi li bay bon rezilta. Mwen satisf\u00e8 100% epi mwen rek\u00f2mande li bay tout moun . Pa ezite eseye li!\u201d",
                       "reviewer_name": "S**9",
                       "created_utc": 1776864066,
                       "is_verified_purchase": true,
@@ -3544,7 +3623,7 @@
           },
           "sec_uid": {
             "type": "string",
-            "description": "Secure user id — needed to call list endpoints."
+            "description": "Secure user id \u2014 needed to call list endpoints."
           },
           "unique_id": {
             "type": "string",
@@ -4447,7 +4526,7 @@
           },
           "search_id": {
             "type": "string",
-            "description": "Search endpoints chain rid → search_id across pages."
+            "description": "Search endpoints chain rid \u2192 search_id across pages."
           }
         },
         "description": "Cursor pagination metadata shared by all list endpoints."
@@ -4837,7 +4916,7 @@
           },
           "id": {
             "type": "string",
-            "description": "Advertiser business id — pass as advertiser_id to ads/search."
+            "description": "Advertiser business id \u2014 pass as advertiser_id to ads/search."
           }
         },
         "description": "One advertiser match."
@@ -4878,7 +4957,7 @@
           },
           "adv_biz_ids": {
             "type": "string",
-            "description": "Advertiser business id — feeds ads/search?advertiser_id=."
+            "description": "Advertiser business id \u2014 feeds ads/search?advertiser_id=."
           },
           "registry_location": {
             "type": "string"
@@ -6280,6 +6359,40 @@
         ],
         "title": "ShopDealsResponse",
         "type": "object"
+      },
+      "ShopBestsellersResponse": {
+        "type": "object",
+        "title": "ShopBestsellersResponse",
+        "properties": {
+          "products": {
+            "type": "array",
+            "title": "Products",
+            "items": {
+              "$ref": "#/components/schemas/ShopProduct"
+            }
+          },
+          "region": {
+            "type": "string",
+            "title": "Region"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source",
+            "default": "sales_ranked",
+            "description": "Ranking source; 'sales_ranked' = ordered by real sold_count."
+          },
+          "category_ids": {
+            "type": "array",
+            "title": "Category Ids",
+            "items": {
+              "type": "string"
+            },
+            "description": "Categories aggregated to build the ranking."
+          }
+        },
+        "required": [
+          "region"
+        ]
       }
     }
   }

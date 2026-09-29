@@ -99,9 +99,10 @@ curl "https://scrapebadger.com/v1/tiktok/users/charlidamelio?region=US" \
 | [`/v1/tiktok/trending/videos`](/api-reference/endpoint/tiktok/trending-videos) | GET | Trending Explore-feed videos |
 | [`/v1/tiktok/trending/hashtags`](/api-reference/endpoint/tiktok/trending-hashtags) | GET | Trending hashtags by usage |
 | [`/v1/tiktok/trending/songs`](/api-reference/endpoint/tiktok/trending-songs) | GET | Trending songs/sounds by usage |
+| [`/v1/tiktok/shop/bestsellers`](/api-reference/endpoint/tiktok/shop-bestsellers) | GET | Sales-ranked best-selling products (every operating market) |
 | [`/v1/tiktok/shop/categories`](/api-reference/endpoint/tiktok/shop-categories) | GET | TikTok Shop root categories (US, GB, ID) |
 | [`/v1/tiktok/shop/categories/{category_id}`](/api-reference/endpoint/tiktok/shop-category) | GET | Subcategories + top products of a category |
-| [`/v1/tiktok/shop/search`](/api-reference/endpoint/tiktok/shop-search) | GET | Keyword product search, 30 per page with offset pagination |
+| [`/v1/tiktok/shop/search`](/api-reference/endpoint/tiktok/shop-search) | GET | Keyword product search (US offset; SG/MY/PH/TH/VN/ID/JP native, token-paginated) |
 | [`/v1/tiktok/shop/stores/{seller_id}`](/api-reference/endpoint/tiktok/shop-store) | GET | Store stats + cursor-paginated catalogue |
 | [`/v1/tiktok/shop/products/{product_id}`](/api-reference/endpoint/tiktok/shop-product) | GET | Product detail: SKUs, prices, first reviews, shop |
 | [`/v1/tiktok/shop/products/{product_id}/reviews`](/api-reference/endpoint/tiktok/shop-reviews) | GET | Paginated reviews with rating breakdown |
@@ -109,6 +110,15 @@ curl "https://scrapebadger.com/v1/tiktok/users/charlidamelio?region=US" \
 | [`/v1/tiktok/ads/advertisers`](/api-reference/endpoint/tiktok/search-advertisers) | GET | Look up advertiser business ids by name |
 | [`/v1/tiktok/ads/{ad_id}`](/api-reference/endpoint/tiktok/get-ad-detail) | GET | Single-ad detail: advertiser + targeting/impression breakdown |
 | [`/v1/tiktok/regions`](/api-reference/endpoint/tiktok/list-regions) | GET | List supported regions |
+
+<Note>
+  **TikTok Shop market coverage** — `US`, `GB` and `ID` (Tokopedia) are served for product
+  detail, categories, search and best-sellers. The Southeast Asian markets `SG`, `MY`, `PH`,
+  `TH`, `VN` and `JP` are supported via native in-region signing for search, best-sellers and
+  product detail, each in its local currency. **Taiwan (`region=TW`)** returns HTTP 200 with
+  `availability: "not_operated"` and empty results on every Shop endpoint — TikTok operates no
+  Shop marketplace there.
+</Note>
 
 ## Credit Costs
 

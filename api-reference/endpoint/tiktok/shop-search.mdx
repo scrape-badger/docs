@@ -5,11 +5,11 @@ description: "Paginated keyword search over TikTok Shop products, 30 per page, w
 ---
 
 <Note>
-  Pages hold 30 products: pass back `pagination.next_offset` as `offset` until `has_more` is false. The first page also carries `shops`, `related_searches`, `related_categories`, and each product's `video` (`play_count`, `like_count`, `author_name`) and `brand`. US only.
+  **US** paginates with `offset`: pages hold 30 products, pass back `pagination.next_offset` until `has_more` is false, and the first page also carries `shops`, `related_searches`, `related_categories`, and each product's `video` (`play_count`, `like_count`, `author_name`) and `brand`.
 </Note>
 
 <Note>
-  **Markets** — `region=US` (default) serves everything; `GB` and `ID` (Tokopedia) serve categories, category products and product detail in GBP/IDR. SG, MY, PH, TH, VN, MX, BR and JP sit behind a puzzle our exits do not clear and return `400`.
+  **Markets** — `region=US` (default), `GB` and `ID` (Tokopedia) are served in their local currency. The Southeast Asian markets `SG`, `MY`, `PH`, `TH`, `VN` and `JP` are now supported via native in-region signing and paginate with `pagination.next_page_token` (pass it back as `page_token`) rather than `offset`. `region=TW` returns HTTP 200 with `availability: "not_operated"` (TikTok runs no Shop marketplace in Taiwan). For a market-wide trending list, see [Shop Bestsellers](/api-reference/endpoint/tiktok/shop-bestsellers).
 </Note>
 
 <Note>
