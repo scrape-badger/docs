@@ -1,0 +1,23 @@
+---
+title: "Shop Bestsellers"
+openapi: "GET /v1/tiktok/shop/bestsellers"
+description: "Sales-ranked best-selling TikTok Shop products for every operating market, ordered by real sold_count."
+---
+
+<Note>
+  Ranked by each product's real `sold_count` (`source: "sales_ranked"`). Omit `category_id`
+  for a market-wide list, or pass one to rank within a category. `pages` (1-4) controls how many
+  category pages are aggregated before ranking; `limit` (1-100) caps the returned list.
+</Note>
+
+<Note>
+  **Markets** — available for every operating market: `US`, `GB`, `ID` (Tokopedia), and the
+  Southeast Asian markets `SG`, `MY`, `PH`, `TH`, `VN` plus `JP`, each in its local currency.
+  This is the recommended trending/best-seller endpoint for markets where TikTok exposes no
+  curated ranking page. `region=TW` returns HTTP 200 with `availability: "not_operated"` and an
+  empty list — TikTok operates no Shop marketplace in Taiwan.
+</Note>
+
+<Note>
+  Each request costs **5 credits**. Failed requests are not charged.
+</Note>
