@@ -1,0 +1,24 @@
+---
+title: "Shop mall"
+openapi: "GET /v1/tiktok/shop/mall"
+description: "Browse Japan's TikTok Shop recommendations and navigation tabs without a TikTok account."
+---
+
+Pass `region=JP` explicitly. Japan is currently available; Singapore and Malaysia
+mall feeds remain unavailable. [Shop search](/api-reference/endpoint/tiktok/shop-search)
+has separate market coverage.
+
+Start with `tab_id=0` for All. Read other tab IDs from `navigation`, then request
+that tab's feed. Tabs are merchandising groups, not a complete category tree or
+a sales ranking.
+
+For the next page, pass `next_page_token` unchanged as `page_token`, keeping the
+same `region` and `tab_id`. Tokens expire after 15 minutes and may expire earlier
+when the service or guest context changes. Restart from the first page if a token
+is rejected. Stop when `has_more` is false; page sizes vary.
+
+Products include their formatted `price_display` and ISO `currency`. Japan's
+prices are in JPY. An upstream verification failure returns an error instead of
+an empty successful page.
+
+Each request costs **5 credits**. Failed requests are not charged.
