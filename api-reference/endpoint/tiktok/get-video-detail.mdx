@@ -11,3 +11,27 @@ description: "Full metadata for a single TikTok video or photo slideshow."
 <Note>
   Each request costs **5 credits**. Failed requests are not charged.
 </Note>
+
+## Downloading video media
+
+Fetch video detail immediately before downloading. When available,
+`video.video.media_headers` contains the anonymous CDN headers that must accompany
+**that same response's** `play_addr` or `download_addr`. Do not mix a URL from a list
+response with headers from video detail. No TikTok account or login cookie is needed.
+
+```python
+media = response["video"]["video"]
+headers = media.get("media_headers")
+if headers:
+    download = requests.get(media["play_addr"], headers=headers, stream=True, timeout=30)
+    download.raise_for_status()
+```
+
+The headers contain a short-lived guest media cookie, not your ScrapeBadger API key.
+Send them only to the returned TikTok media URL. Do not send your ScrapeBadger key
+to the CDN. Refresh video detail if the link expires. If `media_headers` is null,
+metadata is available but authorized media resolution was not obtained; do not treat
+this as a verified downloadable link. Photo slideshows may have no video media.
+
+Social-list requests accept count up to 50, but TikTok permits at most 30 per
+upstream page. A response may contain fewer rows; follow its returned cursor.
