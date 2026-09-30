@@ -2433,7 +2433,7 @@
         "type": "apiKey",
         "name": "x-api-key",
         "in": "header",
-        "description": "Your ScrapeBadger API key. You can find this in your dashboard at https://scrapebadger.com/dashboard/api-keys."
+        "description": "Your ScrapeBadger API key. You can find this in your dashboard at https://scrapebadger.com/dashboard/api-keys?utm_source=docs&utm_medium=referral."
       }
     },
     "schemas": {
@@ -3919,7 +3919,7 @@
         }
       },
       "PaymentRequired": {
-        "description": "Insufficient credits. Your account balance has been exhausted. Purchase more credits at https://scrapebadger.com/dashboard/billing.",
+        "description": "Insufficient credits. Your account balance has been exhausted. Purchase more credits at https://scrapebadger.com/dashboard/billing?utm_source=docs&utm_medium=referral.",
         "content": {
           "application/json": {
             "schema": {
