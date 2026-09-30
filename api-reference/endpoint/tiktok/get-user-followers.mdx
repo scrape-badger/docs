@@ -1,0 +1,14 @@
+---
+title: "Get user followers"
+openapi: "GET /v1/tiktok/users/{username}/followers"
+description: "Retrieve the public followers list that TikTok exposes to a guest."
+---
+
+Each successful request costs **10 credits**. No TikTok account is required.
+
+Pass `pagination.cursor` unchanged with the same username and region to continue.
+Cursors last up to 15 minutes and may expire earlier if the guest session is replaced.
+An expired cursor returns 410; restart from the first page.
+
+Private or hidden data returns 403. Temporary upstream failures return 503.
+Guest lists can be partial even when the profile reports a larger total.

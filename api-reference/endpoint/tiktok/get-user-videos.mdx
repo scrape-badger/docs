@@ -7,3 +7,8 @@ description: "A user's posted videos, newest first, with cursor pagination."
 <Note>
   Each request costs **8 credits**. Failed requests are not charged.
 </Note>
+
+Pass `pagination.cursor` unchanged with the same username and region to continue.
+Guest cursors last up to 15 minutes and can expire earlier when their session is
+replaced (HTTP 410). Public metadata can omit native-only fields. CDN links may
+return 403 and are not guaranteed downloads.

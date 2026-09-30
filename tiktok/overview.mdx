@@ -20,7 +20,7 @@ Fetch full user profiles, posted videos, comments and replies, video transcripts
     Keyword search across videos, users, and hashtags, plus a general Top-feed search.
   </Card>
   <Card title="Trending" icon="arrow-trend-up">
-    Trending videos, hashtags, and songs ranked by usage, with rank-change deltas.
+    US mobile discovery videos, hashtags and songs. Historical windows and rank-change deltas are unavailable.
   </Card>
   <Card title="Ad Transparency" icon="bullhorn">
     Search TikTok's EU Commercial Content Library by keyword or advertiser id.
@@ -170,11 +170,11 @@ curl "https://scrapebadger.com/v1/tiktok/users/charlidamelio" \
 TikTok protects its mobile and web APIs with request signing (X-Argus / X-Ladon / X-Gorgon / X-Khronos), device trust, and per-IP reputation scoring. ScrapeBadger clears these automatically — you never need to manage signatures, device registration, proxies, or sessions. Requests are routed through proxies matched to the `region` you request.
 
 <Note>
-  **Trending hashtags and trending songs** (`/v1/tiktok/trending/hashtags`, `/v1/tiktok/trending/songs`) are served via an **on-device signer path**. They are ranked by real usage (view counts, distinct-creator counts) rather than the deprecated Creative Center trend lists.
+  **Trending hashtags and trending songs** (`/v1/tiktok/trending/hashtags`, `/v1/tiktok/trending/songs`) are served via an **mobile signer path**. They are ranked by real usage (view counts, distinct-creator counts) rather than the deprecated Creative Center trend lists.
 </Note>
 
 <Warning>
-  **Followers, following, and liked-video lists are deprecated.** These endpoints (`/v1/tiktok/users/{username}/followers`, `/following`, `/liked`) require an authenticated account session, which this API intentionally does not provide. They return **HTTP 410 Gone** with a deprecation notice and are not charged. All other TikTok endpoints (videos, profile, search, comments, hashtags, trending, music) remain fully supported.
+  Public followers, following and liked lists use account-free guest requests. TikTok can expose only a subset; hidden/private data returns 403 and temporary upstream failures return 503.
 </Warning>
 
 ## Next Steps
@@ -191,3 +191,21 @@ TikTok protects its mobile and web APIs with request signing (X-Argus / X-Ladon 
 ---
 
 *ScrapeBadger is an independent tool and is not affiliated with, endorsed by, or sponsored by TikTok. "TikTok" is a trademark of TikTok Ltd. (a ByteDance company), used here only to describe the platform this scraper is designed to work with.*
+
+
+## Guest access and pagination
+
+Public content uses guest web and mobile providers; you do not need a TikTok
+account. Public followers/following and reposts support pagination. Liked lists
+are available only when the profile exposes them publicly. Hidden/private data
+returns 403, temporarily unavailable data returns 503, and an expired continuation
+cursor returns 410. Pass cursors unchanged with the same resource and region;
+guest continuation state lasts up to 15 minutes and expires when its guest session
+is replaced or the service restarts. Social lists reflect the subset TikTok exposes
+to that guest; they are not a guaranteed complete follower export.
+
+Web and mobile responses share the documented models, but optional native-only
+fields may be null. A populated metadata response does not guarantee that a media
+URL is downloadable: TikTok may reject even a fresh CDN URL with 403. Media links
+are upstream references, not a guaranteed download service. Mobile hashtag/song recommendations are not
+historical Creative Center rankings: omit `period`; only US is currently verified.
