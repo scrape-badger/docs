@@ -1,0 +1,120 @@
+---
+title: "Trending"
+api: "GET https://scrapebadger.com/v1/tiktok/trending/videos"
+description: "What's trending on TikTok right now — mobile Discover videos, hashtags, and hot-music recommendations from the verified US guest provider."
+---
+
+These are mobile discovery recommendations, not Creative Center historical
+rankings. Hashtags and songs currently support the verified US guest provider;
+other regions and explicit historical periods return HTTP 422.
+
+| Endpoint | Returns | Credits |
+| -------- | ------- | ------- |
+| `GET /v1/tiktok/trending/videos` | Explore-feed videos | 5 |
+| `GET /v1/tiktok/trending/hashtags` | ranked trending hashtags | 5 |
+| `GET /v1/tiktok/trending/songs` | ranked trending songs / sounds | 5 |
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="region" type="string" default="US">
+  Content region, ISO 3166-1 alpha-2. Hashtag and song feeds currently support US only.
+</ParamField>
+
+<ParamField query="count" type="integer" default="20">
+  Items to return, 1–50.
+</ParamField>
+
+<ParamField query="period" type="integer">
+  Historical windows are unavailable. Omit this parameter; sending it returns HTTP 422.
+</ParamField>
+
+## Response
+
+<Tabs>
+  <Tab title="trending/videos">
+    <ResponseField name="videos" type="TikTokVideo[]">Standard `TikTokVideo` objects from the Explore feed.</ResponseField>
+    <ResponseField name="pagination" type="TikTokCursorPage">`has_more`, `cursor`, `count`.</ResponseField>
+    <ResponseField name="region" type="string">Echoes the region.</ResponseField>
+  </Tab>
+  <Tab title="trending/hashtags">
+    <ResponseField name="hashtags" type="TikTokTrendingHashtag[]">
+      Each: `name`, `id`, `rank`, `rank_diff`, `country_code`, `industry`,
+      `publish_count` (videos using it), `view_count`, `user_count` (distinct
+      creators), `is_promoted`, `is_new`, `url`.
+    </ResponseField>
+    <ResponseField name="region" type="string">Echoes the region.</ResponseField>
+  </Tab>
+  <Tab title="trending/songs">
+    <ResponseField name="songs" type="TikTokTrendingSong[]">
+      Each: `title`, `id`, `author`, `rank`, `rank_diff`, `country_code`,
+      `duration`, `user_count` (videos using the sound), `cover`, `play_url`,
+      `is_new`, `link`.
+    </ResponseField>
+    <ResponseField name="region" type="string">Echoes the region.</ResponseField>
+  </Tab>
+</Tabs>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/tiktok/trending/hashtags?region=US&count=20" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/tiktok/trending/hashtags?" +
+    new URLSearchParams({ region: "US", count: "20" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/tiktok/trending/hashtags",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"region": "US", "count": 20},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "hashtags": [
+    {
+      "name": "summervibes",
+      "id": "5566771",
+      "rank": 1,
+      "rank_diff": 3,
+      "country_code": "US",
+      "industry": "Lifestyle",
+      "publish_count": 48200,
+      "view_count": 892000000,
+      "user_count": 31500,
+      "is_promoted": false,
+      "is_new": true,
+      "url": "https://www.tiktok.com/tag/summervibes"
+    }
+  ],
+  "region": "US"
+}
+```
+
+<Tip>
+  `trending/creators` and `trending/keywords` were removed — TikTok deprecated
+  the Creative Center trend lists and there is no public analog. For advertiser
+  and ad-keyword intelligence, use the TikTok Ad Library endpoints.
+</Tip>

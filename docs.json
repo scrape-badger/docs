@@ -1088,6 +1088,9 @@
             "pages": [
               "api-reference/endpoint/tiktok/get-user-profile",
               "api-reference/endpoint/tiktok/get-user-videos",
+              "api-reference/endpoint/tiktok/get-user-followers",
+              "api-reference/endpoint/tiktok/get-user-following",
+              "api-reference/endpoint/tiktok/get-user-liked",
               "api-reference/endpoint/tiktok/get-user-reposts"
             ]
           },
