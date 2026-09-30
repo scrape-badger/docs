@@ -209,3 +209,7 @@ fields may be null. A populated metadata response does not guarantee that a medi
 URL is downloadable: TikTok may reject even a fresh CDN URL with 403. Media links
 are upstream references, not a guaranteed download service. Mobile hashtag/song recommendations are not
 historical Creative Center rankings: omit `period`; only US is currently verified.
+
+For video downloads, fetch video detail and use its matching `video.video.media_headers`
+with `play_addr` or `download_addr`. These anonymous CDN headers are optional: null
+means usable media authorization was not obtained. Refresh detail when links expire.
