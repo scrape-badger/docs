@@ -3479,6 +3479,85 @@
           }
         }
       }
+    },
+    "/v1/tiktok/shop/mall": {
+      "get": {
+        "tags": [
+          "TikTok Shop"
+        ],
+        "summary": "Regional Shop mall feed",
+        "description": "Account-free mall recommendations and navigation. Currently available for JP. Pass region=JP explicitly. Tabs are merchandising groups, not a complete category taxonomy or sales ranking.",
+        "operationId": "tiktok_shop_mall",
+        "parameters": [
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Market: US, GB, ID, JP, MX, SG, MY, PH, TH, VN",
+              "default": "US",
+              "title": "Region"
+            },
+            "description": "Requested market. Currently use JP; other mall markets are unavailable."
+          },
+          {
+            "name": "tab_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Tab Id"
+            }
+          },
+          {
+            "name": "page_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{32}$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Page Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShopMallResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -6393,6 +6472,216 @@
         "required": [
           "region"
         ]
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "ShopMallResponse": {
+        "properties": {
+          "region": {
+            "type": "string",
+            "title": "Region"
+          },
+          "tab_id": {
+            "type": "integer",
+            "title": "Tab Id"
+          },
+          "products": {
+            "items": {
+              "$ref": "#/components/schemas/ShopMallProduct"
+            },
+            "type": "array",
+            "title": "Products"
+          },
+          "navigation": {
+            "items": {
+              "$ref": "#/components/schemas/ShopMallNavigation"
+            },
+            "type": "array",
+            "title": "Navigation"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          },
+          "next_page_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Page Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "region",
+          "tab_id",
+          "products",
+          "navigation",
+          "has_more"
+        ],
+        "title": "ShopMallResponse"
+      },
+      "ShopMallNavigation": {
+        "properties": {
+          "tab_id": {
+            "type": "integer",
+            "title": "Tab Id"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "tree_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tree Id"
+          },
+          "category_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tab_id"
+        ],
+        "title": "ShopMallNavigation"
+      },
+      "ShopMallProduct": {
+        "properties": {
+          "product_id": {
+            "type": "string",
+            "title": "Product Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "price_display": {
+            "type": "string",
+            "title": "Price Display"
+          },
+          "currency_symbol": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency Symbol"
+          },
+          "seller_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Seller Id"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image"
+          }
+        },
+        "type": "object",
+        "required": [
+          "product_id",
+          "title",
+          "currency",
+          "price_display"
+        ],
+        "title": "ShopMallProduct"
       }
     }
   }
