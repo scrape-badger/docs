@@ -1375,7 +1375,7 @@
       "anchors": [
         {
           "anchor": "Dashboard",
-          "href": "https://scrapebadger.com/dashboard",
+          "href": "https://scrapebadger.com/dashboard?utm_source=docs&utm_medium=referral",
           "icon": "gauge"
         },
         {
@@ -1396,7 +1396,7 @@
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://scrapebadger.com/dashboard"
+      "href": "https://scrapebadger.com/dashboard?utm_source=docs&utm_medium=referral"
     }
   },
   "footer": {
