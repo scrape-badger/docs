@@ -11,7 +11,7 @@ Programmatic access to **16 Google product APIs** with structured JSON responses
 
 <CardGroup cols={3}>
   <Card title="Search (SERP)" icon="magnifying-glass">
-    Organic results, ads, knowledge graph, People Also Ask, related searches, AI overview, and pagination.
+    Organic results, ads, knowledge graph, People Also Ask, People also search for, related searches, AI overview, and pagination.
   </Card>
   <Card title="Maps" icon="map-location-dot">
     Place search, business details, reviews, photos, and posts from Google Maps.
@@ -139,6 +139,19 @@ curl "https://scrapebadger.com/v1/google/shopping/product/click?title=Lenovo+Ide
 ```
 
 </CodeGroup>
+
+## Search result blocks
+
+Each block below is returned when Google shows it for your query.
+
+| Field | What it holds |
+|-------|---------------|
+| `related_questions` | The People Also Ask questions shown on the page, usually four, as `question` and `rank`. Google loads each answer only when a question is clicked, so `title`, `link` and `snippet` are `null`. You can't expand the block to load more questions. |
+| `people_also_search_for` | Every item under a "People also search for" heading, as `name`, `link` and `thumbnail`. This covers the list of refined searches at the foot of the page and the entity carousel in a knowledge panel. Only carousel items carry a `thumbnail`. The block is matched on its English heading, so it fills with `hl=en`. |
+| `related_searches` | The refined searches at the foot of the page, as `query` and `link`. Google's tabs (AI Mode, Shopping) and knowledge panel buttons (Address, Phone) are not included. |
+| `local_results` | The places in a local pack (the map with a list of places). A single business or landmark appears in `knowledge_graph` instead, with facts such as `address` in `attributes`. |
+
+For the United Kingdom, pass `gl=gb` (not `uk`), for example `q=lutron+london&gl=gb&hl=en&domain=google.co.uk`.
 
 ## Endpoint Index
 

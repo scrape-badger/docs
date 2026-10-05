@@ -6285,6 +6285,13 @@
             "type": "array",
             "title": "Related Searches"
           },
+          "people_also_search_for": {
+            "items": {
+              "$ref": "#/components/schemas/PeopleAlsoSearchFor"
+            },
+            "title": "People Also Search For",
+            "type": "array"
+          },
           "news_results": {
             "items": {
               "$ref": "#/components/schemas/NewsResult"
@@ -12589,6 +12596,44 @@
         ],
         "title": "LensRelatedSearch",
         "description": "A related-searches chip from the Lens results page."
+      },
+      "PeopleAlsoSearchFor": {
+        "description": "One item of a \"People also search for\" block.\n\nGoogle renders two shapes under that heading: a text list of refined\nqueries at the foot of the page, and an entity carousel (people, places,\nbrands) that carries a thumbnail.",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Link"
+          },
+          "thumbnail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Thumbnail"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "PeopleAlsoSearchFor",
+        "type": "object"
       }
     },
     "securitySchemes": {
