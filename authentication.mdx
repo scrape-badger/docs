@@ -9,16 +9,13 @@ All API requests require authentication using an API key. Learn how to create an
 
 <Steps>
   <Step title="Sign in">
-    [Sign in](https://scrapebadger.com/auth/signin?utm_source=docs&utm_medium=referral) to your ScrapeBadger account.
+    [Sign in](https://scrapebadger.com/auth/signin) to your ScrapeBadger account. Your first API key is created automatically and shown on the [dashboard](https://scrapebadger.com/dashboard), where you can copy or regenerate it anytime.
   </Step>
-  <Step title="Navigate to API Keys">
-    Go to the [API Keys](https://scrapebadger.com/dashboard/api-keys?utm_source=docs&utm_medium=referral) page in your dashboard.
-  </Step>
-  <Step title="Create a new key">
-    Click "Create New Key" and give it a descriptive name.
+  <Step title="Create more keys (optional)">
+    Open the [API Keys](https://scrapebadger.com/dashboard/api-keys) page and click **Create key**. Give it a name, optional notes, the APIs it may call and an optional expiry date.
   </Step>
   <Step title="Copy your key">
-    Copy your key immediately — it won't be shown again.
+    Copy the key and store it as a secret (for example in an environment variable).
   </Step>
 </Steps>
 
@@ -49,15 +46,38 @@ If authentication fails, the API returns one of these status codes:
 
 | Status | Name | Description |
 |--------|------|-------------|
-| `401` | Unauthorized | Missing or invalid API key. Check that you're including the key correctly. |
+| `401` | Unauthorized | Missing, invalid, disabled or expired API key. Check that you're including the key correctly. |
 | `402` | Payment Required | Insufficient credits. Purchase more credits to continue making requests. |
-| `403` | Forbidden | API key is disabled or account is restricted. Contact support if you believe this is an error. |
+| `403` | Forbidden | The key is not permitted to call this API (`insufficient_scope`, see below), or the account is restricted. |
 
 ```json Error Response Format
 {
-  "detail": "Invalid or missing API key"
+  "detail": "Invalid or expired API key."
 }
 ```
+
+## API Key Permissions
+
+Every key either has access to **all APIs** (the default, including APIs added in the future) or is **restricted** to the APIs you pick — for example a key that may only call Google and Amazon. Set this when you create the key or later with **Edit** on the [API Keys](https://scrapebadger.com/dashboard/api-keys) page; changes apply to the key's very next request.
+
+Permissions are per API, matching the first path segment after `/v1/`: `twitter`, `google`, `amazon`, `web`, `youtube`, and so on. Everything under that API — including Twitter stream monitors, filter rules and the stream WebSocket — is covered by its permission. `/v1/account` is always allowed.
+
+A request to an API the key isn't permitted to call is rejected **before** any credits are charged, with `403` and `error: "insufficient_scope"`:
+
+```json 403 insufficient_scope
+{
+  "detail": "This API key does not have permission to use the Twitter / X API (/v1/twitter). It is restricted to: Google, Amazon. Grant the Twitter / X permission to this key at https://scrapebadger.com/dashboard/api-keys, or use a different key.",
+  "error": "insufficient_scope",
+  "required_scope": "twitter",
+  "allowed_scopes": ["google", "amazon"]
+}
+```
+
+The official SDKs raise `PermissionDeniedError` for this response, with `required_scope` and `allowed_scopes` attached.
+
+<Tip>
+  Give each application its own key restricted to the APIs it uses. A leaked key then exposes only those APIs, and you can revoke it without touching anything else.
+</Tip>
 
 ## Security Best Practices
 
@@ -75,10 +95,14 @@ If authentication fails, the API returns one of these status codes:
 
 ## Managing API Keys
 
-From your [dashboard](https://scrapebadger.com/dashboard/api-keys?utm_source=docs&utm_medium=referral), you can:
+From the [API Keys](https://scrapebadger.com/dashboard/api-keys) page you can:
 
-- Create multiple API keys for different projects
-- Rename keys for easier identification
-- Enable or disable keys without deleting them
-- View usage statistics per key
+- Create multiple API keys for different projects and environments
+- Add notes describing what uses each key
+- Restrict each key to specific APIs, or allow all APIs
+- Set an expiry date after which the key stops working
+- Rename keys and enable or disable them without deleting them
+- View and copy a key again later, and see usage per key
 - Delete keys that are no longer needed
+
+Working with colleagues? [Teams](/teams) let several accounts share one balance, with member keys and service keys managed by team admins.

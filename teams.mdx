@@ -1,0 +1,56 @@
+---
+title: Teams
+description: Share one ScrapeBadger account with colleagues — invite members, grant them permissions, and manage member and service API keys.
+---
+
+Teams let a company use one ScrapeBadger balance from several user accounts. Each member signs in with their own account, and the team's API keys draw credits from the **team owner's** balance and use the owner's rate limit.
+
+Create a team on the [Teams](https://scrapebadger.com/dashboard/teams) page.
+
+## Roles
+
+| Role | What they can do |
+|------|------------------|
+| **Owner** | Everything. Pays for the team's usage. The only one who can invite or manage admins, and delete the team. Can't leave the team. |
+| **Admin** | Invite and remove members, change their permissions, and manage every team key. |
+| **Member** | See the team's keys, plus whatever an admin grants them (below). |
+
+## Member permissions
+
+Admins grant plain members any of these:
+
+| Permission | Allows |
+|------------|--------|
+| **Create API keys** | Create their own member keys. |
+| **Delete any key** | Disable or delete any member's key. |
+| **Manage service keys** | Create, edit, view and delete the team's service keys. |
+
+A member can always edit, view, disable and delete the keys they created themselves.
+
+## Member keys and service keys
+
+<CardGroup cols={2}>
+  <Card title="Member keys" icon="user">
+    Belong to the member who created them. They stop working the moment that member leaves or is removed from the team. Nobody else — not even the owner — can view a member's key.
+  </Card>
+  <Card title="Service keys" icon="robot">
+    Owned by the team, not a person, so they keep working when people come and go. Use them for production systems. Only members with **Manage service keys** can view or change them.
+  </Card>
+</CardGroup>
+
+Both kinds support notes, expiry dates and [API permissions](/authentication#api-key-permissions), exactly like personal keys. A team key calling an API it isn't permitted to call gets `403 insufficient_scope`.
+
+## Inviting people
+
+Admins invite by email from the team's **Members** tab, choosing the role and, for members, their permissions. The invitee gets an email with a link that:
+
+- works only for the invited email address, on an account whose email is verified
+- expires after 7 days
+- can be revoked from the pending invitations list
+
+Invitees can also accept from the [Teams](https://scrapebadger.com/dashboard/teams) page once they're signed in. Inviting the same email again replaces the earlier invitation.
+
+## Leaving and deleting
+
+- A member or admin can leave from the team's **Settings** tab. Their member keys are deleted; service keys are unaffected.
+- The owner can delete the team, which immediately and permanently deletes every team key.
