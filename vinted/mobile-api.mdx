@@ -117,13 +117,17 @@ including identifiers used to select an item, seller or category.
 | Operation | Required parameters | Result |
 |---|---|---|
 | `item-services` | `item_id` | `original_asking_amount`, `seller_original_asking_amount`, `services`, `total_amount` |
-| `item-details` | `item_id` | `item`, `plugins` |
+| `item-details` | `item_id` | `item` (plus `item.uploaded_at`), `plugins` |
 | `item-photos` | `item_id` | `photos` |
 | `public-photos` | `item_ids[]`, `photo_size` | `photos` |
 | `item-translatable` | `item_id` | `plugins` |
-| `related-items` | `item_id`, `content_source`, `screen` | `items`, `title`, `pagination` |
+| `related-items` | `item_id`, `content_source` | `items`, `title`, `next_page_token` |
 | `item-shipping` | `item_id` | `shipping_details` |
 | `item-share` | `item_id` | `share_url` |
+
+`item-details` returns Vinted's payload unchanged except for one field we add: `item.uploaded_at`, an ISO 8601 UTC timestamp taken from the earliest photo upload. Treat it as a lower bound on listing age, because a seller who replaces a photo moves it forward. Catalog search and related items carry no upload time.
+
+`related-items` takes `content_source` `similar_items` or `other_user_items`. To get the next page, send the previous response's `next_page_token`. When it is `null` there are no more pages.
 
 ### Sellers
 
