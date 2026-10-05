@@ -48,7 +48,7 @@ If authentication fails, the API returns one of these status codes:
 |--------|------|-------------|
 | `401` | Unauthorized | Missing, invalid, disabled or expired API key. Check that you're including the key correctly. |
 | `402` | Payment Required | Insufficient credits. Purchase more credits to continue making requests. |
-| `403` | Forbidden | The key is not permitted to call this API (`insufficient_scope`, see below), or the account is restricted. |
+| `403` | Forbidden | The key is not permitted to call this API (`insufficient_scope`), the request came from an IP address the key doesn't allow (`ip_not_allowed`), or the account is restricted. See below. |
 
 ```json Error Response Format
 {
@@ -79,6 +79,31 @@ The official SDKs raise `PermissionDeniedError` for this response, with `require
   Give each application its own key restricted to the APIs it uses. A leaked key then exposes only those APIs, and you can revoke it without touching anything else.
 </Tip>
 
+## IP Restrictions
+
+Limit a key to the IP addresses your servers use, so a leaked key is useless anywhere else. On the [API Keys](https://scrapebadger.com/dashboard/api-keys) page, open **Edit → IP restrictions**, choose **Only these addresses** and add:
+
+- single addresses: `203.0.113.7`, `2001:db8::1`
+- CIDR ranges: `203.0.113.0/24`, `2001:db8::/48`
+
+**Add my current IP** fills in the address of the browser you're using — your servers may use a different one. Up to 100 entries per key; IPv4 and IPv6 are both supported. Changes apply on the key's next request.
+
+A request from any other address is rejected **before** any credits are charged, with `403` and `error: "ip_not_allowed"`. The response names the address we saw, so you can tell a misconfigured server from someone else using your key:
+
+```json 403 ip_not_allowed
+{
+  "detail": "This API key only accepts requests from specific IP addresses, and this request came from 198.51.100.23, which is not on its allowlist. If this is your server, add 198.51.100.23 (or its range) to the key at https://scrapebadger.com/dashboard/api-keys. If not, someone else may be using your key: rotate it.",
+  "error": "ip_not_allowed",
+  "client_ip": "198.51.100.23"
+}
+```
+
+The official SDKs (0.53.0+) raise `IPNotAllowedError`, a subclass of `PermissionDeniedError`, with `client_ip`.
+
+<Note>
+  The address is taken from the network connection as it reaches Cloudflare — it can't be set with headers such as `X-Forwarded-For`. Keys with IP restrictions don't work through the hosted [MCP server](/mcp/overview): its requests come from your AI assistant's provider, not your servers. Use a separate, unrestricted key there.
+</Note>
+
 ## Security Best Practices
 
 <CardGroup cols={1}>
@@ -100,6 +125,7 @@ From the [API Keys](https://scrapebadger.com/dashboard/api-keys) page you can:
 - Create multiple API keys for different projects and environments
 - Add notes describing what uses each key
 - Restrict each key to specific APIs, or allow all APIs
+- Limit each key to specific IP addresses or CIDR ranges
 - Set an expiry date after which the key stops working
 - Rename keys and enable or disable them without deleting them
 - View and copy a key again later, and see usage per key
