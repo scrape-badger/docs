@@ -50,6 +50,19 @@ Admins invite by email from the team's **Members** tab, choosing the role and, f
 
 Invitees can also accept from the [Teams](https://scrapebadger.com/dashboard/teams) page once they're signed in. Inviting the same email again replaces the earlier invitation.
 
+## Audit log
+
+Owners and admins see an **Audit log** tab on the team page: a permanent, read-only record of who did what and when.
+
+| Category | Events recorded |
+|----------|-----------------|
+| Team | team created, renamed |
+| Invitations | sent (with role and permissions), revoked, accepted, declined |
+| Members | role or permission changes (before → after), removed, left |
+| API keys | created, edited (each changed field, before → after, including API permissions), enabled, disabled, deleted — also when a member's keys are deleted because they left — and **every time a key's secret was viewed** |
+
+Each entry shows the person who acted, the time, and the IP address it came from. Filter by category, and expand an entry to see the exact changes. Entries cannot be edited or deleted; they are removed only if the team itself is deleted.
+
 ## Leaving and deleting
 
 - A member or admin can leave from the team's **Settings** tab. Their member keys are deleted; service keys are unaffected.
