@@ -230,6 +230,9 @@ The search endpoints support Reddit's full query syntax:
 | `thumbnail` | string \| null | Thumbnail URL (~140px), or `self`/`default`/`nsfw` |
 | `thumbnail_width` | number \| null | Thumbnail width in pixels |
 | `thumbnail_height` | number \| null | Thumbnail height in pixels |
+| `preview_image` | string \| null | Full-resolution preview image URL — see [Post images](#post-images) |
+| `preview_image_width` | number \| null | Preview image width in pixels |
+| `preview_image_height` | number \| null | Preview image height in pixels |
 | `media` | object \| null | Embedded media (Reddit video, oEmbed payload) |
 | `media_embed` | object \| null | Embed HTML and dimensions |
 | `secure_media` | object \| null | HTTPS variant of `media` |
@@ -414,15 +417,29 @@ still-processing slots are omitted.
 
 ### Single image, video and link posts
 
-Non-gallery posts are not affected: a single-image post's `url` is already the
-direct, full-resolution image on `i.redd.it`, and `thumbnail` holds the ~140px
-version. Native Reddit video lives under `media` / `secure_media`. Only
-galleries needed a dedicated field, because their `url` points at a gallery
-page rather than at any image.
+`thumbnail` is at most ~140px wide. For the full-size image:
+
+| Post type | Full-resolution image |
+|-----------|-----------------------|
+| Single image | `url` — the direct file on `i.redd.it` (also in `preview_image`) |
+| Link post | `preview_image` — the link card's image, the only full-size copy |
+| Native video | `preview_image` is the poster frame; the video is under `media` / `secure_media` |
+| Self / text post | Usually none — `preview_image` is `null` |
+
+```json
+{
+  "domain": "abc.net.au",
+  "thumbnail": "https://external-preview.redd.it/zGHG...jpeg?width=140&height=78&crop=140:78,smart&auto=webp&s=...",
+  "preview_image": "https://external-preview.redd.it/zGHG...jpeg?auto=webp&s=...",
+  "preview_image_width": 862,
+  "preview_image_height": 485
+}
+```
 
 <Note>
-  `preview.redd.it` URLs are signed. Use them exactly as returned — stripping or
-  re-ordering the query string invalidates the signature.
+  `preview.redd.it` and `external-preview.redd.it` URLs are signed. Use them
+  exactly as returned — changing `width`/`height`, or stripping or re-ordering
+  the query string, invalidates the signature and Reddit answers `403`.
 </Note>
 
 ## Rate Limits
