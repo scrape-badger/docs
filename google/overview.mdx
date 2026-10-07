@@ -214,6 +214,36 @@ Per-endpoint credit pricing is configured by ScrapeBadger admins and returned li
   Query `GET /api/public/pricing` in your integration to cache the current per-endpoint cost — don't hardcode credit numbers, they can be adjusted.
 </Tip>
 
+## Response Caching
+
+Every Google endpoint keeps a shared **5-minute** result cache. A request with the same endpoint and the same query parameters (`q`, `gl`, `hl`, `location`, `num`, `start`, …) as a recent successful request is answered from the cache instead of fetching Google again. Your API key is not part of the cache key, whether you send it as a header or a query parameter.
+
+- **Cached responses are free.** They cost **0 credits** and return `X-Credits-Used: 0`.
+- **Identical requests sent at the same time are merged.** If you send the same request again while the first is still running, the second one waits for the first and receives the same response (also free).
+- **Only successful responses with data are cached.** Errors, `503 Service Unavailable`, and empty results are never cached, so a retry always makes a fresh attempt.
+
+Every response tells you how it was served:
+
+| Header | Meaning |
+| --- | --- |
+| `X-Cache` | `MISS` — fetched fresh from Google. `HIT` — served from the cache. `COALESCED` — merged with an identical request that was already running. |
+| `X-Cache-TTL-Remaining` | Seconds until the cached response expires (only on `HIT` / `COALESCED`). |
+| `Age` | Seconds since the response was fetched from Google (only on `HIT` / `COALESCED`). |
+
+```bash
+curl -i "https://scrapebadger.com/v1/google/ai-mode/search?q=what+is+scrapebadger" \
+  -H "X-API-Key: YOUR_API_KEY"
+# second identical call within 5 minutes:
+# X-Cache: HIT
+# X-Cache-TTL-Remaining: 287
+# Age: 13
+# X-Credits-Used: 0
+```
+
+<Note>
+  To force a fresh result, change any query parameter — a different query string is a different cache entry.
+</Note>
+
 ## Legal & Compliance
 
 <Warning>
