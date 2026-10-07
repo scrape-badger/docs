@@ -102,7 +102,7 @@ including identifiers used to select an item, seller or category.
 
 | Operation | Required parameters | Result |
 |---|---|---|
-| `catalog-search` | None | `items`, `pagination`, `search_tracking_params` |
+| `catalog-search` | None | `items` (plus estimated listing times), `pagination`, `search_tracking_params`, `uploaded_at_reference` |
 | `filters` | None | `filters`, `selected_filters` |
 | `filter-facets` | `filter_code` | `filter_code`, `options`, `total_count`, `total_count_max` |
 | `filter-search` | `filter_search_code`, `filter_search_text` | `is_selection_highlighted`, `options`, `selected_filters` |
@@ -111,6 +111,38 @@ including identifiers used to select an item, seller or category.
 | `homepage-configuration` | None | `homepage_session_id`, `staggered_homepage_enabled`, `verticals` |
 | `homepage` | `vertical`, `column_count`, `version` | `blocks`, `load_more_button`, `pagination` |
 | `promoted-closets` | None | `page_info`, `promoted_closets` |
+
+### Listing age on catalog search
+
+Vinted sends no upload time on search results. `catalog-search` adds an estimate to every item, at the same 1 credit:
+
+| Field | Meaning |
+|---|---|
+| `estimated_uploaded_at` | ISO 8601 UTC time the listing went live, or `null` when it cannot be estimated. |
+| `estimated_uploaded_at_source` | `photo_stamp`: the item's own measured photo stamp, the same value `item-details` returns as `uploaded_at`. `item_id`: an estimate from the item ID. |
+| `estimated_uploaded_at_bracket_seconds` | For `item_id` estimates: the time between the nearest listings with a known time on either side of this ID. This is what predicts the error. `null` for `photo_stamp`. |
+
+Vinted's item IDs are one global sequence across markets, so an ID can be placed between listings whose times we know. Those reference times come from the photo stamps of item-details responses, including a listing we read every few minutes to keep the most recent IDs covered. The error depends on how close those references are:
+
+| `bracket_seconds` | Error against the photo stamp, 90% of listings |
+|---|---|
+| under 1,800 (30 min) | within 5 minutes |
+| 1,800 to 10,800 | within about 3 hours |
+| over 10,800 | hours to days, so do not rely on it for fine-grained age |
+
+About 1% of listings are off by more than a day even with close references. These are drafts published later or relisted items, whose ID is older than the moment they went live. An item older than every reference comes back `null`. An item newer than every reference is placed between the newest reference and the time of the response.
+
+Each response also carries `uploaded_at_reference`, which tells you how far back the estimates reach:
+
+```json
+"uploaded_at_reference": {
+  "anchors": 98412,
+  "oldest_anchor_at": "2026-09-27T08:14:02Z",
+  "newest_anchor_at": "2026-10-07T13:28:28Z"
+}
+```
+
+It is `null` if the reference table is briefly unavailable, in which case every estimate is `null` too and the search itself still succeeds.
 
 ### Items
 
@@ -125,7 +157,7 @@ including identifiers used to select an item, seller or category.
 | `item-shipping` | `item_id` | `shipping_details` |
 | `item-share` | `item_id` | `share_url` |
 
-`item-details` returns Vinted's payload unchanged except for one field we add: `item.uploaded_at`, an ISO 8601 UTC timestamp taken from the earliest photo upload. Treat it as a lower bound on listing age, because a seller who replaces a photo moves it forward. Catalog search and related items carry no upload time.
+`item-details` returns Vinted's payload unchanged except for one field we add: `item.uploaded_at`, an ISO 8601 UTC timestamp taken from the earliest photo upload. It is approximate in both directions. A seller who replaces a photo after listing moves it later, and a photo uploaded before the listing is published can predate it by about 30 minutes. Related items carry no upload time.
 
 `related-items` takes `content_source` `similar_items` or `other_user_items`. To get the next page, send the previous response's `next_page_token`. When it is `null` there are no more pages.
 
