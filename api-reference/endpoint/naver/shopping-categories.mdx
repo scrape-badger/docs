@@ -1,0 +1,80 @@
+---
+title: "Shopping Categories"
+api: "GET https://scrapebadger.com/v1/naver/shopping/categories"
+description: "The static top-level Naver Shopping category taxonomy — 11 root category ids and names. Free."
+---
+
+Return the **top-level Naver Shopping taxonomy** — the 11 root categories with their ids and names. Use the ids to scope the ranking, keyword and search endpoints. This is static reference data and is served free.
+
+**Credits:** 0
+
+<Note>
+  This endpoint is free (**0 credits**) — static public taxonomy, no upstream fetch.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Response
+
+<ResponseField name="result_count" type="integer">Number of root categories (11).</ResponseField>
+<ResponseField name="categories" type="Category[]">
+  Root categories.
+
+  <Expandable title="Category">
+    <ResponseField name="category_id" type="string" />
+    <ResponseField name="name" type="string" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/categories" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/categories",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/categories",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "result_count": 11,
+  "categories": [
+    {
+      "category_id": "50000000",
+      "name": "패션의류"
+    },
+    {
+      "category_id": "50000001",
+      "name": "패션잡화"
+    },
+    {
+      "category_id": "50000002",
+      "name": "화장품/미용"
+    }
+  ]
+}
+```

@@ -1,0 +1,154 @@
+---
+title: "Naver API Overview"
+description: "Search Naver — South Korea's dominant portal — across web, news, blog, cafe, Knowledge iN, image, video and local, plus the full Naver Shopping stack: rankings, catalog search, SmartStore/Brand storefronts, product detail, reviews & Q&A, and Shopping Live. Clean JSON, no Naver API key required."
+---
+
+## Overview
+
+The ScrapeBadger **Naver API** turns `naver.com` — the search portal most of
+South Korea actually uses — into a clean JSON feed. It covers three areas:
+
+- **Search & content** — the web SERP, the dedicated web/news/blog/cafe/
+  Knowledge iN/image/video/clip verticals, and search-box autocomplete, all
+  with resolved destination URLs and absolute publish timestamps.
+- **Naver Place** — local business search, full place detail with menus and
+  photos, place reviews, and the place photo viewer.
+- **Naver Shopping** — the ranking and insight feeds (bestsellers, keyword and
+  brand rankings, curated verticals), product and catalog search with
+  price-comparison, SmartStore and Brand Store storefronts, product detail,
+  reviews & Q&A, and the full **Shopping Live** broadcast/channel/shortclip
+  stack.
+
+<Info>
+  All endpoints are `GET`, live under `https://scrapebadger.com/v1/naver/*`,
+  and authenticate with the `X-API-Key` header. Credits are charged per request
+  and reported on the `X-Credits-Used` response header. A request that returns
+  an empty result, or that Naver answers with a challenge, is **not billed**.
+</Info>
+
+## Features
+
+- **Web & content verticals** — the integrated
+  [`/search`](/api-reference/endpoint/naver/search) SERP plus the dedicated
+  [`/search/web`](/api-reference/endpoint/naver/search-web),
+  [`/news`](/api-reference/endpoint/naver/news),
+  [`/blog`](/api-reference/endpoint/naver/blog),
+  [`/cafe`](/api-reference/endpoint/naver/cafe),
+  [`/kin`](/api-reference/endpoint/naver/kin) (Knowledge iN),
+  [`/image`](/api-reference/endpoint/naver/image),
+  [`/video`](/api-reference/endpoint/naver/video) and
+  [`/clip`](/api-reference/endpoint/naver/clip) feeds, each with resolved
+  destination URLs and absolute publish times.
+- **Autocomplete** — Naver's search-box suggestions for 1 credit.
+- **Naver Place** — local business search, full place detail, reviews and the
+  place [photo viewer](/api-reference/endpoint/naver/place-photos).
+- **Shopping rankings & insight** — bestseller, keyword and brand rankings,
+  keyword insight, curated deals/verticals/IT-item feeds, and the ranking
+  category trees.
+- **Shopping search & catalog** — the finder product search and filter facets,
+  filtered search, the deep full-catalog search, and per-catalog
+  price-comparison across sellers.
+- **SmartStore & Brand Stores** — store profile, category tree, product
+  listing and per-store bestsellers.
+- **Products, reviews & Q&A** — full product detail, variant groups, rating
+  summaries, paginated reviews and product Q&A.
+- **Shopping Live** — broadcast detail/products/counts/replay, channel profile/
+  products/broadcasts/shortclips, shortclip detail/products, and the live
+  keyword ranking.
+
+## Market
+
+Naver serves **South Korea** only. Results are returned in Korean (`ko-KR`),
+ranked for Korean users, and requests exit from a Korean IP. There is no market
+or country parameter — every endpoint is single-market.
+
+## SmartStore vs. Brand Store
+
+The storefront, product, review and Q&A endpoints take a `host` parameter that
+selects the storefront platform — `smartstore` (Naver SmartStore) or `brand`
+(Naver Brand Store). Brand Store coverage is the most complete; some SmartStore
+calls require an extra identifier (`channel_uid` or `checkout_merchant_no`) and
+may return a partial record. Each endpoint page documents its own requirements.
+
+## Credits
+
+Costs are charged per request and reported on the `X-Credits-Used` response
+header; the live per-endpoint price is also published at `/public/pricing`. The
+standard tier is **5 credits**, with these exceptions:
+
+| Endpoint | Path | Credits |
+| -------- | ---- | ------- |
+| Autocomplete | `GET /v1/naver/autocomplete` | 1 |
+| Shopping categories | `GET /v1/naver/shopping/categories` | 0 (free reference) |
+| Place detail | `GET /v1/naver/place/{place_id}` | 8 (browser-rendered) |
+| Everything else | `GET /v1/naver/*` | 5 |
+
+<Note>
+  The catalog and price-comparison searches
+  ([`/shopping/search-catalog`](/api-reference/endpoint/naver/shopping-search-catalog)
+  and
+  [`/shopping/price-compare`](/api-reference/endpoint/naver/shopping-price-compare))
+  clear Naver's shopping challenge in a live browser session, so they are the
+  heaviest calls and a page can take up to ~90 seconds.
+</Note>
+
+## Quickstart
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/search?query=제주도+맛집" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/search?" +
+    new URLSearchParams({ query: "제주도 맛집" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+console.log(data.result_count, "results returned");
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "제주도 맛집"},
+)
+data = res.json()
+print(data["result_count"], "results returned")
+```
+
+</CodeGroup>
+
+## Other notes
+
+- **Organic `url` values are final destinations** — any Naver redirect wrapper
+  is resolved so you get the real target URL.
+- **`related_searches[]` and `place_results[]`** appear only when Naver serves
+  them for that query.
+- **Shopping ids chain together** — take a `category_id` from
+  [`/shopping/categories`](/api-reference/endpoint/naver/shopping-categories), a
+  catalogue `nv_mid` from a search or ranking feed, and a storefront slug from a
+  product URL to move between the shopping endpoints.
+- **Pagination styles vary by endpoint** — content verticals use `page`,
+  storefront and live lists use `page`/`size`, and the live channel feeds and
+  the place photo viewer use an opaque cursor. Each page documents its own.
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The place, product or resource does not exist. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |
+
+<Tip>
+  Start from [`/autocomplete`](/api-reference/endpoint/naver/autocomplete)
+  (1 credit) to expand a seed term into real Naver queries, then run
+  [`/search`](/api-reference/endpoint/naver/search) on each suggestion.
+</Tip>

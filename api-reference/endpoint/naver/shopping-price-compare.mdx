@@ -1,0 +1,117 @@
+---
+title: "Shopping Price Compare"
+api: "GET https://scrapebadger.com/v1/naver/shopping/price-compare"
+description: "Seller offers per catalog product from Naver's 가격비교 (price-comparison) page — the lowest-price mall rows for each catalog match."
+---
+
+Fetch **seller offers per catalog product** from Naver's 가격비교 (price-comparison) page. For each catalog entry matching the query you get the catalog identity, the total offer count and the first few lowest-price seller rows.
+
+**Credits:** 5
+
+<Note>
+  Clears Naver's shopping captcha in a live browser session. One page of offers is served per call, and each catalog entry exposes its first 5 lowest-price rows.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords (1–200 chars).
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string" />
+<ResponseField name="entries" type="Entry[]">
+  Catalog entries matching the query.
+
+  <Expandable title="Entry">
+    <ResponseField name="catalog_id" type="string" />
+    <ResponseField name="catalog_name" type="string" />
+    <ResponseField name="offer_count" type="integer">Total seller offers for this catalog entry.</ResponseField>
+    <ResponseField name="best_price" type="integer">Lowest price across sellers, in KRW.</ResponseField>
+    <ResponseField name="offers" type="Offer[]">
+      The first 5 lowest-price seller rows.
+
+      <Expandable title="Offer">
+        <ResponseField name="mall_name" type="string" />
+        <ResponseField name="price" type="integer">That mall's price in KRW.</ResponseField>
+        <ResponseField name="nv_mid" type="string" />
+        <ResponseField name="product_id" type="string" />
+        <ResponseField name="mall_seq" type="string" />
+        <ResponseField name="naver_pay" type="boolean">Whether the mall supports Naver Pay.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="price_by_mall" type="string">Raw upstream `lowPriceByMallNo` string for the same 5 malls.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="offers_note" type="string">A note describing the offer-row coverage.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/price-compare?query=다이슨+에어랩" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/price-compare?" +
+    new URLSearchParams({"query": "다이슨 에어랩"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/price-compare",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "다이슨 에어랩"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "다이슨 에어랩",
+  "entries": [
+    {
+      "catalog_id": "82614000777",
+      "catalog_name": "다이슨 에어랩 컴플리트 롱",
+      "offer_count": 214,
+      "best_price": 529000,
+      "offers": [
+        {
+          "mall_name": "다이슨 공식스토어",
+          "price": 529000,
+          "nv_mid": "82614000777",
+          "product_id": "7008888001",
+          "mall_seq": "41021",
+          "naver_pay": true
+        }
+      ],
+      "price_by_mall": "82614000777/41021/7008888001/529000/1/..."
+    }
+  ],
+  "offers_note": "First 5 low-price rows per catalog entry."
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

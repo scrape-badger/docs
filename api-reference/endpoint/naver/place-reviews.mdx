@@ -1,0 +1,102 @@
+---
+title: "Get Place Reviews"
+api: "GET https://scrapebadger.com/v1/naver/place/{place_id}/reviews"
+description: "Visitor reviews for a Naver Place — rating, body, author, visit count, voted keywords and photos per review."
+---
+
+Fetch the visitor review stream for a Naver Place. Each review carries its
+rating, body text, author, how many times they have visited, the voted
+keywords (Naver's structured "what was good" tags), any photos, and whether the
+owner has replied.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="place_id" type="string" required>
+  Naver Place id, e.g. `1234567890`. Take it from `place_id` on a
+  [`/local`](/api-reference/endpoint/naver/local) result.
+</ParamField>
+
+## Response
+
+<ResponseField name="place_id" type="string" />
+<ResponseField name="review_count" type="integer">Total reviews Naver reports for the place.</ResponseField>
+<ResponseField name="rating" type="number">Average visitor rating.</ResponseField>
+<ResponseField name="result_count" type="integer">Reviews returned in this response.</ResponseField>
+<ResponseField name="reviews" type="Review[]">
+  Visitor reviews.
+
+  <Expandable title="Review">
+    <ResponseField name="review_id" type="string" />
+    <ResponseField name="rating" type="number" />
+    <ResponseField name="body" type="string">Review text.</ResponseField>
+    <ResponseField name="author" type="string" />
+    <ResponseField name="visit_count" type="integer">How many times the author has visited.</ResponseField>
+    <ResponseField name="origin_type" type="string">Where the review originated, e.g. a receipt- or booking-verified visit.</ResponseField>
+    <ResponseField name="visited" type="string">Raw visit date as displayed by Naver.</ResponseField>
+    <ResponseField name="visited_at" type="string">ISO 8601 UTC visit date.</ResponseField>
+    <ResponseField name="voted_keywords" type="string[]">Naver's structured "what was good" tags, e.g. `음식이 맛있어요`.</ResponseField>
+    <ResponseField name="images" type="string[]">Photo URLs attached to the review.</ResponseField>
+    <ResponseField name="has_reply" type="boolean">Whether the owner has replied.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/place/1234567890/reviews" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/place/1234567890/reviews",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/place/1234567890/reviews",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "place_id": "1234567890",
+  "review_count": 1823,
+  "rating": 4.6,
+  "result_count": 10,
+  "reviews": [
+    {
+      "review_id": "5f3a9b2c7d1e",
+      "rating": 5,
+      "body": "봉골레 파스타가 정말 맛있었어요. 재방문 의사 100%입니다.",
+      "author": "맛집탐험가",
+      "visit_count": 3,
+      "origin_type": "receipt",
+      "visited": "2026.08.01.",
+      "visited_at": "2026-08-01T00:00:00+00:00",
+      "voted_keywords": ["음식이 맛있어요", "매장이 청결해요"],
+      "images": ["https://pup-review.example.net/5f3a9b2c7d1e_1.jpg"],
+      "has_reply": true
+    }
+  ]
+}
+```

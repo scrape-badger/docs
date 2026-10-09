@@ -1,0 +1,145 @@
+---
+title: "Shopping Product Search"
+api: "GET https://scrapebadger.com/v1/naver/shopping/search-products"
+description: "Product search across Naver Shopping via the mobile integrated-search finder preview — every preview page in one response."
+---
+
+Search products across Naver Shopping using the **mobile integrated-search shopping finder**. One call returns the complete finder preview (all preview pages at once), each product carrying its catalogue id, mall, price, discount, review score and category path.
+
+**Credits:** 5
+
+<Note>
+  This is the **finder preview** — one response holds every preview page. Deep full-catalog pagination is served by [`/shopping/search-catalog`](/api-reference/endpoint/naver/shopping-search-catalog).
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords.
+</ParamField>
+
+<ParamField query="tab" type="string" default="m_view">
+  Finder tab: `m_view` or `m_shop`.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string" />
+<ResponseField name="tab" type="string" />
+<ResponseField name="preview_only" type="boolean">Always `true` — see the note above.</ResponseField>
+<ResponseField name="result_count" type="integer" />
+<ResponseField name="total_pages" type="integer">Preview pages folded into this response.</ResponseField>
+<ResponseField name="products" type="Product[]">
+  Finder product cards.
+
+  <Expandable title="Product">
+    <ResponseField name="rank" type="integer" />
+    <ResponseField name="nv_mid" type="string">Naver Shopping catalogue id.</ResponseField>
+    <ResponseField name="product_id" type="string" />
+    <ResponseField name="channel_product_id" type="string" />
+    <ResponseField name="mall_id" type="string" />
+    <ResponseField name="mall_name" type="string" />
+    <ResponseField name="mall_url" type="string" />
+    <ResponseField name="product_name" type="string" />
+    <ResponseField name="product_url" type="string" />
+    <ResponseField name="sale_price" type="integer">List price in KRW.</ResponseField>
+    <ResponseField name="discounted_sale_price" type="integer" />
+    <ResponseField name="discounted_ratio" type="integer" />
+    <ResponseField name="price_currency" type="string" />
+    <ResponseField name="images" type="string[]" />
+    <ResponseField name="average_review_score" type="number" />
+    <ResponseField name="total_review_count" type="integer" />
+    <ResponseField name="purchase_count" type="integer" />
+    <ResponseField name="keep_count" type="integer">Wishlist (“찜”) count.</ResponseField>
+    <ResponseField name="is_ad" type="boolean" />
+    <ResponseField name="source_type" type="string">`AD` or `SAS`.</ResponseField>
+    <ResponseField name="l_cat_id" type="string">Large category id.</ResponseField>
+    <ResponseField name="m_cat_id" type="string">Medium category id.</ResponseField>
+    <ResponseField name="s_cat_id" type="string">Small category id.</ResponseField>
+    <ResponseField name="leaf_category_id" type="string" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/search-products?query=무선+이어폰&tab=m_view" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/search-products?" +
+    new URLSearchParams({"query": "무선 이어폰", "tab": "m_view"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/search-products",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "무선 이어폰", "tab": "m_view"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "무선 이어폰",
+  "tab": "m_view",
+  "preview_only": true,
+  "result_count": 80,
+  "total_pages": 10,
+  "products": [
+    {
+      "rank": 1,
+      "nv_mid": "82613579214",
+      "product_id": "5123456789",
+      "channel_product_id": "7001234567",
+      "mall_id": "samsung",
+      "mall_name": "삼성전자 공식스토어",
+      "mall_url": "https://brand.naver.com/samsung",
+      "product_name": "삼성전자 갤럭시 버즈3 프로",
+      "product_url": "https://shopping.naver.com/catalog/82613579214",
+      "sale_price": 279000,
+      "discounted_sale_price": 229000,
+      "discounted_ratio": 18,
+      "price_currency": "KRW",
+      "images": [
+        "https://shopping-phinf.example.net/82613579214.jpg"
+      ],
+      "average_review_score": 4.8,
+      "total_review_count": 12043,
+      "purchase_count": 5321,
+      "keep_count": 8820,
+      "is_ad": false,
+      "source_type": "SAS",
+      "l_cat_id": "50000003",
+      "m_cat_id": "50000151",
+      "s_cat_id": "50000806",
+      "leaf_category_id": "50002345"
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

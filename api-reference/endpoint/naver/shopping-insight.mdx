@@ -1,0 +1,114 @@
+---
+title: "Shopping Insight"
+api: "GET https://scrapebadger.com/v1/naver/shopping/insight"
+description: "Naver Shopping keyword insight — the ranked top search keywords for a category over a date range."
+---
+
+Fetch Naver Shopping's keyword insight ranking — the top search keywords for a
+category over a date range. Use it to see what shoppers in a category are
+actually searching for.
+
+**Credits:** 5
+
+<Note>
+  This endpoint returns Naver Shopping's **ranking data only**. General product
+  search and SmartStore storefront listings are not offered.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="category_id" type="string" required>
+  Naver Shopping category id to rank keywords within.
+</ParamField>
+
+<ParamField query="start_date" type="string" required>
+  Start of the date range, `YYYY-MM-DD`.
+</ParamField>
+
+<ParamField query="end_date" type="string" required>
+  End of the date range, `YYYY-MM-DD`.
+</ParamField>
+
+<ParamField query="time_unit" type="string" default="date">
+  Aggregation unit, e.g. `date`, `week`, `month`.
+</ParamField>
+
+<ParamField query="count" type="integer" default="20">
+  Number of keywords to return.
+</ParamField>
+
+## Response
+
+<ResponseField name="category_id" type="string">Echo of the requested category.</ResponseField>
+<ResponseField name="date_range" type="string">The date range the ranking covers.</ResponseField>
+<ResponseField name="result_count" type="integer">Keywords returned.</ResponseField>
+<ResponseField name="keywords" type="Keyword[]">
+  Ranked keywords.
+
+  <Expandable title="Keyword">
+    <ResponseField name="rank" type="integer">1-based rank.</ResponseField>
+    <ResponseField name="keyword" type="string">The search keyword.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/insight?category_id=50000000&start_date=2026-08-01&end_date=2026-08-07&time_unit=date&count=20" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/insight?" +
+    new URLSearchParams({
+      category_id: "50000000",
+      start_date: "2026-08-01",
+      end_date: "2026-08-07",
+      time_unit: "date",
+      count: "20",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/insight",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "category_id": "50000000",
+        "start_date": "2026-08-01",
+        "end_date": "2026-08-07",
+        "time_unit": "date",
+        "count": 20,
+    },
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "category_id": "50000000",
+  "date_range": "2026-08-01 ~ 2026-08-07",
+  "result_count": 20,
+  "keywords": [
+    { "rank": 1, "keyword": "반팔티" },
+    { "rank": 2, "keyword": "린넨 셔츠" },
+    { "rank": 3, "keyword": "샌들" }
+  ]
+}
+```

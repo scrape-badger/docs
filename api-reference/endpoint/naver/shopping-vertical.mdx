@@ -1,0 +1,102 @@
+---
+title: "Shopping Vertical"
+api: "GET https://scrapebadger.com/v1/naver/shopping/verticals/{vertical}"
+description: "Curated Naver Shopping products for a named snxbest vertical such as fashiontown, shoppinglive or logistics."
+---
+
+Fetch the **curated product list for a named Naver Shopping vertical** — the editorial feeds behind the `fashiontown`, `shoppinglive` and `logistics` sections. Returns a fixed set of 12 curated products.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="vertical" type="string" required>
+  One of `fashiontown`, `shoppinglive` or `logistics`.
+</ParamField>
+
+## Response
+
+<ResponseField name="vertical" type="string">Echo of the requested vertical.</ResponseField>
+<ResponseField name="result_count" type="integer">Products returned (12).</ResponseField>
+<ResponseField name="products" type="Product[]">
+  Curated products — same shape as a [`/shopping/deals`](/api-reference/endpoint/naver/shopping-deals) product.
+
+  <Expandable title="Product">
+    <ResponseField name="rank" type="integer" />
+    <ResponseField name="nv_mid" type="string" />
+    <ResponseField name="title" type="string" />
+    <ResponseField name="image_url" type="string" />
+    <ResponseField name="link_url" type="string" />
+    <ResponseField name="price" type="integer" />
+    <ResponseField name="discount_price" type="integer" />
+    <ResponseField name="discount_rate" type="integer" />
+    <ResponseField name="labels" type="string[]" />
+    <ResponseField name="is_ad" type="boolean" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/verticals/fashiontown" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/verticals/fashiontown",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/verticals/fashiontown",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "vertical": "fashiontown",
+  "result_count": 12,
+  "products": [
+    {
+      "rank": 1,
+      "nv_mid": "82613579300",
+      "title": "남성 오버핏 셔츠",
+      "image_url": "https://shopping-phinf.example.net/82613579300.jpg",
+      "link_url": "https://shopping.naver.com/catalog/82613579300",
+      "price": 49000,
+      "discount_price": 34300,
+      "discount_rate": 30,
+      "labels": [
+        "무료배송"
+      ],
+      "is_ad": false
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

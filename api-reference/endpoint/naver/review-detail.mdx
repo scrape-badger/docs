@@ -1,0 +1,96 @@
+---
+title: "Get Review Detail"
+api: "GET https://scrapebadger.com/v1/naver/reviews/{review_id}"
+description: "Commerce review detail by review id — fetch one or more Naver storefront reviews by their ids."
+---
+
+Fetch **commerce review detail** by review id. Accepts one or more comma-separated ids and returns the full review objects, reporting any ids that could not be found.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="review_id" type="string" required>
+  A review id, or several comma-separated ids.
+</ParamField>
+
+## Response
+
+<ResponseField name="requested_ids" type="string[]">The ids requested.</ResponseField>
+<ResponseField name="reviews" type="ReviewDetail[]">
+  The resolved reviews.
+
+  <Expandable title="ReviewDetail">
+    <ResponseField name="review_id" type="string" />
+    <ResponseField name="rating" type="integer" />
+    <ResponseField name="content" type="string" />
+    <ResponseField name="author_masked" type="string" />
+    <ResponseField name="created_at" type="string" />
+    <ResponseField name="images" type="string[]" />
+  </Expandable>
+</ResponseField>
+<ResponseField name="missing_ids" type="string[]">Requested ids that could not be resolved.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/reviews/r900100" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/reviews/r900100",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/reviews/r900100",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "requested_ids": [
+    "r900100"
+  ],
+  "reviews": [
+    {
+      "review_id": "r900100",
+      "rating": 5,
+      "content": "사이즈 정사이즈이고 배송 빨라요",
+      "author_masked": "kim****",
+      "created_at": "2026-07-28T00:00:00+09:00",
+      "images": [
+        "https://review-phinf.example.net/r900100.jpg"
+      ]
+    }
+  ],
+  "missing_ids": []
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

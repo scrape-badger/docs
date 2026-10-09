@@ -1,0 +1,82 @@
+---
+title: "Get Group Review Summary"
+api: "GET https://scrapebadger.com/v1/naver/product-groups/{group_product_no}/review-summary"
+description: "Group-level rating summary for a Naver storefront variant group — the combined score and review count across variants."
+---
+
+Fetch the **group-level rating summary** for a storefront variant group — the combined average score and review count across all variants. Same shape as the per-product [`/products/{origin_product_no}/review-summary`](/api-reference/endpoint/naver/product-review-summary).
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="group_product_no" type="string" required>
+  The variant group's product number (from [`/products/{origin_product_no}/group`](/api-reference/endpoint/naver/product-group)).
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="leaf_category_id" type="string" required>
+  Leaf category id for the group.
+</ParamField>
+
+## Response
+
+<ResponseField name="group_product_no" type="string" />
+<ResponseField name="leaf_category_id" type="string" />
+<ResponseField name="review_count" type="integer" />
+<ResponseField name="average_review_score" type="number" />
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/product-groups/G100200300/review-summary?leaf_category_id=50002345" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/product-groups/G100200300/review-summary?" +
+    new URLSearchParams({"leaf_category_id": "50002345"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/product-groups/G100200300/review-summary",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"leaf_category_id": "50002345"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "group_product_no": "G100200300",
+  "leaf_category_id": "50002345",
+  "review_count": 15320,
+  "average_review_score": 4.7
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

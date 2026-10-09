@@ -1,0 +1,78 @@
+---
+title: "Get Review SSR Queries"
+api: "GET https://scrapebadger.com/v1/naver/reviews/{review_id}/ssr-queries"
+description: "The server-rendered page query recipes for a review — a continuation helper that exposes the queries behind the review page."
+---
+
+A **continuation helper** that returns the server-rendered page query recipes behind a review — the queries and variables the review page itself issues. Useful for advanced continuation and debugging.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="review_id" type="string" required>
+  The review id.
+</ParamField>
+
+## Response
+
+<ResponseField name="review_id" type="string" />
+<ResponseField name="source_url" type="string">The review page the recipes were extracted from.</ResponseField>
+<ResponseField name="queries" type="object">The query recipes keyed by name.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/reviews/r900100/ssr-queries" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/reviews/r900100/ssr-queries",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/reviews/r900100/ssr-queries",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "review_id": "r900100",
+  "source_url": "https://m.smartstore.naver.com/plusink/products/5123456789/reviews/r900100",
+  "queries": {
+    "getReviewDetail": {
+      "variables": {
+        "reviewId": "r900100"
+      }
+    }
+  }
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

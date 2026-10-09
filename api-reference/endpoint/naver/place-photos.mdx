@@ -1,0 +1,118 @@
+---
+title: "Get Place Photos"
+api: "GET https://scrapebadger.com/v1/naver/place/{place_id}/photos"
+description: "Photo viewer for a Naver Place — visitor-review or owner photos with full-resolution URLs and cursor pagination."
+---
+
+Fetch the photo stream for a single Naver Place. Choose between visitor-review photos and the owner/place photos. Each entry carries the full-resolution and thumbnail URLs, dimensions, a caption and a date. Results are cursor-paginated.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="place_id" type="string" required>
+  Naver Place id (digits), e.g. `1234567890`. Take it from a [`/local`](/api-reference/endpoint/naver/local) result.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="media_source" type="string" default="placeReview">
+  `placeReview` for visitor-review photos, or `biz` for the owner/place photos.
+</ParamField>
+
+<ParamField query="cursor" type="string">
+  Opaque pagination cursor. Pass the `next_cursor` from the previous response to fetch the next batch.
+</ParamField>
+
+## Response
+
+<ResponseField name="place_id" type="string" />
+<ResponseField name="media_source" type="string">Echo of the requested source.</ResponseField>
+<ResponseField name="result_count" type="integer">Photos returned in this batch.</ResponseField>
+<ResponseField name="photos" type="Photo[]">
+  Photos (batch size varies, ~40–60).
+
+  <Expandable title="Photo">
+    <ResponseField name="photo_id" type="string" />
+    <ResponseField name="original_url" type="string">Full-resolution media URL.</ResponseField>
+    <ResponseField name="thumbnail_url" type="string" />
+    <ResponseField name="width" type="integer" />
+    <ResponseField name="height" type="integer" />
+    <ResponseField name="title" type="string">Caption, when present.</ResponseField>
+    <ResponseField name="date_text" type="string">Date as displayed.</ResponseField>
+    <ResponseField name="media_format" type="string">`image` or `video`.</ResponseField>
+    <ResponseField name="media_source" type="string" />
+    <ResponseField name="rating" type="integer">Rating from the attached review, when present.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="next_cursor" type="string">Cursor for the next batch, or `null` at the end.</ResponseField>
+<ResponseField name="has_next" type="boolean">Whether another batch is available.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/place/1234567890/photos?media_source=placeReview" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/place/1234567890/photos?" +
+    new URLSearchParams({"media_source": "placeReview"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/place/1234567890/photos",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"media_source": "placeReview"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "place_id": "1234567890",
+  "media_source": "placeReview",
+  "result_count": 48,
+  "photos": [
+    {
+      "photo_id": "a1b2c3",
+      "original_url": "https://pup-review-phinf.example.net/a1b2c3.jpg",
+      "thumbnail_url": "https://pup-review-phinf.example.net/a1b2c3_t.jpg",
+      "width": 1080,
+      "height": 1080,
+      "title": "봉골레 파스타",
+      "date_text": "2026.07.02.",
+      "media_format": "image",
+      "media_source": "placeReview",
+      "rating": 5
+    }
+  ],
+  "next_cursor": "eyJsYXN0Q3Vyc29yIjoiNDgifQ==",
+  "has_next": true
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

@@ -1,0 +1,137 @@
+---
+title: "Shopping Bestsellers"
+api: "GET https://scrapebadger.com/v1/naver/shopping/bestsellers"
+description: "Naver Shopping bestseller product rankings by category, age bracket, sort metric and period."
+---
+
+Fetch Naver Shopping's bestseller product rankings. Scope the chart by
+category, age bracket, the metric it is sorted by and the period. Each product
+carries its rank, the `nv_mid` catalogue id, title, price, discount, review
+score and count, mall name and imagery.
+
+**Credits:** 5
+
+<Note>
+  This endpoint returns Naver Shopping's **ranking data only**. General product
+  search and SmartStore storefront listings are not offered.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="category_id" type="string" default="ALL">
+  Category to rank within. `ALL` for the overall chart, or a Naver Shopping
+  category id.
+</ParamField>
+
+<ParamField query="age_type" type="string" default="ALL">
+  Age bracket to rank for. `ALL`, or a specific bracket.
+</ParamField>
+
+<ParamField query="sort_type" type="string" default="PRODUCT_CLICK">
+  The metric the chart is sorted by, e.g. `PRODUCT_CLICK`.
+</ParamField>
+
+<ParamField query="period_type" type="string" default="DAILY">
+  The ranking period, e.g. `DAILY`.
+</ParamField>
+
+## Response
+
+<ResponseField name="category_id" type="string">Echo of the requested category.</ResponseField>
+<ResponseField name="age_type" type="string">Echo of the requested age bracket.</ResponseField>
+<ResponseField name="sort_type" type="string">Echo of the requested sort metric.</ResponseField>
+<ResponseField name="period_type" type="string">Echo of the requested period.</ResponseField>
+<ResponseField name="sync_date" type="string">When Naver last synced this ranking.</ResponseField>
+<ResponseField name="result_count" type="integer">Products returned.</ResponseField>
+<ResponseField name="products" type="Product[]">
+  Ranked products.
+
+  <Expandable title="Product">
+    <ResponseField name="rank" type="integer">1-based rank in the chart.</ResponseField>
+    <ResponseField name="nv_mid" type="string">Naver Shopping catalogue id.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="price" type="integer">List price in KRW.</ResponseField>
+    <ResponseField name="discount_price" type="integer">Discounted price in KRW, when on offer.</ResponseField>
+    <ResponseField name="discount_rate" type="integer">Discount percentage, when on offer.</ResponseField>
+    <ResponseField name="review_score" type="number">Average review score.</ResponseField>
+    <ResponseField name="review_count" type="integer" />
+    <ResponseField name="mall_name" type="string">The mall selling the product.</ResponseField>
+    <ResponseField name="product_url" type="string" />
+    <ResponseField name="image_url" type="string" />
+    <ResponseField name="is_ad" type="boolean">Whether the entry is a sponsored placement.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/bestsellers?category_id=ALL&age_type=ALL&sort_type=PRODUCT_CLICK&period_type=DAILY" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/bestsellers?" +
+    new URLSearchParams({
+      category_id: "ALL",
+      age_type: "ALL",
+      sort_type: "PRODUCT_CLICK",
+      period_type: "DAILY",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/bestsellers",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "category_id": "ALL",
+        "age_type": "ALL",
+        "sort_type": "PRODUCT_CLICK",
+        "period_type": "DAILY",
+    },
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "category_id": "ALL",
+  "age_type": "ALL",
+  "sort_type": "PRODUCT_CLICK",
+  "period_type": "DAILY",
+  "sync_date": "2026-08-07T00:00:00+00:00",
+  "result_count": 100,
+  "products": [
+    {
+      "rank": 1,
+      "nv_mid": "82613579214",
+      "title": "삼성전자 갤럭시 버즈3 프로",
+      "price": 279000,
+      "discount_price": 229000,
+      "discount_rate": 18,
+      "review_score": 4.8,
+      "review_count": 12043,
+      "mall_name": "삼성전자 공식스토어",
+      "product_url": "https://shopping.naver.com/catalog/82613579214",
+      "image_url": "https://shopping-phinf.example.net/82613579214.jpg",
+      "is_ad": false
+    }
+  ]
+}
+```

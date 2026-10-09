@@ -1,0 +1,108 @@
+---
+title: "Get Store Profile"
+api: "GET https://scrapebadger.com/v1/naver/stores/{store_url}"
+description: "Naver SmartStore / Brand Store seller profile — channel name, description, logo, follower and sale counts, seller grade."
+---
+
+Fetch a **Naver SmartStore or Brand Store seller profile** by its storefront slug. Returns the channel name and description, logo, SNS links, follower and sale counts, seller grade, CS response ratio and business type.
+
+**Credits:** 5
+
+<Note>
+  Personal identity fields (names, phone numbers, addresses, emails) are masked and omitted from the response.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="store_url" type="string" required>
+  Storefront slug, e.g. `plusink` or `drbrian`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="host" type="string" default="smartstore">
+  Storefront host: `smartstore` or `brand`.
+</ParamField>
+
+## Response
+
+<ResponseField name="store_url" type="string" />
+<ResponseField name="host" type="string" />
+<ResponseField name="channel_uid" type="string" />
+<ResponseField name="channel_no" type="string" />
+<ResponseField name="channel_name" type="string" />
+<ResponseField name="description" type="string" />
+<ResponseField name="logo_url" type="string" />
+<ResponseField name="sns" type="object">Social links the store publishes.</ResponseField>
+<ResponseField name="follower_count" type="integer" />
+<ResponseField name="seller_grade" type="string" />
+<ResponseField name="sale_count" type="integer" />
+<ResponseField name="cs_response_ratio" type="string" />
+<ResponseField name="business_type" type="string" />
+<ResponseField name="represent_type" type="string" />
+<ResponseField name="channel_service_type" type="string" />
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/stores/plusink?host=smartstore" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/stores/plusink?" +
+    new URLSearchParams({"host": "smartstore"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/stores/plusink",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"host": "smartstore"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "store_url": "plusink",
+  "host": "smartstore",
+  "channel_uid": "2sV!abc123",
+  "channel_no": "10012345",
+  "channel_name": "플러스잉크",
+  "description": "정품 프린터 잉크 전문 스토어",
+  "logo_url": "https://shop-phinf.example.net/logo/plusink.jpg",
+  "sns": {},
+  "follower_count": 48213,
+  "seller_grade": "빅파워",
+  "sale_count": 152043,
+  "cs_response_ratio": "98%",
+  "business_type": "법인",
+  "represent_type": "SmartStore",
+  "channel_service_type": "STOREFARM"
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

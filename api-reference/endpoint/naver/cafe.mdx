@@ -1,0 +1,105 @@
+---
+title: "Cafe Search"
+api: "GET https://scrapebadger.com/v1/naver/cafe"
+description: "Search the Naver Cafe vertical — community posts with cafe name, snippet, comment count and absolute publish times."
+---
+
+Search the **Naver Cafe** vertical — posts from Naver's community forums. Each result carries the post title and URL, the hosting cafe's name and URL, a snippet, the comment count and an absolute publish timestamp. Returns 30 results per page.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  1-based result page. Each page returns 30 posts.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string" />
+<ResponseField name="page" type="integer" />
+<ResponseField name="result_count" type="integer">Posts returned in this response.</ResponseField>
+<ResponseField name="results" type="CafePost[]">
+  Cafe posts.
+
+  <Expandable title="CafePost">
+    <ResponseField name="position" type="integer">1-based rank within this page.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="url" type="string">Post URL.</ResponseField>
+    <ResponseField name="cafe_name" type="string">The hosting cafe's name.</ResponseField>
+    <ResponseField name="cafe_url" type="string">The hosting cafe's URL.</ResponseField>
+    <ResponseField name="snippet" type="string" />
+    <ResponseField name="published" type="string">Publish time as shown by Naver.</ResponseField>
+    <ResponseField name="published_at" type="string">Absolute publish timestamp (ISO 8601).</ResponseField>
+    <ResponseField name="comment_count" type="integer" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/cafe?query=캠핑+장비+추천&page=1" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/cafe?" +
+    new URLSearchParams({"query": "캠핑 장비 추천", "page": "1"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/cafe",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "캠핑 장비 추천", "page": "1"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "캠핑 장비 추천",
+  "page": 1,
+  "result_count": 30,
+  "results": [
+    {
+      "position": 1,
+      "title": "입문자용 캠핑 장비 추천 리스트",
+      "url": "https://cafe.naver.com/camping/123456",
+      "cafe_name": "캠핑러버",
+      "cafe_url": "https://cafe.naver.com/camping",
+      "snippet": "처음 캠핑 시작하시는 분들께...",
+      "published": "2026.08.05.",
+      "published_at": "2026-08-05T00:00:00+09:00",
+      "comment_count": 42
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

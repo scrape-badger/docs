@@ -1,0 +1,111 @@
+---
+title: "Shopping Search Filters"
+api: "GET https://scrapebadger.com/v1/naver/shopping/search-filters"
+description: "Query-dependent filter facets (brand, attribute) for a Naver Shopping product search."
+---
+
+Return the **filter facets** Naver offers for a product-search query — the brand and attribute filters, each with its selectable values and ids. Feed a value id into [`/shopping/search-filtered`](/api-reference/endpoint/naver/shopping-search-filtered) to narrow a search.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string" />
+<ResponseField name="result_count" type="integer">Filter facets returned.</ResponseField>
+<ResponseField name="filters" type="Filter[]">
+  Filter facets.
+
+  <Expandable title="Filter">
+    <ResponseField name="id" type="string" />
+    <ResponseField name="name" type="string" />
+    <ResponseField name="filter_name" type="string" />
+    <ResponseField name="type" type="string">`BRAND`, `ATTRIBUTE`, …</ResponseField>
+    <ResponseField name="source_type" type="string" />
+    <ResponseField name="values" type="Value[]">
+      Selectable values.
+
+      <Expandable title="Value">
+        <ResponseField name="id" type="string" />
+        <ResponseField name="name" type="string" />
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="category_id" type="string">The dominant category for this query, when Naver resolves one.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/search-filters?query=무선+이어폰" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/search-filters?" +
+    new URLSearchParams({"query": "무선 이어폰"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/search-filters",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "무선 이어폰"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "무선 이어폰",
+  "result_count": 2,
+  "filters": [
+    {
+      "id": "brand",
+      "name": "브랜드",
+      "filter_name": "brand",
+      "type": "BRAND",
+      "source_type": "FINDER",
+      "values": [
+        {
+          "id": "12345",
+          "name": "삼성전자"
+        },
+        {
+          "id": "23456",
+          "name": "애플"
+        }
+      ]
+    }
+  ],
+  "category_id": "50000151"
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

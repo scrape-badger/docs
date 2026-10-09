@@ -1,0 +1,106 @@
+---
+title: "Get Store Categories"
+api: "GET https://scrapebadger.com/v1/naver/stores/{store_url}/categories"
+description: "The display-category tree of a Naver SmartStore / Brand Store storefront."
+---
+
+Fetch the **display-category tree** of a storefront — the seller-defined categories shoppers browse the store by, returned recursively with level and sort order.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="store_url" type="string" required>
+  Storefront slug.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="host" type="string" default="smartstore">
+  Storefront host: `smartstore` or `brand`.
+</ParamField>
+
+## Response
+
+<ResponseField name="store_url" type="string" />
+<ResponseField name="host" type="string" />
+<ResponseField name="result_count" type="integer" />
+<ResponseField name="categories" type="Category[]">
+  Display categories.
+
+  <Expandable title="Category">
+    <ResponseField name="category_id" type="string" />
+    <ResponseField name="parent_category_id" type="string" />
+    <ResponseField name="name" type="string" />
+    <ResponseField name="level" type="integer" />
+    <ResponseField name="sort_order" type="integer" />
+    <ResponseField name="all_product_category" type="boolean">Whether this is the catch-all “전체상품” node.</ResponseField>
+    <ResponseField name="exposure" type="boolean" />
+    <ResponseField name="type" type="string" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/stores/plusink/categories?host=smartstore" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/stores/plusink/categories?" +
+    new URLSearchParams({"host": "smartstore"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/stores/plusink/categories",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"host": "smartstore"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "store_url": "plusink",
+  "host": "smartstore",
+  "result_count": 4,
+  "categories": [
+    {
+      "category_id": "1000000001",
+      "parent_category_id": null,
+      "name": "전체상품",
+      "level": 1,
+      "sort_order": 0,
+      "all_product_category": true,
+      "exposure": true,
+      "type": "MANUAL"
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

@@ -1,0 +1,95 @@
+---
+title: "Shopping Category Tree"
+api: "GET https://scrapebadger.com/v1/naver/shopping/category-tree"
+description: "One level of the Naver Shopping ranking category tree — DIV1 roots, or the DIV2 children of a parent id."
+---
+
+Walk the **Naver Shopping ranking category tree** one level at a time. With no `parent_id` it returns the DIV1 root categories; pass a `parent_id` to return that node's DIV2 children. Each node carries its full ancestor id/name chain.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="parent_id" type="string">
+  A DIV1 category id to list its DIV2 children. Omit for the roots.
+</ParamField>
+
+## Response
+
+<ResponseField name="parent_id" type="string">Echo of the requested parent, or `null` for roots.</ResponseField>
+<ResponseField name="level" type="string">The depth returned, e.g. `DIV1` or `DIV2`.</ResponseField>
+<ResponseField name="result_count" type="integer" />
+<ResponseField name="categories" type="Category[]">
+  Categories at this level.
+
+  <Expandable title="Category">
+    <ResponseField name="type" type="string" />
+    <ResponseField name="category_id" type="string" />
+    <ResponseField name="category_name" type="string" />
+    <ResponseField name="cat_id_1..N" type="string">Ancestor category ids, root to leaf.</ResponseField>
+    <ResponseField name="cat_nm_1..N" type="string">Ancestor category names, root to leaf.</ResponseField>
+    <ResponseField name="image_url" type="string" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/category-tree?parent_id=50000000" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/category-tree?" +
+    new URLSearchParams({"parent_id": "50000000"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/category-tree",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"parent_id": "50000000"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "parent_id": "50000000",
+  "level": "DIV2",
+  "result_count": 12,
+  "categories": [
+    {
+      "type": "DIV2",
+      "category_id": "50000167",
+      "category_name": "원피스",
+      "cat_id_1": "50000000",
+      "cat_nm_1": "패션의류",
+      "image_url": "https://shopping-phinf.example.net/cat/50000167.jpg"
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

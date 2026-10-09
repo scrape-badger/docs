@@ -1,0 +1,92 @@
+---
+title: "List Live Channel Broadcasts"
+api: "GET https://scrapebadger.com/v1/naver/shopping/live/channels/{channel_id}/broadcasts"
+description: "Broadcast list for a Naver Shopping Live channel, including upcoming standby schedule cards."
+---
+
+List a **Shopping Live channel's broadcasts** — past, live and upcoming — including the STANDBY schedule cards for broadcasts not yet started. Cursor-paginated.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="channel_id" type="string" required>
+  Shopping Live channel id.
+</ParamField>
+
+## Response
+
+<ResponseField name="channel_id" type="string" />
+<ResponseField name="count" type="integer" />
+<ResponseField name="next" type="string">Cursor for the next page, or `null` at the end.</ResponseField>
+<ResponseField name="result_count" type="integer" />
+<ResponseField name="broadcasts" type="Broadcast[]">
+  Broadcast cards.
+
+  <Expandable title="Broadcast">
+    <ResponseField name="id" type="string" />
+    <ResponseField name="title" type="string" />
+    <ResponseField name="status" type="string">e.g. `ONAIR`, `END`, `STANDBY`.</ResponseField>
+    <ResponseField name="expectedStartDate" type="string" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/live/channels/abcde/broadcasts" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/live/channels/abcde/broadcasts",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/live/channels/abcde/broadcasts",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "channel_id": "abcde",
+  "count": 42,
+  "next": "20",
+  "result_count": 20,
+  "broadcasts": [
+    {
+      "id": "1234567",
+      "title": "여름 침구 특가 라이브",
+      "status": "END",
+      "expectedStartDate": "2026-08-01T20:00:00+09:00"
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

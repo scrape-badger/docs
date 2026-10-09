@@ -1,0 +1,110 @@
+---
+title: "Video Search"
+api: "GET https://scrapebadger.com/v1/naver/video"
+description: "Search the Naver video vertical — 48 videos per page with duration, channel, view count and thumbnail."
+---
+
+Search the **Naver video** vertical, which aggregates videos across YouTube, Naver TV and other sources. Each result carries the title and URL, duration, channel name and URL, view count, source and an absolute publish timestamp. Returns 48 videos per page.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  1-based result page. Each page returns up to 48 videos.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string" />
+<ResponseField name="page" type="integer" />
+<ResponseField name="result_count" type="integer" />
+<ResponseField name="results" type="VideoResult[]">
+  Videos.
+
+  <Expandable title="VideoResult">
+    <ResponseField name="position" type="integer" />
+    <ResponseField name="title" type="string" />
+    <ResponseField name="url" type="string">Video URL.</ResponseField>
+    <ResponseField name="duration" type="string">Runtime as displayed, e.g. `12:04`.</ResponseField>
+    <ResponseField name="channel" type="string" />
+    <ResponseField name="channel_url" type="string" />
+    <ResponseField name="channel_thumbnail_url" type="string" />
+    <ResponseField name="source" type="string">Platform, e.g. `YouTube`, `네이버TV`.</ResponseField>
+    <ResponseField name="view_count" type="integer" />
+    <ResponseField name="thumbnail_url" type="string" />
+    <ResponseField name="published" type="string" />
+    <ResponseField name="published_at" type="string">Absolute publish timestamp (ISO 8601).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/video?query=제주도+브이로그&page=1" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/video?" +
+    new URLSearchParams({"query": "제주도 브이로그", "page": "1"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/video",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "제주도 브이로그", "page": "1"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "제주도 브이로그",
+  "page": 1,
+  "result_count": 48,
+  "results": [
+    {
+      "position": 1,
+      "title": "제주도 3박4일 브이로그",
+      "url": "https://tv.naver.com/v/12345",
+      "duration": "12:04",
+      "channel": "여행하는쩡",
+      "channel_url": "https://tv.naver.com/jjeong",
+      "source": "네이버TV",
+      "view_count": 48213,
+      "thumbnail_url": "https://video-phinf.example.net/12345.jpg",
+      "published": "2026.06.01.",
+      "published_at": "2026-06-01T00:00:00+09:00"
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

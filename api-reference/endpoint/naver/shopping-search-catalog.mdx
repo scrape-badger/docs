@@ -1,0 +1,165 @@
+---
+title: "Shopping Catalog Search"
+api: "GET https://scrapebadger.com/v1/naver/shopping/search-catalog"
+description: "Full-catalog Naver Shopping search — deep, paginated product results (pages 1–5) with sort control."
+---
+
+Run a **full-catalog Naver Shopping search** against `search.shopping.naver.com`. Unlike the finder preview, this is the deep catalog feed with sort control and pagination through pages 1–5. Each product carries its catalogue identity, price, review stats, delivery fee and category path.
+
+**Credits:** 5
+
+<Note>
+  This endpoint clears Naver's shopping captcha in a live browser session, so it is the heaviest Naver call and a page can take up to ~90 seconds. Pages are capped at 5; sorted lists are capped upstream at ~120 items. Sponsored rows stay in `products` flagged `is_ad`.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords (1–200 chars).
+</ParamField>
+
+<ParamField query="sort" type="string" default="RECOMMEND">
+  `RECOMMEND`, `LOW_PRICE`, `HIGH_PRICE`, `PURCHASE`, `REVIEW` or `RECENT`.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  1-based page, `1`–`5`. Page 1 is the SSR page; pages 2+ use the catalog XHR.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string" />
+<ResponseField name="sort" type="string" />
+<ResponseField name="page" type="integer" />
+<ResponseField name="page_size" type="integer" />
+<ResponseField name="total" type="integer">Total catalog matches, when Naver reports it.</ResponseField>
+<ResponseField name="cursor" type="integer">Cursor for the next page, when present.</ResponseField>
+<ResponseField name="has_more" type="boolean">Whether another page is available (within the 5-page cap).</ResponseField>
+<ResponseField name="result_count" type="integer" />
+<ResponseField name="preview_only" type="boolean">Always `false` — this is the full catalog feed.</ResponseField>
+<ResponseField name="products" type="Product[]">
+  Catalog products.
+
+  <Expandable title="Product">
+    <ResponseField name="rank" type="integer" />
+    <ResponseField name="nv_mid" type="string">Naver Shopping catalogue id.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="price" type="integer" />
+    <ResponseField name="discounted_price" type="integer" />
+    <ResponseField name="discount_rate" type="integer" />
+    <ResponseField name="image_url" type="string" />
+    <ResponseField name="product_url" type="string" />
+    <ResponseField name="channel_product_id" type="string" />
+    <ResponseField name="mall_name" type="string" />
+    <ResponseField name="mall_id" type="string" />
+    <ResponseField name="mall_seq" type="string" />
+    <ResponseField name="review_score" type="number" />
+    <ResponseField name="review_count" type="integer" />
+    <ResponseField name="delivery_fee" type="integer" />
+    <ResponseField name="category_path" type="string[]" />
+    <ResponseField name="leaf_category_id" type="string" />
+    <ResponseField name="is_ad" type="boolean" />
+  </Expandable>
+</ResponseField>
+<ResponseField name="pages" type="PageSummary[]">
+  Per-page summary, including the overlap count with earlier pages.
+
+  <Expandable title="PageSummary">
+    <ResponseField name="page" type="integer" />
+    <ResponseField name="result_count" type="integer" />
+    <ResponseField name="repeated_count" type="integer">Items on this page already seen on an earlier page.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="source_url" type="string" />
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/search-catalog?query=로봇청소기&sort=LOW_PRICE&page=1" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/search-catalog?" +
+    new URLSearchParams({"query": "로봇청소기", "sort": "LOW_PRICE", "page": "1"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/search-catalog",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "로봇청소기", "sort": "LOW_PRICE", "page": "1"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "로봇청소기",
+  "sort": "LOW_PRICE",
+  "page": 1,
+  "page_size": 40,
+  "total": 1200,
+  "cursor": 41,
+  "has_more": true,
+  "result_count": 40,
+  "preview_only": false,
+  "products": [
+    {
+      "rank": 1,
+      "nv_mid": "82613999001",
+      "title": "로보락 S8 로봇청소기",
+      "price": 899000,
+      "discounted_price": 799000,
+      "discount_rate": 11,
+      "image_url": "https://shopping-phinf.example.net/82613999001.jpg",
+      "product_url": "https://shopping.naver.com/catalog/82613999001",
+      "channel_product_id": "7009999001",
+      "mall_name": "로보락 공식스토어",
+      "mall_id": "roborock",
+      "mall_seq": "55123",
+      "review_score": 4.7,
+      "review_count": 8842,
+      "delivery_fee": 0,
+      "category_path": [
+        "디지털/가전",
+        "생활가전",
+        "청소기"
+      ],
+      "leaf_category_id": "50002100",
+      "is_ad": false
+    }
+  ],
+  "pages": [
+    {
+      "page": 1,
+      "result_count": 40,
+      "repeated_count": 0
+    }
+  ],
+  "source_url": "https://search.shopping.naver.com/ns/search?query=로봇청소기"
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

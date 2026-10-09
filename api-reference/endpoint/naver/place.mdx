@@ -1,0 +1,122 @@
+---
+title: "Get Place Detail"
+api: "GET https://scrapebadger.com/v1/naver/place/{place_id}"
+description: "Full Naver Place detail — category, addresses, phone, website, rating, menus, photos and map coordinates."
+---
+
+Fetch a single Naver Place by its `place_id`. Returns the full profile: the
+primary category and every category it is listed under, both road and
+lot-number addresses, phone, website, rating and review count, the menu with
+prices, photos, and the map coordinates.
+
+**Credits:** 8
+
+<Note>
+  This endpoint is **browser-rendered** — the richest and slowest call in this
+  API, hence 8 credits. Take a `place_id` from a
+  [`/local`](/api-reference/endpoint/naver/local) result or from the web SERP's
+  `place_results[]`.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="place_id" type="string" required>
+  Naver Place id, e.g. `1234567890`. Take it from `place_id` on a
+  [`/local`](/api-reference/endpoint/naver/local) result or from a
+  `map.naver.com/p/entry/place/{place_id}` URL.
+</ParamField>
+
+## Response
+
+<ResponseField name="place_id" type="string" />
+<ResponseField name="name" type="string" />
+<ResponseField name="category" type="string">Primary category, e.g. `파스타`.</ResponseField>
+<ResponseField name="categories" type="string[]">Every category the place is listed under.</ResponseField>
+<ResponseField name="address" type="string">Lot-number (jibun) address.</ResponseField>
+<ResponseField name="road_address" type="string">Road-name (doro) address.</ResponseField>
+<ResponseField name="phone" type="string" />
+<ResponseField name="website" type="string" />
+<ResponseField name="rating" type="number">Average visitor rating.</ResponseField>
+<ResponseField name="review_count" type="integer" />
+<ResponseField name="menus" type="Menu[]">
+  Menu items with prices.
+
+  <Expandable title="Menu">
+    <ResponseField name="name" type="string" />
+    <ResponseField name="price" type="string">Price as displayed, e.g. `18,000원`.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="images" type="string[]">Photo URLs.</ResponseField>
+<ResponseField name="latitude" type="number" />
+<ResponseField name="longitude" type="number" />
+<ResponseField name="url" type="string">Naver Place page URL.</ResponseField>
+<ResponseField name="source_url" type="string">The underlying page the detail was rendered from.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/place/1234567890" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/place/1234567890",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const place = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/place/1234567890",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+place = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "place_id": "1234567890",
+  "name": "트라토리아 강남",
+  "category": "파스타",
+  "categories": ["파스타", "이탈리아음식", "레스토랑"],
+  "address": "서울특별시 강남구 역삼동 123-45",
+  "road_address": "서울특별시 강남구 테헤란로 12길 34",
+  "phone": "02-555-1234",
+  "website": "https://trattoria-gangnam.example.com",
+  "rating": 4.6,
+  "review_count": 1823,
+  "menus": [
+    { "name": "봉골레 파스타", "price": "18,000원" },
+    { "name": "트러플 크림 파스타", "price": "22,000원" }
+  ],
+  "images": [
+    "https://ldb-phinf.example.net/place/1234567890_1.jpg",
+    "https://ldb-phinf.example.net/place/1234567890_2.jpg"
+  ],
+  "latitude": 37.500123,
+  "longitude": 127.036456,
+  "url": "https://map.naver.com/p/entry/place/1234567890",
+  "source_url": "https://pcmap.place.naver.com/restaurant/1234567890/home"
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The place does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |

@@ -1,0 +1,107 @@
+---
+title: "Image Search"
+api: "GET https://scrapebadger.com/v1/naver/image"
+description: "Search the Naver image vertical — 100 images per page with thumbnail, full-resolution URL, dimensions and source."
+---
+
+Search the **Naver image** vertical. Backed by Naver's image JSON API, it returns up to 100 images per page, each with its thumbnail and full-resolution URLs, dimensions, title and source site.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  1-based result page. Each page returns up to 100 images.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string" />
+<ResponseField name="page" type="integer" />
+<ResponseField name="result_count" type="integer" />
+<ResponseField name="results" type="ImageResult[]">
+  Images.
+
+  <Expandable title="ImageResult">
+    <ResponseField name="position" type="integer" />
+    <ResponseField name="img_id" type="string">Naver image id.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="url" type="string">The page the image was found on.</ResponseField>
+    <ResponseField name="source" type="string">Source site name.</ResponseField>
+    <ResponseField name="thumbnail_url" type="string" />
+    <ResponseField name="original_url" type="string">Full-resolution image URL.</ResponseField>
+    <ResponseField name="width" type="integer" />
+    <ResponseField name="height" type="integer" />
+    <ResponseField name="published" type="string" />
+    <ResponseField name="published_at" type="string">Absolute publish timestamp (ISO 8601), when present.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/image?query=한라산+설경&page=1" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/image?" +
+    new URLSearchParams({"query": "한라산 설경", "page": "1"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/image",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "한라산 설경", "page": "1"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "한라산 설경",
+  "page": 1,
+  "result_count": 100,
+  "results": [
+    {
+      "position": 1,
+      "img_id": "blog_12345",
+      "title": "한라산 겨울 설경",
+      "url": "https://blog.example.com/hallasan",
+      "source": "제주여행블로그",
+      "thumbnail_url": "https://search-phinf.example.net/thumb/12345.jpg",
+      "original_url": "https://blogfiles.example.net/hallasan_full.jpg",
+      "width": 1920,
+      "height": 1280
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

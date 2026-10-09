@@ -1,0 +1,94 @@
+---
+title: "Shopping Live Keyword Rankings"
+api: "GET https://scrapebadger.com/v1/naver/shopping/live/search/keywords"
+description: "Naver Shopping Live standby search keyword ranking — the keywords trending on the Shopping Live search screen."
+---
+
+Fetch the **Shopping Live standby keyword ranking** — the trending keywords shown on the Shopping Live search screen, each with its rank movement, plus the recent-keyword list.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Response
+
+<ResponseField name="keyword_ranking" type="object">
+  The keyword ranking block.
+
+  <Expandable title="keyword_ranking">
+    <ResponseField name="keywordRankings" type="Keyword[]">
+      Ranked keywords.
+
+      <Expandable title="Keyword">
+        <ResponseField name="keyword" type="string" />
+        <ResponseField name="variation" type="integer">Rank change.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="updated_at" type="string">Absolute update timestamp (ISO 8601).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="recent_keywords" type="string[]" />
+<ResponseField name="result_count" type="integer" />
+<ResponseField name="source_url" type="string" />
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/live/search/keywords" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/live/search/keywords",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/live/search/keywords",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "keyword_ranking": {
+    "keywordRankings": [
+      {
+        "keyword": "여름 이불",
+        "variation": 2
+      }
+    ],
+    "updatedAt": "2026-08-07T10:00:00+09:00",
+    "updated_at": "2026-08-07T01:00:00+00:00",
+    "updated_utc": "2026-08-07T01:00:00Z"
+  },
+  "recent_keywords": [
+    "캠핑",
+    "원피스"
+  ],
+  "result_count": 20,
+  "source_url": "https://shoppinglive.naver.com/search"
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

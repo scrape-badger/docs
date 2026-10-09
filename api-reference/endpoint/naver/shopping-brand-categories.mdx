@@ -1,0 +1,89 @@
+---
+title: "Shopping Brand Categories"
+api: "GET https://scrapebadger.com/v1/naver/shopping/brand-categories"
+description: "One level of the Naver Shopping brand-ranking category tree — DIV1 roots or the DIV2 children of a parent id."
+---
+
+Walk the **brand-ranking category tree** that scopes [`/shopping/brand-rank`](/api-reference/endpoint/naver/shopping-brand-rank). With no `parent_id` it returns the DIV1 roots; pass an 8-digit `parent_id` to return its DIV2 children.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="parent_id" type="string">
+  An 8-digit DIV1 category id to list its DIV2 children. Omit for the roots.
+</ParamField>
+
+## Response
+
+<ResponseField name="depth" type="string">`DIV1` or `DIV2`.</ResponseField>
+<ResponseField name="parent_id" type="string">Echo of the requested parent, or `null` for roots.</ResponseField>
+<ResponseField name="result_count" type="integer" />
+<ResponseField name="categories" type="Category[]">
+  Categories at this level.
+
+  <Expandable title="Category">
+    <ResponseField name="category_id" type="string" />
+    <ResponseField name="category_name" type="string" />
+    <ResponseField name="image_url" type="string" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/brand-categories?parent_id=50000000" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/brand-categories?" +
+    new URLSearchParams({"parent_id": "50000000"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/brand-categories",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"parent_id": "50000000"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "depth": "DIV2",
+  "parent_id": "50000000",
+  "result_count": 9,
+  "categories": [
+    {
+      "category_id": "50000167",
+      "category_name": "여성의류",
+      "image_url": "https://shopping-phinf.example.net/brandcat/50000167.jpg"
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |
