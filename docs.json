@@ -1457,6 +1457,7 @@
               "mcp/integrations/vscode-copilot",
               "mcp/integrations/gemini",
               "mcp/integrations/chatgpt",
+              "mcp/integrations/codex",
               "mcp/integrations/openclaw",
               "mcp/integrations/cline",
               "mcp/integrations/continue-dev"
