@@ -1,0 +1,190 @@
+---
+title: "Get Store Products"
+api: "GET https://scrapebadger.com/v1/naver/stores/{store_url}/products"
+description: "Paginated product listing for a Naver SmartStore / Brand Store, optionally scoped to a display category."
+---
+
+List the **products in a storefront**, optionally scoped to one of its display categories. Each product is the storefront listing card — name, price, discount, stock status, review summary and representative image.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="store_url" type="string" required>
+  Storefront slug.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="host" type="string" default="smartstore">
+  Storefront host: `smartstore` or `brand`.
+</ParamField>
+
+<ParamField query="category_id" type="string">
+  Scope to a display category id from [`/stores/{store_url}/categories`](/api-reference/endpoint/naver/store-categories).
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  1-based page.
+</ParamField>
+
+<ParamField query="size" type="integer" default="20">
+  Products per page.
+</ParamField>
+
+<ParamField query="sort" type="string" default="POPULARITY">
+  Sort order, e.g. `POPULARITY`.
+</ParamField>
+
+<ParamField query="channel_uid" type="string">
+  Storefront channel uid. Optional — resolved from the slug when omitted.
+</ParamField>
+
+## Response
+
+<ResponseField name="store_url" type="string" />
+<ResponseField name="host" type="string" />
+<ResponseField name="total_count" type="integer">Total products in scope.</ResponseField>
+<ResponseField name="page" type="integer" />
+<ResponseField name="page_size" type="integer" />
+<ResponseField name="sort" type="string" />
+<ResponseField name="products" type="Product[]">
+  Storefront listing cards.
+
+  <Expandable title="Product">
+    <ResponseField name="id" type="string">Channel product number.</ResponseField>
+    <ResponseField name="product_no" type="string" />
+    <ResponseField name="name" type="string" />
+    <ResponseField name="disp_name" type="string" />
+    <ResponseField name="sale_price" type="integer" />
+    <ResponseField name="disp_sale_price" type="integer" />
+    <ResponseField name="product_status_type" type="string">e.g. `SALE`, `SOLDOUT`.</ResponseField>
+    <ResponseField name="stock_quantity" type="integer" />
+    <ResponseField name="category" type="object">
+      <Expandable title="category">
+        <ResponseField name="category_id" type="string" />
+        <ResponseField name="category_name" type="string" />
+        <ResponseField name="whole_category_id" type="string" />
+        <ResponseField name="whole_category_name" type="string" />
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="channel" type="object">
+      <Expandable title="channel">
+        <ResponseField name="channel_no" type="string" />
+        <ResponseField name="account_no" type="string" />
+        <ResponseField name="channel_uid" type="string" />
+        <ResponseField name="channel_name" type="string" />
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="benefits_view" type="object">
+      Discount view.
+
+      <Expandable title="benefits_view">
+        <ResponseField name="discounted_sale_price" type="integer" />
+        <ResponseField name="discounted_ratio" type="integer" />
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="review_amount" type="object">
+      <Expandable title="review_amount">
+        <ResponseField name="total_review_count" type="integer" />
+        <ResponseField name="average_review_score" type="number" />
+        <ResponseField name="product_satisfaction_percent" type="integer" />
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="representative_image_url" type="string" />
+    <ResponseField name="is_free_delivery" type="boolean" />
+    <ResponseField name="today_delivery" type="boolean">Whether same-day (“오늘출발”) delivery is offered.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/stores/plusink/products?host=smartstore&page=1&size=20" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/stores/plusink/products?" +
+    new URLSearchParams({"host": "smartstore", "page": "1", "size": "20"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/stores/plusink/products",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"host": "smartstore", "page": "1", "size": "20"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "store_url": "plusink",
+  "host": "smartstore",
+  "total_count": 312,
+  "page": 1,
+  "page_size": 20,
+  "sort": "POPULARITY",
+  "products": [
+    {
+      "id": "7001234567",
+      "product_no": "5123456789",
+      "name": "정품 HP 잉크 카트리지 세트",
+      "disp_name": "정품 HP 잉크 세트",
+      "sale_price": 48000,
+      "disp_sale_price": 48000,
+      "product_status_type": "SALE",
+      "stock_quantity": 820,
+      "category": {
+        "category_id": "50006543",
+        "category_name": "잉크/토너",
+        "whole_category_id": "50000003>50006543",
+        "whole_category_name": "디지털/가전>잉크/토너"
+      },
+      "channel": {
+        "channel_no": "10012345",
+        "account_no": "90012345",
+        "channel_uid": "2sV!abc123",
+        "channel_name": "플러스잉크"
+      },
+      "benefits_view": {
+        "discounted_sale_price": 42000,
+        "discounted_ratio": 13
+      },
+      "review_amount": {
+        "total_review_count": 2841,
+        "average_review_score": 4.9,
+        "product_satisfaction_percent": 98
+      },
+      "representative_image_url": "https://shop-phinf.example.net/7001234567.jpg",
+      "is_free_delivery": true,
+      "today_delivery": true
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

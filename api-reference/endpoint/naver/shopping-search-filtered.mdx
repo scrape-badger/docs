@@ -1,0 +1,108 @@
+---
+title: "Shopping Filtered Search"
+api: "GET https://scrapebadger.com/v1/naver/shopping/search-filtered"
+description: "Filtered Naver Shopping product search — narrow a finder query by a brand id and/or attribute id."
+---
+
+Run a **filtered Naver Shopping product search** — the same finder feed as [`/shopping/search-products`](/api-reference/endpoint/naver/shopping-search-products), narrowed by a brand id and/or attribute id taken from [`/shopping/search-filters`](/api-reference/endpoint/naver/shopping-search-filters). Returns the finite finder set (up to 10 pages of 8 slots).
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords.
+</ParamField>
+
+<ParamField query="brand_id" type="string">
+  A brand value id from `/shopping/search-filters` (`BRAND` facet).
+</ParamField>
+
+<ParamField query="attribute_id" type="string">
+  An attribute value id from `/shopping/search-filters` (`ATTRIBUTE` facet).
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string" />
+<ResponseField name="brand_ids" type="string[]">The brand ids applied.</ResponseField>
+<ResponseField name="attribute_ids" type="string[]">The attribute ids applied.</ResponseField>
+<ResponseField name="preview_only" type="boolean">Always `true`.</ResponseField>
+<ResponseField name="result_count" type="integer" />
+<ResponseField name="page_count" type="integer">Finder pages folded in (≤ 10).</ResponseField>
+<ResponseField name="page_size" type="integer" />
+<ResponseField name="total_count" type="integer">Total matches reported by Naver, when available.</ResponseField>
+<ResponseField name="filters_applied_by" type="string">How the filter was applied: `click` or `rewrite`.</ResponseField>
+<ResponseField name="products" type="Product[]">Filtered products — same shape as a [`/shopping/search-products`](/api-reference/endpoint/naver/shopping-search-products) product.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/search-filtered?query=무선+이어폰&brand_id=12345" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/search-filtered?" +
+    new URLSearchParams({"query": "무선 이어폰", "brand_id": "12345"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/search-filtered",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "무선 이어폰", "brand_id": "12345"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "무선 이어폰",
+  "brand_ids": [
+    "12345"
+  ],
+  "attribute_ids": [],
+  "preview_only": true,
+  "result_count": 40,
+  "page_count": 5,
+  "page_size": 8,
+  "total_count": 40,
+  "filters_applied_by": "click",
+  "products": [
+    {
+      "rank": 1,
+      "nv_mid": "82613579214",
+      "product_name": "삼성전자 갤럭시 버즈3 프로",
+      "product_url": "https://shopping.naver.com/catalog/82613579214",
+      "sale_price": 279000,
+      "discounted_sale_price": 229000,
+      "mall_name": "삼성전자 공식스토어",
+      "is_ad": false
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

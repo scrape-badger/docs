@@ -1,0 +1,103 @@
+---
+title: "Blog Search"
+api: "GET https://scrapebadger.com/v1/naver/blog"
+description: "Search Naver Blog — title, blog name, author, snippet and absolute publish time per post, with thumbnail imagery."
+---
+
+Search Naver Blog, the dominant consumer-review and how-to corpus in Korea.
+Each post carries the title, the blog it lives on, the author, a snippet and
+an **absolute publish time** (`published_at`), plus a thumbnail when one is
+shown.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords, e.g. `에어프라이어 추천`.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  1-based result page for pagination.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="page" type="integer">The page that was fetched.</ResponseField>
+<ResponseField name="result_count" type="integer">Posts returned.</ResponseField>
+<ResponseField name="results" type="BlogPost[]">
+  Blog posts.
+
+  <Expandable title="BlogPost">
+    <ResponseField name="position" type="integer">1-based rank.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="url" type="string">Destination post URL — any Naver redirect is resolved.</ResponseField>
+    <ResponseField name="snippet" type="string" />
+    <ResponseField name="blog_name" type="string">The blog the post lives on.</ResponseField>
+    <ResponseField name="author" type="string">Post author / blogger handle.</ResponseField>
+    <ResponseField name="published" type="string">Raw publish date as displayed by Naver.</ResponseField>
+    <ResponseField name="published_at" type="string">ISO 8601 UTC publish time.</ResponseField>
+    <ResponseField name="thumbnail_url" type="string">Post thumbnail, when present.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="url" type="string">The Naver Blog SERP URL for this query and page.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/blog?query=에어프라이어+추천" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/blog?" +
+    new URLSearchParams({ query: "에어프라이어 추천" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/blog",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "에어프라이어 추천"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "에어프라이어 추천",
+  "page": 1,
+  "result_count": 10,
+  "results": [
+    {
+      "position": 1,
+      "title": "2026 에어프라이어 추천 TOP 5 솔직 후기",
+      "url": "https://blog.naver.com/example/223456789012",
+      "snippet": "직접 써본 에어프라이어 5종을 용량, 소비전력, 청소 편의성 기준으로 비교했습니다...",
+      "blog_name": "살림꿀팁 블로그",
+      "author": "살림꾼",
+      "published": "2026.08.06.",
+      "published_at": "2026-08-06T09:21:00+00:00",
+      "thumbnail_url": "https://blogthumb.example.net/2026080612345.jpg"
+    }
+  ],
+  "url": "https://search.naver.com/search.naver?where=blog&query=에어프라이어+추천"
+}
+```

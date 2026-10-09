@@ -1,0 +1,107 @@
+---
+title: "Local Search"
+api: "GET https://scrapebadger.com/v1/naver/local"
+description: "Search Naver Place — local businesses with rating, review count, live opening status, category and addresses."
+---
+
+Search Naver Place, Korea's dominant local-business directory. Each result
+carries the `place_id` (use it with
+[Place Detail](/api-reference/endpoint/naver/place) and
+[Place Reviews](/api-reference/endpoint/naver/place-reviews)), rating and
+review count, live opening status, category, both road and lot-number
+addresses, and any badges Naver attaches.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Place search keywords, e.g. `강남 파스타` or a business name.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="result_count" type="integer">Places returned.</ResponseField>
+<ResponseField name="results" type="Place[]">
+  Local places.
+
+  <Expandable title="Place">
+    <ResponseField name="place_id" type="string">Naver Place id — use it with the detail and reviews endpoints.</ResponseField>
+    <ResponseField name="name" type="string" />
+    <ResponseField name="category" type="string">e.g. `파스타`, `카페`.</ResponseField>
+    <ResponseField name="address" type="string">Lot-number (jibun) address.</ResponseField>
+    <ResponseField name="road_address" type="string">Road-name (doro) address.</ResponseField>
+    <ResponseField name="phone" type="string" />
+    <ResponseField name="rating" type="number">Average visitor rating.</ResponseField>
+    <ResponseField name="review_count" type="integer" />
+    <ResponseField name="is_open" type="boolean">Whether the place is open right now.</ResponseField>
+    <ResponseField name="open_status_text" type="string">Human-readable status, e.g. `영업 중`, `21:00에 영업 종료`.</ResponseField>
+    <ResponseField name="badges" type="string[]">Labels Naver attaches, e.g. `예약`, `주차`.</ResponseField>
+    <ResponseField name="url" type="string">Naver Place page URL.</ResponseField>
+    <ResponseField name="rank" type="integer">1-based rank within the results.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="url" type="string">The Naver Place search URL for this query.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/local?query=강남+파스타" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/local?" +
+    new URLSearchParams({ query: "강남 파스타" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/local",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "강남 파스타"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "강남 파스타",
+  "result_count": 10,
+  "results": [
+    {
+      "place_id": "1234567890",
+      "name": "트라토리아 강남",
+      "category": "파스타",
+      "address": "서울특별시 강남구 역삼동 123-45",
+      "road_address": "서울특별시 강남구 테헤란로 12길 34",
+      "phone": "02-555-1234",
+      "rating": 4.6,
+      "review_count": 1823,
+      "is_open": true,
+      "open_status_text": "영업 중 · 22:00에 영업 종료",
+      "badges": ["예약", "포장"],
+      "url": "https://map.naver.com/p/entry/place/1234567890",
+      "rank": 1
+    }
+  ],
+  "url": "https://map.naver.com/p/search/강남+파스타"
+}
+```

@@ -1,0 +1,127 @@
+---
+title: "Shopping Brand Rankings"
+api: "GET https://scrapebadger.com/v1/naver/shopping/brand-rank"
+description: "Naver Shopping brand ranking — the top 20 brands for a category, age bracket and period."
+---
+
+Fetch Naver Shopping's **brand ranking** — the top 20 brands for a category, scoped by age bracket, sort metric and period. Each entry carries the brand's rank, name, logo, storefront URL and movement status.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="category_id" type="string" default="A">
+  `A` for the overall chart, or an 8-digit brand-ranking category id.
+</ParamField>
+
+<ParamField query="age_type" type="string" default="ALL">
+  Age bracket, e.g. `ALL`, `MEN_20`, `WOMEN_30`.
+</ParamField>
+
+<ParamField query="sort_type" type="string" default="BRAND_POPULAR">
+  `BRAND_POPULAR` or `BRAND_ISSUE`.
+</ParamField>
+
+<ParamField query="period_type" type="string" default="WEEKLY">
+  `WEEKLY` or `MONTHLY`.
+</ParamField>
+
+## Response
+
+<ResponseField name="category_id" type="string" />
+<ResponseField name="age_type" type="string" />
+<ResponseField name="sort_type" type="string" />
+<ResponseField name="period_type" type="string" />
+<ResponseField name="result_count" type="integer">Brands returned (20).</ResponseField>
+<ResponseField name="brands" type="Brand[]">
+  Ranked brands.
+
+  <Expandable title="Brand">
+    <ResponseField name="rank" type="integer" />
+    <ResponseField name="rank_id" type="string" />
+    <ResponseField name="title" type="string" />
+    <ResponseField name="status" type="string">Movement status versus the previous period.</ResponseField>
+    <ResponseField name="chart_type" type="string" />
+    <ResponseField name="tags" type="string[]" />
+    <ResponseField name="brand_seq" type="string" />
+    <ResponseField name="brand_channel_seq" type="string" />
+    <ResponseField name="brand_name" type="string" />
+    <ResponseField name="brand_logo_url" type="string" />
+    <ResponseField name="brand_url" type="string" />
+    <ResponseField name="sync_date" type="string" />
+    <ResponseField name="synced_at" type="string">Absolute sync timestamp (ISO 8601).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/brand-rank?category_id=A&period_type=WEEKLY" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/brand-rank?" +
+    new URLSearchParams({"category_id": "A", "period_type": "WEEKLY"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/brand-rank",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"category_id": "A", "period_type": "WEEKLY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "category_id": "A",
+  "age_type": "ALL",
+  "sort_type": "BRAND_POPULAR",
+  "period_type": "WEEKLY",
+  "result_count": 20,
+  "brands": [
+    {
+      "rank": 1,
+      "rank_id": "b1",
+      "title": "나이키",
+      "status": "STABLE",
+      "chart_type": "POPULAR",
+      "tags": [
+        "스포츠"
+      ],
+      "brand_seq": "12345",
+      "brand_channel_seq": "67890",
+      "brand_name": "나이키",
+      "brand_logo_url": "https://shopping-phinf.example.net/brand/12345.png",
+      "brand_url": "https://brand.naver.com/nike",
+      "sync_date": "2026-08-07",
+      "synced_at": "2026-08-07T00:00:00+00:00"
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

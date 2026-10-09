@@ -1,0 +1,75 @@
+---
+title: "Get Review Video Key"
+api: "GET https://scrapebadger.com/v1/naver/reviews/video-inkey"
+description: "Mint the video playback key (inKey) for a review-attached video from its attachVid and videoStamp."
+---
+
+Mint the **video playback key** (`inKey`) for a video attached to a review. Pass the `attach_vid` and the `videoStamp` from the review's attachment and receive the video id and its playback key, which the player needs to stream the clip.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="attach_vid" type="string" required>
+  The attached video id (`attachVid`).
+</ParamField>
+
+<ParamField query="stamp" type="string" required>
+  The `videoStamp` from the review attachment (type `M`).
+</ParamField>
+
+## Response
+
+<ResponseField name="video_id" type="string" />
+<ResponseField name="in_key" type="string">The playback key, or `null` when it could not be minted.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/reviews/video-inkey?attach_vid=A1B2C3D4&stamp=1699999999" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/reviews/video-inkey?" +
+    new URLSearchParams({"attach_vid": "A1B2C3D4", "stamp": "1699999999"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/reviews/video-inkey",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"attach_vid": "A1B2C3D4", "stamp": "1699999999"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "video_id": "A1B2C3D4",
+  "in_key": "V_abcdef123456"
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

@@ -1,0 +1,114 @@
+---
+title: "Shopping Deals"
+api: "GET https://scrapebadger.com/v1/naver/shopping/deals"
+description: "Curated Naver Shopping deal products, gender-scoped — a fixed 12-item best-deal card list."
+---
+
+Fetch Naver Shopping's **curated deal products** (the `bestdeal` vertical). The list is gender-scoped and returns a fixed set of 12 deal cards, each with its rank, catalogue id, title, price, discount and labels.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="gender" type="string" required>
+  `M` or `F`. A blank gender returns an empty list upstream.
+</ParamField>
+
+## Response
+
+<ResponseField name="gender" type="string">Echo of the requested gender.</ResponseField>
+<ResponseField name="result_count" type="integer">Products returned (12).</ResponseField>
+<ResponseField name="products" type="Product[]">
+  Curated deal products.
+
+  <Expandable title="Product">
+    <ResponseField name="rank" type="integer" />
+    <ResponseField name="nv_mid" type="string">Naver Shopping catalogue id.</ResponseField>
+    <ResponseField name="product_id" type="string" />
+    <ResponseField name="channel_product_id" type="string" />
+    <ResponseField name="title" type="string" />
+    <ResponseField name="image_url" type="string" />
+    <ResponseField name="link_url" type="string" />
+    <ResponseField name="price" type="integer">List price in KRW.</ResponseField>
+    <ResponseField name="price_value" type="integer" />
+    <ResponseField name="discount_price" type="integer">Discounted price in KRW.</ResponseField>
+    <ResponseField name="discount_rate" type="integer" />
+    <ResponseField name="delivery_fee" type="integer" />
+    <ResponseField name="labels" type="string[]" />
+    <ResponseField name="is_ad" type="boolean" />
+    <ResponseField name="is_zzim" type="boolean">Whether the item is a “찜” (wishlist) favourite.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/deals?gender=F" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/deals?" +
+    new URLSearchParams({"gender": "F"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/deals",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"gender": "F"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "gender": "F",
+  "result_count": 12,
+  "products": [
+    {
+      "rank": 1,
+      "nv_mid": "82613579214",
+      "product_id": "5123456789",
+      "channel_product_id": "7001234567",
+      "title": "여성 여름 린넨 원피스",
+      "image_url": "https://shopping-phinf.example.net/82613579214.jpg",
+      "link_url": "https://shopping.naver.com/catalog/82613579214",
+      "price": 39000,
+      "price_value": 39000,
+      "discount_price": 29900,
+      "discount_rate": 23,
+      "delivery_fee": 0,
+      "labels": [
+        "무료배송",
+        "오늘출발"
+      ],
+      "is_ad": false,
+      "is_zzim": false
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

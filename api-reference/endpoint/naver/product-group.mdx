@@ -1,0 +1,78 @@
+---
+title: "Get Product Group"
+api: "GET https://scrapebadger.com/v1/naver/products/{origin_product_no}/group"
+description: "The storefront variant group of a product — the group id and the member origin product numbers."
+---
+
+Resolve the **variant group** a product belongs to. SmartStore sellers group colour/size variants under one group; this returns the group id and the member `originProductNo`s so you can fetch each variant.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="origin_product_no" type="string" required>
+  The product's origin product number.
+</ParamField>
+
+## Response
+
+<ResponseField name="origin_product_no" type="string">Echo of the requested product.</ResponseField>
+<ResponseField name="group_id" type="string">The variant group id, or `null` when the product is not grouped.</ResponseField>
+<ResponseField name="origin_product_nos" type="string[]">Member origin product numbers.</ResponseField>
+<ResponseField name="is_grouped" type="boolean" />
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/products/5123456789/group" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/products/5123456789/group",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/products/5123456789/group",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "origin_product_no": "5123456789",
+  "group_id": "G100200300",
+  "origin_product_nos": [
+    "5123456789",
+    "5123456790",
+    "5123456791"
+  ],
+  "is_grouped": true
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

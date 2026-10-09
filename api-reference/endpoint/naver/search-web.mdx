@@ -1,0 +1,99 @@
+---
+title: "Web Vertical Search"
+api: "GET https://scrapebadger.com/v1/naver/search/web"
+description: "Naver's dedicated web-document vertical SERP — 15 organic documents per page with resolved destination URLs."
+---
+
+Search Naver's **web-document vertical** (the `웹사이트` tab). Unlike the integrated [`/search`](/api-reference/endpoint/naver/search) SERP, this is the pure web-document feed: 15 organic results per page, each with its resolved destination URL, display URL and snippet.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords, e.g. `제주도 맛집`.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  1-based result page. Each page returns 15 documents.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="page" type="integer">The page that was fetched.</ResponseField>
+<ResponseField name="result_count" type="integer">Organic results returned in this response.</ResponseField>
+<ResponseField name="results" type="WebResult[]">
+  Organic web documents.
+
+  <Expandable title="WebResult">
+    <ResponseField name="position" type="integer">1-based rank within this page.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="url" type="string">Destination URL — any Naver redirect is resolved.</ResponseField>
+    <ResponseField name="display_url" type="string">Human-readable URL shown by Naver.</ResponseField>
+    <ResponseField name="snippet" type="string" />
+  </Expandable>
+</ResponseField>
+<ResponseField name="url" type="string">The Naver web-vertical SERP URL for this query and page.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/search/web?query=제주도+맛집&page=1" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/search/web?" +
+    new URLSearchParams({"query": "제주도 맛집", "page": "1"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/search/web",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "제주도 맛집", "page": "1"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "제주도 맛집",
+  "page": 1,
+  "result_count": 15,
+  "results": [
+    {
+      "position": 1,
+      "title": "제주도 맛집 추천 TOP 20",
+      "url": "https://blog.example.com/jeju-food",
+      "display_url": "blog.example.com › jeju-food",
+      "snippet": "제주 현지인이 추천하는 흑돼지, 고기국수 맛집 정리..."
+    }
+  ],
+  "url": "https://search.naver.com/search.naver?where=web&query=제주도+맛집"
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

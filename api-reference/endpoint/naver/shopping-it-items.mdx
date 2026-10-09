@@ -1,0 +1,107 @@
+---
+title: "Shopping IT Items"
+api: "GET https://scrapebadger.com/v1/naver/shopping/it-items"
+description: "Curated Naver Shopping “IT item” editorial cards — themed card lists each carrying a product set."
+---
+
+Fetch Naver Shopping's **“IT item” editorial cards** — themed, curated card lists (e.g. trend and best-of round-ups). Each card carries its metadata and an embedded product set.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Response
+
+<ResponseField name="result_count" type="integer">Cards returned.</ResponseField>
+<ResponseField name="cards" type="Card[]">
+  Editorial cards.
+
+  <Expandable title="Card">
+    <ResponseField name="card_id" type="string" />
+    <ResponseField name="card_seq" type="integer" />
+    <ResponseField name="card" type="object">
+      Card metadata.
+
+      <Expandable title="card">
+        <ResponseField name="gender" type="string" />
+        <ResponseField name="aggregate_type" type="string" />
+        <ResponseField name="text" type="string" />
+        <ResponseField name="title" type="string" />
+        <ResponseField name="title_best" type="string" />
+        <ResponseField name="exposure_rank" type="integer" />
+        <ResponseField name="exposure_type" type="string" />
+        <ResponseField name="img_url" type="string" />
+        <ResponseField name="active_start_ymd" type="string" />
+        <ResponseField name="sync_date" type="string" />
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="products" type="Product[]">Products featured on the card.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="best_cards" type="Card[]">The subset of cards flagged as best-of.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/it-items" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/it-items",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/it-items",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "result_count": 8,
+  "cards": [
+    {
+      "card_id": "it_001",
+      "card_seq": 1,
+      "card": {
+        "gender": "F",
+        "aggregate_type": "TREND",
+        "text": "지금 뜨는",
+        "title": "여름 홈웨어 베스트",
+        "title_best": "여름 홈웨어",
+        "exposure_rank": 1,
+        "exposure_type": "MAIN",
+        "img_url": "https://shopping-phinf.example.net/card/it_001.jpg",
+        "active_start_ymd": "20260801",
+        "sync_date": "2026-08-07T00:00:00+00:00"
+      },
+      "products": []
+    }
+  ],
+  "best_cards": []
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

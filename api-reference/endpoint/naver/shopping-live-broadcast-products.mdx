@@ -1,0 +1,114 @@
+---
+title: "List Live Broadcast Products"
+api: "GET https://scrapebadger.com/v1/naver/shopping/live/broadcasts/{broadcast_id}/products"
+description: "Paginated product list for a single Naver Shopping Live broadcast."
+---
+
+List the **products featured in a Shopping Live broadcast**, paginated. Each product carries its live price, discount and link.
+
+**Credits:** 5
+
+<Note>
+  `page` is 0-based. Omit it for the first page — `page=1` returns an empty list.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="broadcast_id" type="string" required>
+  Shopping Live broadcast id.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="page" type="integer">
+  0-based page. Omit for the first page.
+</ParamField>
+
+<ParamField query="size" type="integer">
+  Products per page (1–200). Omit for the upstream default.
+</ParamField>
+
+## Response
+
+<ResponseField name="broadcast_id" type="string" />
+<ResponseField name="page" type="integer" />
+<ResponseField name="total_count" type="integer" />
+<ResponseField name="total_page" type="integer" />
+<ResponseField name="result_count" type="integer" />
+<ResponseField name="products" type="Product[]">
+  Live products.
+
+  <Expandable title="Product">
+    <ResponseField name="key" type="string" />
+    <ResponseField name="name" type="string" />
+    <ResponseField name="salePrice" type="integer" />
+    <ResponseField name="discountedSalePrice" type="integer" />
+    <ResponseField name="productUrl" type="string" />
+    <ResponseField name="imageUrl" type="string" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/live/broadcasts/1234567/products?size=20" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/live/broadcasts/1234567/products?" +
+    new URLSearchParams({"size": "20"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/live/broadcasts/1234567/products",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"size": "20"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "broadcast_id": "1234567",
+  "page": 0,
+  "total_count": 5,
+  "total_page": 1,
+  "result_count": 5,
+  "products": [
+    {
+      "key": "p1",
+      "name": "시원한 여름 이불",
+      "salePrice": 59000,
+      "discountedSalePrice": 39000,
+      "productUrl": "https://shopping.naver.com/catalog/82614111000",
+      "imageUrl": "https://shop-phinf.example.net/p1.jpg"
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

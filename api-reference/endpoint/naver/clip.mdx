@@ -1,0 +1,101 @@
+---
+title: "Clip Search"
+api: "GET https://scrapebadger.com/v1/naver/clip"
+description: "Search the Naver Clip vertical — short-form vertical videos with author, view count and publish time."
+---
+
+Search the **Naver Clip** vertical — Naver's short-form, vertical-video feed. Each result carries the clip title and URL, author, view count and an absolute publish timestamp. Returns 24 clips per page.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  1-based result page. Each page returns up to 24 clips.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string" />
+<ResponseField name="page" type="integer" />
+<ResponseField name="result_count" type="integer" />
+<ResponseField name="results" type="ClipResult[]">
+  Clips.
+
+  <Expandable title="ClipResult">
+    <ResponseField name="position" type="integer" />
+    <ResponseField name="title" type="string" />
+    <ResponseField name="url" type="string">Clip URL.</ResponseField>
+    <ResponseField name="author" type="string" />
+    <ResponseField name="view_count" type="integer" />
+    <ResponseField name="published" type="string" />
+    <ResponseField name="published_at" type="string">Absolute publish timestamp (ISO 8601).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/clip?query=홈카페+레시피&page=1" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/clip?" +
+    new URLSearchParams({"query": "홈카페 레시피", "page": "1"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/clip",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "홈카페 레시피", "page": "1"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "홈카페 레시피",
+  "page": 1,
+  "result_count": 24,
+  "results": [
+    {
+      "position": 1,
+      "title": "1분 홈카페 아인슈페너",
+      "url": "https://m.clip.naver.com/clips/98765",
+      "author": "카페인중독",
+      "view_count": 120345,
+      "published": "2026.07.11.",
+      "published_at": "2026-07-11T00:00:00+09:00"
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

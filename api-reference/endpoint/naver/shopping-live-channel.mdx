@@ -1,0 +1,82 @@
+---
+title: "Get Live Channel"
+api: "GET https://scrapebadger.com/v1/naver/shopping/live/channels/{channel_id}"
+description: "Naver Shopping Live channel / store profile — nickname, on-air status and scheduled broadcasts."
+---
+
+Fetch a **Shopping Live channel (store) profile** — the channel nickname, current on-air status and any scheduled upcoming broadcast.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="channel_id" type="string" required>
+  Shopping Live channel id.
+</ParamField>
+
+## Response
+
+<ResponseField name="channel_id" type="string" />
+<ResponseField name="profile" type="object">
+  Channel profile.
+
+  <Expandable title="profile">
+    <ResponseField name="nickname" type="string" />
+    <ResponseField name="onair" type="boolean">Whether the channel is live now.</ResponseField>
+    <ResponseField name="broadcastExpectedStartDate" type="string">Next scheduled broadcast start, when any.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/live/channels/abcde" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/live/channels/abcde",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/live/channels/abcde",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "channel_id": "abcde",
+  "profile": {
+    "nickname": "리빙하우스",
+    "onair": false,
+    "broadcastExpectedStartDate": "2026-08-10T20:00:00+09:00"
+  }
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

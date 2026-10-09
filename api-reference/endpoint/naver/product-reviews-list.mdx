@@ -1,0 +1,134 @@
+---
+title: "List Product Reviews"
+api: "GET https://scrapebadger.com/v1/naver/products/{origin_product_no}/reviews"
+description: "Paginated review list for a Naver storefront product, with sort control."
+---
+
+List the **individual reviews** for a storefront product, paginated and sortable. Each review carries its rating, body, author (masked), options purchased and media.
+
+**Credits:** 5
+
+<Note>
+  Brand Store products are fully supported. SmartStore review listing requires a `checkout_merchant_no` and may be unavailable.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="origin_product_no" type="string" required>
+  The product's origin product number.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="store_url" type="string" required>
+  Store/brand slug.
+</ParamField>
+
+<ParamField query="product_no" type="string" required>
+  Channel product number (the storefront `/products/{no}` id, not the origin product number).
+</ParamField>
+
+<ParamField query="host" type="string" default="smartstore">
+  `brand` or `smartstore`.
+</ParamField>
+
+<ParamField query="checkout_merchant_no" type="integer">
+  SmartStore only — passed through when known.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  1-based page.
+</ParamField>
+
+<ParamField query="sort" type="string" default="REVIEW_RANKING">
+  `REVIEW_RANKING` or `REVIEW_CREATE_DATE_DESC`.
+</ParamField>
+
+## Response
+
+<ResponseField name="origin_product_no" type="string" />
+<ResponseField name="page" type="integer" />
+<ResponseField name="page_size" type="integer" />
+<ResponseField name="sort" type="string" />
+<ResponseField name="total_count" type="integer">Total reviews, when reported.</ResponseField>
+<ResponseField name="reviews" type="Review[]">
+  Reviews.
+
+  <Expandable title="Review">
+    <ResponseField name="review_id" type="string" />
+    <ResponseField name="rating" type="integer" />
+    <ResponseField name="content" type="string" />
+    <ResponseField name="author_masked" type="string" />
+    <ResponseField name="option" type="string">The purchased option, when shown.</ResponseField>
+    <ResponseField name="created_at" type="string" />
+    <ResponseField name="images" type="string[]" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/products/5123456789/reviews?store_url=nike&product_no=7001234567&host=brand&page=1" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/products/5123456789/reviews?" +
+    new URLSearchParams({"store_url": "nike", "product_no": "7001234567", "host": "brand", "page": "1"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/products/5123456789/reviews",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"store_url": "nike", "product_no": "7001234567", "host": "brand", "page": "1"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "origin_product_no": "5123456789",
+  "page": 1,
+  "page_size": 20,
+  "sort": "REVIEW_RANKING",
+  "total_count": 5231,
+  "reviews": [
+    {
+      "review_id": "r900100",
+      "rating": 5,
+      "content": "사이즈 정사이즈이고 배송 빨라요",
+      "author_masked": "kim****",
+      "option": "270",
+      "created_at": "2026-07-28T00:00:00+09:00",
+      "images": [
+        "https://review-phinf.example.net/r900100.jpg"
+      ]
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

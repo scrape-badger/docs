@@ -1,0 +1,100 @@
+---
+title: "News Search"
+api: "GET https://scrapebadger.com/v1/naver/news"
+description: "Search Naver News — headline, source, snippet and absolute publish time per article, with thumbnail imagery."
+---
+
+Search Naver News. Each article carries the headline, the publishing source,
+a snippet and an **absolute publish time** (`published_at`) alongside Naver's
+raw displayed date, plus a thumbnail when one is shown.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords, e.g. `금리 인상`.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  1-based result page for pagination.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="page" type="integer">The page that was fetched.</ResponseField>
+<ResponseField name="result_count" type="integer">Articles returned.</ResponseField>
+<ResponseField name="results" type="NewsArticle[]">
+  News articles.
+
+  <Expandable title="NewsArticle">
+    <ResponseField name="position" type="integer">1-based rank.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="url" type="string">Destination article URL — any Naver redirect is resolved.</ResponseField>
+    <ResponseField name="snippet" type="string" />
+    <ResponseField name="source" type="string">Publisher name.</ResponseField>
+    <ResponseField name="published" type="string">Raw publish date as displayed by Naver.</ResponseField>
+    <ResponseField name="published_at" type="string">ISO 8601 UTC publish time.</ResponseField>
+    <ResponseField name="thumbnail_url" type="string">Article thumbnail, when present.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="url" type="string">The Naver News SERP URL for this query and page.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/news?query=금리+인상" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/news?" +
+    new URLSearchParams({ query: "금리 인상" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/news",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "금리 인상"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "금리 인상",
+  "page": 1,
+  "result_count": 10,
+  "results": [
+    {
+      "position": 1,
+      "title": "한국은행, 기준금리 동결 결정",
+      "url": "https://news.example.co.kr/article/2026080712345",
+      "snippet": "한국은행 금융통화위원회는 기준금리를 현 수준에서 동결하기로 결정했다...",
+      "source": "연합뉴스",
+      "published": "2026.08.07.",
+      "published_at": "2026-08-07T05:03:00+00:00",
+      "thumbnail_url": "https://imgnews.example.co.kr/thumb/2026080712345.jpg"
+    }
+  ],
+  "url": "https://search.naver.com/search.naver?where=news&query=금리+인상"
+}
+```

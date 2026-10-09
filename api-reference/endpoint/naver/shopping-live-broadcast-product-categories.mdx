@@ -1,0 +1,94 @@
+---
+title: "List Live Broadcast Product Categories"
+api: "GET https://scrapebadger.com/v1/naver/shopping/live/broadcasts/{broadcast_id}/product-categories"
+description: "The product categories featured in a Naver Shopping Live broadcast."
+---
+
+List the **product categories present in a Shopping Live broadcast** — the category chips shoppers can filter the broadcast's products by.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="broadcast_id" type="string" required>
+  Shopping Live broadcast id.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="attachment_type" type="string">
+  `MAIN` or `SUB`.
+</ParamField>
+
+## Response
+
+<ResponseField name="broadcast_id" type="string" />
+<ResponseField name="result_count" type="integer" />
+<ResponseField name="categories" type="Category[]">
+  Product categories.
+
+  <Expandable title="Category">
+    <ResponseField name="id" type="string" />
+    <ResponseField name="name" type="string" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/live/broadcasts/1234567/product-categories" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/live/broadcasts/1234567/product-categories",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/live/broadcasts/1234567/product-categories",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "broadcast_id": "1234567",
+  "result_count": 3,
+  "categories": [
+    {
+      "id": "c1",
+      "name": "침구"
+    },
+    {
+      "id": "c2",
+      "name": "생활용품"
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

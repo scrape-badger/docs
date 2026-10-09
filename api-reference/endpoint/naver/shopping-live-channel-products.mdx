@@ -1,0 +1,94 @@
+---
+title: "List Live Channel Products"
+api: "GET https://scrapebadger.com/v1/naver/shopping/live/channels/{channel_id}/products"
+description: "Product list for a Naver Shopping Live channel, cursor-paginated."
+---
+
+List the **products a Shopping Live channel features** across its broadcasts, cursor-paginated.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="channel_id" type="string" required>
+  Shopping Live channel id.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="next" type="string">
+  Pagination cursor from a prior page.
+</ParamField>
+
+<ParamField query="size" type="integer">
+  Products per page (1–100). Omit for the upstream default (10).
+</ParamField>
+
+## Response
+
+<ResponseField name="channel_id" type="string" />
+<ResponseField name="count" type="integer" />
+<ResponseField name="next" type="string">Cursor for the next page, or `null` at the end.</ResponseField>
+<ResponseField name="result_count" type="integer" />
+<ResponseField name="products" type="Product[]">Channel products.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/live/channels/abcde/products?size=20" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/live/channels/abcde/products?" +
+    new URLSearchParams({"size": "20"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/live/channels/abcde/products",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"size": "20"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "channel_id": "abcde",
+  "count": 120,
+  "next": "20",
+  "result_count": 20,
+  "products": [
+    {
+      "key": "p1",
+      "name": "시원한 여름 이불",
+      "salePrice": 59000
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

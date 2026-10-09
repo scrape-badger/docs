@@ -1,0 +1,107 @@
+---
+title: "Knowledge iN Search"
+api: "GET https://scrapebadger.com/v1/naver/kin"
+description: "Search Naver Knowledge iN (지식iN) — community question-and-answer threads with the question, best answer and author."
+---
+
+Search **Naver Knowledge iN** (`지식iN`), Korea's largest community Q&A service. Each result carries the question title and URL, the question body, the accepted answer, the author and an absolute publish timestamp. Returns 10 results per page.
+
+**Credits:** 5
+
+<Note>
+  Knowledge iN exposes only the first page of results — the upstream “더보기” (load-more) control is JavaScript-driven and has no stable page cursor, so `page` above 1 returns the same first page.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  1-based result page (see the note above).
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string" />
+<ResponseField name="page" type="integer" />
+<ResponseField name="result_count" type="integer" />
+<ResponseField name="results" type="KinResult[]">
+  Knowledge iN threads.
+
+  <Expandable title="KinResult">
+    <ResponseField name="position" type="integer" />
+    <ResponseField name="title" type="string" />
+    <ResponseField name="url" type="string">Thread URL.</ResponseField>
+    <ResponseField name="question" type="string">The question body.</ResponseField>
+    <ResponseField name="answer" type="string">The accepted / top answer.</ResponseField>
+    <ResponseField name="author" type="string" />
+    <ResponseField name="published" type="string" />
+    <ResponseField name="published_at" type="string">Absolute publish timestamp (ISO 8601).</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/kin?query=노트북+발열+해결&page=1" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/kin?" +
+    new URLSearchParams({"query": "노트북 발열 해결", "page": "1"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/kin",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "노트북 발열 해결", "page": "1"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "노트북 발열 해결",
+  "page": 1,
+  "result_count": 10,
+  "results": [
+    {
+      "position": 1,
+      "title": "노트북 발열 심한데 어떻게 하나요?",
+      "url": "https://kin.naver.com/qna/detail.naver?d1id=1&dirId=1&docId=456789",
+      "question": "게임만 하면 노트북이 너무 뜨거워요...",
+      "answer": "쿨링패드 사용과 서멀구리스 재도포를 추천합니다...",
+      "author": "컴닥터",
+      "published": "2026.07.30.",
+      "published_at": "2026-07-30T00:00:00+09:00"
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

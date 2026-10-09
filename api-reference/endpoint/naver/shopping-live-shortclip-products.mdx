@@ -1,0 +1,109 @@
+---
+title: "List Live Shortclip Products"
+api: "GET https://scrapebadger.com/v1/naver/shopping/live/shortclips/{shortclip_id}/products"
+description: "Paginated product list for a Naver Shopping Live shortclip, with attachment-type and sort control."
+---
+
+List the **products featured in a Shopping Live shortclip**, paginated, with attachment-type and sort control.
+
+**Credits:** 5
+
+<Note>
+  `page` is 0-based.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="shortclip_id" type="string" required>
+  Shopping Live shortclip id.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="attachment_type" type="string">
+  `MAIN` or `SUB`.
+</ParamField>
+
+<ParamField query="page" type="integer">
+  0-based page.
+</ParamField>
+
+<ParamField query="size" type="integer">
+  Products per page (1–100).
+</ParamField>
+
+<ParamField query="sort" type="string">
+  `RECOMMEND` or `POPULAR`.
+</ParamField>
+
+## Response
+
+<ResponseField name="shortclip_id" type="string" />
+<ResponseField name="page" type="integer" />
+<ResponseField name="total_count" type="integer" />
+<ResponseField name="total_page" type="integer" />
+<ResponseField name="result_count" type="integer" />
+<ResponseField name="products" type="Product[]">Clip products.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/live/shortclips/sc100/products?sort=POPULAR&size=20" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/live/shortclips/sc100/products?" +
+    new URLSearchParams({"sort": "POPULAR", "size": "20"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/live/shortclips/sc100/products",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"sort": "POPULAR", "size": "20"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "shortclip_id": "sc100",
+  "page": 0,
+  "total_count": 2,
+  "total_page": 1,
+  "result_count": 2,
+  "products": [
+    {
+      "key": "p1",
+      "name": "시원한 여름 이불",
+      "salePrice": 59000,
+      "discountedSalePrice": 39000
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

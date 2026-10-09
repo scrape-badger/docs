@@ -1,0 +1,98 @@
+---
+title: "Get Live Broadcast"
+api: "GET https://scrapebadger.com/v1/naver/shopping/live/broadcasts/{broadcast_id}"
+description: "Naver Shopping Live broadcast detail by id, including the embedded featured products."
+---
+
+Fetch **Shopping Live broadcast detail** by id — the title, status and schedule, plus the featured products embedded in the broadcast.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="broadcast_id" type="string" required>
+  Shopping Live broadcast id.
+</ParamField>
+
+## Response
+
+<ResponseField name="broadcast_id" type="string" />
+<ResponseField name="item_count" type="integer">Featured products on the broadcast.</ResponseField>
+<ResponseField name="source_url" type="string" />
+<ResponseField name="broadcast" type="object">
+  Broadcast detail.
+
+  <Expandable title="broadcast">
+    <ResponseField name="title" type="string" />
+    <ResponseField name="status" type="string">e.g. `ONAIR`, `END`, `STANDBY`.</ResponseField>
+    <ResponseField name="expected_start_at" type="string">Scheduled start (KST).</ResponseField>
+    <ResponseField name="expected_start_utc" type="string">Scheduled start (UTC).</ResponseField>
+    <ResponseField name="shoppingProducts" type="Product[]">Featured products.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/live/broadcasts/1234567" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/live/broadcasts/1234567",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/live/broadcasts/1234567",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "broadcast_id": "1234567",
+  "item_count": 5,
+  "source_url": "https://shoppinglive.naver.com/replays/1234567",
+  "broadcast": {
+    "title": "여름 침구 특가 라이브",
+    "status": "END",
+    "expectedStartDate": "2026-08-01T20:00:00+09:00",
+    "expected_start_at": "2026-08-01T20:00:00+09:00",
+    "expected_start_utc": "2026-08-01T11:00:00Z",
+    "shoppingProducts": [
+      {
+        "key": "p1",
+        "name": "시원한 여름 이불",
+        "salePrice": 59000,
+        "discountedSalePrice": 39000
+      }
+    ]
+  }
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

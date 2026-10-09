@@ -1,0 +1,120 @@
+---
+title: "List Product Q&A"
+api: "GET https://scrapebadger.com/v1/naver/products/{origin_product_no}/qnas"
+description: "Paginated product Q&A / inquiries for a Naver storefront product."
+---
+
+List the **product Q&A / inquiries** for a storefront product — shopper questions and the seller's answers, paginated.
+
+**Credits:** 5
+
+<Note>
+  Brand Store products are fully supported. SmartStore Q&A requires `channel_uid` and may be unavailable.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="origin_product_no" type="string" required>
+  The product's origin product number.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="store_url" type="string" required>
+  Store/brand slug.
+</ParamField>
+
+<ParamField query="product_no" type="string" required>
+  Channel product number (the storefront `/products/{no}` id).
+</ParamField>
+
+<ParamField query="host" type="string" default="smartstore">
+  `brand` or `smartstore`.
+</ParamField>
+
+<ParamField query="channel_uid" type="string">
+  Storefront channel uid; required for `host=smartstore`.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  1-based page.
+</ParamField>
+
+## Response
+
+<ResponseField name="origin_product_no" type="string" />
+<ResponseField name="page" type="integer" />
+<ResponseField name="total_count" type="integer">Total Q&A entries, when reported.</ResponseField>
+<ResponseField name="qnas" type="Qna[]">
+  Q&A entries.
+
+  <Expandable title="Qna">
+    <ResponseField name="question" type="string" />
+    <ResponseField name="answer" type="string" />
+    <ResponseField name="author_masked" type="string" />
+    <ResponseField name="created_at" type="string" />
+    <ResponseField name="answered_at" type="string" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/products/5123456789/qnas?store_url=nike&product_no=7001234567&host=brand&page=1" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/products/5123456789/qnas?" +
+    new URLSearchParams({"store_url": "nike", "product_no": "7001234567", "host": "brand", "page": "1"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/products/5123456789/qnas",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"store_url": "nike", "product_no": "7001234567", "host": "brand", "page": "1"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "origin_product_no": "5123456789",
+  "page": 1,
+  "total_count": 128,
+  "qnas": [
+    {
+      "question": "275 사이즈 재입고 언제 되나요?",
+      "answer": "다음 주 중 재입고 예정입니다.",
+      "author_masked": "lee****",
+      "created_at": "2026-07-20T00:00:00+09:00",
+      "answered_at": "2026-07-21T00:00:00+09:00"
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

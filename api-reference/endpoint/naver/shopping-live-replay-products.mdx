@@ -1,0 +1,108 @@
+---
+title: "List Live Replay Products"
+api: "GET https://scrapebadger.com/v1/naver/shopping/live/broadcasts/{broadcast_id}/replay-products"
+description: "The replay product timeline of an ended Naver Shopping Live broadcast — products with their on-air offsets."
+---
+
+Fetch the **replay product timeline** of an ended Shopping Live broadcast — the products as they were featured over the broadcast, each entry carrying its on-air offset so you can align products to the replay video. Cursor-paginated.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="broadcast_id" type="string" required>
+  Shopping Live broadcast id.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="include_before" type="boolean" default="true">
+  Include products shown before the broadcast started.
+</ParamField>
+
+<ParamField query="next" type="string" default="0">
+  Pagination cursor; `0` starts from the beginning.
+</ParamField>
+
+## Response
+
+<ResponseField name="broadcast_id" type="string" />
+<ResponseField name="next" type="string">Cursor for the next page, or `null` at the end.</ResponseField>
+<ResponseField name="result_count" type="integer">Timeline entries in this page.</ResponseField>
+<ResponseField name="product_count" type="integer">Distinct products across the timeline.</ResponseField>
+<ResponseField name="entries" type="Entry[]">
+  Timeline entries.
+
+  <Expandable title="Entry">
+    <ResponseField name="createdAtMilli" type="integer">Entry timestamp (epoch ms).</ResponseField>
+    <ResponseField name="offset_seconds" type="integer">Offset into the replay, in seconds.</ResponseField>
+    <ResponseField name="products" type="Product[]">Products featured at this offset.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/live/broadcasts/1234567/replay-products?next=0" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/live/broadcasts/1234567/replay-products?" +
+    new URLSearchParams({"next": "0"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/live/broadcasts/1234567/replay-products",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"next": "0"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "broadcast_id": "1234567",
+  "next": "20",
+  "result_count": 1,
+  "product_count": 5,
+  "entries": [
+    {
+      "createdAtMilli": 1754044800000,
+      "offset_seconds": 120,
+      "products": [
+        {
+          "key": "p1",
+          "name": "시원한 여름 이불",
+          "salePrice": 59000
+        }
+      ]
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

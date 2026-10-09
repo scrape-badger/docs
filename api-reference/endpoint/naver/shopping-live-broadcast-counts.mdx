@@ -1,0 +1,82 @@
+---
+title: "Get Live Broadcast Counts"
+api: "GET https://scrapebadger.com/v1/naver/shopping/live/broadcasts/{broadcast_id}/counts"
+description: "Viewer, like and comment counts for a Naver Shopping Live broadcast."
+---
+
+Fetch the **engagement counts** for a Shopping Live broadcast — the viewer, like and comment totals.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="broadcast_id" type="string" required>
+  Shopping Live broadcast id.
+</ParamField>
+
+## Response
+
+<ResponseField name="broadcast_id" type="string" />
+<ResponseField name="counts" type="object">
+  Engagement counts.
+
+  <Expandable title="counts">
+    <ResponseField name="viewerCount" type="integer" />
+    <ResponseField name="likeCount" type="integer" />
+    <ResponseField name="commentCount" type="integer" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/live/broadcasts/1234567/counts" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/live/broadcasts/1234567/counts",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/live/broadcasts/1234567/counts",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "broadcast_id": "1234567",
+  "counts": {
+    "viewerCount": 48213,
+    "likeCount": 120345,
+    "commentCount": 2841
+  }
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

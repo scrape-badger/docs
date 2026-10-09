@@ -1,0 +1,115 @@
+---
+title: "Web Search"
+api: "GET https://scrapebadger.com/v1/naver/search"
+description: "Search the Naver web SERP — organic results, related searches and any local place pack, with resolved destination URLs."
+---
+
+Search Naver's web SERP. Organic results carry the **resolved destination
+URL**, display URL, snippet and source. When Naver shows a local "place" block
+for the query, those entries are returned in `place_results[]`.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Search keywords, e.g. `제주도 맛집`.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  1-based result page for pagination.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="page" type="integer">The page that was fetched.</ResponseField>
+<ResponseField name="result_count" type="integer">Organic results returned in this response.</ResponseField>
+<ResponseField name="results" type="SearchResult[]">
+  Organic results.
+
+  <Expandable title="SearchResult">
+    <ResponseField name="position" type="integer">1-based rank within this page.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="url" type="string">Destination URL — any Naver redirect is resolved.</ResponseField>
+    <ResponseField name="display_url" type="string">Human-readable URL shown by Naver.</ResponseField>
+    <ResponseField name="snippet" type="string" />
+    <ResponseField name="source" type="string">Site or publisher name.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="related_searches" type="string[]">Naver's related query suggestions, when present.</ResponseField>
+<ResponseField name="place_results" type="PlaceResult[]">
+  The local "place" pack Naver shows for the query, when present — same shape as
+  a [`/local`](/api-reference/endpoint/naver/local) result (`place_id`, `name`,
+  `category`, `address`, `rating`, `review_count`, `url`, …).
+</ResponseField>
+<ResponseField name="url" type="string">The Naver SERP URL for this query and page.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/search?query=제주도+맛집" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/search?" +
+    new URLSearchParams({ query: "제주도 맛집" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "제주도 맛집"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "제주도 맛집",
+  "page": 1,
+  "result_count": 10,
+  "results": [
+    {
+      "position": 1,
+      "title": "제주도 가볼 만한 맛집 BEST 20",
+      "url": "https://blog.example.com/jeju-food",
+      "display_url": "blog.example.com › jeju-food",
+      "snippet": "제주 현지인이 추천하는 흑돼지, 고기국수, 해산물 맛집을 정리했습니다...",
+      "source": "제주맛집블로그"
+    }
+  ],
+  "related_searches": ["제주도 흑돼지 맛집", "제주 고기국수", "제주 애월 맛집"],
+  "place_results": [
+    {
+      "place_id": "1234567890",
+      "name": "돈사돈",
+      "category": "돼지고기구이",
+      "address": "제주특별자치도 제주시 ...",
+      "rating": 4.5,
+      "review_count": 2841,
+      "url": "https://map.naver.com/p/entry/place/1234567890",
+      "rank": 1
+    }
+  ],
+  "url": "https://search.naver.com/search.naver?query=제주도+맛집"
+}
+```

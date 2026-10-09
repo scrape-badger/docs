@@ -1,0 +1,95 @@
+---
+title: "Get Store Bestsellers"
+api: "GET https://scrapebadger.com/v1/naver/stores/{store_url}/bestsellers"
+description: "Bestselling products within a single Naver SmartStore / Brand Store, by period."
+---
+
+List the **bestselling products within one storefront**, scoped by period. Each product is the same storefront listing card returned by [`/stores/{store_url}/products`](/api-reference/endpoint/naver/store-products).
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="store_url" type="string" required>
+  Storefront slug.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="host" type="string" default="smartstore">
+  Storefront host: `smartstore` or `brand`.
+</ParamField>
+
+<ParamField query="period" type="string" default="DAILY">
+  `REALTIME`, `DAILY`, `WEEKLY` or `MONTHLY`.
+</ParamField>
+
+## Response
+
+<ResponseField name="store_url" type="string" />
+<ResponseField name="host" type="string" />
+<ResponseField name="period" type="string" />
+<ResponseField name="result_count" type="integer" />
+<ResponseField name="products" type="Product[]">Bestselling storefront listing cards — same shape as [`/stores/{store_url}/products`](/api-reference/endpoint/naver/store-products).</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/stores/plusink/bestsellers?host=smartstore&period=DAILY" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/stores/plusink/bestsellers?" +
+    new URLSearchParams({"host": "smartstore", "period": "DAILY"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/stores/plusink/bestsellers",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"host": "smartstore", "period": "DAILY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "store_url": "plusink",
+  "host": "smartstore",
+  "period": "DAILY",
+  "result_count": 20,
+  "products": [
+    {
+      "id": "7001234567",
+      "name": "정품 HP 잉크 카트리지 세트",
+      "sale_price": 48000,
+      "representative_image_url": "https://shop-phinf.example.net/7001234567.jpg"
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

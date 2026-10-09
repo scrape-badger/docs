@@ -1,0 +1,83 @@
+---
+title: "Autocomplete"
+api: "GET https://scrapebadger.com/v1/naver/autocomplete"
+description: "Get Naver search-box query suggestions for a partial term, each tagged with a type."
+---
+
+Get Naver's search-box suggestions for a partial term. The cheapest call in
+this API — useful for expanding a seed keyword into real Naver queries before
+running [`/search`](/api-reference/endpoint/naver/search) on each one. Each
+suggestion is tagged with a `type` describing what kind of entity it points to.
+
+**Credits:** 1
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Partial search term, e.g. `제주`.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested term.</ResponseField>
+<ResponseField name="result_count" type="integer">Number of suggestions.</ResponseField>
+<ResponseField name="suggestions" type="Suggestion[]">
+  Suggested queries, in Naver's order.
+
+  <Expandable title="Suggestion">
+    <ResponseField name="query" type="string">The suggested query text.</ResponseField>
+    <ResponseField name="type" type="string">The suggestion kind, e.g. `keyword`, `place`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/autocomplete?query=제주" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/autocomplete?" +
+    new URLSearchParams({ query: "제주" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { suggestions } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/autocomplete",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "제주"},
+)
+suggestions = res.json()["suggestions"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "제주",
+  "result_count": 6,
+  "suggestions": [
+    { "query": "제주도 맛집", "type": "keyword" },
+    { "query": "제주도 여행", "type": "keyword" },
+    { "query": "제주 날씨", "type": "keyword" },
+    { "query": "제주항공", "type": "keyword" },
+    { "query": "제주 렌트카", "type": "keyword" },
+    { "query": "제주도 가볼만한곳", "type": "keyword" }
+  ]
+}
+```

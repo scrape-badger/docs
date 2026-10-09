@@ -350,6 +350,107 @@
         ]
       },
       {
+        "tab": "Naver",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "naver/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/naver/search",
+              "api-reference/endpoint/naver/search-web",
+              "api-reference/endpoint/naver/news",
+              "api-reference/endpoint/naver/blog",
+              "api-reference/endpoint/naver/cafe",
+              "api-reference/endpoint/naver/kin",
+              "api-reference/endpoint/naver/autocomplete",
+              "api-reference/endpoint/naver/image",
+              "api-reference/endpoint/naver/video",
+              "api-reference/endpoint/naver/clip"
+            ]
+          },
+          {
+            "group": "Place",
+            "pages": [
+              "api-reference/endpoint/naver/local",
+              "api-reference/endpoint/naver/place",
+              "api-reference/endpoint/naver/place-reviews",
+              "api-reference/endpoint/naver/place-photos"
+            ]
+          },
+          {
+            "group": "Shopping Intelligence",
+            "pages": [
+              "api-reference/endpoint/naver/shopping-bestsellers",
+              "api-reference/endpoint/naver/shopping-keywords",
+              "api-reference/endpoint/naver/shopping-insight",
+              "api-reference/endpoint/naver/shopping-categories",
+              "api-reference/endpoint/naver/shopping-category-tree",
+              "api-reference/endpoint/naver/shopping-deals",
+              "api-reference/endpoint/naver/shopping-vertical",
+              "api-reference/endpoint/naver/shopping-it-items",
+              "api-reference/endpoint/naver/shopping-brand-rank",
+              "api-reference/endpoint/naver/shopping-brand-categories",
+              "api-reference/endpoint/naver/shopping-keyword-periods"
+            ]
+          },
+          {
+            "group": "Shopping Search & Catalog",
+            "pages": [
+              "api-reference/endpoint/naver/shopping-search-products",
+              "api-reference/endpoint/naver/shopping-search-filters",
+              "api-reference/endpoint/naver/shopping-search-filtered",
+              "api-reference/endpoint/naver/shopping-search-catalog",
+              "api-reference/endpoint/naver/shopping-price-compare"
+            ]
+          },
+          {
+            "group": "SmartStore & Stores",
+            "pages": [
+              "api-reference/endpoint/naver/store-profile",
+              "api-reference/endpoint/naver/store-categories",
+              "api-reference/endpoint/naver/store-products",
+              "api-reference/endpoint/naver/store-bestsellers"
+            ]
+          },
+          {
+            "group": "Products & Reviews",
+            "pages": [
+              "api-reference/endpoint/naver/product-detail",
+              "api-reference/endpoint/naver/product-group",
+              "api-reference/endpoint/naver/product-review-summary",
+              "api-reference/endpoint/naver/product-reviews-list",
+              "api-reference/endpoint/naver/product-qna-list",
+              "api-reference/endpoint/naver/group-review-summary",
+              "api-reference/endpoint/naver/review-detail",
+              "api-reference/endpoint/naver/review-ssr-queries",
+              "api-reference/endpoint/naver/review-video-inkey"
+            ]
+          },
+          {
+            "group": "Shopping Live",
+            "pages": [
+              "api-reference/endpoint/naver/shopping-live-search-keywords",
+              "api-reference/endpoint/naver/shopping-live-broadcast",
+              "api-reference/endpoint/naver/shopping-live-broadcast-products",
+              "api-reference/endpoint/naver/shopping-live-broadcast-counts",
+              "api-reference/endpoint/naver/shopping-live-replay-products",
+              "api-reference/endpoint/naver/shopping-live-broadcast-product-categories",
+              "api-reference/endpoint/naver/shopping-live-channel",
+              "api-reference/endpoint/naver/shopping-live-channel-products",
+              "api-reference/endpoint/naver/shopping-live-channel-broadcasts",
+              "api-reference/endpoint/naver/shopping-live-channel-shortclips",
+              "api-reference/endpoint/naver/shopping-live-shortclip",
+              "api-reference/endpoint/naver/shopping-live-shortclip-products"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Reddit",
         "groups": [
           {

@@ -1,0 +1,100 @@
+---
+title: "Get Live Shortclip"
+api: "GET https://scrapebadger.com/v1/naver/shopping/live/shortclips/{shortclip_id}"
+description: "Naver Shopping Live shortclip detail with embedded products and categories."
+---
+
+Fetch **Shopping Live shortclip detail** — the clip's channel, video id, product categories and the products embedded in the clip.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="shortclip_id" type="string" required>
+  Shopping Live shortclip id.
+</ParamField>
+
+## Response
+
+<ResponseField name="shortclip_id" type="string" />
+<ResponseField name="item_count" type="integer">Products embedded in the clip.</ResponseField>
+<ResponseField name="shortclip" type="object">
+  Shortclip detail.
+
+  <Expandable title="shortclip">
+    <ResponseField name="channel" type="object">The owning channel.</ResponseField>
+    <ResponseField name="vid" type="string">Video id.</ResponseField>
+    <ResponseField name="categories" type="Category[]">Product categories in the clip.</ResponseField>
+    <ResponseField name="products" type="Product[]">Embedded products.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/live/shortclips/sc100" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/live/shortclips/sc100",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/live/shortclips/sc100",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "shortclip_id": "sc100",
+  "item_count": 2,
+  "shortclip": {
+    "channel": {
+      "id": "abcde",
+      "nickname": "리빙하우스"
+    },
+    "vid": "V_ab12cd34",
+    "categories": [
+      {
+        "id": "c1",
+        "name": "침구"
+      }
+    ],
+    "products": [
+      {
+        "key": "p1",
+        "name": "시원한 여름 이불",
+        "salePrice": 59000
+      }
+    ]
+  }
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |

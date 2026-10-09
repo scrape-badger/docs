@@ -1,0 +1,108 @@
+---
+title: "List Live Channel Shortclips"
+api: "GET https://scrapebadger.com/v1/naver/shopping/live/channels/{channel_id}/shortclips"
+description: "Shorts / clips list for a Naver Shopping Live channel, with sort control and cursor pagination."
+---
+
+List a **Shopping Live channel's shortclips** — its short-form shopping clips — with sort control and cursor pagination.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="channel_id" type="string" required>
+  Shopping Live channel id.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="sort_type" type="string">
+  `LATEST`, `VIEW` or `RECOMMEND`. Omit for the upstream default.
+</ParamField>
+
+<ParamField query="next" type="string">
+  Pagination cursor from a prior page.
+</ParamField>
+
+<ParamField query="size" type="integer">
+  Clips per page (1–100). Omit for the upstream default (10).
+</ParamField>
+
+## Response
+
+<ResponseField name="channel_id" type="string" />
+<ResponseField name="count" type="integer" />
+<ResponseField name="next" type="string">Cursor for the next page, or `null` at the end.</ResponseField>
+<ResponseField name="result_count" type="integer" />
+<ResponseField name="shortclips" type="Shortclip[]">
+  Shortclip cards.
+
+  <Expandable title="Shortclip">
+    <ResponseField name="id" type="string" />
+    <ResponseField name="title" type="string" />
+    <ResponseField name="thumbnailUrl" type="string" />
+    <ResponseField name="viewCount" type="integer" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/naver/shopping/live/channels/abcde/shortclips?sort_type=VIEW&size=20" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/naver/shopping/live/channels/abcde/shortclips?" +
+    new URLSearchParams({"sort_type": "VIEW", "size": "20"}),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/naver/shopping/live/channels/abcde/shortclips",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"sort_type": "VIEW", "size": "20"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "channel_id": "abcde",
+  "count": 60,
+  "next": "20",
+  "result_count": 20,
+  "shortclips": [
+    {
+      "id": "sc100",
+      "title": "1분 침구 꿀팁",
+      "thumbnailUrl": "https://shop-phinf.example.net/sc100.jpg",
+      "viewCount": 88213
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | The requested resource does not exist or has been removed. |
+| `422` | Naver served a challenge instead of content — **not billed**. Retry; it succeeds. |
+| `502` | Unexpected upstream failure — **not billed**. |
