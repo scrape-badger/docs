@@ -1,0 +1,42 @@
+---
+title: "Codex"
+description: "Connect ScrapeBadger to OpenAI Codex (CLI, IDE extension and Codex app) via MCP with OAuth."
+---
+
+# Codex
+
+The Codex CLI, IDE extension and Codex app share one MCP configuration, so you only set ScrapeBadger up once.
+
+## Setup
+
+<Steps>
+  <Step title="Add the server">
+    ```bash
+    codex mcp add scrapebadger --url https://mcp.scrapebadger.com/mcp
+    ```
+  </Step>
+  <Step title="Sign in">
+    ```bash
+    codex mcp login scrapebadger
+    ```
+
+    Your browser opens the ScrapeBadger sign-in and consent screen. Approve it, and Codex stores the token. You don't need an API key.
+  </Step>
+</Steps>
+
+<Note>
+Prefer an API key? Export it and point Codex at the variable instead of running `codex mcp login`:
+
+```bash
+export SCRAPEBADGER_API_KEY=sb_live_...
+codex mcp add scrapebadger --url https://mcp.scrapebadger.com/mcp --bearer-token-env-var SCRAPEBADGER_API_KEY
+```
+</Note>
+
+## What you can ask
+
+Once connected, Codex can call any of ScrapeBadger's tools while it works. Try:
+
+> "Pull the latest 20 tweets from @openai and write them to tweets.json"
+
+> "Scrape https://example.com/pricing and turn the plans into a TypeScript type"
