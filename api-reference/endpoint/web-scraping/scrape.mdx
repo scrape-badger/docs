@@ -261,7 +261,9 @@ openapi: POST /v1/web/scrape
 </ParamField>
 
 <ParamField body="video" type="boolean" default={false}>
-  Record a video of the browser session (animated GIF). Forces the browser engine. Returned as base64 in the `video_url` response field. No extra charge — you pay the browser engine cost you were already paying. Useful for debugging, visual verification, or monitoring how a page loads.
+  Record the browser session, from navigation to the final page, as an animated GIF. Forces the browser engine. Returned in the `video_url` response field as a `data:image/gif;base64,…` URI. No extra charge — you pay the browser engine cost you were already paying. Useful for debugging, visual verification, or monitoring how a page loads.
+
+  The recording is bounded so it stays small enough to return inline: up to 5 frames per second, at most 640 px on its longest side, idle stretches (a `wait_for` or a dwell) shortened to 3 s, and at most 2 MB. A recording over 2 MB is downscaled, then thinned to fewer frames. Recording never fails the scrape: if nothing could be recorded you still get the page, with `video_url: null`.
 </ParamField>
 
 <ParamField body="anti_bot" type="boolean" default={false}>
@@ -406,7 +408,7 @@ checked against the estimate *including* the proxy surcharge.
 </ResponseField>
 
 <ResponseField name="video_url" type="string">
-  Base64-encoded animated GIF of the browser session. Only present when `video: true` was requested.
+  The browser session as an animated GIF `data:image/gif;base64,…` URI. Only present when `video: true` was requested; `null` if the session could not be recorded.
 </ResponseField>
 
 <ResponseField name="headers" type="object">
