@@ -56,6 +56,21 @@ ScrapeBadger uses a simple credit-based pricing model. Pay only for what you use
   Failed requests (4xx/5xx errors) do not consume credits. You are only charged for successful responses.
 </Info>
 
+## Repeated requests are free for 60 seconds
+
+If you send the same request again within **60 seconds**, the cached response is returned and you are charged **0 credits**. "The same request" means the same API key, endpoint, query parameters (in any order) and request body. This covers accidental retry loops and duplicate calls from your code.
+
+- A cached response has the `X-Cache: HIT` header, an `Age` header (seconds since the original call) and `X-Credits-Used: 0`.
+- If identical requests are sent at the same time, only the first one runs and is billed. The others wait for it and get its result for free.
+- Only successful responses that cost credits are cached. Errors and empty results that cost 0 credits are not cached, so retrying them still makes a real request.
+- To force a fresh result, send `Cache-Control: no-cache`. That request is billed as normal.
+- Cached responses still count toward your [rate limit](/rate-limits).
+
+```bash
+curl -H "x-api-key: $SCRAPEBADGER_API_KEY" -H "Cache-Control: no-cache" \
+  "https://scrapebadger.com/v1/facebook/posts/1113411791332972"
+```
+
 ## Free Credits
 
 New accounts receive free credits to get started. Use them to test the API and build your integration before purchasing more.
@@ -86,6 +101,9 @@ We offer a range of credit packages to suit different needs. Larger packages off
   </Accordion>
   <Accordion title="Do you offer refunds?">
     Credits are non-refundable once purchased. However, if you experience technical issues, contact support and we will work with you.
+  </Accordion>
+  <Accordion title="Am I charged for repeating the same request?">
+    No, not if you repeat it within 60 seconds. An identical request (same API key, endpoint, parameters and body) in that window returns the cached response at **0 credits**, marked `X-Cache: HIT`. See [Repeated requests are free for 60 seconds](#repeated-requests-are-free-for-60-seconds).
   </Accordion>
   <Accordion title="Am I charged for repeating the same Google request?">
     No. Google endpoints cache successful responses for 5 minutes. A repeat of the same endpoint with the same query parameters within that window — or sent while an identical request is still running — is served from the cache at **0 credits** and marked with an `X-Cache: HIT` or `X-Cache: COALESCED` response header. See [Google — Response Caching](/google/overview#response-caching).
