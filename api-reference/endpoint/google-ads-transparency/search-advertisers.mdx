@@ -9,7 +9,15 @@ take. This is the **entry point for brand-name lookups** — free-text search on
 [`/ads/search`](/api-reference/endpoint/google-ads-transparency/search-ads) is
 domain-based and will not find a brand by name.
 
-**Credits:** 5
+**Credits:** 5 — or 15 with `fuzzy=true`. An empty result is not billed.
+
+<Note>
+  Google's own matching has **no typo tolerance**: advertiser names match by
+  word prefix (`ruff wear` finds *Ruff Wear, Inc.*, `ruffwear` does not) and
+  domains by substring (`uffwear` finds `ruffwear.com`). A single typo —
+  `rufwear`, `ruffwearp` — returns nothing. Set `fuzzy=true` to find misspelled
+  and look-alike advertisers.
+</Note>
 
 ## Authorization
 
@@ -24,26 +32,56 @@ domain-based and will not find a brand by name.
 </ParamField>
 
 <ParamField query="region" type="string" default="US">
-  ISO 3166-1 alpha-2 region, or `anywhere`. Echoed on the response.
+  Echoed on the response only. Use `country` to filter advertisers.
 </ParamField>
 
 <ParamField query="num" type="integer" default="10">
-  Suggestions to return, `1`–`20`.
+  Advertisers to return, `1`–`3000`. 3000 is Google's own per-call ceiling;
+  one call returns every match up to it, so advertisers do not page.
+</ParamField>
+
+<ParamField query="num_domains" type="integer" default="10">
+  Domain rows to return, `0`–`100`. They follow the advertiser rows.
+</ParamField>
+
+<ParamField query="country" type="string">
+  ISO 3166-1 alpha-2. Only advertisers registered in this country. Domain rows
+  are not filtered.
+</ParamField>
+
+<ParamField query="cursor" type="string">
+  `next_page_token` from a previous response: the next page of domain rows.
+  Cannot be combined with `fuzzy`.
+</ParamField>
+
+<ParamField query="fuzzy" type="boolean" default="false">
+  Find misspelled and look-alike advertisers. Searches up to 7 variants of the
+  query (shorter prefixes, overlapping halves, swapped leading letters),
+  resolves the closest look-alike domains to the advertisers running ads on
+  them, drops weak matches, and ranks every row by `similarity`. Billed 15
+  credits (3 lookups), however many variants run.
 </ParamField>
 
 ## Response
 
 <ResponseField name="query" type="string">Echo of the requested text.</ResponseField>
 <ResponseField name="region" type="string" />
+<ResponseField name="country" type="string">The applied `country` filter, upper-cased, or null.</ResponseField>
+<ResponseField name="fuzzy" type="boolean" />
+<ResponseField name="variants" type="string[]">`fuzzy=true` only: the query variants that were searched.</ResponseField>
+<ResponseField name="variants_failed" type="string[]">`fuzzy=true` only: variants whose upstream call failed. The rest are still returned.</ResponseField>
+<ResponseField name="next_page_token" type="string">Pass as `cursor` for the next page of domain rows.</ResponseField>
 <ResponseField name="advertisers" type="AdvertiserSuggestion[]">
   <Expandable title="AdvertiserSuggestion">
     <ResponseField name="advertiser_id" type="string">Pass to `/ads/search` and `/ads/advertiser`.</ResponseField>
     <ResponseField name="name" type="string" />
     <ResponseField name="region" type="string">The advertiser's own registered region, when disclosed.</ResponseField>
     <ResponseField name="domain" type="string">Verified domain — a bare-domain suggestion has this but no name.</ResponseField>
-    <ResponseField name="verified" type="boolean" />
+    <ResponseField name="verified" type="boolean">Whether Google has verified the advertiser's identity.</ResponseField>
     <ResponseField name="ads_count" type="integer" />
     <ResponseField name="details_link" type="string">The advertiser's Transparency Center page.</ResponseField>
+    <ResponseField name="similarity" type="number">`fuzzy=true` only: 0–1 closeness to the query (1 = exact).</ResponseField>
+    <ResponseField name="matched_query" type="string">`fuzzy=true` only: the variant that surfaced this row, or the look-alike domain an advertiser was found behind.</ResponseField>
   </Expandable>
 </ResponseField>
 
@@ -111,9 +149,53 @@ advertisers = res.json()["advertisers"]
   market you care about.
 </Tip>
 
+## Finding look-alike advertisers
+
+`fuzzy=true` is built for brand protection. Impersonators rarely advertise
+under the brand's name. They register under a personal or unrelated name and
+point ads at a look-alike domain, so no name search reaches them. The fuzzy
+mode resolves those domains to the advertiser behind them:
+
+```bash
+curl "https://scrapebadger.com/v1/google/ads/advertisers?query=rufwear&fuzzy=true" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```json
+{
+  "query": "rufwear",
+  "fuzzy": true,
+  "variants": ["rufwear", "ruf", "rufw", "fwear", "urfwear", "rfuwear", "ruwfear"],
+  "variants_failed": [],
+  "advertisers": [
+    {
+      "advertiser_id": "AR01181731973429723137",
+      "name": "Ruff Wear, Inc.",
+      "domain": "ruffwear.ca",
+      "similarity": 0.875,
+      "matched_query": "ruf"
+    },
+    {
+      "advertiser_id": "AR14220847488281083905",
+      "name": "葛茂朋",
+      "domain": "ruffwearcf.shop",
+      "similarity": 0.814,
+      "matched_query": "ruffwearcf.shop"
+    },
+    { "advertiser_id": null, "domain": "ruffwear.com", "similarity": 0.875, "matched_query": "ruf" },
+    { "advertiser_id": null, "domain": "ruffwearcf.shop", "similarity": 0.814, "matched_query": "fwear" }
+  ]
+}
+```
+
+The same query without `fuzzy` returns `"advertisers": []`. Pass any
+`advertiser_id` to [`/ads/search`](/api-reference/endpoint/google-ads-transparency/search-ads)
+to see the ads.
+
 ## Errors
 
 | Status | Meaning |
 | ------ | ------- |
-| `400` | `query` shorter than 2 characters, or `num` out of range. |
+| `400` | Unknown `country`, or `cursor` combined with `fuzzy`. |
+| `422` | `query` shorter than 2 characters, or `num` / `num_domains` out of range. |
 | `502` | Upstream Transparency Center failure — **not billed**. |

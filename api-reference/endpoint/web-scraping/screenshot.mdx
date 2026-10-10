@@ -1,0 +1,138 @@
+---
+title: Screenshot
+description: Render a URL in a real browser and get a PNG screenshot back.
+---
+
+Loads the page in the browser engine and returns a PNG of the viewport, or of the whole scrollable page with `full_page`. It is billed like a browser scrape plus the proxy tier, the same as `POST /v1/web/scrape` with `screenshot: true`. If the page loads but no screenshot comes back, the call returns `502` and costs **0 credits**.
+
+## Request Body
+
+<ParamField body="url" type="string" required>
+  The page to capture. Must be a valid HTTP or HTTPS URL.
+</ParamField>
+
+<ParamField body="full_page" type="boolean" default={false}>
+  Capture the whole scrollable page instead of only the viewport.
+</ParamField>
+
+<ParamField body="width" type="integer">
+  Viewport width in pixels. Range: `320` – `3840`.
+</ParamField>
+
+<ParamField body="height" type="integer">
+  Viewport height in pixels. Range: `240` – `4320`.
+</ParamField>
+
+<ParamField body="wait_for" type="string">
+  CSS selector to wait for before capturing, e.g. `"#main"`.
+</ParamField>
+
+<ParamField body="country" type="string">
+  ISO 3166-1 alpha-2 country code for the proxy exit, e.g. `"US"`.
+</ParamField>
+
+<ParamField body="proxy_tier" type="string" default="simple">
+  Proxy pool: `simple`, `premium` or `ultra`. Same pricing as on [`/v1/web/scrape`](/api-reference/endpoint/web-scraping/scrape).
+</ParamField>
+
+Unknown fields are rejected with `422`.
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  `true` when a screenshot was captured.
+</ResponseField>
+
+<ResponseField name="url" type="string">
+  The final URL after redirects.
+</ResponseField>
+
+<ResponseField name="status_code" type="integer">
+  HTTP status code of the captured page.
+</ResponseField>
+
+<ResponseField name="content_type" type="string">
+  Always `image/png`.
+</ResponseField>
+
+<ResponseField name="screenshot" type="string">
+  The PNG image, base64-encoded (no `data:` prefix).
+</ResponseField>
+
+<ResponseField name="engine_used" type="string">
+  Browser engine that rendered the page.
+</ResponseField>
+
+<ResponseField name="credits_used" type="integer">
+  Credits charged for this request.
+</ResponseField>
+
+<ResponseField name="duration_ms" type="integer">
+  Total time in milliseconds.
+</ResponseField>
+
+## Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://scrapebadger.com/v1/web/screenshot" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com", "full_page": true, "width": 1280}' \
+  | jq -r .screenshot | base64 --decode > page.png
+```
+
+```python Python
+import base64
+import requests
+
+response = requests.post(
+    "https://scrapebadger.com/v1/web/screenshot",
+    headers={"x-api-key": "YOUR_API_KEY"},
+    json={"url": "https://example.com", "full_page": True, "width": 1280},
+)
+response.raise_for_status()
+with open("page.png", "wb") as f:
+    f.write(base64.b64decode(response.json()["screenshot"]))
+```
+
+```javascript JavaScript
+import { writeFile } from "node:fs/promises";
+
+const res = await fetch("https://scrapebadger.com/v1/web/screenshot", {
+  method: "POST",
+  headers: { "x-api-key": "YOUR_API_KEY", "Content-Type": "application/json" },
+  body: JSON.stringify({ url: "https://example.com", full_page: true, width: 1280 })
+});
+const { screenshot } = await res.json();
+await writeFile("page.png", Buffer.from(screenshot, "base64"));
+```
+
+</CodeGroup>
+
+## Error Responses
+
+| Status | Description |
+|--------|-------------|
+| `402` | Insufficient credits |
+| `422` | Invalid request, or the target blocked the request (not billed) |
+| `429` | Rate limit exceeded, or the browser farm is at capacity (not billed) |
+| `502` | The page loaded but no screenshot was captured (not billed) |
+
+<ResponseExample>
+
+```json 200
+{
+  "success": true,
+  "url": "https://www.example.com/",
+  "status_code": 200,
+  "content_type": "image/png",
+  "screenshot": "iVBORw0KGgoAAAANSUhEUgAAAyAAAAO/CAIAAA...",
+  "engine_used": "cloakbrowser",
+  "credits_used": 6,
+  "duration_ms": 4210
+}
+```
+
+</ResponseExample>

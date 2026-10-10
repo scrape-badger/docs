@@ -245,7 +245,19 @@ openapi: POST /v1/web/scrape
 </ParamField>
 
 <ParamField body="screenshot" type="boolean" default={false}>
-  Capture a full-page screenshot (PNG). Forces the browser engine. Returned as base64 in the `screenshot_url` response field.
+  Capture a PNG screenshot of the rendered page. Forces the browser engine. Returned in the `screenshot_url` response field as a `data:image/png;base64,…` URI. Captures the viewport unless `screenshot_full_page` is set. For a screenshot-only call, [`POST /v1/web/screenshot`](/api-reference/endpoint/web-scraping/screenshot) returns the bare base64 PNG.
+</ParamField>
+
+<ParamField body="screenshot_full_page" type="boolean" default={false}>
+  With `screenshot: true`, capture the whole scrollable page instead of the viewport.
+</ParamField>
+
+<ParamField body="window_width" type="integer">
+  Browser viewport width in pixels for the render (`320` – `3840`).
+</ParamField>
+
+<ParamField body="window_height" type="integer">
+  Browser viewport height in pixels for the render (`240` – `4320`).
 </ParamField>
 
 <ParamField body="video" type="boolean" default={false}>
@@ -390,7 +402,7 @@ checked against the estimate *including* the proxy surcharge.
 </ResponseField>
 
 <ResponseField name="screenshot_url" type="string">
-  Base64-encoded PNG screenshot of the page. Only present when `screenshot: true` was requested.
+  The PNG screenshot as a `data:image/png;base64,…` URI. Only present when `screenshot: true` was requested.
 </ResponseField>
 
 <ResponseField name="video_url" type="string">
