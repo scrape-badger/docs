@@ -40,7 +40,9 @@ region.
 
   For a brand name, go through
   [`/ads/advertisers`](/api-reference/endpoint/google-ads-transparency/search-advertisers)
-  first and use the `advertiser_id` it returns.
+  first and use the `advertiser_id` it returns. Its name match has no typo
+  tolerance either: add `fuzzy=true` to find misspelled and look-alike
+  advertisers, including those behind look-alike domains.
 </Warning>
 
 ```bash
@@ -85,7 +87,7 @@ set. Keep paging.
 | -------- | ---- | ------- |
 | Search creatives | `GET /v1/google/ads/search` | 10 |
 | Creative detail | `GET /v1/google/ads/creative` | 5 |
-| Search advertisers | `GET /v1/google/ads/advertisers` | 5 |
+| Search advertisers | `GET /v1/google/ads/advertisers` | 5 (15 with `fuzzy=true`) |
 | Advertiser detail | `GET /v1/google/ads/advertiser` | 5 |
 
 ## Quickstart

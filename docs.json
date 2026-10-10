@@ -74,7 +74,9 @@
             "group": "API Reference",
             "pages": [
               "api-reference/endpoint/web-scraping/scrape",
-              "api-reference/endpoint/web-scraping/detect"
+              "api-reference/endpoint/web-scraping/detect",
+              "api-reference/endpoint/web-scraping/screenshot",
+              "api-reference/endpoint/web-scraping/extract"
             ]
           }
         ]

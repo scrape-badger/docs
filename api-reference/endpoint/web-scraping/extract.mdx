@@ -1,0 +1,197 @@
+---
+title: Extract Data
+description: Scrape a URL and pull fields out of it with CSS/XPath selectors, AI, or both.
+---
+
+Fetches the page the same way as [`/v1/web/scrape`](/api-reference/endpoint/web-scraping/scrape), then extracts what you asked for:
+
+- `extract_rules` run CSS or XPath selectors over the HTML and return `data`.
+- `ai_extract_rules` and `ai_query` ask an LLM about the page and return `ai_extraction`.
+
+Billing works like a scrape, plus the AI extraction credits when AI is requested and succeeds. Broken selectors are rejected with `422` before anything is fetched.
+
+## Request Body
+
+<ParamField body="url" type="string" required>
+  The page to extract from.
+</ParamField>
+
+<ParamField body="extract_rules" type="object">
+  Field name → selector. A selector starting with `/` or `(` is treated as XPath; anything else is CSS. CSS supports `::text` and `::attr(name)`.
+
+  For more control, pass an object instead of a string:
+  - `selector` (required): the CSS or XPath selector.
+  - `type`: `css` or `xpath`. Inferred when unset.
+  - `all`: return every match as a list instead of the first one.
+  - `output`: `text` (default) or `html` (the element's outer HTML).
+
+  ```json
+  {
+    "title": "h1",
+    "price": "//span[@class='price']",
+    "links": { "selector": "a::attr(href)", "all": true }
+  }
+  ```
+</ParamField>
+
+<ParamField body="ai_extract_rules" type="object">
+  Field name → plain-language description. The AI returns a JSON object with exactly these keys.
+
+  ```json
+  { "price": "the product price with currency", "in_stock": "true if the product can be bought" }
+  ```
+</ParamField>
+
+<ParamField body="ai_query" type="string">
+  A freeform question about the page. When combined with `ai_extract_rules`, the answer is added under an `answer` key.
+</ParamField>
+
+<ParamField body="render_js" type="boolean" default={false}>
+  Render the page in a browser before extracting. Use this for pages that build their content with JavaScript.
+</ParamField>
+
+<ParamField body="wait_for" type="string">
+  CSS selector to wait for before extracting (browser render).
+</ParamField>
+
+<ParamField body="country" type="string">
+  ISO 3166-1 alpha-2 country code for the proxy exit.
+</ParamField>
+
+<ParamField body="proxy_tier" type="string" default="simple">
+  Proxy pool: `simple`, `premium` or `ultra`.
+</ParamField>
+
+At least one of `extract_rules`, `ai_extract_rules` or `ai_query` is required. Unknown fields are rejected with `422`.
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  `true` when the page was fetched and extraction ran.
+</ResponseField>
+
+<ResponseField name="url" type="string">
+  The final URL after redirects.
+</ResponseField>
+
+<ResponseField name="status_code" type="integer">
+  HTTP status code of the fetched page.
+</ResponseField>
+
+<ResponseField name="data" type="object">
+  One key per `extract_rules` field: the first match as a string, a list with `all: true`, or `null` when nothing matched. `null` when no `extract_rules` were given.
+</ResponseField>
+
+<ResponseField name="ai_extraction" type="object">
+  The AI's JSON answer. `null` when no AI was requested.
+</ResponseField>
+
+<ResponseField name="ai_model" type="string">
+  The model that produced `ai_extraction`.
+</ResponseField>
+
+<ResponseField name="ai_error" type="string">
+  Why AI extraction failed, when it did. Selector results in `data` are still returned.
+</ResponseField>
+
+<ResponseField name="engine_used" type="string">
+  Engine that fetched the page.
+</ResponseField>
+
+<ResponseField name="credits_used" type="integer">
+  Credits charged for this request.
+</ResponseField>
+
+<ResponseField name="duration_ms" type="integer">
+  Total time in milliseconds.
+</ResponseField>
+
+## Examples
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST "https://scrapebadger.com/v1/web/extract" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "url": "https://news.ycombinator.com",
+    "extract_rules": {
+      "top_story": ".titleline a",
+      "links": {"selector": ".titleline a::attr(href)", "all": true}
+    }
+  }'
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    "https://scrapebadger.com/v1/web/extract",
+    headers={"x-api-key": "YOUR_API_KEY"},
+    json={
+        "url": "https://example.com/product/123",
+        "ai_extract_rules": {"price": "the product price", "name": "the product name"},
+    },
+)
+print(response.json()["ai_extraction"])
+```
+
+```javascript JavaScript
+const res = await fetch("https://scrapebadger.com/v1/web/extract", {
+  method: "POST",
+  headers: { "x-api-key": "YOUR_API_KEY", "Content-Type": "application/json" },
+  body: JSON.stringify({
+    url: "https://example.com",
+    ai_query: "What is this page for, in one sentence?"
+  })
+});
+console.log((await res.json()).ai_extraction);
+```
+
+</CodeGroup>
+
+## Error Responses
+
+| Status | Description |
+|--------|-------------|
+| `402` | Insufficient credits |
+| `422` | Invalid request or selector, or the target blocked the request (not billed) |
+| `429` | Rate limit exceeded |
+| `502` | The page could not be fetched, or AI-only extraction returned nothing (not billed) |
+
+<ResponseExample>
+
+```json 200 — Selectors
+{
+  "success": true,
+  "url": "https://news.ycombinator.com/",
+  "status_code": 200,
+  "data": { "first_title": "Bitwarden Dual License Model" },
+  "ai_extraction": null,
+  "ai_model": null,
+  "ai_error": null,
+  "engine_used": "http",
+  "credits_used": 2,
+  "duration_ms": 1384
+}
+```
+
+```json 200 — AI query
+{
+  "success": true,
+  "url": "https://www.example.com/",
+  "status_code": 200,
+  "data": null,
+  "ai_extraction": {
+    "answer": "This page is a documentation example domain that should not be used for testing or monitoring."
+  },
+  "ai_model": "google/gemini-2.5-flash",
+  "ai_error": null,
+  "engine_used": "http",
+  "credits_used": 4,
+  "duration_ms": 1188
+}
+```
+
+</ResponseExample>
