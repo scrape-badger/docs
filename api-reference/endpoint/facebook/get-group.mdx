@@ -11,7 +11,13 @@ Fetch a Facebook Group's metadata, and its feed from the companion endpoint.
 | `GET /v1/facebook/groups/{group_id}` | `Group` metadata |
 | `GET /v1/facebook/groups/{group_id}/posts` | the group feed (`Post[]`) |
 
-**Credits:** 5 (each)
+**Credits:** 5 (each). A `/posts` page that returns no posts, and any error,
+costs nothing.
+
+Facebook decides the feed's page size and serves **3 posts per page** to a
+logged-out client, regardless of how many are asked for — the same on every
+plan. Follow `end_cursor` while `has_next_page` is true to walk back through
+older posts.
 
 ## Authorization
 
@@ -30,6 +36,13 @@ Fetch a Facebook Group's metadata, and its feed from the companion endpoint.
 
 <ParamField query="after" type="string">
   `/posts` only. Pagination cursor — the `end_cursor` from a previous response.
+  Keep the same `sort` for every page of one walk.
+</ParamField>
+
+<ParamField query="sort" type="string" default="newest">
+  `/posts` only. `newest` — newest first by post time, and each page continues
+  with older posts. `relevance` — Facebook's "top posts" ranking, which moves
+  older posts with fresh comments up, so the order can change between calls.
 </ParamField>
 
 ## Response — `/groups/{group_id}`
@@ -61,10 +74,13 @@ Returns a single `Group` object.
 <ResponseField name="end_cursor" type="string">Pass as `after` for the next page.</ResponseField>
 <ResponseField name="has_next_page" type="boolean">Whether more posts are reachable.</ResponseField>
 
+Album, sale and listing posts list each photo once in `attachments[]`, with its
+`uri`, `width` and `height`. Facebook includes up to 5 photos per post in a feed.
+
 <Warning>
-  A **private** group returns metadata but an empty `posts[]` — Facebook serves
-  no feed units to a non-member session. Check `privacy` before treating an
-  empty feed as an error.
+  A **private** group's `/posts` returns **503** with a message saying Facebook
+  serves its feed only to signed-in members — not an empty `posts[]`. An empty
+  `posts[]` with `has_next_page: false` means the end of the feed.
 </Warning>
 
 ## Example
