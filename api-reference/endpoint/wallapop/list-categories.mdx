@@ -1,0 +1,116 @@
+---
+title: "List Categories"
+api: "GET https://scrapebadger.com/v1/wallapop/categories"
+description: "Wallapop's full category tree with localised names — the ids are the category_id values search and filters accept."
+---
+
+Wallapop's full category tree. Every `id` in the tree, at any depth, works as the `category_id` in [search](/api-reference/endpoint/wallapop/search-items) and [filters](/api-reference/endpoint/wallapop/list-filters).
+
+**Credits:** 1
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="es">
+  `es`, `it`, or `pt`. Sets the language of category names. See [`/v1/wallapop/markets`](/api-reference/endpoint/wallapop/list-markets).
+</ParamField>
+
+## Response
+
+<ResponseField name="categories" type="Category[]">
+  Top-level categories, each with its subcategories nested.
+
+  <Expandable title="Category">
+    <ResponseField name="id" type="integer">Category id, e.g. `100` (Cars) or `24200` (Technology & electronics).</ResponseField>
+    <ResponseField name="name" type="string | null">Localised category name.</ResponseField>
+    <ResponseField name="parent_id" type="integer | null">Parent category id; `null` for top-level categories.</ResponseField>
+    <ResponseField name="vertical" type="string | null">Wallapop vertical, e.g. `consumer_goods` or `cars`. Subcategories inherit it from their parent.</ResponseField>
+    <ResponseField name="icon" type="string | null">Wallapop icon name for the category, e.g. `car`.</ResponseField>
+    <ResponseField name="subcategories" type="Category[]">Child categories, with the same shape, nested to any depth.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="market" type="string">The market used for the request.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/wallapop/categories?market=es" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/wallapop/categories",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"market": "es"},
+)
+data = res.json()
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/wallapop/categories?market=es", {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+});
+const data = await res.json();
+```
+
+```bash CLI
+scrapebadger wallapop categories --market es
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "categories": [
+    {
+      "id": 100,
+      "name": "Coches",
+      "parent_id": null,
+      "vertical": "cars",
+      "icon": "car",
+      "subcategories": []
+    },
+    {
+      "id": 12465,
+      "name": "Moda y accesorios",
+      "parent_id": null,
+      "vertical": "consumer_goods",
+      "icon": "t-shirt",
+      "subcategories": [
+        {
+          "id": 11002,
+          "name": "Mujer",
+          "parent_id": 12465,
+          "vertical": "consumer_goods",
+          "icon": null,
+          "subcategories": [
+            {
+              "id": 11004,
+              "name": "Ropa",
+              "parent_id": 11002,
+              "vertical": "consumer_goods",
+              "icon": null,
+              "subcategories": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "market": "es"
+}
+```
+
+<Note>
+  Listing categories costs **1 credit**. Failed requests are not charged.
+</Note>

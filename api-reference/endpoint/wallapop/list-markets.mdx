@@ -1,0 +1,101 @@
+---
+title: "List Markets"
+api: "GET https://scrapebadger.com/v1/wallapop/markets"
+description: "List the supported Wallapop markets — Spain, Italy, and Portugal — with their language, currency, and default search location."
+---
+
+The Wallapop markets you can pass as `market`, with each market's language, currency, and default search coordinates.
+
+**Credits:** 0 (free)
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Response
+
+<ResponseField name="markets" type="Market[]">
+  Supported markets.
+
+  <Expandable title="Market">
+    <ResponseField name="code" type="string">Market code to use in the `market` parameter: `es`, `it`, or `pt`.</ResponseField>
+    <ResponseField name="country_code" type="string">ISO 3166-1 alpha-2 country code.</ResponseField>
+    <ResponseField name="name" type="string">Country name.</ResponseField>
+    <ResponseField name="currency" type="string">ISO 4217 currency code, `EUR`.</ResponseField>
+    <ResponseField name="language" type="string">Language of category names, filter labels, and attribute text, e.g. `es-ES`.</ResponseField>
+    <ResponseField name="default_latitude" type="number">Latitude search uses when you don't pass `latitude` (the capital).</ResponseField>
+    <ResponseField name="default_longitude" type="number">Longitude search uses when you don't pass `longitude`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/wallapop/markets" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/wallapop/markets",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/wallapop/markets", {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+});
+const data = await res.json();
+```
+
+```bash CLI
+scrapebadger wallapop markets
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "markets": [
+    {
+      "code": "es",
+      "country_code": "ES",
+      "name": "Spain",
+      "currency": "EUR",
+      "language": "es-ES",
+      "default_latitude": 40.4168,
+      "default_longitude": -3.7038
+    },
+    {
+      "code": "it",
+      "country_code": "IT",
+      "name": "Italy",
+      "currency": "EUR",
+      "language": "it-IT",
+      "default_latitude": 41.9028,
+      "default_longitude": 12.4964
+    },
+    {
+      "code": "pt",
+      "country_code": "PT",
+      "name": "Portugal",
+      "currency": "EUR",
+      "language": "pt-PT",
+      "default_latitude": 38.7223,
+      "default_longitude": -9.1393
+    }
+  ]
+}
+```
+
+<Note>
+  Listing markets is a **free** reference endpoint (0 credits).
+</Note>

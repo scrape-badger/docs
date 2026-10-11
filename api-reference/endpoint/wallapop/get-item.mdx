@@ -1,0 +1,217 @@
+---
+title: "Get Item"
+api: "GET https://scrapebadger.com/v1/wallapop/items/{item_id}"
+description: "Full Wallapop listing detail — description, price, category path, structured attributes, photos, location, shipping, and views, favorites, and conversations counters."
+---
+
+Full detail for one Wallapop listing, including engagement counters that search does not return: **views**, **favorites**, and **conversations**.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="item_id" type="string" required>
+  The listing, in any of three forms:
+
+  - **Id** — `nzxeknm5x562` (the `id` field of any search result). Fastest.
+  - **Slug** — `iphone-14-128gb-1311318554` (the `slug` field).
+  - **Full URL** — `https://es.wallapop.com/item/iphone-14-128gb-1311318554`. URL-encode it when you put it in the path.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="es">
+  `es`, `it`, or `pt`. Sets the language of attribute titles and text and the host of the returned `url`. See [`/v1/wallapop/markets`](/api-reference/endpoint/wallapop/list-markets).
+</ParamField>
+
+## Response
+
+<ResponseField name="id" type="string">Listing id.</ResponseField>
+<ResponseField name="user_id" type="string | null">Seller id. Use it with [`/v1/wallapop/users/{user_id}`](/api-reference/endpoint/wallapop/get-user).</ResponseField>
+<ResponseField name="title" type="string | null">Listing title, as the seller wrote it.</ResponseField>
+<ResponseField name="description" type="string | null">Listing description, as the seller wrote it.</ResponseField>
+<ResponseField name="vertical" type="string | null">Wallapop vertical: `consumer_goods`, `cars`, `real_estate`, and so on.</ResponseField>
+<ResponseField name="price" type="number | null">Asking price.</ResponseField>
+<ResponseField name="currency" type="string | null">ISO 4217 currency code, `EUR`.</ResponseField>
+<ResponseField name="category_id" type="integer | null">The most specific category in `taxonomy`.</ResponseField>
+<ResponseField name="taxonomy" type="TaxonomyNode[]">
+  Category path from top level to leaf.
+
+  <Expandable title="TaxonomyNode">
+    <ResponseField name="id" type="integer">Category id.</ResponseField>
+    <ResponseField name="name" type="string | null">Localised category name.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="condition" type="string | null">Condition id: `un_opened`, `in_box`, `new`, `as_good_as_new`, `good`, `fair`, or `has_given_it_all`.</ResponseField>
+<ResponseField name="brand" type="string | null">Brand (or car make), when set.</ResponseField>
+<ResponseField name="model" type="string | null">Model, when set.</ResponseField>
+<ResponseField name="attributes" type="object">
+  Structured attributes keyed by attribute id (`condition`, `brand`, `model`, `color`, `storage_capacity`, car specs, and so on).
+
+  <Expandable title="Attribute">
+    <ResponseField name="value" type="any">Machine value, e.g. `good` or `128gb`.</ResponseField>
+    <ResponseField name="title" type="string | null">Localised attribute name, e.g. `Estado`.</ResponseField>
+    <ResponseField name="text" type="string | null">Localised display value, e.g. `Buen estado`.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="characteristics" type="string | null">One-line summary of the main attributes, as shown on Wallapop.</ResponseField>
+<ResponseField name="characteristics_details" type="object[]">Attribute rows as shown on the listing page, each `{ "attribute": ..., "value": ... }`.</ResponseField>
+<ResponseField name="hashtags" type="string[]">Hashtags the seller added.</ResponseField>
+<ResponseField name="images" type="Image[]">
+  Listing photos.
+
+  <Expandable title="Image">
+    <ResponseField name="id" type="string | null">Image id.</ResponseField>
+    <ResponseField name="small" type="string | null">320 px wide URL.</ResponseField>
+    <ResponseField name="medium" type="string | null">640 px wide URL.</ResponseField>
+    <ResponseField name="large" type="string | null">800 px wide URL.</ResponseField>
+    <ResponseField name="average_color" type="string | null">Average colour as a hex string.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="location" type="Location | null">
+  Where the listing is.
+
+  <Expandable title="Location">
+    <ResponseField name="latitude" type="number | null" />
+    <ResponseField name="longitude" type="number | null" />
+    <ResponseField name="postal_code" type="string | null" />
+    <ResponseField name="city" type="string | null" />
+    <ResponseField name="region" type="string | null" />
+    <ResponseField name="region2" type="string | null">Province.</ResponseField>
+    <ResponseField name="country_code" type="string | null">ISO 3166-1 alpha-2 country code.</ResponseField>
+    <ResponseField name="approximated" type="boolean | null">`true` when the coordinates are approximate.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="shippable" type="boolean | null">Whether the item can be shipped.</ResponseField>
+<ResponseField name="user_allows_shipping" type="boolean | null">Whether the seller accepts shipping.</ResponseField>
+<ResponseField name="supports_shipping" type="boolean | null">Whether Wallapop shipping is available for this listing.</ResponseField>
+<ResponseField name="bumped" type="boolean">Whether the listing is currently promoted.</ResponseField>
+<ResponseField name="bump_type" type="string | null">Promotion type, e.g. `city`, when bumped.</ResponseField>
+<ResponseField name="is_top_profile" type="boolean | null">Whether the seller is a Wallapop top profile.</ResponseField>
+<ResponseField name="views" type="integer | null">Times the listing has been viewed.</ResponseField>
+<ResponseField name="favorites" type="integer | null">Times the listing has been saved as a favorite.</ResponseField>
+<ResponseField name="conversations" type="integer | null">Chat conversations buyers have opened about the listing.</ResponseField>
+<ResponseField name="slug" type="string | null">Listing slug.</ResponseField>
+<ResponseField name="url" type="string | null">Full listing URL on wallapop.com.</ResponseField>
+<ResponseField name="modified_utc" type="number | null">Last modification time, Unix seconds.</ResponseField>
+<ResponseField name="modified_at" type="string | null">Last modification time, ISO 8601 UTC.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/wallapop/items/nzxeknm5x562?market=es" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/wallapop/items/nzxeknm5x562",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"market": "es"},
+)
+data = res.json()
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/wallapop/items/nzxeknm5x562?market=es",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```bash CLI
+scrapebadger wallapop item nzxeknm5x562 --market es
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "id": "nzxeknm5x562",
+  "user_id": "dqjwdd53wwzo",
+  "title": "iPhone 14 128GB Negro",
+  "description": "iPhone 14 de color negro, con 128GB de almacenamiento.\nEn perfectas condiciones, y la pantalla impecable, siempre usado con cristal protector y funda desde el primer día.",
+  "vertical": "consumer_goods",
+  "price": 250.0,
+  "currency": "EUR",
+  "category_id": 9447,
+  "taxonomy": [
+    { "id": 24200, "name": "Tecnología y electrónica" },
+    { "id": 24201, "name": "Telefonía: móviles y smartwatches" },
+    { "id": 9447, "name": "Smartphones" }
+  ],
+  "condition": "good",
+  "brand": "Apple",
+  "model": "iPhone 14",
+  "attributes": {
+    "color": { "value": "black", "title": "Color", "text": "Negro" },
+    "condition": { "value": "good", "title": "Estado", "text": "Buen estado" },
+    "model": { "value": "iPhone 14", "title": "Modelo", "text": "iPhone 14" },
+    "brand": { "value": "Apple", "title": "Marca", "text": "Apple" },
+    "storage_capacity": { "value": "128gb", "title": "Capacidad de almacenamiento", "text": "128 GB" },
+    "up_to_kg": { "value": "1.0", "title": "Kg", "text": "1.0" }
+  },
+  "characteristics": "Buen estado · Apple · iPhone 14 · 128 GB · Negro",
+  "characteristics_details": [
+    { "attribute": "Modelo", "value": "iPhone 14" },
+    { "attribute": "Color", "value": "Negro" },
+    { "attribute": "Capacidad de almacenamiento", "value": "128 GB" }
+  ],
+  "hashtags": [],
+  "images": [
+    {
+      "id": "e65ve2rg0l2j",
+      "small": "https://cdn.wallapop.com/images/10420/lo/q3/__/c10420p1311318554/i6787540572.jpg?pictureSize=W320",
+      "medium": "https://cdn.wallapop.com/images/10420/lo/q3/__/c10420p1311318554/i6787540572.jpg?pictureSize=W640",
+      "large": "https://cdn.wallapop.com/images/10420/lo/q3/__/c10420p1311318554/i6787540572.jpg?pictureSize=W800",
+      "average_color": "13C1AC"
+    }
+  ],
+  "location": {
+    "latitude": 40.47122907944395,
+    "longitude": -3.8786801592876357,
+    "postal_code": "28222",
+    "city": "Majadahonda",
+    "region": null,
+    "region2": null,
+    "country_code": "ES",
+    "approximated": true
+  },
+  "shippable": true,
+  "user_allows_shipping": true,
+  "supports_shipping": true,
+  "bumped": true,
+  "bump_type": "city",
+  "is_top_profile": true,
+  "views": 225,
+  "favorites": 14,
+  "conversations": 4,
+  "slug": "iphone-14-128gb-1311318554",
+  "url": "https://es.wallapop.com/item/iphone-14-128gb-1311318554",
+  "modified_utc": 1791753563.0,
+  "modified_at": "2026-10-11T21:19:23Z"
+}
+```
+
+## Errors
+
+| Status | Cause |
+|--------|-------|
+| `404` | The listing does not exist or has been removed. Not charged. |
+| `422` | `market` is not `es`, `it`, or `pt`. |
+| `502` | Wallapop did not answer after retries. Not charged — retry the request. |
+
+<Note>
+  Each listing lookup costs **5 credits**. Failed requests are not charged.
+</Note>

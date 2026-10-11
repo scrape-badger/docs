@@ -1,0 +1,92 @@
+---
+title: "Autocomplete"
+api: "GET https://scrapebadger.com/v1/wallapop/autocomplete"
+description: "Wallapop's search-box suggestions for a partial query, in Spain, Italy, or Portugal."
+---
+
+The suggestions Wallapop shows under its search box as you type.
+
+**Credits:** 1. Empty results are not charged.
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Partial search text, at least 1 character, e.g. `bici`.
+</ParamField>
+
+<ParamField query="market" type="string" default="es">
+  `es`, `it`, or `pt`. Suggestions come from that market's capital and language. See [`/v1/wallapop/markets`](/api-reference/endpoint/wallapop/list-markets).
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested query.</ResponseField>
+<ResponseField name="suggestions" type="Suggestion[]">
+  Suggested searches, in Wallapop's order.
+
+  <Expandable title="Suggestion">
+    <ResponseField name="text" type="string">The suggested search text.</ResponseField>
+    <ResponseField name="subtitle" type="string | null">Extra context Wallapop shows under the suggestion, when present.</ResponseField>
+    <ResponseField name="type" type="string | null">Wallapop's suggestion kind, e.g. `regular`.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="market" type="string">The market used for the request.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/wallapop/autocomplete?query=bici&market=es" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/wallapop/autocomplete",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "bici", "market": "es"},
+)
+data = res.json()
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/wallapop/autocomplete?" +
+    new URLSearchParams({ query: "bici", market: "es" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```bash CLI
+scrapebadger wallapop autocomplete "bici" --market es
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "bici",
+  "suggestions": [
+    { "text": "bicicleta look", "subtitle": null, "type": "regular" },
+    { "text": "bicis", "subtitle": null, "type": "regular" },
+    { "text": "bicicleta niños", "subtitle": null, "type": "regular" },
+    { "text": "bicicletas montaña", "subtitle": null, "type": "regular" },
+    { "text": "bici montaña", "subtitle": null, "type": "regular" }
+  ],
+  "market": "es"
+}
+```
+
+<Note>
+  Each autocomplete request costs **1 credit**. Empty results and failed requests are not charged.
+</Note>

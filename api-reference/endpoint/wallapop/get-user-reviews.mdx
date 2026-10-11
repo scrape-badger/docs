@@ -1,0 +1,181 @@
+---
+title: "Get User Reviews"
+api: "GET https://scrapebadger.com/v1/wallapop/users/{user_id}/reviews"
+description: "Reviews a Wallapop user received, newest first — rating, comment, reviewer, whether it was a sale or a purchase, and the listing involved."
+---
+
+The reviews a Wallapop user received, **newest first, 40 per page**. Each review says whether the user was the seller (`sell`) or the buyer (`buy`) and names the listing involved.
+
+**Credits:** 5 per page. Empty results are not charged.
+
+<Tip>
+  Wallapop has no sold-listings search. Reviews with `type: "sell"` are the closest record of what a seller has actually sold, with the listing title and the date of the sale.
+</Tip>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="user_id" type="string" required>
+  The user, as an **id** — `dqjwdd53wwzo` — or a **profile slug** — `alexc-25115753`. The id is fastest.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="es">
+  `es`, `it`, or `pt`. Sets the host of the returned listing URLs. See [`/v1/wallapop/markets`](/api-reference/endpoint/wallapop/list-markets).
+</ParamField>
+
+<ParamField query="next_page" type="string">
+  Cursor from the previous response's `next_page`.
+</ParamField>
+
+## Response
+
+<ResponseField name="user_id" type="string">The resolved user id.</ResponseField>
+<ResponseField name="reviews" type="Review[]">
+  Reviews, newest first.
+
+  <Expandable title="Review">
+    <ResponseField name="id" type="string | null">Review id.</ResponseField>
+    <ResponseField name="rating" type="integer | null">Rating, `1`–`5`.</ResponseField>
+    <ResponseField name="scoring" type="integer | null">Rating on a `0`–`100` scale.</ResponseField>
+    <ResponseField name="comment" type="string | null">The reviewer's comment.</ResponseField>
+    <ResponseField name="type" type="string | null">`sell` — the profile sold to the reviewer. `buy` — the profile bought from the reviewer.</ResponseField>
+    <ResponseField name="is_shipping_transaction" type="boolean | null">Whether the deal used Wallapop shipping.</ResponseField>
+    <ResponseField name="item" type="ReviewItem | null">
+      The listing the review is about. Fields can be `null` when the listing is no longer available.
+
+      <Expandable title="ReviewItem">
+        <ResponseField name="id" type="string | null">Listing id.</ResponseField>
+        <ResponseField name="title" type="string | null">Listing title.</ResponseField>
+        <ResponseField name="category_id" type="integer | null">Category id.</ResponseField>
+        <ResponseField name="image" type="string | null">Listing photo URL.</ResponseField>
+        <ResponseField name="slug" type="string | null">Listing slug.</ResponseField>
+        <ResponseField name="url" type="string | null">Full listing URL on wallapop.com.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="reviewer" type="Reviewer | null">
+      The user who wrote the review.
+
+      <Expandable title="Reviewer">
+        <ResponseField name="id" type="string | null">Reviewer's user id.</ResponseField>
+        <ResponseField name="name" type="string | null">Reviewer's display name.</ResponseField>
+        <ResponseField name="image" type="string | null">Reviewer's profile picture URL.</ResponseField>
+        <ResponseField name="slug" type="string | null">Reviewer's profile slug.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="created_utc" type="number | null">Review time, Unix seconds.</ResponseField>
+    <ResponseField name="created_at" type="string | null">Review time, ISO 8601 UTC.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="result_count" type="integer">Number of reviews on this page.</ResponseField>
+<ResponseField name="next_page" type="string | null">Cursor for the next page. Pass it back as `next_page`; `null` when there are no more reviews.</ResponseField>
+<ResponseField name="market" type="string">The market used for the request.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/wallapop/users/dqjwdd53wwzo/reviews" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/wallapop/users/dqjwdd53wwzo/reviews",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+sold = [r for r in res.json()["reviews"] if r["type"] == "sell"]
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/wallapop/users/dqjwdd53wwzo/reviews", {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+});
+const sold = (await res.json()).reviews.filter((r) => r.type === "sell");
+```
+
+```bash CLI
+scrapebadger wallapop user-reviews dqjwdd53wwzo
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "user_id": "dqjwdd53wwzo",
+  "reviews": [
+    {
+      "id": "7035191d-0156-40e3-90c3-736a0bf6f24c",
+      "rating": 5,
+      "scoring": 100,
+      "comment": "Muy agradable y super facil de hacer tratos con el, lo recomiendo al 100%, se preocupa mucho.",
+      "type": "sell",
+      "is_shipping_transaction": true,
+      "item": {
+        "id": "3zlmy547v8jx",
+        "title": "Sony Alpha a6400 Cámara Mirrorless APS-C",
+        "category_id": 24200,
+        "image": "https://cdn.wallapop.com/images/10420/li/xd/__/c10420p1301579669/i6739066786.jpg?pictureSize=W800",
+        "slug": "sony-alpha-a6400-camara-mirrorless-aps-c-1301579669",
+        "url": "https://es.wallapop.com/item/sony-alpha-a6400-camara-mirrorless-aps-c-1301579669"
+      },
+      "reviewer": {
+        "id": "pj9yxer3go6e",
+        "name": "Markel L.",
+        "image": "https://cdn.wallapop.com/images/13/7f/qs/__/c13p449707485/i3608964288.jpg?pictureSize=W800",
+        "slug": "unknown-449707485"
+      },
+      "created_utc": 1790438569.0,
+      "created_at": "2026-09-26T16:02:49Z"
+    },
+    {
+      "id": "b4831a0d-e542-4c79-99ad-7d84e5d6aa17",
+      "rating": 5,
+      "scoring": 100,
+      "comment": "Recomendo 5estrelas",
+      "type": "buy",
+      "is_shipping_transaction": true,
+      "item": {
+        "id": null,
+        "title": null,
+        "category_id": 24200,
+        "image": null,
+        "slug": null,
+        "url": null
+      },
+      "reviewer": {
+        "id": "v6g474qp426e",
+        "name": "José M.",
+        "image": "https://cdn.wallapop.com/images/13/7e/02/__/c13p446781364/i3603773269.jpg?pictureSize=W800",
+        "slug": "alvarojosef-446781364"
+      },
+      "created_utc": 1787916978.0,
+      "created_at": "2026-08-28T11:36:18Z"
+    }
+  ],
+  "result_count": 40,
+  "next_page": "40",
+  "market": "es"
+}
+```
+
+## Errors
+
+| Status | Cause |
+|--------|-------|
+| `404` | The user does not exist. Not charged. |
+| `422` | `market` is not `es`, `it`, or `pt`. |
+| `502` | Wallapop did not answer after retries. Not charged — retry the request. |
+
+<Note>
+  Each page of reviews costs **5 credits**. Empty pages and failed requests are not charged.
+</Note>

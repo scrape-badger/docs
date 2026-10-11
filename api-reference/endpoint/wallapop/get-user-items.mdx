@@ -1,0 +1,181 @@
+---
+title: "Get User Items"
+api: "GET https://scrapebadger.com/v1/wallapop/users/{user_id}/items"
+description: "A Wallapop seller's live listings, 40 per page, with price, condition, attributes, photos, and shipping."
+---
+
+The listings a Wallapop user currently has published, **40 per page**.
+
+**Credits:** 5 per page. Empty results are not charged.
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="user_id" type="string" required>
+  The user, as an **id** — `dqjwdd53wwzo` — or a **profile slug** — `alexc-25115753`. The id is fastest.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="es">
+  `es`, `it`, or `pt`. Sets the host of the returned listing URLs. See [`/v1/wallapop/markets`](/api-reference/endpoint/wallapop/list-markets).
+</ParamField>
+
+<ParamField query="next_page" type="string">
+  Cursor from the previous response's `next_page`.
+</ParamField>
+
+## Response
+
+<ResponseField name="user_id" type="string">The resolved user id.</ResponseField>
+<ResponseField name="items" type="UserItem[]">
+  The user's live listings.
+
+  <Expandable title="UserItem">
+    <ResponseField name="id" type="string">Listing id. Use it with [`/v1/wallapop/items/{item_id}`](/api-reference/endpoint/wallapop/get-item) for views, favorites, and the full taxonomy.</ResponseField>
+    <ResponseField name="title" type="string | null">Listing title.</ResponseField>
+    <ResponseField name="description" type="string | null">Listing description.</ResponseField>
+    <ResponseField name="price" type="number | null">Asking price.</ResponseField>
+    <ResponseField name="currency" type="string | null">ISO 4217 currency code, `EUR`.</ResponseField>
+    <ResponseField name="category_id" type="integer | null">Category id.</ResponseField>
+    <ResponseField name="condition" type="string | null">Condition id, e.g. `good`, when set.</ResponseField>
+    <ResponseField name="attributes" type="object">Category-specific attributes as flat key/value pairs, e.g. `brand`, `condition`, `up_to_kg`.</ResponseField>
+    <ResponseField name="images" type="Image[]">
+      Listing photos.
+
+      <Expandable title="Image">
+        <ResponseField name="id" type="string | null">Image id.</ResponseField>
+        <ResponseField name="small" type="string | null">320 px wide URL.</ResponseField>
+        <ResponseField name="medium" type="string | null">640 px wide URL.</ResponseField>
+        <ResponseField name="large" type="string | null">800 px wide URL.</ResponseField>
+        <ResponseField name="average_color" type="string | null">Average colour as a hex string.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="shippable" type="boolean | null">Whether the item can be shipped.</ResponseField>
+    <ResponseField name="user_allows_shipping" type="boolean | null">Whether the seller accepts shipping.</ResponseField>
+    <ResponseField name="is_refurbished" type="boolean | null">Whether the item is refurbished.</ResponseField>
+    <ResponseField name="has_warranty" type="boolean | null">Whether the item comes with a warranty.</ResponseField>
+    <ResponseField name="slug" type="string | null">Listing slug.</ResponseField>
+    <ResponseField name="url" type="string | null">Full listing URL on wallapop.com.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="result_count" type="integer">Number of listings on this page.</ResponseField>
+<ResponseField name="next_page" type="string | null">Cursor for the next page. Pass it back as `next_page`; `null` when there are no more listings.</ResponseField>
+<ResponseField name="market" type="string">The market used for the request.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/wallapop/users/dqjwdd53wwzo/items" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/wallapop/users/dqjwdd53wwzo/items",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/wallapop/users/dqjwdd53wwzo/items", {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+});
+const data = await res.json();
+```
+
+```bash CLI
+scrapebadger wallapop user-items dqjwdd53wwzo
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "user_id": "dqjwdd53wwzo",
+  "items": [
+    {
+      "id": "3zlm3y52kpjx",
+      "title": "Caja Cooler Master c700m",
+      "description": "En buen estado, valorada en 300€, nueva 600€, le falta solo una pata de goma y una de las tiras led superiores no funciona.",
+      "price": 150.0,
+      "currency": "EUR",
+      "category_id": 24200,
+      "condition": "good",
+      "attributes": {
+        "brand": "Cooler Master ",
+        "condition": "good",
+        "up_to_kg": "30.0"
+      },
+      "images": [
+        {
+          "id": "0j2wey3lm2rj",
+          "small": "https://cdn.wallapop.com/images/10420/lf/ul/__/c10420p1296410893/i6706063683.jpg?pictureSize=W320",
+          "medium": "https://cdn.wallapop.com/images/10420/lf/ul/__/c10420p1296410893/i6706063683.jpg?pictureSize=W640",
+          "large": "https://cdn.wallapop.com/images/10420/lf/ul/__/c10420p1296410893/i6706063683.jpg?pictureSize=W800",
+          "average_color": "13C1AC"
+        }
+      ],
+      "shippable": true,
+      "user_allows_shipping": true,
+      "is_refurbished": false,
+      "has_warranty": false,
+      "slug": "caja-cooler-master-c700m-1296410893",
+      "url": "https://es.wallapop.com/item/caja-cooler-master-c700m-1296410893"
+    },
+    {
+      "id": "mzn3d72pk0jn",
+      "title": "Lego 100% original lote 3,6 kg",
+      "description": "En buen estado, solo los motores ya se venden a 60€",
+      "price": 70.0,
+      "currency": "EUR",
+      "category_id": 12461,
+      "condition": "good",
+      "attributes": {
+        "condition": "good",
+        "up_to_kg": "5.0"
+      },
+      "images": [
+        {
+          "id": "8z8qevl2x4lz",
+          "small": "https://cdn.wallapop.com/images/10420/le/m2/__/c10420p1294334049/i6693385070.jpg?pictureSize=W320",
+          "medium": "https://cdn.wallapop.com/images/10420/le/m2/__/c10420p1294334049/i6693385070.jpg?pictureSize=W640",
+          "large": "https://cdn.wallapop.com/images/10420/le/m2/__/c10420p1294334049/i6693385070.jpg?pictureSize=W800",
+          "average_color": "13C1AC"
+        }
+      ],
+      "shippable": true,
+      "user_allows_shipping": true,
+      "is_refurbished": false,
+      "has_warranty": false,
+      "slug": "lego-100-original-lote-1294334049",
+      "url": "https://es.wallapop.com/item/lego-100-original-lote-1294334049"
+    }
+  ],
+  "result_count": 2,
+  "next_page": null,
+  "market": "es"
+}
+```
+
+## Errors
+
+| Status | Cause |
+|--------|-------|
+| `404` | The user does not exist. Not charged. |
+| `422` | `market` is not `es`, `it`, or `pt`. |
+| `502` | Wallapop did not answer after retries. Not charged — retry the request. |
+
+<Note>
+  Each page of listings costs **5 credits**. Empty pages and failed requests are not charged.
+</Note>

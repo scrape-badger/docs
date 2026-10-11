@@ -1,0 +1,336 @@
+---
+title: "Search Listings"
+api: "GET https://scrapebadger.com/v1/wallapop/search"
+description: "Search Wallapop second-hand listings in Spain, Italy, or Portugal with Wallapop's own filters — price, condition, brand, model, colour, distance, listing age, shipping, and car filters."
+---
+
+Search Wallapop listings, **40 per page**, with the same filters the Wallapop app offers. Send a `query`, a `category_id`, or both.
+
+**Credits:** 5 per page. Empty results are not charged.
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string">
+  Search text, e.g. `iphone 14`, `bicicleta montaña`. Required unless you pass `category_id`; requests with neither return `422`.
+</ParamField>
+
+<ParamField query="market" type="string" default="es">
+  `es` (Spain), `it` (Italy), or `pt` (Portugal). Sets the default search location (Madrid, Rome, or Lisbon) and the language of category and attribute text. Any other value returns `422`. See [`/v1/wallapop/markets`](/api-reference/endpoint/wallapop/list-markets).
+</ParamField>
+
+<ParamField query="latitude" type="number">
+  Search centre latitude, `-90` to `90`. Defaults to the market's capital. The country searched follows the coordinates, not the market.
+</ParamField>
+
+<ParamField query="longitude" type="number">
+  Search centre longitude, `-180` to `180`. Defaults to the market's capital.
+</ParamField>
+
+<ParamField query="distance_km" type="integer">
+  Radius around the search centre in kilometres, `1` to `500`. Omit to search without a radius limit.
+</ParamField>
+
+<ParamField query="category_id" type="integer">
+  Category id from [`/v1/wallapop/categories`](/api-reference/endpoint/wallapop/list-categories), e.g. `24200` (Technology & electronics) or `100` (Cars). Required unless you pass `query`.
+</ParamField>
+
+<ParamField query="min_price" type="number">
+  Minimum price in EUR, `0` or more.
+</ParamField>
+
+<ParamField query="max_price" type="number">
+  Maximum price in EUR, `0` or more.
+</ParamField>
+
+<ParamField query="condition" type="string">
+  Comma-separated conditions: `un_opened`, `in_box`, `new`, `as_good_as_new`, `good`, `fair`, `has_given_it_all`. Example: `new,as_good_as_new`.
+</ParamField>
+
+<ParamField query="brand" type="string">
+  Brand option id, e.g. `Apple`. Get valid ids from [`/v1/wallapop/filters/brand/options`](/api-reference/endpoint/wallapop/list-filter-options) for your category or query.
+</ParamField>
+
+<ParamField query="model" type="string">
+  Model option id, e.g. `iPhone 14`. Get valid ids from [`/v1/wallapop/filters/model/options`](/api-reference/endpoint/wallapop/list-filter-options).
+</ParamField>
+
+<ParamField query="color" type="string">
+  Colour option id, e.g. `black`. Valid ids are listed under the `color` filter in [`/v1/wallapop/filters`](/api-reference/endpoint/wallapop/list-filters).
+</ParamField>
+
+<ParamField query="time_filter" type="string">
+  Only listings published within: `today`, `lastWeek`, or `lastMonth`.
+</ParamField>
+
+<ParamField query="shippable" type="boolean" default="false">
+  `true` returns only listings that can be shipped.
+</ParamField>
+
+<ParamField query="has_warranty" type="boolean" default="false">
+  `true` returns only listings with a warranty.
+</ParamField>
+
+<ParamField query="refurbished" type="boolean" default="false">
+  `true` returns only refurbished listings.
+</ParamField>
+
+<ParamField query="order_by" type="string" default="most_relevance">
+  Sort order: `most_relevance`, `newest`, `closest`, `price_low_to_high`, or `price_high_to_low`.
+</ParamField>
+
+<ParamField query="next_page" type="string">
+  Cursor from the previous response's `next_page`. Send it on its own (with the same `market`): the cursor carries the original query and filters, and all other search parameters are ignored.
+</ParamField>
+
+### Car filters
+
+These filters apply when you search cars with `category_id=100`.
+
+<ParamField query="min_year" type="integer">
+  Earliest model year, e.g. `2015`.
+</ParamField>
+
+<ParamField query="max_year" type="integer">
+  Latest model year.
+</ParamField>
+
+<ParamField query="min_km" type="integer">
+  Minimum mileage in km, `0` or more.
+</ParamField>
+
+<ParamField query="max_km" type="integer">
+  Maximum mileage in km, `0` or more.
+</ParamField>
+
+<ParamField query="gearbox" type="string">
+  `manual` or `automatic`.
+</ParamField>
+
+<ParamField query="min_horsepower" type="integer">
+  Minimum engine power in hp, `0` or more.
+</ParamField>
+
+<ParamField query="max_horsepower" type="integer">
+  Maximum engine power in hp, `0` or more.
+</ParamField>
+
+<Note>
+  For car searches, `brand` and `model` take the car make and model option ids from [`/v1/wallapop/filters/brand/options?category_id=100`](/api-reference/endpoint/wallapop/list-filter-options) and `/v1/wallapop/filters/model/options?category_id=100`.
+</Note>
+
+<Info>
+  There is no sold-listings search: Wallapop search only returns live listings. To see what a seller has sold, read their [reviews](/api-reference/endpoint/wallapop/get-user-reviews) — reviews with `type: "sell"` name the listing they sold.
+</Info>
+
+## Response
+
+<ResponseField name="items" type="SearchItem[]">
+  Matching listings, up to 40 per page.
+
+  <Expandable title="SearchItem">
+    <ResponseField name="id" type="string">Listing id, e.g. `nzxeknm5x562`. Use it with [`/v1/wallapop/items/{item_id}`](/api-reference/endpoint/wallapop/get-item).</ResponseField>
+    <ResponseField name="user_id" type="string | null">Seller id. Use it with [`/v1/wallapop/users/{user_id}`](/api-reference/endpoint/wallapop/get-user).</ResponseField>
+    <ResponseField name="title" type="string | null">Listing title.</ResponseField>
+    <ResponseField name="description" type="string | null">Listing description.</ResponseField>
+    <ResponseField name="price" type="number | null">Asking price.</ResponseField>
+    <ResponseField name="currency" type="string | null">ISO 4217 currency code, `EUR`.</ResponseField>
+    <ResponseField name="category_id" type="integer | null">Category id as Wallapop reports it in search (often the top-level category). See `taxonomy` for the full path.</ResponseField>
+    <ResponseField name="taxonomy" type="TaxonomyNode[]">
+      Category path from top level to leaf.
+
+      <Expandable title="TaxonomyNode">
+        <ResponseField name="id" type="integer">Category id.</ResponseField>
+        <ResponseField name="name" type="string | null">Localised category name.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="condition" type="string | null">Condition id, e.g. `good`, when the seller set one.</ResponseField>
+    <ResponseField name="brand" type="string | null">Brand (or car make), when set.</ResponseField>
+    <ResponseField name="model" type="string | null">Model, when set.</ResponseField>
+    <ResponseField name="attributes" type="object">Category-specific attributes as flat key/value pairs. Cars include `brand`, `model`, `year`, `version`, `km`, `engine`, `gearbox`, and `horsepower`.</ResponseField>
+    <ResponseField name="images" type="Image[]">
+      Listing photos.
+
+      <Expandable title="Image">
+        <ResponseField name="id" type="string | null">Image id.</ResponseField>
+        <ResponseField name="small" type="string | null">320 px wide URL.</ResponseField>
+        <ResponseField name="medium" type="string | null">640 px wide URL.</ResponseField>
+        <ResponseField name="large" type="string | null">800 px wide URL.</ResponseField>
+        <ResponseField name="average_color" type="string | null">Average colour as a hex string, e.g. `13C1AC`.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="location" type="Location | null">
+      Where the listing is.
+
+      <Expandable title="Location">
+        <ResponseField name="latitude" type="number | null" />
+        <ResponseField name="longitude" type="number | null" />
+        <ResponseField name="postal_code" type="string | null" />
+        <ResponseField name="city" type="string | null" />
+        <ResponseField name="region" type="string | null">Region, e.g. `Comunidad de Madrid`.</ResponseField>
+        <ResponseField name="region2" type="string | null">Province, e.g. `Madrid`.</ResponseField>
+        <ResponseField name="country_code" type="string | null">ISO 3166-1 alpha-2 country code.</ResponseField>
+        <ResponseField name="approximated" type="boolean | null">`true` when the coordinates are approximate.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="shippable" type="boolean | null">Whether the item can be shipped.</ResponseField>
+    <ResponseField name="user_allows_shipping" type="boolean | null">Whether the seller accepts shipping.</ResponseField>
+    <ResponseField name="reserved" type="boolean | null">Whether the seller marked the listing as reserved.</ResponseField>
+    <ResponseField name="bumped" type="boolean">Whether the listing is currently promoted.</ResponseField>
+    <ResponseField name="bump_type" type="string | null">Promotion type, e.g. `city`, when bumped.</ResponseField>
+    <ResponseField name="is_top_profile" type="boolean | null">Whether the seller is a Wallapop top profile.</ResponseField>
+    <ResponseField name="is_refurbished" type="boolean | null">Whether the item is refurbished.</ResponseField>
+    <ResponseField name="has_warranty" type="boolean | null">Whether the item comes with a warranty.</ResponseField>
+    <ResponseField name="slug" type="string | null">Listing slug, e.g. `iphone-14-128gb-1311318554`.</ResponseField>
+    <ResponseField name="url" type="string | null">Full listing URL on wallapop.com.</ResponseField>
+    <ResponseField name="created_utc" type="number | null">Publication time, Unix seconds.</ResponseField>
+    <ResponseField name="created_at" type="string | null">Publication time, ISO 8601 UTC.</ResponseField>
+    <ResponseField name="modified_utc" type="number | null">Last modification time, Unix seconds.</ResponseField>
+    <ResponseField name="modified_at" type="string | null">Last modification time, ISO 8601 UTC.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="result_count" type="integer">Number of listings on this page.</ResponseField>
+<ResponseField name="total_results" type="integer | null">Wallapop's own estimate of how many listings match the search. `null` on the last page.</ResponseField>
+<ResponseField name="next_page" type="string | null">Cursor for the next page. Pass it back as `next_page`; `null` when there are no more results.</ResponseField>
+<ResponseField name="order_by" type="string | null">The sort order Wallapop applied.</ResponseField>
+<ResponseField name="market" type="string">The market used for the request.</ResponseField>
+<ResponseField name="country_code" type="string | null">The country Wallapop searched in, which follows the search coordinates.</ResponseField>
+<ResponseField name="search_id" type="string | null">Wallapop's id for this search.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/wallapop/search?query=iphone&market=es&shippable=true" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/wallapop/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "iphone", "market": "es", "shippable": "true"},
+)
+data = res.json()
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/wallapop/search?" +
+    new URLSearchParams({ query: "iphone", market: "es", shippable: "true" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```bash CLI
+scrapebadger wallapop search "iphone" --market es --shippable
+```
+
+</CodeGroup>
+
+Car search — manual cars from 2015 on with under 100,000 km, closest to Madrid first:
+
+```bash
+curl "https://scrapebadger.com/v1/wallapop/search?category_id=100&min_year=2015&max_km=100000&gearbox=manual&order_by=closest" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+Car listings carry their specs in `attributes`:
+
+```json
+"attributes": {
+  "brand": "SEAT",
+  "model": "Leon",
+  "year": 2017,
+  "version": "1.4 TSI ACT 150 FR Plus 5p S/S",
+  "km": 83000,
+  "engine": "Gasoline",
+  "gearbox": "Manual",
+  "horsepower": 150.0
+}
+```
+
+```json Response
+{
+  "items": [
+    {
+      "id": "nzxeknm5x562",
+      "user_id": "dqjwdd53wwzo",
+      "title": "iPhone 14 128GB Negro",
+      "description": "iPhone 14 de color negro, con 128GB de almacenamiento.\nEn perfectas condiciones, y la pantalla impecable, siempre usado con cristal protector y funda desde el primer día.",
+      "price": 250.0,
+      "currency": "EUR",
+      "category_id": 24200,
+      "taxonomy": [
+        { "id": 24200, "name": "Tecnología y electrónica" },
+        { "id": 24201, "name": "Telefonía: móviles y smartwatches" },
+        { "id": 9447, "name": "Smartphones" }
+      ],
+      "condition": null,
+      "brand": null,
+      "model": null,
+      "attributes": {},
+      "images": [
+        {
+          "id": "e65ve2rg0l2j",
+          "small": "https://cdn.wallapop.com/images/10420/lo/q3/__/c10420p1311318554/i6787540572.jpg?pictureSize=W320",
+          "medium": "https://cdn.wallapop.com/images/10420/lo/q3/__/c10420p1311318554/i6787540572.jpg?pictureSize=W640",
+          "large": "https://cdn.wallapop.com/images/10420/lo/q3/__/c10420p1311318554/i6787540572.jpg?pictureSize=W800",
+          "average_color": "13C1AC"
+        }
+      ],
+      "location": {
+        "latitude": 40.47122907944395,
+        "longitude": -3.8786801592876357,
+        "postal_code": "28222",
+        "city": "Majadahonda",
+        "region": "Comunidad de Madrid",
+        "region2": "Madrid",
+        "country_code": "ES",
+        "approximated": null
+      },
+      "shippable": true,
+      "user_allows_shipping": true,
+      "reserved": false,
+      "bumped": true,
+      "bump_type": "city",
+      "is_top_profile": true,
+      "is_refurbished": false,
+      "has_warranty": false,
+      "slug": "iphone-14-128gb-1311318554",
+      "url": "https://es.wallapop.com/item/iphone-14-128gb-1311318554",
+      "created_utc": 1791580490.949,
+      "created_at": "2026-10-09T21:14:50.949000Z",
+      "modified_utc": 1791753563.082,
+      "modified_at": "2026-10-11T21:19:23.082000Z"
+    }
+  ],
+  "result_count": 40,
+  "total_results": 49371,
+  "next_page": "eyJhbGciOiJIUzI1NiJ9.eyJwYXJhbXMiOnsic2VhcmNoUmVxdWVzdFBhcmFtcyI6eyJrZXl3b3JkcyI6ImlwaG9uZSIs...",
+  "order_by": "most_relevance",
+  "market": "es",
+  "country_code": "ES",
+  "search_id": "a6e9213a-8d01-481f-8f3d-bd6ffaf2a61c"
+}
+```
+
+## Errors
+
+| Status | Cause |
+|--------|-------|
+| `422` | Neither `query` nor `category_id` was sent, a value is out of range, or `market` is not `es`, `it`, or `pt`. |
+| `502` | Wallapop did not answer after retries. Not charged — retry the request. |
+
+<Note>
+  Each search request costs **5 credits**. Pages with no results and failed requests are not charged.
+</Note>
