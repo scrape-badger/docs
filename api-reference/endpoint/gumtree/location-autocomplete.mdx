@@ -1,0 +1,106 @@
+---
+title: "Location Autocomplete"
+api: "GET https://scrapebadger.com/v1/gumtree/locations/autocomplete"
+description: "Resolve a UK town, area or postcode prefix to Gumtree locations with coordinates."
+---
+
+Resolve a place name or postcode prefix to the locations Gumtree knows, each
+with its coordinates. Pass a result's `name` (a town) or a postcode as
+`location` to [`/search`](/api-reference/endpoint/gumtree/search).
+
+**Credits:** 1
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Town, area or postcode prefix — at least 2 characters, e.g. `manch`, `leed`
+  or `SW1A`.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested prefix.</ResponseField>
+<ResponseField name="result_count" type="integer">Number of locations.</ResponseField>
+<ResponseField name="locations" type="LocationSuggestion[]">
+  Matching locations.
+
+  <Expandable title="LocationSuggestion">
+    <ResponseField name="id" type="integer">Gumtree location id.</ResponseField>
+    <ResponseField name="name" type="string">e.g. `Leeds City Centre, West Yorkshire`.</ResponseField>
+    <ResponseField name="type" type="string">`location`, `outcode` or `postcode`.</ResponseField>
+    <ResponseField name="latitude" type="number" />
+    <ResponseField name="longitude" type="number" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/gumtree/locations/autocomplete?query=leed" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/gumtree/locations/autocomplete?" +
+    new URLSearchParams({ query: "leed" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { locations } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/gumtree/locations/autocomplete",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "leed"},
+)
+locations = res.json()["locations"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "leed",
+  "result_count": 2,
+  "locations": [
+    {
+      "id": 10000360,
+      "name": "Leeds",
+      "type": "location",
+      "latitude": 53.808019,
+      "longitude": -1.541784
+    },
+    {
+      "id": 52026,
+      "name": "Leeds City Centre, West Yorkshire",
+      "type": "location",
+      "latitude": 53.797899,
+      "longitude": -1.548119
+    }
+  ]
+}
+```
+
+<Tip>
+  `/search` also takes a full UK postcode directly as `location`
+  (`location=SW1A 1AA&distance=2`), so you only need this endpoint to resolve
+  partial input or to show the user a choice.
+</Tip>
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | `query` is shorter than 2 characters, or Gumtree temporarily refused the request. **Not billed** — retry the latter shortly. |

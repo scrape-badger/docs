@@ -910,6 +910,45 @@
         ]
       },
       {
+        "tab": "Gumtree",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "gumtree/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/gumtree/search",
+              "api-reference/endpoint/gumtree/search-filters"
+            ]
+          },
+          {
+            "group": "Listings",
+            "pages": [
+              "api-reference/endpoint/gumtree/get-listing"
+            ]
+          },
+          {
+            "group": "Sellers",
+            "pages": [
+              "api-reference/endpoint/gumtree/get-seller-listings"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api-reference/endpoint/gumtree/autocomplete",
+              "api-reference/endpoint/gumtree/location-autocomplete",
+              "api-reference/endpoint/gumtree/list-categories",
+              "api-reference/endpoint/gumtree/list-locations"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Immobiliare",
         "groups": [
           {

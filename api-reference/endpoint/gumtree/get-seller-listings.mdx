@@ -1,0 +1,115 @@
+---
+title: "Get Seller Listings"
+api: "GET https://scrapebadger.com/v1/gumtree/listings/{listing_id}/seller-listings"
+description: "Every live listing by the seller of a Gumtree listing."
+---
+
+List every live ad posted by the seller of `listing_id`. Gumtree keys a
+seller's ad list by one of their ads, so **any listing id of theirs works** —
+there is no separate seller id to look up.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="listing_id" type="string" required>
+  Any Gumtree listing id by the seller, e.g. `1803293391`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="page" type="integer" default="1">
+  Result page, `1`–`50`.
+</ParamField>
+
+## Response
+
+<ResponseField name="listing_id" type="string">Echo of the listing id the lookup started from.</ResponseField>
+<ResponseField name="seller_name" type="string">The seller's display name.</ResponseField>
+<ResponseField name="total_results" type="integer">Live listings by this seller.</ResponseField>
+<ResponseField name="page" type="integer">The page returned.</ResponseField>
+<ResponseField name="total_pages" type="integer" />
+<ResponseField name="result_count" type="integer">Listings on this page.</ResponseField>
+<ResponseField name="listings" type="ListingSummary[]">
+  The seller's listings, in the same shape as
+  [`/search`](/api-reference/endpoint/gumtree/search#response) listings.
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/gumtree/listings/1803293391/seller-listings" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/gumtree/listings/1803293391/seller-listings",
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/gumtree/listings/1803293391/seller-listings",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "listing_id": "1803293391",
+  "seller_name": "Allan",
+  "total_results": 12,
+  "page": 1,
+  "total_pages": 1,
+  "result_count": 12,
+  "listings": [
+    {
+      "id": "1803761638",
+      "title": "Honda, CIVIC, Hatchback, 2016, Manual, 1597 (cc), 5 doors",
+      "url": "https://www.gumtree.com/p/honda/honda-civic-hatchback-2016-manual-1597-cc-5-doors/1803761638",
+      "description": "Welcome to Thomson Twins Motors. We are a family run business based in Larkhall Scotland...",
+      "price": 5799.0,
+      "price_text": "£5,799.00",
+      "currency": "GBP",
+      "location": "Larkhall, South Lanarkshire",
+      "location_id": "11000569",
+      "postcode": "ML93BQ",
+      "category_id": 10307,
+      "image_url": "https://img.gumtree.com/ePR8PyKf84wPHx7_RYmEag/f0018e42e2c44a579d_150de0fec609/86",
+      "image_count": 17,
+      "posted_text": "3 hours ago",
+      "posted_utc": 1791743982.768,
+      "posted_at": "2026-10-11T18:39:42.768000Z",
+      "status": "LIVE",
+      "seller_type": "Trade",
+      "seller_id": "91457907",
+      "is_pro_seller": true,
+      "is_featured": false,
+      "is_urgent": false
+    }
+  ]
+}
+```
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | Listing does not exist or has been removed. |
+| `422` | `listing_id` is not 5–12 digits, or Gumtree temporarily refused the request. **Not billed** — retry the latter shortly. |

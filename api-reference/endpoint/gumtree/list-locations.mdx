@@ -1,0 +1,86 @@
+---
+title: "List Locations"
+api: "GET https://scrapebadger.com/v1/gumtree/locations"
+description: "Browse Gumtree's UK location tree: United Kingdom, nations, counties, towns."
+---
+
+Browse Gumtree's location tree one level at a time — United Kingdom → nations →
+counties → towns. Each child's `slug` is a valid `location` for
+[`/search`](/api-reference/endpoint/gumtree/search).
+
+**Credits:** 1
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="parent_id" type="integer" default="10000392">
+  Location id to list the children of. `10000392` (the default) is the United
+  Kingdom. Then drill down by `id`, e.g. `10000393` for England.
+</ParamField>
+
+## Response
+
+<ResponseField name="id" type="integer">The parent location id.</ResponseField>
+<ResponseField name="name" type="string">e.g. `England`.</ResponseField>
+<ResponseField name="slug" type="string">e.g. `england`.</ResponseField>
+<ResponseField name="result_count" type="integer">Number of children.</ResponseField>
+<ResponseField name="children" type="TreeNode[]">
+  Child locations.
+
+  <Expandable title="TreeNode">
+    <ResponseField name="id" type="integer">Pass as `parent_id` to go one level deeper.</ResponseField>
+    <ResponseField name="name" type="string" />
+    <ResponseField name="slug" type="string">The `/search` `location` value.</ResponseField>
+    <ResponseField name="has_children" type="boolean" />
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/gumtree/locations?parent_id=10000393" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/gumtree/locations?" +
+    new URLSearchParams({ parent_id: "10000393" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { children } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/gumtree/locations",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"parent_id": 10000393},
+)
+children = res.json()["children"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "id": 10000393,
+  "name": "England",
+  "slug": "england",
+  "result_count": 47,
+  "children": [
+    { "id": 11000000, "name": "Bedfordshire", "slug": "bedfordshire", "has_children": true },
+    { "id": 11000001, "name": "Berkshire", "slug": "berkshire", "has_children": true },
+    { "id": 10000348, "name": "Bristol", "slug": "bristol", "has_children": true }
+  ]
+}
+```

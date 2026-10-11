@@ -1,0 +1,288 @@
+---
+title: "Search Listings"
+api: "GET https://scrapebadger.com/v1/gumtree/search"
+description: "Search gumtree.com classified ads by keyword, category, town or UK postcode radius, price band, seller type and category-specific filters."
+---
+
+Search `gumtree.com` listings across every vertical — For Sale, Motors, Property,
+Jobs, Services, Pets and Community. Returns ~25–30 listings per page, up to 50
+pages.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string">
+  Search keywords, e.g. `mountain bike`. Optional — omit it to browse a whole
+  category.
+</ParamField>
+
+<ParamField query="category" type="string" default="all">
+  Category slug, e.g. `cars`, `for-sale`, `property-to-rent`, `jobs`, `pets`,
+  `bicycles`. Browse every slug with
+  [`/categories`](/api-reference/endpoint/gumtree/list-categories).
+</ParamField>
+
+<ParamField query="location" type="string" default="uk">
+  Location slug (`london`, `manchester`), town name or full UK postcode
+  (`SW1A 1AA`). `uk` searches nationwide. Resolve a place with
+  [`/locations/autocomplete`](/api-reference/endpoint/gumtree/location-autocomplete).
+</ParamField>
+
+<ParamField query="distance" type="number">
+  Radius in miles around `location`, greater than `0` and up to `1000`.
+</ParamField>
+
+<ParamField query="min_price" type="integer">
+  Minimum price in GBP. Needs a `category` other than `all`.
+</ParamField>
+
+<ParamField query="max_price" type="integer">
+  Maximum price in GBP. Needs a `category` other than `all`.
+</ParamField>
+
+<ParamField query="sort" type="string" default="relevance">
+  Result ordering. One of `relevance`, `date`, `price_asc`, `price_desc`,
+  `distance`.
+</ParamField>
+
+<ParamField query="seller_type" type="string">
+  `private` or `trade`. `trade` covers dealers, letting agents and recruiters.
+</ParamField>
+
+<ParamField query="urgent_only" type="boolean" default="false">
+  Only ads the seller marked urgent.
+</ParamField>
+
+<ParamField query="with_photos" type="boolean" default="false">
+  Only ads with photos.
+</ParamField>
+
+<ParamField query="filters" type="string">
+  Category-specific filters as comma-separated `key:value` pairs, e.g.
+  `vehicle_make:bmw,vehicle_fuel_type:petrol,min_vehicle_mileage:10000`. Repeat
+  a key to select several values (`vehicle_make:bmw,vehicle_make:audi`).
+  Discover the keys and values for a category with
+  [`/search/filters`](/api-reference/endpoint/gumtree/search-filters).
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+  Result page, `1`–`50`.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested keywords.</ResponseField>
+<ResponseField name="category" type="string">Category slug the search ran in.</ResponseField>
+<ResponseField name="category_name" type="string">e.g. `Cars`.</ResponseField>
+<ResponseField name="category_id" type="integer">Gumtree category id.</ResponseField>
+<ResponseField name="location" type="string">Location slug or postcode searched.</ResponseField>
+<ResponseField name="location_name" type="string">e.g. `United Kingdom`.</ResponseField>
+<ResponseField name="distance" type="number">Radius in miles, when one was applied.</ResponseField>
+<ResponseField name="sort" type="string">The sort that was applied.</ResponseField>
+<ResponseField name="page" type="integer">The page returned.</ResponseField>
+<ResponseField name="total_pages" type="integer">Pages available for this search (at most `50`).</ResponseField>
+<ResponseField name="total_results" type="integer">Total matching listings Gumtree reports.</ResponseField>
+<ResponseField name="result_count" type="integer">Listings on this page.</ResponseField>
+<ResponseField name="url" type="string">The gumtree.com search URL equivalent to this request.</ResponseField>
+<ResponseField name="category_facets" type="CategoryFacet[]">
+  Sub-categories of the result set with counts — `name`, `slug`, `count`. Feed
+  a `slug` back in as `category` to drill down.
+</ResponseField>
+<ResponseField name="listings" type="ListingSummary[]">
+  Listing cards.
+
+  <Expandable title="ListingSummary">
+    <ResponseField name="id" type="string">Listing id — use it for `/listings/{listing_id}`.</ResponseField>
+    <ResponseField name="title" type="string" />
+    <ResponseField name="url" type="string" />
+    <ResponseField name="description" type="string">Gumtree's short description.</ResponseField>
+    <ResponseField name="price" type="number">Numeric price in GBP.</ResponseField>
+    <ResponseField name="price_text" type="string">Price as shown, e.g. `£1,850.00pm`.</ResponseField>
+    <ResponseField name="price_frequency" type="string">`pm` / `pw` for rentals.</ResponseField>
+    <ResponseField name="currency" type="string">Always `GBP`.</ResponseField>
+    <ResponseField name="location" type="string">e.g. `Penkridge, Staffordshire`.</ResponseField>
+    <ResponseField name="location_id" type="string" />
+    <ResponseField name="postcode" type="string" />
+    <ResponseField name="latitude" type="number" />
+    <ResponseField name="longitude" type="number" />
+    <ResponseField name="distance_text" type="string">e.g. `13 miles` from the search location.</ResponseField>
+    <ResponseField name="distance_miles" type="number" />
+    <ResponseField name="category_id" type="integer" />
+    <ResponseField name="category_name" type="string" />
+    <ResponseField name="category_ids" type="integer[]">Root-to-leaf category ids.</ResponseField>
+    <ResponseField name="image_url" type="string" />
+    <ResponseField name="image_urls" type="string[]" />
+    <ResponseField name="image_count" type="integer" />
+    <ResponseField name="posted_text" type="string">Relative age as shown, e.g. `3 days ago`.</ResponseField>
+    <ResponseField name="posted_utc" type="number">Unix seconds.</ResponseField>
+    <ResponseField name="posted_at" type="string">ISO 8601 UTC.</ResponseField>
+    <ResponseField name="status" type="string">e.g. `LIVE`.</ResponseField>
+    <ResponseField name="seller_type" type="string">`Private`, `Trade` or `Agency`.</ResponseField>
+    <ResponseField name="seller_id" type="string" />
+    <ResponseField name="account_id" type="string" />
+    <ResponseField name="is_pro_seller" type="boolean" />
+    <ResponseField name="is_featured" type="boolean">Paid top-slot ad.</ResponseField>
+    <ResponseField name="is_urgent" type="boolean" />
+    <ResponseField name="is_bumped_up" type="boolean" />
+    <ResponseField name="is_standout" type="boolean" />
+    <ResponseField name="is_premium" type="boolean" />
+    <ResponseField name="has_video" type="boolean" />
+    <ResponseField name="supports_shipping" type="boolean" />
+    <ResponseField name="favourite_count" type="integer" />
+    <ResponseField name="seller_skills" type="string[]">Services listings only.</ResponseField>
+    <ResponseField name="attributes" type="Attribute[]">
+      Category attributes — `key`, `label`, `value`, `unit`. Motors listings
+      carry the full vehicle spec (make, model, year, mileage, fuel, engine,
+      MPG, CO2, insurance group, history-check flags).
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/gumtree/search?category=cars" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/gumtree/search?" +
+    new URLSearchParams({ category: "cars" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/gumtree/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"category": "cars"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": null,
+  "category": "cars",
+  "category_name": "Cars",
+  "category_id": 9311,
+  "location": "uk",
+  "location_name": "United Kingdom",
+  "distance": null,
+  "sort": "relevance",
+  "page": 1,
+  "total_pages": 50,
+  "total_results": 139812,
+  "result_count": 30,
+  "listings": [
+    {
+      "id": "1802409381",
+      "title": "Ford, RANGER, Pick Up, 2024, Automatic, 1996 (cc)",
+      "url": "https://www.gumtree.com/p/ford/ford-ranger-pick-up-2024-automatic-1996-cc-/1802409381",
+      "description": "2024 Ford Ranger Automatic – NO VAT – Only 11,400 Miles\n\nVery clean, low-mileage example of a 2024 Ford Ranger with just 11,400 miles from new...",
+      "price": 29000.0,
+      "price_text": "£29,000.00",
+      "price_frequency": null,
+      "currency": "GBP",
+      "location": "Penkridge, Staffordshire",
+      "location_id": "11002225",
+      "postcode": "ST195DU",
+      "latitude": 52.7257,
+      "longitude": -2.10523,
+      "category_id": 10306,
+      "category_name": "Ford",
+      "category_ids": [2551, 9311, 10306],
+      "image_url": "https://img.gumtree.com/ePR8PyKf84wPHx7_RYmEag/c77d793ecce84e13a9_a54724b51d3e/86",
+      "image_count": 17,
+      "posted_text": "4 days ago",
+      "posted_utc": 1791395043.988,
+      "posted_at": "2026-10-07T17:44:03.988000Z",
+      "status": "LIVE",
+      "seller_type": "Private",
+      "seller_id": "96740710",
+      "is_pro_seller": false,
+      "is_featured": true,
+      "is_urgent": true,
+      "is_bumped_up": false,
+      "is_standout": false,
+      "favourite_count": 1,
+      "attributes": [
+        { "key": "vehicle_make", "label": "Make", "value": "Ford", "unit": null },
+        { "key": "vehicle_model", "label": "Model", "value": "RANGER", "unit": null },
+        { "key": "vehicle_registration_year", "label": "Year", "value": "2024", "unit": null },
+        { "key": "vehicle_mileage", "label": "Mileage", "value": "11400", "unit": "miles" },
+        { "key": "vehicle_fuel_type", "label": "Fuel type", "value": "Diesel", "unit": null },
+        { "key": "vehicle_engine_power", "label": "Engine Power", "value": "205", "unit": "bhp" },
+        { "key": "vehicle_not_writeoff", "label": "Not written-off", "value": "true", "unit": null },
+        { "key": "vehicle_previous_keepers", "label": "Previous Keepers", "value": "4", "unit": null }
+      ]
+    }
+  ],
+  "category_facets": [],
+  "url": "https://www.gumtree.com/search?search_category=cars&search_location=uk"
+}
+```
+
+## Search behaviour
+
+<Note>
+  **Price filters need a category.** `min_price` / `max_price` have no effect
+  when `category` is `all` — pick a category (`for-sale`, `cars`, `bicycles` …)
+  to filter by price.
+</Note>
+
+<Note>
+  Gumtree pins up to **5 paid featured ads** (`is_featured: true`) above the
+  chosen sort order. Skip them if you need a strict date or price ordering.
+</Note>
+
+<Warning>
+  A result set holds at most **50 pages** (~1,500 listings), whatever
+  `total_results` reports. To collect more, narrow the search — by
+  sub-category (`category_facets`), location and `distance`, price band, or
+  [`filters`](/api-reference/endpoint/gumtree/search-filters).
+</Warning>
+
+### Postcode radius
+
+Pass a full UK postcode as `location` with a `distance` in miles:
+
+```bash
+curl "https://scrapebadger.com/v1/gumtree/search?query=sofa&category=for-sale&location=SW1A%201AA&distance=2" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+### Category filters
+
+```bash
+curl "https://scrapebadger.com/v1/gumtree/search?category=cars&filters=vehicle_make:bmw,vehicle_fuel_type:petrol,min_vehicle_mileage:10000" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+Range filters (`type: enum_range`) take `min_` / `max_` + the filter key, e.g.
+`min_vehicle_mileage:10000,max_vehicle_mileage:50000`. List every key and value
+for a category with
+[`/search/filters`](/api-reference/endpoint/gumtree/search-filters).
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `400` | Malformed `filters` value — expected comma-separated `key:value` pairs. |
+| `422` | Invalid parameter (e.g. `page` above 50), or Gumtree temporarily refused the request. **Not billed** — retry the latter shortly. |
