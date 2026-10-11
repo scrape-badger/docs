@@ -130,8 +130,8 @@ filters = res.json()["filters"]
   "sort_options": [
     { "value": "relevance", "label": "Most relevant first" },
     { "value": "date", "label": "Most recent first" },
-    { "value": "price_lowest_first", "label": "Price: Low to High" },
-    { "value": "price_highest_first", "label": "Price: High to Low" },
+    { "value": "price_asc", "label": "Price: Low to High" },
+    { "value": "price_desc", "label": "Price: High to Low" },
     { "value": "distance", "label": "Nearest first" }
   ],
   "distance_options": [1.0, 3.0, 5.0, 10.0, 15.0, 30.0, 50.0, 75.0, 100.0, 1000.0],
@@ -140,10 +140,8 @@ filters = res.json()["filters"]
 ```
 
 <Note>
-  `sort_options` lists Gumtree's own sort values. On
-  [`/search`](/api-reference/endpoint/gumtree/search), pass `price_asc` for
-  `price_lowest_first` and `price_desc` for `price_highest_first`;
-  `relevance`, `date` and `distance` are the same.
+  `sort_options` values are the ones [`/search`](/api-reference/endpoint/gumtree/search)
+  accepts as `sort` — pass them straight back.
 </Note>
 
 ### Using a filter in `/search`
