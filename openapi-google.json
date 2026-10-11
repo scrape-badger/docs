@@ -3983,7 +3983,7 @@
           "Google Lens"
         ],
         "summary": "Google Lens visual search",
-        "description": "Search Google Lens by image URL for visually similar results.\n\nAccepts Scrapingdog-parity ``country`` / ``language`` aliases on top\nof the native ``gl`` / ``hl``; the aliases take precedence when\nsupplied. Toggling ``product`` / ``visual_matches`` / ``exact_matches``\npasses Google's matching hints through to the upstream Lens page so\nGoogle biases the result mix appropriately.",
+        "description": "Google Lens visual search.\n\nResponse carries ``lens_results`` (Scrapingdog parity alias) with\n``title`` / ``source`` / ``source_favicon`` / ``thumbnail`` /\n``original_thumbnail`` / ``rating`` / ``reviews`` / ``in_stock``, plus\n``price`` (``{value, currency, extracted}``) and the raw ``tag`` chip it\nis parsed from, on shoppable matches. ``related_searches`` chips come\nalongside. Legacy ``results`` alias kept for backwards compat.\n\n``query`` refines the grid with text. ``exact_matches=true`` returns just\nthe pages hosting the image, each flagged ``exact_match: true``, instead\nof the broad grid — available for most images (8 of 10 in sampling) and\nfalling back to the grid otherwise. ``product=true`` narrows the grid to\nthe tiles Google marked buyable. ``visual_matches=false`` cannot be\nhonoured: visual matches are the only grid served. Anything that could not\nbe applied — including an exact-match lookup that came back empty — is\nnamed in the ``warnings`` array rather than silently dropped (SCR-177,\nSCR-180).\n\nWhen Google has no matches for an image — it filters explicit images and\nmatches removed under DMCA — the response is ``404`` with\n``error: lens_no_visual_matches``. That is Google's final answer for the\nimage: it is not charged, and retrying will not change it (SCR-325).",
         "operationId": "search_lens_api_v1_lens_search_get",
         "parameters": [
           {
@@ -4010,10 +4010,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Optional text refinement — e.g. 'pizza' to focus Lens on food matches.",
+              "description": "Optional text refinement (e.g. 'pizza')",
               "title": "Query"
             },
-            "description": "Optional text refinement — e.g. 'pizza' to focus Lens on food matches."
+            "description": "Optional text refinement (e.g. 'pizza')"
           },
           {
             "name": "country",
@@ -4028,10 +4028,10 @@
                   "type": "null"
                 }
               ],
-              "description": "ISO country code (alias for ``gl``).",
+              "description": "ISO country code (alias for gl)",
               "title": "Country"
             },
-            "description": "ISO country code (alias for ``gl``)."
+            "description": "ISO country code (alias for gl)"
           },
           {
             "name": "language",
@@ -4046,10 +4046,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Language code (alias for ``hl``).",
+              "description": "Language code (alias for hl)",
               "title": "Language"
             },
-            "description": "Language code (alias for ``hl``)."
+            "description": "Language code (alias for hl)"
           },
           {
             "name": "gl",
@@ -4081,11 +4081,11 @@
             "required": false,
             "schema": {
               "type": "boolean",
-              "description": "When True, bias towards shoppable product matches.",
+              "description": "Only the tiles Google marked buyable (price + stock), drawn from the same grid",
               "default": false,
               "title": "Product"
             },
-            "description": "When True, bias towards shoppable product matches."
+            "description": "Only the tiles Google marked buyable (price + stock), drawn from the same grid"
           },
           {
             "name": "visual_matches",
@@ -4093,11 +4093,11 @@
             "required": false,
             "schema": {
               "type": "boolean",
-              "description": "Include the visual-matches carousel (Scrapingdog parity).",
+              "description": "Always true in practice — `false` is reported back in `warnings`",
               "default": true,
               "title": "Visual Matches"
             },
-            "description": "Include the visual-matches carousel (Scrapingdog parity)."
+            "description": "Always true in practice — `false` is reported back in `warnings`"
           },
           {
             "name": "exact_matches",
@@ -4105,11 +4105,11 @@
             "required": false,
             "schema": {
               "type": "boolean",
-              "description": "Restrict to exact-match results only.",
+              "description": "Return only the pages hosting this image, flagged exact_match. Available for most images (8/10 in sampling); falls back to the full grid otherwise, saying so in warnings",
               "default": false,
               "title": "Exact Matches"
             },
-            "description": "Restrict to exact-match results only."
+            "description": "Return only the pages hosting this image, flagged exact_match. Available for most images (8/10 in sampling); falls back to the full grid otherwise, saying so in warnings"
           }
         ],
         "responses": {
