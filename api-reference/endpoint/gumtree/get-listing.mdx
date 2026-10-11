@@ -1,0 +1,244 @@
+---
+title: "Get Listing"
+api: "GET https://scrapebadger.com/v1/gumtree/listings/{listing_id}"
+description: "Full Gumtree listing — description, every attribute (full vehicle spec for cars), images, location, seller profile and similar listings."
+---
+
+Fetch one Gumtree listing in full: the description, every category attribute,
+all images, postcode and coordinates, the seller's profile and Gumtree's
+similar listings. Motors listings carry the full vehicle spec — make, model,
+mileage, MPG, CO2, insurance group, previous keepers and the vehicle
+history-check flags. Property, jobs, pets and services listings carry their own
+attribute sets.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="listing_id" type="string" required>
+  Gumtree listing id — the number at the end of a `gumtree.com/p/...` URL, e.g.
+  `1803293391`. Returned as `id` by
+  [`/search`](/api-reference/endpoint/gumtree/search).
+</ParamField>
+
+## Response
+
+<ResponseField name="id" type="string">Listing id.</ResponseField>
+<ResponseField name="title" type="string" />
+<ResponseField name="url" type="string" />
+<ResponseField name="description" type="string">Full description text.</ResponseField>
+<ResponseField name="price" type="number">Numeric price in GBP.</ResponseField>
+<ResponseField name="price_text" type="string">Price as shown, e.g. `£5,699.00`.</ResponseField>
+<ResponseField name="price_frequency" type="string">`pm` / `pw` for rentals.</ResponseField>
+<ResponseField name="currency" type="string">Always `GBP`.</ResponseField>
+<ResponseField name="vat" type="string">Motors trade listings: `Inc VAT` / `No VAT`.</ResponseField>
+<ResponseField name="location" type="string">e.g. `Larkhall, South Lanarkshire`.</ResponseField>
+<ResponseField name="area" type="string" />
+<ResponseField name="sub_area" type="string" />
+<ResponseField name="location_id" type="string" />
+<ResponseField name="postcode" type="string" />
+<ResponseField name="latitude" type="number" />
+<ResponseField name="longitude" type="number" />
+<ResponseField name="category_id" type="integer" />
+<ResponseField name="category_name" type="string" />
+<ResponseField name="category_ids" type="integer[]">Root-to-leaf category ids.</ResponseField>
+<ResponseField name="breadcrumbs" type="Breadcrumb[]">`name`, `url`.</ResponseField>
+<ResponseField name="image_urls" type="string[]" />
+<ResponseField name="video_urls" type="string[]" />
+<ResponseField name="posted_text" type="string">Relative age as shown, e.g. `1 day ago`.</ResponseField>
+<ResponseField name="posted_utc" type="number">Last (re)posted, Unix seconds — moves when the ad is bumped.</ResponseField>
+<ResponseField name="posted_at" type="string">Same, ISO 8601 UTC.</ResponseField>
+<ResponseField name="created_utc" type="number">When the ad was first created, Unix seconds.</ResponseField>
+<ResponseField name="created_at" type="string">Same, ISO 8601 UTC.</ResponseField>
+<ResponseField name="updated_utc" type="number" />
+<ResponseField name="updated_at" type="string" />
+<ResponseField name="expires_at" type="string">Date the ad is valid through (`YYYY-MM-DD`).</ResponseField>
+<ResponseField name="is_featured" type="boolean" />
+<ResponseField name="is_urgent" type="boolean" />
+<ResponseField name="is_bumped_up" type="boolean" />
+<ResponseField name="is_standout" type="boolean" />
+<ResponseField name="favourite_count" type="integer" />
+<ResponseField name="vehicle_history_checked" type="boolean">Motors: Gumtree's vehicle history check ran on this car.</ResponseField>
+<ResponseField name="attributes" type="Attribute[]">
+  Every category attribute — `key`, `label`, `value`, `unit`, e.g.
+  `{"key": "vehicle_mileage", "label": "Mileage", "value": "94130", "unit": "miles"}`.
+</ResponseField>
+<ResponseField name="seller" type="Seller">
+  The seller's profile.
+
+  <Expandable title="Seller">
+    <ResponseField name="name" type="string" />
+    <ResponseField name="user_id" type="string" />
+    <ResponseField name="public_id" type="string" />
+    <ResponseField name="type" type="string">`Private`, `Trade` or `Agency`.</ResponseField>
+    <ResponseField name="is_pro" type="boolean" />
+    <ResponseField name="posting_since" type="string">e.g. `6+ years`.</ResponseField>
+    <ResponseField name="last_active_utc" type="number" />
+    <ResponseField name="last_active_at" type="string" />
+    <ResponseField name="total_listings" type="integer" />
+    <ResponseField name="listings_last_year" type="integer" />
+    <ResponseField name="listings_by_category" type="object">Category name → live listing count.</ResponseField>
+    <ResponseField name="reply_speed" type="string" />
+    <ResponseField name="reply_rate" type="string" />
+    <ResponseField name="rating" type="object">`average`, `total`, and a per-star `breakdown`.</ResponseField>
+    <ResponseField name="verification" type="object">`status`, `label` (e.g. `Business Verified`) and the `checks` Gumtree ran.</ResponseField>
+    <ResponseField name="phone_masked" type="string">The masked phone number shown on the listing page, e.g. `0794997XXXX`. Full numbers are never returned.</ResponseField>
+    <ResponseField name="website_url" type="string" />
+    <ResponseField name="avatar_url" type="string" />
+    <ResponseField name="logo_url" type="string" />
+    <ResponseField name="badges" type="string[]" />
+  </Expandable>
+</ResponseField>
+<ResponseField name="seller_skills" type="string[]">Services listings only.</ResponseField>
+<ResponseField name="seller_listings_url" type="string">The seller's other ads on gumtree.com.</ResponseField>
+<ResponseField name="similar_listings" type="ListingSummary[]">
+  Gumtree's similar listings, in the same shape as
+  [`/search`](/api-reference/endpoint/gumtree/search#response) listings.
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/gumtree/listings/1803293391" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/gumtree/listings/1803293391", {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+});
+const listing = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/gumtree/listings/1803293391",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+listing = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "id": "1803293391",
+  "title": "Mazda, 2, Hatchback, 2018, Manual, 1496 (cc), 5 doors",
+  "description": "Welcome to Thomson Twins Motors. We are based in Larkhall, Scotland. Our cars come with a Fresh Service, Valeted inside and long MOT's...",
+  "price": 5699.0,
+  "price_text": "£5,699.00",
+  "price_frequency": null,
+  "currency": "GBP",
+  "vat": "No VAT",
+  "location": "Larkhall, South Lanarkshire",
+  "area": "South Lanarkshire",
+  "sub_area": "Larkhall",
+  "location_id": "11000569",
+  "postcode": "ML93BQ",
+  "latitude": 55.7269,
+  "longitude": -3.92624,
+  "category_id": 10312,
+  "category_name": "Mazda",
+  "category_ids": [2551, 9311, 10312],
+  "breadcrumbs": [
+    { "name": "Home", "url": "https://www.gumtree.com/" },
+    { "name": "Motors", "url": "https://www.gumtree.com/cars-vans-motorbikes/uk/larkhall" },
+    { "name": "Cars", "url": "https://www.gumtree.com/cars-vans-motorbikes/cars/uk/larkhall" },
+    { "name": "Mazda", "url": "https://www.gumtree.com/cars-vans-motorbikes/cars/mazda/uk/larkhall" }
+  ],
+  "image_urls": [
+    "https://img.gumtree.com/ePR8PyKf84wPHx7_RYmEag/cba6556cbcb7464a97_78d604ec62db/86",
+    "https://img.gumtree.com/ePR8PyKf84wPHx7_RYmEag/b5a807b290974290b8_5c9645400e3e/86"
+  ],
+  "video_urls": [],
+  "posted_text": "1 day ago",
+  "posted_utc": 1791643486.952,
+  "posted_at": "2026-10-10T14:44:46.952000Z",
+  "created_utc": 1790675543.83,
+  "created_at": "2026-09-29T09:52:23.830000Z",
+  "updated_utc": 1791643487.028,
+  "updated_at": "2026-10-10T14:44:47.028000Z",
+  "expires_at": "2026-11-09",
+  "is_featured": false,
+  "is_urgent": false,
+  "is_bumped_up": false,
+  "is_standout": false,
+  "favourite_count": 2,
+  "vehicle_history_checked": true,
+  "attributes": [
+    { "key": "vehicle_make", "label": "Make", "value": "Mazda", "unit": null },
+    { "key": "vehicle_model", "label": "Model", "value": "2", "unit": null },
+    { "key": "vehicle_registration_year", "label": "Year", "value": "2018", "unit": null },
+    { "key": "vehicle_mileage", "label": "Mileage", "value": "94130", "unit": "miles" },
+    { "key": "vehicle_transmission", "label": "Transmission", "value": "Manual", "unit": null },
+    { "key": "vehicle_fuel_type", "label": "Fuel type", "value": "Petrol", "unit": null },
+    { "key": "vehicle_average_mpg", "label": "Fuel Consumption", "value": "62.8", "unit": "mpg" }
+  ],
+  "seller": {
+    "name": "Thomson Twins Motors Ltd",
+    "user_id": "91457907",
+    "public_id": "41d401e0ec9e0dfa128b17775c8f2f9d",
+    "type": "Trade",
+    "is_pro": true,
+    "posting_since": "4+ months",
+    "rating": {
+      "average": 0.0,
+      "total": 0,
+      "breakdown": { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 }
+    },
+    "verification": {
+      "status": "VERIFIED",
+      "label": "Business Verified",
+      "checks": ["Age verification (maximum)", "Age verification (minimum)", "Directors"]
+    },
+    "phone_masked": null,
+    "badges": []
+  },
+  "seller_skills": [],
+  "seller_listings_url": "https://www.gumtree.com/sellerads/1803293391?userId=91457907&publicUserId=41d401e0ec9e0dfa128b17775c8f2f9d",
+  "similar_listings": [
+    {
+      "id": "1803422383",
+      "title": "2017 Mazda MX-5 1.5 SE-L Nav 2dr CONVERTIBLE PETROL Manual",
+      "url": "https://www.gumtree.com/p/mazda/2017-mazda-mx-5-1.5-se-l-nav-2dr-convertible-petrol-manual/1803422383",
+      "price": 12695.0,
+      "price_text": "£12,695.00",
+      "location": "Colchester, Essex",
+      "postcode": "CO27QB",
+      "seller_type": "Trade",
+      "posted_text": "Just now"
+    }
+  ]
+}
+```
+
+<Note>
+  **Phone numbers are masked.** `seller.phone_masked` is the masked form shown
+  on the public listing page (e.g. `0794997XXXX`), or `null` when the seller
+  shows none. The full number is never returned.
+</Note>
+
+<Tip>
+  Vehicle history-check flags arrive as attributes with the value `"true"` —
+  `vehicle_not_stolen`, `vehicle_not_writeoff`, `vehicle_not_scrapped`,
+  `vehicle_not_exported`, `vehicle_road_worthy` — alongside
+  `vehicle_previous_keepers` and `vrn` (the registration) where the seller shows
+  it.
+</Tip>
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | Listing does not exist or has been removed. |
+| `422` | `listing_id` is not 5–12 digits, or Gumtree temporarily refused the request. **Not billed** — retry the latter shortly. |

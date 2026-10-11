@@ -1,0 +1,168 @@
+---
+title: "Get Search Filters"
+api: "GET https://scrapebadger.com/v1/gumtree/search/filters"
+description: "The filters, sort orders and radius options Gumtree offers for a category, each value with its live result count."
+---
+
+List every filter Gumtree offers for a category — make, model, fuel type,
+mileage range, bedrooms, job type and so on — with a **live result count** per
+value, plus the available sort orders and search radii. Feed a filter's `key`
+and an option's `value` straight back into
+[`/search`](/api-reference/endpoint/gumtree/search) as `filters=key:value`.
+
+**Credits:** 5
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="category" type="string" default="all">
+  Category slug, e.g. `cars`, `property-to-rent`, `jobs`. Filters are
+  category-specific, so pass the category you intend to search.
+</ParamField>
+
+<ParamField query="location" type="string" default="uk">
+  Location slug, town name or UK postcode. Scopes the counts.
+</ParamField>
+
+<ParamField query="query" type="string">
+  Optional keywords to scope the counts.
+</ParamField>
+
+## Response
+
+<ResponseField name="category" type="string">Category slug.</ResponseField>
+<ResponseField name="category_name" type="string">e.g. `Cars`.</ResponseField>
+<ResponseField name="total_results" type="integer">Matching listings before any filter.</ResponseField>
+<ResponseField name="filters" type="SearchFilter[]">
+  Filters for the category.
+
+  <Expandable title="SearchFilter">
+    <ResponseField name="key" type="string">Filter key for `filters=key:value`, e.g. `vehicle_make`.</ResponseField>
+    <ResponseField name="label" type="string">e.g. `Make`.</ResponseField>
+    <ResponseField name="type" type="string">`enum`, `multiple_selection`, `enum_range`, `range_freeform` or `boolean`.</ResponseField>
+    <ResponseField name="min_key" type="string">Range filters: the lower-bound key when Gumtree names it explicitly (e.g. `min_price`). Otherwise it is `min_` + `key`.</ResponseField>
+    <ResponseField name="max_key" type="string">Range filters: the upper-bound key, likewise `max_` + `key` when null.</ResponseField>
+    <ResponseField name="options" type="FilterOption[]">`label`, `value`, `count` — `value` is what `/search` takes. Empty for range filters.</ResponseField>
+    <ResponseField name="min_options" type="FilterOption[]">Range filters: the lower bounds Gumtree offers.</ResponseField>
+    <ResponseField name="max_options" type="FilterOption[]">Range filters: the upper bounds Gumtree offers.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="sort_options" type="SortOption[]">
+  Sort orders Gumtree offers for the category — `value`, `label`.
+</ResponseField>
+<ResponseField name="distance_options" type="number[]">Search radius values in miles.</ResponseField>
+<ResponseField name="category_facets" type="CategoryFacet[]">Sub-categories with counts — `name`, `slug`, `count`.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/gumtree/search/filters?category=cars" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/gumtree/search/filters?" +
+    new URLSearchParams({ category: "cars" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const { filters } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/gumtree/search/filters",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"category": "cars"},
+)
+filters = res.json()["filters"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "category": "cars",
+  "category_name": "Cars",
+  "total_results": 139812,
+  "filters": [
+    {
+      "key": "vehicle_make",
+      "label": "Make",
+      "type": "enum",
+      "min_key": null,
+      "max_key": null,
+      "options": [
+        { "label": "Abarth", "value": "abarth", "count": 265 },
+        { "label": "AC", "value": "ac", "count": 1 },
+        { "label": "Aixam", "value": "aixam", "count": 1 }
+      ],
+      "min_options": [],
+      "max_options": []
+    },
+    {
+      "key": "vehicle_mileage",
+      "label": "Mileage",
+      "type": "enum_range",
+      "min_key": null,
+      "max_key": null,
+      "options": [],
+      "min_options": [
+        { "label": "0 miles", "value": "0", "count": null },
+        { "label": "10,000 miles", "value": "10000", "count": null },
+        { "label": "50,000 miles", "value": "50000", "count": null }
+      ],
+      "max_options": [
+        { "label": "1,000 miles", "value": "1000", "count": null },
+        { "label": "10,000 miles", "value": "10000", "count": null }
+      ]
+    }
+  ],
+  "sort_options": [
+    { "value": "relevance", "label": "Most relevant first" },
+    { "value": "date", "label": "Most recent first" },
+    { "value": "price_asc", "label": "Price: Low to High" },
+    { "value": "price_desc", "label": "Price: High to Low" },
+    { "value": "distance", "label": "Nearest first" }
+  ],
+  "distance_options": [1.0, 3.0, 5.0, 10.0, 15.0, 30.0, 50.0, 75.0, 100.0, 1000.0],
+  "category_facets": []
+}
+```
+
+<Note>
+  `sort_options` values are the ones [`/search`](/api-reference/endpoint/gumtree/search)
+  accepts as `sort` — pass them straight back.
+</Note>
+
+### Using a filter in `/search`
+
+| Filter `type` | Pass to `/search` as |
+| ------------- | -------------------- |
+| `enum`, `multiple_selection` | `filters=vehicle_make:bmw` — repeat the key for several values: `vehicle_make:bmw,vehicle_make:audi` |
+| `enum_range` | `filters=min_vehicle_mileage:10000,max_vehicle_mileage:50000` (`min_` / `max_` + `key`) |
+
+`price`, `seller_type`, `photos_filter` and `urgent_filter` also appear in this
+list; on `/search` use the dedicated `min_price` / `max_price`, `seller_type`,
+`with_photos` and `urgent_only` parameters for them.
+
+<Tip>
+  Use this endpoint to size a search before paging it: the per-value counts
+  tell you which filters bring a result set under the 50-page ceiling of
+  `/search`.
+</Tip>
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `422` | Gumtree temporarily refused the request — **not billed**. Retry shortly. |

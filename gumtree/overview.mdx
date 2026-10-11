@@ -1,0 +1,159 @@
+---
+title: "Gumtree Scraper by ScrapeBadger — Overview"
+description: "Search gumtree.com UK classifieds by keyword, category and postcode radius, and pull full listings with vehicle spec, seller profile and similar ads — no Gumtree account required."
+---
+
+## Scraper API for Gumtree
+
+The ScrapeBadger **Gumtree API** turns `gumtree.com`, the UK's classifieds
+marketplace, into a clean JSON feed: keyword and category search with postcode
+radius and category-specific filters, filter discovery with live counts, full
+listing detail (every attribute, the full vehicle spec for cars, the seller's
+profile and similar ads), a seller's other listings, search and location
+autocomplete, and the category and location trees.
+
+<Info>
+  All endpoints are `GET`, live under `https://scrapebadger.com/v1/gumtree/*`,
+  and authenticate with the `X-API-Key` header. Credits are charged per request
+  (see the table below) and reported on the `X-Credits-Used` response header.
+</Info>
+
+## Features
+
+- **Every vertical** — For Sale, Motors (cars, vans, motorbikes), Property (to
+  rent, for sale, flatshare), Jobs, Services, Pets and Community. ~25–30
+  listings per search page, up to 50 pages.
+- **Postcode-radius search** — `location` takes a town slug, a town name or a
+  full UK postcode (`SW1A 1AA`), plus a `distance` in miles.
+- **Category filters with live counts** —
+  [`/search/filters`](/api-reference/endpoint/gumtree/search-filters) lists
+  every filter Gumtree offers for a category (make, fuel type, mileage range,
+  bedrooms …) with the result count per value; pass them back to `/search` as
+  `filters=key:value`.
+- **Full vehicle spec on Motors listings** — make, model, year, mileage, fuel,
+  transmission, body type, engine size and power, MPG, CO2, insurance group,
+  0–62, top speed, previous keepers, the registration where shown, and the
+  history-check flags (not stolen, not written off, not scrapped).
+- **Seller profile** — private or trade, verified-business status with the
+  checks Gumtree ran, rating with per-star breakdown, posting since, last
+  active, total listings and listings by category, and the masked phone number.
+- **Promotion flags** — `is_featured`, `is_urgent`, `is_bumped_up`,
+  `is_standout` and `favourite_count` on every listing.
+- **Dates in both forms** — every timestamp ships as Unix seconds (`*_utc`) and
+  ISO 8601 (`*_at`). Listing detail separates `created_at` (first posted) from
+  `posted_at` (moves on a bump).
+
+<Note>
+  **Phone numbers are masked.** Only the masked form Gumtree shows on the public
+  listing page is returned (e.g. `0794997XXXX`). Full numbers are never
+  returned.
+</Note>
+
+## Coverage
+
+**United Kingdom only.** Only `gumtree.com` is supported, so there is no market
+parameter — scope results with `location` and `distance` instead.
+
+| Code | Country | Currency | Language | Domain |
+| ---- | ------- | -------- | -------- | ----------- |
+| `GB` | United Kingdom | GBP | en-GB | gumtree.com |
+
+## Credit Costs
+
+| Endpoint | Path | Credits |
+| -------- | ---- | ------- |
+| Search listings | `GET /v1/gumtree/search` | 5 credits |
+| Get search filters | `GET /v1/gumtree/search/filters` | 5 credits |
+| Get listing | `GET /v1/gumtree/listings/{listing_id}` | 5 credits |
+| Get seller listings | `GET /v1/gumtree/listings/{listing_id}/seller-listings` | 5 credits |
+| Autocomplete | `GET /v1/gumtree/autocomplete` | 1 credit |
+| Location autocomplete | `GET /v1/gumtree/locations/autocomplete` | 1 credit |
+| List locations | `GET /v1/gumtree/locations` | 1 credit |
+| List categories | `GET /v1/gumtree/categories` | 1 credit |
+| Health | `GET /v1/gumtree/health` | 0 credits |
+
+## Quickstart
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/gumtree/search?category=cars&location=manchester&distance=30&filters=vehicle_make:bmw" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/gumtree/search?" +
+    new URLSearchParams({
+      category: "cars",
+      location: "manchester",
+      distance: "30",
+      filters: "vehicle_make:bmw",
+    }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+console.log(data.total_results, "listings");
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/gumtree/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={
+        "category": "cars",
+        "location": "manchester",
+        "distance": 30,
+        "filters": "vehicle_make:bmw",
+    },
+)
+print(res.json()["total_results"], "listings")
+```
+
+</CodeGroup>
+
+## Typical workflow
+
+1. **Pick a category** — [`/categories`](/api-reference/endpoint/gumtree/list-categories)
+   or [`/autocomplete`](/api-reference/endpoint/gumtree/autocomplete) give you
+   the `slug` (`cars`, `property-to-rent`, `sofas-couches` …).
+2. **Discover its filters** —
+   [`/search/filters`](/api-reference/endpoint/gumtree/search-filters) returns
+   each filter's `key` and values with live counts.
+3. **Search** — [`/search`](/api-reference/endpoint/gumtree/search) with
+   `category`, `location` + `distance`, price band and `filters`.
+4. **Enrich** — [`/listings/{id}`](/api-reference/endpoint/gumtree/get-listing)
+   for the full description, attributes and seller, and
+   [`/listings/{id}/seller-listings`](/api-reference/endpoint/gumtree/get-seller-listings)
+   for everything else that seller has listed.
+
+## Limits
+
+- **50 pages per result set** (~1,500 listings). To go deeper, narrow by
+  sub-category, location and `distance`, price band or filters.
+- **Price filters need a category.** `min_price` / `max_price` have no effect
+  with `category=all`.
+- **Featured ads are pinned.** Gumtree places up to 5 paid featured ads
+  (`is_featured`) above the chosen sort order.
+- **Seller listings are keyed by a listing.** Pass any listing id of the seller
+  to `/listings/{id}/seller-listings`; there is no separate seller lookup.
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `400` | Malformed `filters` value — expected comma-separated `key:value` pairs. |
+| `404` | Listing does not exist or has been removed. |
+| `422` | Invalid parameter, or Gumtree temporarily refused the request. **Not billed** — retry the latter shortly. |
+
+<Tip>
+  The reference endpoints — autocomplete, location autocomplete, categories and
+  locations — cost 1 credit each. Use them to build the right `category` and
+  `location` before spending 5 credits on a search.
+</Tip>
+
+---
+
+*ScrapeBadger is an independent tool and is not affiliated with, endorsed by, or sponsored by Gumtree. "Gumtree" is a trademark of its respective owner, used here only to describe the platform this scraper is designed to work with.*

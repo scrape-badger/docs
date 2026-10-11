@@ -1,0 +1,94 @@
+---
+title: "Autocomplete"
+api: "GET https://scrapebadger.com/v1/gumtree/autocomplete"
+description: "Gumtree search-box keyword suggestions for a partial term, each with the categories it maps to."
+---
+
+Expand a partial search term into Gumtree's own search-box suggestions. Where
+Gumtree attaches categories to a suggestion, they come back with their `slug`,
+ready to pass to [`/search`](/api-reference/endpoint/gumtree/search) as
+`category`.
+
+**Credits:** 1
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="query" type="string" required>
+  Partial search term, e.g. `sofa` or `iph`.
+</ParamField>
+
+## Response
+
+<ResponseField name="query" type="string">Echo of the requested term.</ResponseField>
+<ResponseField name="result_count" type="integer">Number of suggestions.</ResponseField>
+<ResponseField name="suggestions" type="Suggestion[]">
+  Suggestions.
+
+  <Expandable title="Suggestion">
+    <ResponseField name="query" type="string">The suggested search term — feed straight into `/search`.</ResponseField>
+    <ResponseField name="highlighted" type="string">The term with the matched part wrapped in `<em>`.</ResponseField>
+    <ResponseField name="categories" type="CategoryRef[]">`id`, `name`, `slug` of the categories Gumtree suggests for the term.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/gumtree/autocomplete?query=sofa" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/gumtree/autocomplete?" +
+    new URLSearchParams({ query: "sofa" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/gumtree/autocomplete",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "sofa"},
+)
+data = res.json()
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "query": "sofa",
+  "result_count": 10,
+  "suggestions": [
+    {
+      "query": "sofa",
+      "highlighted": "<em>sofa</em>",
+      "categories": [
+        { "id": 12494, "name": "Sofas & Couches", "slug": "sofas-couches" },
+        { "id": 679, "name": "Sofa Beds & Futons", "slug": "sofa-beds-futons" }
+      ]
+    },
+    { "query": "sofa bed", "highlighted": "<em>sofa</em> bed", "categories": [] },
+    { "query": "sofa set", "highlighted": "<em>sofa</em> set", "categories": [] }
+  ]
+}
+```
+
+<Tip>
+  A suggestion's category `slug` is the cheapest way to find the right
+  `category` for a search — e.g. `query=sofa&category=sofas-couches` — which
+  also unlocks the price filters.
+</Tip>
