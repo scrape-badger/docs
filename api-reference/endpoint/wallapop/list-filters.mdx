@@ -1,0 +1,186 @@
+---
+title: "List Filters"
+api: "GET https://scrapebadger.com/v1/wallapop/filters"
+description: "The search filters Wallapop offers for a category or query — condition, colour, brand, model, price, and more — with their option ids."
+---
+
+The filters Wallapop offers for a category or search text, with the option ids each filter accepts. Use the option ids as values for the matching [search](/api-reference/endpoint/wallapop/search-items) parameters, such as `condition` and `color`.
+
+Filters with long option lists, such as `brand` and `model`, return no options here and are flagged `options_endpoint: true`. Fetch their options from [`/v1/wallapop/filters/{filter_id}/options`](/api-reference/endpoint/wallapop/list-filter-options).
+
+**Credits:** 2. Empty results are not charged.
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="category_id" type="integer">
+  Category the filters apply to, from [`/v1/wallapop/categories`](/api-reference/endpoint/wallapop/list-categories). Use `100` for car filters.
+</ParamField>
+
+<ParamField query="query" type="string">
+  Search text the filters apply to, e.g. `iphone`.
+</ParamField>
+
+<ParamField query="market" type="string" default="es">
+  `es`, `it`, or `pt`. Sets the language of filter and option titles. See [`/v1/wallapop/markets`](/api-reference/endpoint/wallapop/list-markets).
+</ParamField>
+
+## Response
+
+<ResponseField name="filters" type="SearchFilter[]">
+  Available filters, in Wallapop's order.
+
+  <Expandable title="SearchFilter">
+    <ResponseField name="id" type="string">Filter id, e.g. `condition`, `color`, `brand`, `model`, `price`, `time_filter`.</ResponseField>
+    <ResponseField name="title" type="string | null">Localised filter title.</ResponseField>
+    <ResponseField name="type" type="string | null">Filter type: `list`, `toggle`, `slider`, `location`, or `tree`.</ResponseField>
+    <ResponseField name="params" type="string[]">The Wallapop search parameters this filter sets, e.g. `min_sale_price` and `max_sale_price` for `price`.</ResponseField>
+    <ResponseField name="multi" type="boolean | null">For `list` filters, whether several options can be combined (comma-separated). `null` for other types.</ResponseField>
+    <ResponseField name="options" type="FilterOption[]">
+      The filter's options, when the list is short enough to inline.
+
+      <Expandable title="FilterOption">
+        <ResponseField name="id" type="string">Option id — the value to send to search, e.g. `as_good_as_new` or `black`.</ResponseField>
+        <ResponseField name="title" type="string | null">Localised option title.</ResponseField>
+      </Expandable>
+    </ResponseField>
+    <ResponseField name="options_endpoint" type="boolean">`true` when the options are too long to inline — fetch them from [`/v1/wallapop/filters/{filter_id}/options`](/api-reference/endpoint/wallapop/list-filter-options).</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="market" type="string">The market used for the request.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/wallapop/filters?query=iphone&market=es" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/wallapop/filters",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "iphone", "market": "es"},
+)
+data = res.json()
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/wallapop/filters?" +
+    new URLSearchParams({ query: "iphone", market: "es" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```bash CLI
+scrapebadger wallapop filters --query iphone --market es
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "filters": [
+    {
+      "id": "time_filter",
+      "title": "Fecha de publicación",
+      "type": "list",
+      "params": ["time_filter"],
+      "multi": false,
+      "options": [
+        { "id": "today", "title": "Hoy" },
+        { "id": "lastWeek", "title": "Últimos 7 días" },
+        { "id": "lastMonth", "title": "Últimos 30 días" }
+      ],
+      "options_endpoint": false
+    },
+    {
+      "id": "price",
+      "title": "Precio",
+      "type": "slider",
+      "params": ["min_sale_price", "max_sale_price"],
+      "multi": null,
+      "options": [],
+      "options_endpoint": false
+    },
+    {
+      "id": "condition",
+      "title": "Estado",
+      "type": "list",
+      "params": ["condition"],
+      "multi": true,
+      "options": [
+        { "id": "un_opened", "title": "Sin abrir" },
+        { "id": "in_box", "title": "En su caja" },
+        { "id": "new", "title": "Nuevo" },
+        { "id": "as_good_as_new", "title": "Como nuevo" },
+        { "id": "good", "title": "En buen estado" },
+        { "id": "fair", "title": "En condiciones aceptables" },
+        { "id": "has_given_it_all", "title": "Lo ha dado todo" }
+      ],
+      "options_endpoint": false
+    },
+    {
+      "id": "brand",
+      "title": "Marca",
+      "type": "list",
+      "params": ["brand"],
+      "multi": true,
+      "options": [],
+      "options_endpoint": true
+    },
+    {
+      "id": "model",
+      "title": "Modelo",
+      "type": "list",
+      "params": ["model"],
+      "multi": true,
+      "options": [],
+      "options_endpoint": true
+    },
+    {
+      "id": "has_warranty",
+      "title": "Garantía incluida",
+      "type": "toggle",
+      "params": ["has_warranty"],
+      "multi": null,
+      "options": [],
+      "options_endpoint": false
+    },
+    {
+      "id": "color",
+      "title": "Color",
+      "type": "list",
+      "params": ["color"],
+      "multi": true,
+      "options": [
+        { "id": "black", "title": "Negro" },
+        { "id": "blue", "title": "Azul" },
+        { "id": "space_gray", "title": "Gris espacial" },
+        { "id": "white", "title": "Blanco" }
+      ],
+      "options_endpoint": false
+    }
+  ],
+  "market": "es"
+}
+```
+
+<Note>
+  The `params` names are Wallapop's own. On ScrapeBadger's search endpoint, `min_sale_price` / `max_sale_price` are `min_price` / `max_price`, `is_shippable` is `shippable`, and `distance_in_km` is `distance_km`. Option ids are passed unchanged.
+</Note>
+
+<Note>
+  Listing filters costs **2 credits**. Empty results and failed requests are not charged.
+</Note>

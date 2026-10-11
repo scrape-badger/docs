@@ -1,0 +1,173 @@
+---
+title: "Wallapop Scraper by ScrapeBadger — Overview"
+description: "Scrape Wallapop second-hand listings in Spain, Italy, and Portugal — search with Wallapop's own filters (cars included), pull full listing detail, and look up seller profiles, listings, and reviews — as structured JSON."
+---
+
+## Scraper API for Wallapop
+
+Search **second-hand listings** with Wallapop's own filters, pull **full listing detail** (description, attributes, photos, views, and favorites), and look up **seller profiles**, their live listings, and the **reviews** they received across Wallapop's **3 markets** — Spain, Italy, and Portugal. Prices are in EUR.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="3 Markets" icon="earth-europe">
+    One API for **Spain** (`es`), **Italy** (`it`), and **Portugal** (`pt`). Pick one with the `market` parameter, or search anywhere with `latitude` / `longitude`.
+  </Card>
+  <Card title="Listing Search" icon="magnifying-glass">
+    Filter by **price**, **condition**, **brand**, **model**, **colour**, **distance**, **listing age**, **shipping**, **warranty**, and **refurbished** — plus car filters for **year**, **mileage**, **gearbox**, and **horsepower**.
+  </Card>
+  <Card title="Rich Listing Detail" icon="box-open">
+    Title, description, price, category path, structured attributes, photos, location, shipping, and engagement counters — **views**, **favorites**, and **conversations**.
+  </Card>
+  <Card title="Seller Profiles" icon="user-check">
+    [Profiles](/api-reference/endpoint/wallapop/get-user) with **rating**, **sales and purchase counters**, response rate, **verifications**, and every live listing.
+  </Card>
+  <Card title="Reviews" icon="star">
+    The [reviews](/api-reference/endpoint/wallapop/get-user-reviews) a user received, with rating, comment, reviewer, and the listing that was bought or sold.
+  </Card>
+  <Card title="Structured Data" icon="database">
+    Clean JSON with numeric prices, ISO 8601 and Unix timestamps, normalised image sizes, and full listing URLs.
+  </Card>
+</CardGroup>
+
+## Markets
+
+A Wallapop market picks two things: the **default search location** and the **language** of category names, filter labels, and attribute text.
+
+| Market | Country | Default search location | Language | Currency |
+|--------|---------|-------------------------|----------|----------|
+| :es: `es` | Spain | Madrid (40.4168, -3.7038) | `es-ES` | EUR |
+| :it: `it` | Italy | Rome (41.9028, 12.4964) | `it-IT` | EUR |
+| :portugal: `pt` | Portugal | Lisbon (38.7223, -9.1393) | `pt-PT` | EUR |
+
+Wallapop searches by location, not by domain. Pass `latitude` and `longitude` to [search](/api-reference/endpoint/wallapop/search-items) around any point. Those coordinates override the market's default location, and the country searched follows them: coordinates in Barcelona return Spanish listings even with `market=it`. Each search response reports the country Wallapop searched in as `country_code`.
+
+<Tip>
+  If no `market` is specified, it defaults to `es`. Use [`/v1/wallapop/markets`](/api-reference/endpoint/wallapop/list-markets) to get the list, with default coordinates, programmatically.
+</Tip>
+
+## Quick Start
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/wallapop/search?query=iphone+14&market=es&max_price=400" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/wallapop/search",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"query": "iphone 14", "market": "es", "max_price": 400},
+)
+data = res.json()
+
+for item in data["items"]:
+    print(item["price"], item["title"], item["url"])
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/wallapop/search?" +
+    new URLSearchParams({ query: "iphone 14", market: "es", max_price: "400" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+
+for (const item of data.items) {
+  console.log(item.price, item.title, item.url);
+}
+```
+
+```bash CLI
+scrapebadger wallapop search "iphone 14" --market es --max-price 400
+```
+
+</CodeGroup>
+
+<Note>
+  The ScrapeBadger Python and Node.js SDKs do not have typed Wallapop clients yet. Call the REST endpoints directly as shown above, or use the [CLI](/cli/overview) or the [MCP server](/mcp/overview) (`wallapop_*` tools).
+</Note>
+
+## Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/wallapop/search`](/api-reference/endpoint/wallapop/search-items) | GET | Search listings with Wallapop's filters |
+| [`/v1/wallapop/items/{item_id}`](/api-reference/endpoint/wallapop/get-item) | GET | Full detail for a single listing |
+| [`/v1/wallapop/users/{user_id}`](/api-reference/endpoint/wallapop/get-user) | GET | Seller profile with ratings and counters |
+| [`/v1/wallapop/users/{user_id}/items`](/api-reference/endpoint/wallapop/get-user-items) | GET | A seller's live listings |
+| [`/v1/wallapop/users/{user_id}/reviews`](/api-reference/endpoint/wallapop/get-user-reviews) | GET | Reviews a user received |
+| [`/v1/wallapop/autocomplete`](/api-reference/endpoint/wallapop/autocomplete) | GET | Search-box suggestions |
+| [`/v1/wallapop/categories`](/api-reference/endpoint/wallapop/list-categories) | GET | Full category tree |
+| [`/v1/wallapop/filters`](/api-reference/endpoint/wallapop/list-filters) | GET | Filters available for a category or query |
+| [`/v1/wallapop/filters/{filter_id}/options`](/api-reference/endpoint/wallapop/list-filter-options) | GET | Long option lists, such as brands and models |
+| [`/v1/wallapop/markets`](/api-reference/endpoint/wallapop/list-markets) | GET | Supported markets |
+
+## Pagination
+
+Search, user listings, and user reviews return up to **40 results per page** and a `next_page` cursor.
+
+1. Make the first request with your parameters.
+2. To get the next page, send `next_page` back **on its own**, with the same `market`. The cursor carries the original query and filters, so any other search parameters are ignored.
+3. When `next_page` is `null`, there are no more results.
+
+```python
+import requests
+
+params = {"query": "bicicleta", "market": "es"}
+items = []
+while True:
+    data = requests.get(
+        "https://scrapebadger.com/v1/wallapop/search",
+        headers={"X-API-Key": "YOUR_API_KEY"},
+        params=params,
+    ).json()
+    items += data["items"]
+    if not data["next_page"] or len(items) >= 200:
+        break
+    params = {"next_page": data["next_page"], "market": "es"}
+```
+
+## Credit Costs
+
+| Endpoint | Cost |
+|----------|------|
+| Search listings | 5 credits |
+| Get item | 5 credits |
+| Get user | 5 credits |
+| Get user items | 5 credits |
+| Get user reviews | 5 credits |
+| List filters | 2 credits |
+| List filter options | 2 credits |
+| Autocomplete | 1 credit |
+| List categories | 1 credit |
+| List markets | 0 credits |
+| Empty results and failed requests | 0 credits |
+
+## Authentication
+
+All requests require your API key in the `X-API-Key` header:
+
+```bash
+curl "https://scrapebadger.com/v1/wallapop/items/nzxeknm5x562" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Search Listings" icon="magnifying-glass" href="/api-reference/endpoint/wallapop/search-items">
+    Full API reference for searching Wallapop, including car filters
+  </Card>
+  <Card title="Get User" icon="user-check" href="/api-reference/endpoint/wallapop/get-user">
+    Seller ratings, sales counters, and verifications
+  </Card>
+</CardGroup>
+
+---
+
+*ScrapeBadger is an independent tool and is not affiliated with, endorsed by, or sponsored by Wallapop. "Wallapop" is a trademark of Wallapop, S.L., used here only to describe the platform this scraper is designed to work with.*

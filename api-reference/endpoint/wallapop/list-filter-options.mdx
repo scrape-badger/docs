@@ -1,0 +1,101 @@
+---
+title: "List Filter Options"
+api: "GET https://scrapebadger.com/v1/wallapop/filters/{filter_id}/options"
+description: "Long Wallapop filter option lists — brands, models — scoped to a category or query. The option ids are the values search accepts."
+---
+
+The options for filters too long to inline in [`/v1/wallapop/filters`](/api-reference/endpoint/wallapop/list-filters) — those flagged `options_endpoint: true`, such as `brand` and `model`. Pass an option `id` as the matching [search](/api-reference/endpoint/wallapop/search-items) parameter, e.g. `brand=Apple`.
+
+**Credits:** 2. Empty results are not charged.
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="filter_id" type="string" required>
+  Id of a filter flagged `options_endpoint: true` in [`/v1/wallapop/filters`](/api-reference/endpoint/wallapop/list-filters), e.g. `brand` or `model`. Lowercase letters and underscores only, up to 40 characters; anything else returns `422`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="category_id" type="integer">
+  Category to scope the options to, e.g. `100` for car makes and models.
+</ParamField>
+
+<ParamField query="query" type="string">
+  Search text to scope the options to, e.g. `iphone`.
+</ParamField>
+
+<ParamField query="market" type="string" default="es">
+  `es`, `it`, or `pt`. See [`/v1/wallapop/markets`](/api-reference/endpoint/wallapop/list-markets).
+</ParamField>
+
+## Response
+
+<ResponseField name="filter_id" type="string">Echo of the requested filter id.</ResponseField>
+<ResponseField name="options" type="FilterOption[]">
+  The filter's options.
+
+  <Expandable title="FilterOption">
+    <ResponseField name="id" type="string">Option id — the value to send to search.</ResponseField>
+    <ResponseField name="title" type="string | null">Display title.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="market" type="string">The market used for the request.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/wallapop/filters/brand/options?category_id=24200&market=es" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/wallapop/filters/brand/options",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"category_id": 24200, "market": "es"},
+)
+data = res.json()
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://scrapebadger.com/v1/wallapop/filters/brand/options?" +
+    new URLSearchParams({ category_id: "24200", market: "es" }),
+  { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
+);
+const data = await res.json();
+```
+
+```bash CLI
+scrapebadger wallapop filter-options brand --category-id 24200 --market es
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "filter_id": "brand",
+  "options": [
+    { "id": "2K", "title": "2K" },
+    { "id": "2K Games", "title": "2K Games" },
+    { "id": "2NLF", "title": "2NLF" },
+    { "id": "3 Legged Thing", "title": "3 Legged Thing" },
+    { "id": "3DMakerpro", "title": "3DMakerpro" }
+  ],
+  "market": "es"
+}
+```
+
+<Note>
+  Listing filter options costs **2 credits**. Empty results and failed requests are not charged.
+</Note>

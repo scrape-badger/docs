@@ -589,6 +589,47 @@
         ]
       },
       {
+        "tab": "Wallapop",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "wallapop/overview"
+            ]
+          },
+          {
+            "group": "Search",
+            "pages": [
+              "api-reference/endpoint/wallapop/search-items"
+            ]
+          },
+          {
+            "group": "Items",
+            "pages": [
+              "api-reference/endpoint/wallapop/get-item"
+            ]
+          },
+          {
+            "group": "Users",
+            "pages": [
+              "api-reference/endpoint/wallapop/get-user",
+              "api-reference/endpoint/wallapop/get-user-items",
+              "api-reference/endpoint/wallapop/get-user-reviews"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api-reference/endpoint/wallapop/autocomplete",
+              "api-reference/endpoint/wallapop/list-categories",
+              "api-reference/endpoint/wallapop/list-filters",
+              "api-reference/endpoint/wallapop/list-filter-options",
+              "api-reference/endpoint/wallapop/list-markets"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "LinkedIn",
         "groups": [
           {
