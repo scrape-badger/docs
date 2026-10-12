@@ -92,25 +92,26 @@ location and listing ids from one market mean nothing in another. List them with
 
 ## Credit Costs
 
-| Endpoint | Path | UK / ZA | AU |
-| -------- | ---- | ------- | -- |
-| Search listings | `GET /v1/gumtree/search` | 5 credits | 10 credits |
-| Get search filters | `GET /v1/gumtree/search/filters` | 5 credits | 10 credits |
-| Get listing | `GET /v1/gumtree/listings/{listing_id}` | 5 credits | 5 credits |
-| Get seller listings | `GET /v1/gumtree/listings/{listing_id}/seller-listings` | 5 credits | 5 credits |
-| Autocomplete | `GET /v1/gumtree/autocomplete` | 1 credit | 1 credit |
-| Location autocomplete | `GET /v1/gumtree/locations/autocomplete` | 1 credit | 1 credit |
-| List locations | `GET /v1/gumtree/locations` | 1 credit | 5 credits |
-| List categories | `GET /v1/gumtree/categories` | 1 credit | 1 credit |
-| List markets | `GET /v1/gumtree/markets` | 0 credits | 0 credits |
-| Health | `GET /v1/gumtree/health` | 0 credits | 0 credits |
+| Endpoint | Path | Credits |
+| -------- | ---- | ------- |
+| Search listings | `GET /v1/gumtree/search` | 5 credits |
+| Get search filters | `GET /v1/gumtree/search/filters` | 5 credits |
+| Get listing | `GET /v1/gumtree/listings/{listing_id}` | 5 credits |
+| Get seller listings | `GET /v1/gumtree/listings/{listing_id}/seller-listings` | 5 credits |
+| Autocomplete | `GET /v1/gumtree/autocomplete` | 1 credit |
+| Location autocomplete | `GET /v1/gumtree/locations/autocomplete` | 1 credit |
+| List locations | `GET /v1/gumtree/locations` | 1 credit |
+| List categories | `GET /v1/gumtree/categories` | 1 credit |
+| List markets | `GET /v1/gumtree/markets` | 0 credits |
+| Health | `GET /v1/gumtree/health` | 0 credits |
 
 <Note>
-  **Australian search, filters and locations run in a real browser.**
-  gumtree.com.au puts its search pages behind a JavaScript challenge, so these
-  three calls render a browser to get past it — they cost more and take
+  **Three Australian calls run in a real browser and are billed as more than
+  one request.** gumtree.com.au puts its search pages behind a JavaScript
+  challenge, so with `market=au` the search and search-filters endpoints are
+  billed 2× (10 credits) and the location tree 5× (5 credits); they take
   10–20 seconds. Every other Australian call, and every UK and South African
-  call, is a direct fetch that answers in ~2–5 seconds.
+  call, is a direct fetch at the price above that answers in ~2–5 seconds.
 </Note>
 
 ## Quickstart
