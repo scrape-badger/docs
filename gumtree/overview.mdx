@@ -106,12 +106,10 @@ location and listing ids from one market mean nothing in another. List them with
 | Health | `GET /v1/gumtree/health` | 0 credits |
 
 <Note>
-  **Three Australian calls run in a real browser and are billed as more than
-  one request.** gumtree.com.au puts its search pages behind a JavaScript
-  challenge, so with `market=au` the search and search-filters endpoints are
-  billed 2× (10 credits) and the location tree 5× (5 credits); they take
-  10–20 seconds. Every other Australian call, and every UK and South African
-  call, is a direct fetch at the price above that answers in ~2–5 seconds.
+  Every market costs the same. gumtree.com.au puts its search behind a
+  JavaScript challenge; ScrapeBadger clears it for you, so Australian calls
+  are billed at the price above and answer in ~2–5 seconds, like UK and South
+  African ones.
 </Note>
 
 ## Quickstart
