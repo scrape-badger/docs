@@ -1,12 +1,13 @@
 ---
 title: "Location Autocomplete"
 api: "GET https://scrapebadger.com/v1/gumtree/locations/autocomplete"
-description: "Resolve a UK town, area or postcode prefix to Gumtree locations with coordinates."
+description: "Resolve a town, area or postcode prefix to Gumtree locations in the UK, Australia or South Africa."
 ---
 
-Resolve a place name or postcode prefix to the locations Gumtree knows, each
-with its coordinates. Pass a result's `name` (a town) or a postcode as
-`location` to [`/search`](/api-reference/endpoint/gumtree/search).
+Resolve a place name or postcode prefix to the locations Gumtree knows. Pass a
+result to [`/search`](/api-reference/endpoint/gumtree/search) as `location`:
+its `name` (a town) or a postcode on `uk`, its numeric `id` on `au` and `za`.
+UK results carry coordinates.
 
 **Credits:** 1
 
@@ -18,24 +19,29 @@ with its coordinates. Pass a result's `name` (a town) or a postcode as
 
 ## Query Parameters
 
+<ParamField query="market" type="string" default="uk">
+  `uk` (gumtree.com), `au` (gumtree.com.au) or `za` (gumtree.co.za).
+</ParamField>
+
 <ParamField query="query" type="string" required>
   Town, area or postcode prefix — at least 2 characters, e.g. `manch`, `leed`
-  or `SW1A`.
+  or `SW1A` (`uk`), `sydney` (`au`), `pret` (`za`).
 </ParamField>
 
 ## Response
 
+<ResponseField name="market" type="string">`uk`, `au` or `za`.</ResponseField>
 <ResponseField name="query" type="string">Echo of the requested prefix.</ResponseField>
 <ResponseField name="result_count" type="integer">Number of locations.</ResponseField>
 <ResponseField name="locations" type="LocationSuggestion[]">
   Matching locations.
 
   <Expandable title="LocationSuggestion">
-    <ResponseField name="id" type="integer">Gumtree location id.</ResponseField>
-    <ResponseField name="name" type="string">e.g. `Leeds City Centre, West Yorkshire`.</ResponseField>
-    <ResponseField name="type" type="string">`location`, `outcode` or `postcode`.</ResponseField>
-    <ResponseField name="latitude" type="number" />
-    <ResponseField name="longitude" type="number" />
+    <ResponseField name="id" type="integer">Gumtree location id — the `/search` `location` on `au` and `za`.</ResponseField>
+    <ResponseField name="name" type="string">e.g. `Leeds City Centre, West Yorkshire`, `Sydney Region, NSW`, `Pretoria / Tshwane, Gauteng`.</ResponseField>
+    <ResponseField name="type" type="string">`uk`: `location`, `outcode` or `postcode`. `au` / `za`: `region`, `area` or `postcode`.</ResponseField>
+    <ResponseField name="latitude" type="number">`uk` only.</ResponseField>
+    <ResponseField name="longitude" type="number">`uk` only.</ResponseField>
   </Expandable>
 </ResponseField>
 
@@ -72,6 +78,7 @@ locations = res.json()["locations"]
 
 ```json Response
 {
+  "market": "uk",
   "query": "leed",
   "result_count": 2,
   "locations": [
@@ -93,8 +100,36 @@ locations = res.json()["locations"]
 }
 ```
 
+### Australia and South Africa
+
+```bash
+curl "https://scrapebadger.com/v1/gumtree/locations/autocomplete?market=za&query=pret" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```json Response
+{
+  "market": "za",
+  "query": "pret",
+  "result_count": 1,
+  "locations": [
+    {
+      "id": 3100094,
+      "name": "Pretoria / Tshwane, Gauteng",
+      "type": "area",
+      "latitude": null,
+      "longitude": null
+    }
+  ]
+}
+```
+
+On `au`, `query=sydney` returns `Sydney Region, NSW` (`3003435`), `Inner
+Sydney, NSW` (`3003771`), postcodes such as `North Sydney 2060, NSW` and more.
+Pass the `id` to `/search` as `location`.
+
 <Tip>
-  `/search` also takes a full UK postcode directly as `location`
+  On `uk`, `/search` also takes a full UK postcode directly as `location`
   (`location=SW1A 1AA&distance=2`), so you only need this endpoint to resolve
   partial input or to show the user a choice.
 </Tip>

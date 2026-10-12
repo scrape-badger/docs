@@ -5,9 +5,9 @@ description: "Gumtree search-box keyword suggestions for a partial term, each wi
 ---
 
 Expand a partial search term into Gumtree's own search-box suggestions. Where
-Gumtree attaches categories to a suggestion, they come back with their `slug`,
-ready to pass to [`/search`](/api-reference/endpoint/gumtree/search) as
-`category`.
+Gumtree attaches categories to a suggestion, they come back with their `slug`
+(`uk`) or `id` (`au`, `za`), ready to pass to
+[`/search`](/api-reference/endpoint/gumtree/search) as `category`.
 
 **Credits:** 1
 
@@ -19,12 +19,17 @@ ready to pass to [`/search`](/api-reference/endpoint/gumtree/search) as
 
 ## Query Parameters
 
+<ParamField query="market" type="string" default="uk">
+  `uk` (gumtree.com), `au` (gumtree.com.au) or `za` (gumtree.co.za).
+</ParamField>
+
 <ParamField query="query" type="string" required>
   Partial search term, e.g. `sofa` or `iph`.
 </ParamField>
 
 ## Response
 
+<ResponseField name="market" type="string">`uk`, `au` or `za`.</ResponseField>
 <ResponseField name="query" type="string">Echo of the requested term.</ResponseField>
 <ResponseField name="result_count" type="integer">Number of suggestions.</ResponseField>
 <ResponseField name="suggestions" type="Suggestion[]">
@@ -32,8 +37,8 @@ ready to pass to [`/search`](/api-reference/endpoint/gumtree/search) as
 
   <Expandable title="Suggestion">
     <ResponseField name="query" type="string">The suggested search term — feed straight into `/search`.</ResponseField>
-    <ResponseField name="highlighted" type="string">The term with the matched part wrapped in `<em>`.</ResponseField>
-    <ResponseField name="categories" type="CategoryRef[]">`id`, `name`, `slug` of the categories Gumtree suggests for the term.</ResponseField>
+    <ResponseField name="highlighted" type="string">The term with the matched part highlighted as the site does it — `<em>` (`uk`), `<strong>` (`au`) or the suggestion with its category (`za`).</ResponseField>
+    <ResponseField name="categories" type="CategoryRef[]">`id`, `name`, `slug` of the categories Gumtree suggests for the term. On `au` / `za` pass the `id` to `/search` as `category`.</ResponseField>
   </Expandable>
 </ResponseField>
 
@@ -70,6 +75,7 @@ data = res.json()
 
 ```json Response
 {
+  "market": "uk",
   "query": "sofa",
   "result_count": 10,
   "suggestions": [
@@ -83,6 +89,33 @@ data = res.json()
     },
     { "query": "sofa bed", "highlighted": "<em>sofa</em> bed", "categories": [] },
     { "query": "sofa set", "highlighted": "<em>sofa</em> set", "categories": [] }
+  ]
+}
+```
+
+### South Africa
+
+```bash
+curl "https://scrapebadger.com/v1/gumtree/autocomplete?market=za&query=mountain" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```json Response (abridged)
+{
+  "market": "za",
+  "query": "mountain",
+  "result_count": 10,
+  "suggestions": [
+    {
+      "query": "mountain view",
+      "highlighted": "mountain view in Flats for Rent",
+      "categories": [{ "id": 9071, "name": "Flats for Rent", "slug": null }]
+    },
+    {
+      "query": "houses for sale in mountain rise",
+      "highlighted": "houses for sale in mountain rise in Houses & Flats for Sale",
+      "categories": [{ "id": 9074, "name": "Houses & Flats for Sale", "slug": null }]
+    }
   ]
 }
 ```

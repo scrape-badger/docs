@@ -943,7 +943,8 @@
               "api-reference/endpoint/gumtree/autocomplete",
               "api-reference/endpoint/gumtree/location-autocomplete",
               "api-reference/endpoint/gumtree/list-categories",
-              "api-reference/endpoint/gumtree/list-locations"
+              "api-reference/endpoint/gumtree/list-locations",
+              "api-reference/endpoint/gumtree/list-markets"
             ]
           }
         ]
