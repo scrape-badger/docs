@@ -35,7 +35,7 @@ Quickly scan a URL to identify which anti-bot and CAPTCHA systems are in use. Re
 
   <Expandable>
     <ResponseField name="system" type="string">
-      System name. Common values: `cloudflare_turnstile`, `datadome`, `akamai`, `kasada`, `amazon_waf`, `imperva`, `perimeterx`.
+      System name: `cloudflare_interstitial`, `datadome`, `akamai_web`, `akamai_sbsd`, `kasada`, `amazon_waf`, `incapsula`, `perimeterx` or `peakhour`.
     </ResponseField>
     <ResponseField name="confidence" type="number">
       Confidence score from `0.0` to `1.0`.
@@ -51,7 +51,7 @@ Quickly scan a URL to identify which anti-bot and CAPTCHA systems are in use. Re
 
   <Expandable>
     <ResponseField name="system" type="string">
-      System name. Common values: `recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, `geetest`.
+      System name: `cloudflare_turnstile`, `recaptcha_v2`, `recaptcha_v3`, `hcaptcha` or `geetest`.
     </ResponseField>
     <ResponseField name="confidence" type="number">
       Confidence score from `0.0` to `1.0`.
