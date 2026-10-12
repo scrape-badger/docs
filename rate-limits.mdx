@@ -1,15 +1,15 @@
 ---
 title: Rate Limits
-description: Understand ScrapeBadger API rate limits, tier-based limits, and best practices for handling rate limit errors.
+description: Understand ScrapeBadger API rate limits, the limit each plan includes, and best practices for handling rate limit errors.
 ---
 
-ScrapeBadger uses tier-based rate limiting to ensure fair usage and reliable performance for all users.
+ScrapeBadger rate limits requests per minute to ensure fair usage and reliable performance for all users.
 
 ## How Rate Limiting Works
 
 <CardGroup cols={3}>
-  <Card title="Tier-Based Limits" icon="shield">
-    Your rate limit is determined by your account tier. All API keys inherit the same limit from your account.
+  <Card title="Plan-Based Limits" icon="shield">
+    Your rate limit is determined by your plan. All API keys inherit the same limit from your account.
   </Card>
   <Card title="Sliding Window" icon="clock">
     We use a sliding window algorithm for accurate rate limiting. Limits are calculated per minute with smooth request distribution.
@@ -19,14 +19,18 @@ ScrapeBadger uses tier-based rate limiting to ensure fair usage and reliable per
   </Card>
 </CardGroup>
 
-## Rate Limits by Tier
+## Rate Limits by Plan
 
-| Tier | Requests/Minute | Description |
-|------|-----------------|-------------|
-| Free | 60 | Default tier for new accounts |
-| Basic | 300 | For small-scale applications |
-| Pro | 1,000 | For production applications |
-| Enterprise | 5,000 | For high-volume applications |
+| Plan | Tier | Requests/Minute |
+|------|------|-----------------|
+| Pay-as-you-go | Basic | 60 |
+| Starter, Growth | Pro | 300 |
+| Pro, Scale | Enterprise | 1,000 |
+| Volume | Enterprise | 3,000 |
+| Max | Enterprise | 5,000 |
+| Custom | Enterprise | By agreement |
+
+See [pricing](https://scrapebadger.com/pricing) for what each plan includes.
 
 ## Rate Limit Headers
 
@@ -142,7 +146,7 @@ def fetch_with_rate_limit(url: str, api_key: str):
 
 <AccordionGroup>
   <Accordion title="How are rate limits applied?">
-    Rate limits are applied per API key using a sliding window algorithm. Each API key has its own separate rate limit counter based on your account tier.
+    Rate limits are applied per API key using a sliding window algorithm. Each API key has its own separate rate limit counter based on your plan.
   </Accordion>
   <Accordion title="What happens when I hit the rate limit?">
     The API returns a 429 Too Many Requests response with details about when you can retry. Use the `Retry-After` header to know when to try again.
@@ -151,7 +155,7 @@ def fetch_with_rate_limit(url: str, api_key: str):
     Yes, all requests (successful or not) count against your rate limit. However, rate limits are generous and designed to accommodate normal usage patterns.
   </Accordion>
   <Accordion title="Can I have different rate limits for different API keys?">
-    All API keys inherit the rate limit from your account tier. To get higher rate limits, upgrade your account tier.
+    All API keys inherit the rate limit from your plan. To get higher rate limits, upgrade your plan.
   </Accordion>
   <Accordion title="How do I check my current rate limit usage?">
     Every API response includes rate limit headers (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`) so you can track your usage in real-time.
