@@ -1,0 +1,102 @@
+---
+title: "List Markets"
+api: "GET https://scrapebadger.com/v1/gumtree/markets"
+description: "List the Gumtree sites this API covers — UK, Australia and South Africa — with their currency, distance unit, page size and id format."
+---
+
+List the Gumtree sites this API covers. Pass a market's `market` code as the
+`market` parameter of every other Gumtree endpoint. This endpoint is **free**.
+
+**Credits:** 0
+
+<Note>
+  The three markets are separate platforms. Category, location and listing ids
+  from one market mean nothing in another — always pair an id with the
+  `market` it came from.
+</Note>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Response
+
+<ResponseField name="result_count" type="integer">Number of markets.</ResponseField>
+<ResponseField name="markets" type="MarketInfo[]">
+  Supported markets.
+
+  <Expandable title="MarketInfo">
+    <ResponseField name="market" type="string">`uk`, `au` or `za` — the `market` parameter value.</ResponseField>
+    <ResponseField name="domain" type="string">e.g. `www.gumtree.com.au`.</ResponseField>
+    <ResponseField name="country" type="string">ISO country code, e.g. `AU`.</ResponseField>
+    <ResponseField name="currency" type="string">`GBP`, `AUD` or `ZAR`.</ResponseField>
+    <ResponseField name="distance_unit" type="string">Unit of the `/search` `distance` parameter — `miles`, `km`, or `null` when the market has no radius search.</ResponseField>
+    <ResponseField name="page_size" type="integer">Organic results per `/search` page (featured ads come on top).</ResponseField>
+    <ResponseField name="id_format" type="string">How `/search` takes `category` and `location`.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/gumtree/markets" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/gumtree/markets", {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+});
+const { markets } = await res.json();
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/gumtree/markets",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+markets = res.json()["markets"]
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "result_count": 3,
+  "markets": [
+    {
+      "market": "uk",
+      "domain": "www.gumtree.com",
+      "country": "GB",
+      "currency": "GBP",
+      "distance_unit": "miles",
+      "page_size": 25,
+      "id_format": "slugs: category 'cars', location 'london' or a UK postcode"
+    },
+    {
+      "market": "au",
+      "domain": "www.gumtree.com.au",
+      "country": "AU",
+      "currency": "AUD",
+      "distance_unit": "km",
+      "page_size": 24,
+      "id_format": "numeric ids from /categories and /locations (market=au)"
+    },
+    {
+      "market": "za",
+      "domain": "www.gumtree.co.za",
+      "country": "ZA",
+      "currency": "ZAR",
+      "distance_unit": null,
+      "page_size": 20,
+      "id_format": "numeric ids from /categories and /locations (market=za)"
+    }
+  ]
+}
+```

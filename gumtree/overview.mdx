@@ -1,16 +1,20 @@
 ---
 title: "Gumtree Scraper by ScrapeBadger — Overview"
-description: "Search gumtree.com UK classifieds by keyword, category and postcode radius, and pull full listings with vehicle spec, seller profile and similar ads — no Gumtree account required."
+description: "Search Gumtree classifieds in the UK (gumtree.com), Australia (gumtree.com.au) and South Africa (gumtree.co.za) by keyword, category, location and filters, and pull full listings with vehicle spec, seller profile and similar ads — no Gumtree account required."
 ---
 
 ## Scraper API for Gumtree
 
-The ScrapeBadger **Gumtree API** turns `gumtree.com`, the UK's classifieds
-marketplace, into a clean JSON feed: keyword and category search with postcode
+The ScrapeBadger **Gumtree API** turns three Gumtree classifieds sites —
+`gumtree.com` (UK), `gumtree.com.au` (Australia) and `gumtree.co.za` (South
+Africa) — into one clean JSON feed: keyword and category search with location,
 radius and category-specific filters, filter discovery with live counts, full
 listing detail (every attribute, the full vehicle spec for cars, the seller's
 profile and similar ads), a seller's other listings, search and location
 autocomplete, and the category and location trees.
+
+Every endpoint takes a `market` parameter — `uk` (the default), `au` or `za` —
+so existing UK integrations keep working unchanged.
 
 <Info>
   All endpoints are `GET`, live under `https://scrapebadger.com/v1/gumtree/*`,
@@ -20,43 +24,71 @@ autocomplete, and the category and location trees.
 
 ## Features
 
-- **Every vertical** — For Sale, Motors (cars, vans, motorbikes), Property (to
-  rent, for sale, flatshare), Jobs, Services, Pets and Community. ~25–30
-  listings per search page, up to 50 pages.
-- **Postcode-radius search** — `location` takes a town slug, a town name or a
-  full UK postcode (`SW1A 1AA`), plus a `distance` in miles.
+- **Three markets, one schema** — UK, Australia and South Africa share the same
+  response models; every top-level response carries its `market`, and prices
+  come in the market's `currency` (GBP, AUD, ZAR). A field a site does not
+  publish is simply `null` there.
+- **Every vertical** — For Sale, Motors, Property, Jobs, Services, Pets and
+  Community. 25 (UK), 24 (AU) or 20 (ZA) listings per search page, up to 50
+  pages.
+- **Location search** — UK `location` takes a town slug, a town name or a full
+  UK postcode (`SW1A 1AA`) with a `distance` in miles; Australia takes a
+  numeric location id with a `distance` in km; South Africa takes a numeric
+  province or town id.
 - **Category filters with live counts** —
   [`/search/filters`](/api-reference/endpoint/gumtree/search-filters) lists
-  every filter Gumtree offers for a category (make, fuel type, mileage range,
-  bedrooms …) with the result count per value; pass them back to `/search` as
-  `filters=key:value`.
+  every filter Gumtree offers for a category (make, model, fuel type, mileage
+  or year range, bedrooms …) with the result count per value; pass them back to
+  `/search` as `filters=key:value`.
 - **Full vehicle spec on Motors listings** — make, model, year, mileage, fuel,
-  transmission, body type, engine size and power, MPG, CO2, insurance group,
-  0–62, top speed, previous keepers, the registration where shown, and the
-  history-check flags (not stolen, not written off, not scrapped).
-- **Seller profile** — private or trade, verified-business status with the
-  checks Gumtree ran, rating with per-star breakdown, posting since, last
-  active, total listings and listings by category, and the masked phone number.
+  transmission, body type and engine; the UK adds MPG, CO2, insurance group,
+  previous keepers and the history-check flags, Australia adds variant,
+  odometer, VIN and rego where the seller shows them.
+- **Seller profile** — private or trade, rating, verification (UK), posting
+  since, member since (AU), live and lifetime listing counts and total views
+  (ZA), and the masked phone number.
 - **Promotion flags** — `is_featured`, `is_urgent`, `is_bumped_up`,
-  `is_standout` and `favourite_count` on every listing.
+  `is_standout` and `favourite_count` where the site publishes them.
 - **Dates in both forms** — every timestamp ships as Unix seconds (`*_utc`) and
   ISO 8601 (`*_at`). Listing detail separates `created_at` (first posted) from
   `posted_at` (moves on a bump).
+- **No silent broadening** — an unknown category or location id, a parameter a
+  market does not support, or a filter the site would quietly drop is a `400`,
+  never a search that silently ran across the whole country.
 
 <Note>
   **Phone numbers are masked.** Only the masked form Gumtree shows on the public
-  listing page is returned (e.g. `0794997XXXX`). Full numbers are never
-  returned.
+  listing page is returned (e.g. `0794997XXXX` in the UK, `068*******` in South
+  Africa; Australia shows none). Full numbers are never returned.
 </Note>
 
-## Coverage
+## Markets
 
-**United Kingdom only.** Only `gumtree.com` is supported, so there is no market
-parameter — scope results with `location` and `distance` instead.
+Pass `market` on every request. The three sites are separate platforms: category,
+location and listing ids from one market mean nothing in another. List them with
+[`/markets`](/api-reference/endpoint/gumtree/list-markets).
 
-| Code | Country | Currency | Language | Domain |
-| ---- | ------- | -------- | -------- | ----------- |
-| `GB` | United Kingdom | GBP | en-GB | gumtree.com |
+| `market` | Country | Domain | Currency | `category` / `location` | `distance` | Results per page |
+| -------- | ------- | ------ | -------- | ----------------------- | ---------- | ---------------- |
+| `uk` (default) | United Kingdom | gumtree.com | GBP | Slugs — `cars`, `london`, or a UK postcode | miles | 25 + featured |
+| `au` | Australia | gumtree.com.au | AUD | Numeric ids — `18320` (cars), `3003435` (Sydney Region) | km | 24 + up to 6 featured |
+| `za` | South Africa | gumtree.co.za | ZAR | Numeric ids — `9077` (cars), `3100003` (Gauteng) | not supported | 20 |
+
+<Tip>
+  For `au` and `za`, get ids from
+  [`/categories`](/api-reference/endpoint/gumtree/list-categories),
+  [`/locations`](/api-reference/endpoint/gumtree/list-locations) and
+  [`/locations/autocomplete`](/api-reference/endpoint/gumtree/location-autocomplete)
+  with the same `market`. Omit `location` to search the whole country.
+</Tip>
+
+### Listing ids
+
+- **UK and Australia** — the ~10-digit number at the end of a listing URL, e.g.
+  `1803293391` (UK) or `1344981847` (AU).
+- **South Africa** — the full 26-digit number at the end of a `gumtree.co.za`
+  URL, e.g. `10013681289561010209976109`. The 10-digit id the site displays is
+  returned as `short_id`; `/listings/{listing_id}` takes the long one.
 
 ## Credit Costs
 
@@ -70,7 +102,17 @@ parameter — scope results with `location` and `distance` instead.
 | Location autocomplete | `GET /v1/gumtree/locations/autocomplete` | 1 credit |
 | List locations | `GET /v1/gumtree/locations` | 1 credit |
 | List categories | `GET /v1/gumtree/categories` | 1 credit |
+| List markets | `GET /v1/gumtree/markets` | 0 credits |
 | Health | `GET /v1/gumtree/health` | 0 credits |
+
+<Note>
+  **Three Australian calls run in a real browser and are billed as more than
+  one request.** gumtree.com.au puts its search pages behind a JavaScript
+  challenge, so with `market=au` the search and search-filters endpoints are
+  billed 2× (10 credits) and the location tree 5× (5 credits); they take
+  10–20 seconds. Every other Australian call, and every UK and South African
+  call, is a direct fetch at the price above that answers in ~2–5 seconds.
+</Note>
 
 ## Quickstart
 
@@ -79,21 +121,25 @@ parameter — scope results with `location` and `distance` instead.
 ```bash cURL
 curl "https://scrapebadger.com/v1/gumtree/search?category=cars&location=manchester&distance=30&filters=vehicle_make:bmw" \
   -H "X-API-Key: YOUR_API_KEY"
+
+# South Africa: petrol Toyotas in Gauteng between R50,000 and R300,000
+curl "https://scrapebadger.com/v1/gumtree/search?market=za&category=9077&location=3100003&filters=ma:toyota,fu:petrol&min_price=50000&max_price=300000&sort=price_asc" \
+  -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ```javascript Node.js
 const res = await fetch(
   "https://scrapebadger.com/v1/gumtree/search?" +
     new URLSearchParams({
-      category: "cars",
-      location: "manchester",
-      distance: "30",
-      filters: "vehicle_make:bmw",
+      market: "au",
+      query: "mountain bike",
+      category: "18560",
+      location: "3003435",
     }),
   { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
 );
 const data = await res.json();
-console.log(data.total_results, "listings");
+console.log(data.total_results, "listings in", data.currency);
 ```
 
 ```python Python
@@ -116,27 +162,42 @@ print(res.json()["total_results"], "listings")
 
 ## Typical workflow
 
-1. **Pick a category** — [`/categories`](/api-reference/endpoint/gumtree/list-categories)
+1. **Pick a market** — `uk`, `au` or `za`. Use the same `market` on every call
+   in the workflow.
+2. **Pick a category** — [`/categories`](/api-reference/endpoint/gumtree/list-categories)
    or [`/autocomplete`](/api-reference/endpoint/gumtree/autocomplete) give you
-   the `slug` (`cars`, `property-to-rent`, `sofas-couches` …).
-2. **Discover its filters** —
+   the `slug` (UK: `cars`, `property-to-rent` …) or numeric `id` (AU/ZA:
+   `18320`, `9077` …).
+3. **Pick a location** (optional) —
+   [`/locations/autocomplete`](/api-reference/endpoint/gumtree/location-autocomplete)
+   or [`/locations`](/api-reference/endpoint/gumtree/list-locations). Without
+   one, the search covers the whole country.
+4. **Discover its filters** —
    [`/search/filters`](/api-reference/endpoint/gumtree/search-filters) returns
    each filter's `key` and values with live counts.
-3. **Search** — [`/search`](/api-reference/endpoint/gumtree/search) with
-   `category`, `location` + `distance`, price band and `filters`.
-4. **Enrich** — [`/listings/{id}`](/api-reference/endpoint/gumtree/get-listing)
+5. **Search** — [`/search`](/api-reference/endpoint/gumtree/search) with
+   `category`, `location` (+ `distance` in the UK and Australia), price band and
+   `filters`.
+6. **Enrich** — [`/listings/{id}`](/api-reference/endpoint/gumtree/get-listing)
    for the full description, attributes and seller, and
    [`/listings/{id}/seller-listings`](/api-reference/endpoint/gumtree/get-seller-listings)
    for everything else that seller has listed.
 
 ## Limits
 
-- **50 pages per result set** (~1,500 listings). To go deeper, narrow by
-  sub-category, location and `distance`, price band or filters.
-- **Price filters need a category.** `min_price` / `max_price` have no effect
-  with `category=all`.
-- **Featured ads are pinned.** Gumtree places up to 5 paid featured ads
-  (`is_featured`) above the chosen sort order.
+- **50 pages per result set.** To go deeper, narrow by sub-category, location
+  and `distance`, price band or filters. A page past the end comes back empty
+  and is not billed.
+- **UK price filters need a category.** `min_price` / `max_price` are refused
+  with `category=all` in the UK, where Gumtree would ignore them.
+- **Market-specific parameters.** `urgent_only` and `with_photos` are UK only.
+  `distance` is UK (miles) and Australia (km). `seller_type` is UK and South
+  Africa — in Australia pass it as a filter (e.g. `cars.forsaleby_s:ownr`).
+  `sort=distance` needs the UK, or Australia with a `location`. Anything else
+  is a `400`.
+- **Featured ads are pinned.** Gumtree places paid featured ads
+  (`is_featured`) above the chosen sort order — up to 5 in the UK, up to 6 in
+  Australia.
 - **Seller listings are keyed by a listing.** Pass any listing id of the seller
   to `/listings/{id}/seller-listings`; there is no separate seller lookup.
 
@@ -144,14 +205,15 @@ print(res.json()["total_results"], "listings")
 
 | Status | Meaning |
 | ------ | ------- |
-| `400` | Malformed `filters` value — expected comma-separated `key:value` pairs. |
+| `400` | Bad input the site would silently ignore — malformed `filters`, an unknown category or location id, a parameter the `market` does not support, a South African filter Gumtree would drop, or a listing id from another market. |
 | `404` | Listing does not exist or has been removed. |
 | `422` | Invalid parameter, or Gumtree temporarily refused the request. **Not billed** — retry the latter shortly. |
 
 <Tip>
-  The reference endpoints — autocomplete, location autocomplete, categories and
-  locations — cost 1 credit each. Use them to build the right `category` and
-  `location` before spending 5 credits on a search.
+  The reference endpoints — autocomplete, location autocomplete and categories
+  (and locations in the UK and South Africa) — cost 1 credit each. Use them to
+  build the right `category` and `location` before spending credits on a
+  search.
 </Tip>
 
 ---

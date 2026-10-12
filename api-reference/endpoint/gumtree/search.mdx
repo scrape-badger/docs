@@ -1,14 +1,21 @@
 ---
 title: "Search Listings"
 api: "GET https://scrapebadger.com/v1/gumtree/search"
-description: "Search gumtree.com classified ads by keyword, category, town or UK postcode radius, price band, seller type and category-specific filters."
+description: "Search Gumtree classified ads in the UK, Australia or South Africa by keyword, category, location and radius, price band, seller type and category-specific filters."
 ---
 
-Search `gumtree.com` listings across every vertical — For Sale, Motors, Property,
-Jobs, Services, Pets and Community. Returns ~25–30 listings per page, up to 50
-pages.
+Search Gumtree listings across every vertical — For Sale, Motors, Property,
+Jobs, Services, Pets and Community — on `gumtree.com` (UK), `gumtree.com.au`
+(Australia) or `gumtree.co.za` (South Africa). Returns 25 (UK), 24 (AU) or 20
+(ZA) listings per page plus any pinned featured ads, up to 50 pages.
 
-**Credits:** 5
+**Credits:** 5 (`uk`, `za`) · 10 (`au`)
+
+<Note>
+  Australian searches render a real browser to get past gumtree.com.au's
+  JavaScript challenge, so they cost 10 credits and take 10–20 seconds. UK and
+  South African searches answer in ~2–5 seconds.
+</Note>
 
 ## Authorization
 
@@ -18,58 +25,90 @@ pages.
 
 ## Query Parameters
 
+<ParamField query="market" type="string" default="uk">
+  Which Gumtree: `uk` (gumtree.com, GBP), `au` (gumtree.com.au, AUD) or `za`
+  (gumtree.co.za, ZAR). Separate sites — category, location and listing ids
+  from one market mean nothing in another.
+</ParamField>
+
 <ParamField query="query" type="string">
   Search keywords, e.g. `mountain bike`. Optional — omit it to browse a whole
   category.
 </ParamField>
 
 <ParamField query="category" type="string" default="all">
-  Category slug, e.g. `cars`, `for-sale`, `property-to-rent`, `jobs`, `pets`,
-  `bicycles`. Browse every slug with
-  [`/categories`](/api-reference/endpoint/gumtree/list-categories).
+  - `uk`: category slug, e.g. `cars`, `for-sale`, `property-to-rent`, `jobs`,
+    `pets`, `bicycles`.
+  - `au` / `za`: numeric category id, e.g. `18320` (AU cars), `18560` (AU
+    bicycles), `9077` (ZA cars & bakkies).
+
+  Browse the tree with
+  [`/categories`](/api-reference/endpoint/gumtree/list-categories) for the same
+  `market`. An unknown id is a `400`.
 </ParamField>
 
-<ParamField query="location" type="string" default="uk">
-  Location slug (`london`, `manchester`), town name or full UK postcode
-  (`SW1A 1AA`). `uk` searches nationwide. Resolve a place with
+<ParamField query="location" type="string">
+  Omit to search the whole country.
+
+  - `uk`: location slug (`london`, `manchester`), town name or full UK postcode
+    (`SW1A 1AA`).
+  - `au` / `za`: numeric location id, e.g. `3003435` (AU Sydney Region) or
+    `3100003` (ZA Gauteng).
+
+  Resolve a place with
   [`/locations/autocomplete`](/api-reference/endpoint/gumtree/location-autocomplete).
+  An unknown location is a `400` — the sites would otherwise silently search
+  the whole country.
 </ParamField>
 
 <ParamField query="distance" type="number">
-  Radius in miles around `location`, greater than `0` and up to `1000`.
+  Radius around `location`, greater than `0` and up to `1000`: miles (`uk`) or
+  km (`au`, needs a `location`). Not supported for `za`.
 </ParamField>
 
 <ParamField query="min_price" type="integer">
-  Minimum price in GBP. Needs a `category` other than `all`.
+  Minimum price in the market's currency. `uk`: needs a `category` other than
+  `all`.
 </ParamField>
 
 <ParamField query="max_price" type="integer">
-  Maximum price in GBP. Needs a `category` other than `all`.
+  Maximum price in the market's currency. `uk`: needs a `category` other than
+  `all`.
 </ParamField>
 
 <ParamField query="sort" type="string" default="relevance">
   Result ordering. One of `relevance`, `date`, `price_asc`, `price_desc`,
-  `distance`.
+  `distance`. `distance` needs `uk`, or `au` with a `location`.
 </ParamField>
 
 <ParamField query="seller_type" type="string">
   `private` or `trade`. `trade` covers dealers, letting agents and recruiters.
+  `uk` and `za` only — on `au` pass it as a filter instead (e.g.
+  `cars.forsaleby_s:ownr`).
 </ParamField>
 
 <ParamField query="urgent_only" type="boolean" default="false">
-  Only ads the seller marked urgent.
+  `uk` only: only ads the seller marked urgent.
 </ParamField>
 
 <ParamField query="with_photos" type="boolean" default="false">
-  Only ads with photos.
+  `uk` only: only ads with photos.
 </ParamField>
 
 <ParamField query="filters" type="string">
-  Category-specific filters as comma-separated `key:value` pairs, e.g.
-  `vehicle_make:bmw,vehicle_fuel_type:petrol,min_vehicle_mileage:10000`. Repeat
-  a key to select several values (`vehicle_make:bmw,vehicle_make:audi`).
-  Discover the keys and values for a category with
-  [`/search/filters`](/api-reference/endpoint/gumtree/search-filters).
+  Category-specific filters as comma-separated `key:value` pairs. Range filters
+  take `min_<key>:<value>` / `max_<key>:<value>`. Keys differ per market —
+  discover them, with their values, from
+  [`/search/filters`](/api-reference/endpoint/gumtree/search-filters) for the
+  same `market` and `category`:
+
+  - `uk`: `vehicle_make:bmw,vehicle_fuel_type:petrol,min_vehicle_mileage:10000`.
+    Repeat a key to select several values (`vehicle_make:bmw,vehicle_make:audi`).
+  - `au`: `cars.carmake_s:toyota,min_cars.caryear_i:2015,priceType:NEGOTIABLE`.
+  - `za`: `ma:toyota,mo:hilux,fu:diesel,max_km:100000,min_cy:2015` — `ma` make,
+    `mo` model, `fu` fuel, `tr` transmission, `bt` body type, `co` colour,
+    `km` mileage, `cy` year, `price_type`. One value per key. A filter
+    gumtree.co.za would silently drop is a `400`.
 </ParamField>
 
 <ParamField query="page" type="integer" default="1">
@@ -78,41 +117,46 @@ pages.
 
 ## Response
 
+<ResponseField name="market" type="string">`uk`, `au` or `za`.</ResponseField>
 <ResponseField name="query" type="string">Echo of the requested keywords.</ResponseField>
-<ResponseField name="category" type="string">Category slug the search ran in.</ResponseField>
+<ResponseField name="category" type="string">Category the search ran in — slug (`uk`) or id (`au`, `za`).</ResponseField>
 <ResponseField name="category_name" type="string">e.g. `Cars`.</ResponseField>
 <ResponseField name="category_id" type="integer">Gumtree category id.</ResponseField>
-<ResponseField name="location" type="string">Location slug or postcode searched.</ResponseField>
-<ResponseField name="location_name" type="string">e.g. `United Kingdom`.</ResponseField>
-<ResponseField name="distance" type="number">Radius in miles, when one was applied.</ResponseField>
+<ResponseField name="location" type="string">Location slug, postcode or id searched.</ResponseField>
+<ResponseField name="location_name" type="string">e.g. `United Kingdom`, `Sydney Region`.</ResponseField>
+<ResponseField name="distance" type="number">Radius (miles `uk`, km `au`), when one was applied.</ResponseField>
 <ResponseField name="sort" type="string">The sort that was applied.</ResponseField>
 <ResponseField name="page" type="integer">The page returned.</ResponseField>
 <ResponseField name="total_pages" type="integer">Pages available for this search (at most `50`).</ResponseField>
 <ResponseField name="total_results" type="integer">Total matching listings Gumtree reports.</ResponseField>
-<ResponseField name="result_count" type="integer">Listings on this page.</ResponseField>
-<ResponseField name="url" type="string">The gumtree.com search URL equivalent to this request.</ResponseField>
+<ResponseField name="result_count" type="integer">Listings on this page, featured ads included.</ResponseField>
+<ResponseField name="currency" type="string">`GBP`, `AUD` or `ZAR`.</ResponseField>
+<ResponseField name="url" type="string">The Gumtree search URL equivalent to this request.</ResponseField>
 <ResponseField name="category_facets" type="CategoryFacet[]">
-  Sub-categories of the result set with counts — `name`, `slug`, `count`. Feed
-  a `slug` back in as `category` to drill down.
+  Sub-categories of the result set with counts — `id`, `name`, `slug`, `count`.
+  Feed a `slug` (`uk`) or `id` (`au`, `za`) back in as `category` to drill
+  down.
 </ResponseField>
 <ResponseField name="listings" type="ListingSummary[]">
   Listing cards.
 
   <Expandable title="ListingSummary">
-    <ResponseField name="id" type="string">Listing id — use it for `/listings/{listing_id}`.</ResponseField>
+    <ResponseField name="id" type="string">Listing id — use it for `/listings/{listing_id}`. `za`: the full 26-digit ad id.</ResponseField>
+    <ResponseField name="short_id" type="string">`za`: the 10-digit id the site displays.</ResponseField>
     <ResponseField name="title" type="string" />
     <ResponseField name="url" type="string" />
     <ResponseField name="description" type="string">Gumtree's short description.</ResponseField>
-    <ResponseField name="price" type="number">Numeric price in GBP.</ResponseField>
-    <ResponseField name="price_text" type="string">Price as shown, e.g. `£1,850.00pm`.</ResponseField>
+    <ResponseField name="price" type="number">Numeric price in `currency`; `null` for negotiable or contact-for-price ads.</ResponseField>
+    <ResponseField name="price_text" type="string">Price as shown, e.g. `£1,850.00pm`, `$17,990`, `R 2,600`, `Negotiable`.</ResponseField>
     <ResponseField name="price_frequency" type="string">`pm` / `pw` for rentals.</ResponseField>
-    <ResponseField name="currency" type="string">Always `GBP`.</ResponseField>
+    <ResponseField name="price_type" type="string">`au` / `za`: `FIXED`, `NEGOTIABLE` / `MAKE_OFFER`, `CONTACT_ME`, `FREE`, `SWAP_TRADE` …</ResponseField>
+    <ResponseField name="currency" type="string">`GBP`, `AUD` or `ZAR`.</ResponseField>
     <ResponseField name="location" type="string">e.g. `Penkridge, Staffordshire`.</ResponseField>
     <ResponseField name="location_id" type="string" />
     <ResponseField name="postcode" type="string" />
     <ResponseField name="latitude" type="number" />
     <ResponseField name="longitude" type="number" />
-    <ResponseField name="distance_text" type="string">e.g. `13 miles` from the search location.</ResponseField>
+    <ResponseField name="distance_text" type="string">e.g. `13 miles` (`uk`) or `4 km` (`au`) from the search location.</ResponseField>
     <ResponseField name="distance_miles" type="number" />
     <ResponseField name="category_id" type="integer" />
     <ResponseField name="category_name" type="string" />
@@ -124,8 +168,9 @@ pages.
     <ResponseField name="posted_utc" type="number">Unix seconds.</ResponseField>
     <ResponseField name="posted_at" type="string">ISO 8601 UTC.</ResponseField>
     <ResponseField name="status" type="string">e.g. `LIVE`.</ResponseField>
-    <ResponseField name="seller_type" type="string">`Private`, `Trade` or `Agency`.</ResponseField>
+    <ResponseField name="seller_type" type="string">`Private`, `Trade` or `Agency` (`au` motors: e.g. `Dealer used`).</ResponseField>
     <ResponseField name="seller_id" type="string" />
+    <ResponseField name="seller_name" type="string">`au` / `za`: the seller's display name.</ResponseField>
     <ResponseField name="account_id" type="string" />
     <ResponseField name="is_pro_seller" type="boolean" />
     <ResponseField name="is_featured" type="boolean">Paid top-slot ad.</ResponseField>
@@ -139,8 +184,10 @@ pages.
     <ResponseField name="seller_skills" type="string[]">Services listings only.</ResponseField>
     <ResponseField name="attributes" type="Attribute[]">
       Category attributes — `key`, `label`, `value`, `unit`. Motors listings
-      carry the full vehicle spec (make, model, year, mileage, fuel, engine,
-      MPG, CO2, insurance group, history-check flags).
+      carry the vehicle spec (make, model, year, mileage, fuel, engine; `uk`
+      adds MPG, CO2, insurance group and history-check flags). Keys are each
+      site's own, e.g. `vehicle_mileage` (`uk`), `carmileageinkms` (`au`),
+      `CarMileageInKms` (`za`).
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -178,6 +225,7 @@ data = res.json()
 
 ```json Response
 {
+  "market": "uk",
   "query": null,
   "category": "cars",
   "category_name": "Cars",
@@ -190,6 +238,7 @@ data = res.json()
   "total_pages": 50,
   "total_results": 139812,
   "result_count": 30,
+  "currency": "GBP",
   "listings": [
     {
       "id": "1802409381",
@@ -242,22 +291,37 @@ data = res.json()
 ## Search behaviour
 
 <Note>
-  **Price filters need a category.** `min_price` / `max_price` have no effect
-  when `category` is `all` — pick a category (`for-sale`, `cars`, `bicycles` …)
-  to filter by price.
+  **UK price filters need a category.** gumtree.com ignores `min_price` /
+  `max_price` when `category` is `all`, so that combination is a `400` — pick a
+  category (`for-sale`, `cars`, `bicycles` …) to filter by price.
 </Note>
 
 <Note>
-  Gumtree pins up to **5 paid featured ads** (`is_featured: true`) above the
-  chosen sort order. Skip them if you need a strict date or price ordering.
+  Gumtree pins **paid featured ads** (`is_featured: true`) above the chosen
+  sort order — up to 5 in the UK and up to 6 in Australia. Skip them if you
+  need a strict date or price ordering.
 </Note>
 
 <Warning>
-  A result set holds at most **50 pages** (~1,500 listings), whatever
-  `total_results` reports. To collect more, narrow the search — by
-  sub-category (`category_facets`), location and `distance`, price band, or
-  [`filters`](/api-reference/endpoint/gumtree/search-filters).
+  A result set holds at most **50 pages**, whatever `total_results` reports. To
+  collect more, narrow the search — by sub-category (`category_facets`),
+  location and `distance`, price band, or
+  [`filters`](/api-reference/endpoint/gumtree/search-filters). A page past the
+  end comes back with no listings and is not billed.
 </Warning>
+
+### Market support
+
+| Parameter | `uk` | `au` | `za` |
+| --------- | ---- | ---- | ---- |
+| `category` / `location` | slug / slug or postcode | numeric id | numeric id |
+| `distance` | miles | km (needs `location`) | — |
+| `seller_type` | ✓ | as a filter | ✓ |
+| `urgent_only`, `with_photos` | ✓ | — | — |
+| `sort=distance` | ✓ | with `location` | — |
+| Listings per page | 25 + featured | 24 + up to 6 featured | 20 |
+
+A parameter a market does not support is a `400`, not silently ignored.
 
 ### Postcode radius
 
@@ -280,9 +344,98 @@ Range filters (`type: enum_range`) take `min_` / `max_` + the filter key, e.g.
 for a category with
 [`/search/filters`](/api-reference/endpoint/gumtree/search-filters).
 
+### South Africa
+
+Petrol Toyotas in Gauteng between R50,000 and R300,000, cheapest first
+(`9077` = Cars & Bakkies, `3100003` = Gauteng) — 325 results:
+
+```bash
+curl "https://scrapebadger.com/v1/gumtree/search?market=za&category=9077&location=3100003&filters=ma:toyota,fu:petrol&min_price=50000&max_price=300000&sort=price_asc" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+The same search without the make, fuel and price filters
+(`market=za&category=9077&location=3100003`), abridged:
+
+```json
+{
+  "market": "za",
+  "category": "9077",
+  "category_id": 9077,
+  "location": "3100003",
+  "location_name": "Cars & Bakkies in Gauteng",
+  "total_results": 2964,
+  "result_count": 20,
+  "currency": "ZAR",
+  "listings": [
+    {
+      "id": "10013680889901013488680709",
+      "short_id": "1368088990",
+      "title": "Vw golf4 1.6 automatic",
+      "url": "https://www.gumtree.co.za/a-cars-bakkies/dobsonville/vw-golf4-1-6-automatic/10013680889901013488680709",
+      "price": null,
+      "price_text": "Negotiable",
+      "price_type": "MAKE_OFFER",
+      "currency": "ZAR",
+      "location": "Dobsonville",
+      "category_id": 9077,
+      "image_count": 2,
+      "posted_text": "1d",
+      "status": "ACTIVE",
+      "seller_type": "Private",
+      "seller_name": "Richard Ngwenya",
+      "attributes": [
+        { "key": "CarMake", "label": null, "value": "Volkswagen", "unit": null },
+        { "key": "CarModel", "label": null, "value": "Golf", "unit": null },
+        { "key": "CarYear", "label": null, "value": "2002", "unit": null },
+        { "key": "FuelType", "label": null, "value": "Petrol", "unit": null },
+        { "key": "CarMileageInKms", "label": null, "value": "190km", "unit": null }
+      ]
+    }
+  ],
+  "url": "https://www.gumtree.co.za/s-x/x/v1c9077l3100003p1"
+}
+```
+
+### Australia
+
+Mountain bikes in the Sydney Region (`18560` = Bicycles, `3003435` = Sydney
+Region), within 25 km:
+
+```bash
+curl "https://scrapebadger.com/v1/gumtree/search?market=au&query=mountain%20bike&category=18560&location=3003435&distance=25" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+A listing card from an Australian cars search (`market=au&category=18320`),
+abridged:
+
+```json
+{
+  "id": "1344981847",
+  "title": "2018 Holden Commodore RS ZB",
+  "url": "https://www.gumtree.com.au/web/listing/cars-vans-utes/1344981847",
+  "price": 16990.0,
+  "price_text": "$16,990",
+  "price_type": "FIXED",
+  "currency": "AUD",
+  "location": "Wanneroo Area, WA",
+  "category_id": 18320,
+  "seller_type": "Dealer used",
+  "is_featured": false,
+  "attributes": [
+    { "key": "carmileageinkms", "label": null, "value": "89168 km", "unit": null },
+    { "key": "cartransmission", "label": null, "value": "Auto", "unit": null }
+  ]
+}
+```
+
+On `au`, sell-by and price type are filters: `filters=cars.forsaleby_s:ownr`
+for private sellers, `priceType:NEGOTIABLE` for negotiable prices.
+
 ## Errors
 
 | Status | Meaning |
 | ------ | ------- |
-| `400` | Malformed `filters` value — expected comma-separated `key:value` pairs. |
+| `400` | Malformed `filters` value; an unknown `category` or `location` id; a parameter the `market` does not support (see the table above); a `za` filter gumtree.co.za would silently drop; or `min_price` / `max_price` with `category=all` on `uk`. |
 | `422` | Invalid parameter (e.g. `page` above 50), or Gumtree temporarily refused the request. **Not billed** — retry the latter shortly. |

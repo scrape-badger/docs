@@ -1,15 +1,15 @@
 ---
 title: "Get Listing"
 api: "GET https://scrapebadger.com/v1/gumtree/listings/{listing_id}"
-description: "Full Gumtree listing — description, every attribute (full vehicle spec for cars), images, location, seller profile and similar listings."
+description: "Full Gumtree listing from the UK, Australia or South Africa — description, every attribute (full vehicle spec for cars), images, location, seller profile and similar listings."
 ---
 
 Fetch one Gumtree listing in full: the description, every category attribute,
-all images, postcode and coordinates, the seller's profile and Gumtree's
-similar listings. Motors listings carry the full vehicle spec — make, model,
-mileage, MPG, CO2, insurance group, previous keepers and the vehicle
-history-check flags. Property, jobs, pets and services listings carry their own
-attribute sets.
+all images, location and coordinates, the seller's profile and Gumtree's
+similar listings. Motors listings carry the vehicle spec — in the UK make,
+model, mileage, MPG, CO2, insurance group, previous keepers and the vehicle
+history-check flags; in Australia make, model, variant, odometer, VIN and rego.
+Property, jobs, pets and services listings carry their own attribute sets.
 
 **Credits:** 5
 
@@ -22,21 +22,36 @@ attribute sets.
 ## Path Parameters
 
 <ParamField path="listing_id" type="string" required>
-  Gumtree listing id — the number at the end of a `gumtree.com/p/...` URL, e.g.
-  `1803293391`. Returned as `id` by
-  [`/search`](/api-reference/endpoint/gumtree/search).
+  Gumtree listing id — the number at the end of the listing URL, returned as
+  `id` by [`/search`](/api-reference/endpoint/gumtree/search):
+
+  - `uk`: ~10 digits, e.g. `1803293391`.
+  - `au`: ~10 digits, e.g. `1344981847`.
+  - `za`: the full 26-digit ad id at the end of a `gumtree.co.za` URL, e.g.
+    `10013681289561010209976109` — not the 10-digit `short_id` the site
+    displays.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="market" type="string" default="uk">
+  `uk` (gumtree.com), `au` (gumtree.com.au) or `za` (gumtree.co.za). Must match
+  the site the listing id comes from — a 26-digit id with `uk` / `au`, or a
+  short id with `za`, is a `400`.
 </ParamField>
 
 ## Response
 
+<ResponseField name="market" type="string">`uk`, `au` or `za`.</ResponseField>
 <ResponseField name="id" type="string">Listing id.</ResponseField>
 <ResponseField name="title" type="string" />
 <ResponseField name="url" type="string" />
 <ResponseField name="description" type="string">Full description text.</ResponseField>
-<ResponseField name="price" type="number">Numeric price in GBP.</ResponseField>
-<ResponseField name="price_text" type="string">Price as shown, e.g. `£5,699.00`.</ResponseField>
+<ResponseField name="price" type="number">Numeric price in `currency`; `null` for negotiable or contact-for-price ads.</ResponseField>
+<ResponseField name="price_text" type="string">Price as shown, e.g. `£5,699.00`, `$16,990`, `R 2,600`.</ResponseField>
 <ResponseField name="price_frequency" type="string">`pm` / `pw` for rentals.</ResponseField>
-<ResponseField name="currency" type="string">Always `GBP`.</ResponseField>
+<ResponseField name="price_type" type="string">`au` / `za`: `FIXED`, `NEGOTIABLE` / `MAKE_OFFER`, `CONTACT_ME`, `FREE`, `SWAP_TRADE` …</ResponseField>
+<ResponseField name="currency" type="string">`GBP`, `AUD` or `ZAR`.</ResponseField>
 <ResponseField name="vat" type="string">Motors trade listings: `Inc VAT` / `No VAT`.</ResponseField>
 <ResponseField name="location" type="string">e.g. `Larkhall, South Lanarkshire`.</ResponseField>
 <ResponseField name="area" type="string" />
@@ -59,6 +74,9 @@ attribute sets.
 <ResponseField name="updated_utc" type="number" />
 <ResponseField name="updated_at" type="string" />
 <ResponseField name="expires_at" type="string">Date the ad is valid through (`YYYY-MM-DD`).</ResponseField>
+<ResponseField name="status" type="string">`au` / `za`: e.g. `ACTIVE`.</ResponseField>
+<ResponseField name="view_count" type="integer">`au` / `za`: views of this ad.</ResponseField>
+<ResponseField name="reply_count" type="integer">`au`: replies to this ad.</ResponseField>
 <ResponseField name="is_featured" type="boolean" />
 <ResponseField name="is_urgent" type="boolean" />
 <ResponseField name="is_bumped_up" type="boolean" />
@@ -79,16 +97,20 @@ attribute sets.
     <ResponseField name="type" type="string">`Private`, `Trade` or `Agency`.</ResponseField>
     <ResponseField name="is_pro" type="boolean" />
     <ResponseField name="posting_since" type="string">e.g. `6+ years`.</ResponseField>
+    <ResponseField name="member_since_year" type="integer">`au`: year the account opened.</ResponseField>
+    <ResponseField name="last_active_text" type="string">`au`: e.g. `yesterday`.</ResponseField>
     <ResponseField name="last_active_utc" type="number" />
     <ResponseField name="last_active_at" type="string" />
-    <ResponseField name="total_listings" type="integer" />
+    <ResponseField name="total_listings" type="integer">Live listings right now.</ResponseField>
+    <ResponseField name="lifetime_listings" type="integer">`za`: ads ever posted.</ResponseField>
+    <ResponseField name="total_views" type="integer">`za`: views across all their ads.</ResponseField>
     <ResponseField name="listings_last_year" type="integer" />
     <ResponseField name="listings_by_category" type="object">Category name → live listing count.</ResponseField>
     <ResponseField name="reply_speed" type="string" />
     <ResponseField name="reply_rate" type="string" />
     <ResponseField name="rating" type="object">`average`, `total`, and a per-star `breakdown`.</ResponseField>
     <ResponseField name="verification" type="object">`status`, `label` (e.g. `Business Verified`) and the `checks` Gumtree ran.</ResponseField>
-    <ResponseField name="phone_masked" type="string">The masked phone number shown on the listing page, e.g. `0794997XXXX`. Full numbers are never returned.</ResponseField>
+    <ResponseField name="phone_masked" type="string">The masked phone number shown on the listing page, e.g. `0794997XXXX` (`uk`) or `068*******` (`za`); always `null` on `au`. Full numbers are never returned.</ResponseField>
     <ResponseField name="website_url" type="string" />
     <ResponseField name="avatar_url" type="string" />
     <ResponseField name="logo_url" type="string" />
@@ -96,7 +118,7 @@ attribute sets.
   </Expandable>
 </ResponseField>
 <ResponseField name="seller_skills" type="string[]">Services listings only.</ResponseField>
-<ResponseField name="seller_listings_url" type="string">The seller's other ads on gumtree.com.</ResponseField>
+<ResponseField name="seller_listings_url" type="string">The seller's other ads on the Gumtree site.</ResponseField>
 <ResponseField name="similar_listings" type="ListingSummary[]">
   Gumtree's similar listings, in the same shape as
   [`/search`](/api-reference/endpoint/gumtree/search#response) listings.
@@ -132,6 +154,7 @@ listing = res.json()
 
 ```json Response
 {
+  "market": "uk",
   "id": "1803293391",
   "title": "Mazda, 2, Hatchback, 2018, Manual, 1496 (cc), 5 doors",
   "description": "Welcome to Thomson Twins Motors. We are based in Larkhall, Scotland. Our cars come with a Fresh Service, Valeted inside and long MOT's...",
@@ -222,10 +245,107 @@ listing = res.json()
 }
 ```
 
+### South Africa
+
+```bash
+curl "https://scrapebadger.com/v1/gumtree/listings/10013681289561010209976109?market=za" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```json Response (abridged)
+{
+  "market": "za",
+  "id": "10013681289561010209976109",
+  "title": "Bunkbed Pine Wood Single R2600",
+  "url": "https://www.gumtree.co.za/a-beds-headboards/centurion/bunkbed-pine-wood-single-r2600/10013681289561010209976109",
+  "description": "Second hand Single Size Bunkbed in Painted Pine Wood with matching Pedestal available in lyttelton Centurion.",
+  "price": 2600.0,
+  "price_text": "R 2,600",
+  "price_type": "FIXED",
+  "currency": "ZAR",
+  "location": "Centurion",
+  "area": "Gauteng",
+  "sub_area": "Pretoria / Tshwane",
+  "location_id": "3100247",
+  "latitude": -25.862281,
+  "longitude": 28.088474,
+  "category_id": 9272,
+  "category_name": "Beds & Headboards",
+  "posted_at": "2026-10-12T06:45:39Z",
+  "expires_at": "2026-11-11",
+  "status": "ACTIVE",
+  "view_count": 65,
+  "attributes": [
+    { "key": "Condition", "label": null, "value": "used", "unit": null },
+    { "key": "BedMattressesSize", "label": null, "value": "single", "unit": null },
+    { "key": "Material", "label": null, "value": "wood", "unit": null }
+  ],
+  "seller": {
+    "name": "Paul",
+    "user_id": "102099761",
+    "type": "Trade",
+    "posting_since": "Selling for 12+ years",
+    "total_listings": 183,
+    "lifetime_listings": 3100,
+    "total_views": 263430,
+    "phone_masked": "068*******"
+  },
+  "seller_listings_url": "https://www.gumtree.co.za/u-seller-listings/x/v1u102099761p1"
+}
+```
+
+### Australia
+
+```bash
+curl "https://scrapebadger.com/v1/gumtree/listings/1344981847?market=au" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```json Response (abridged)
+{
+  "market": "au",
+  "id": "1344981847",
+  "title": "2018 Holden Commodore RS ZB",
+  "url": "https://www.gumtree.com.au/web/listing/cars-vans-utes/1344981847",
+  "price": 16990.0,
+  "price_text": "$16,990",
+  "price_type": "FIXED",
+  "currency": "AUD",
+  "location": "25 Prindiville Drive Wangara WA 6065",
+  "location_id": "3008658",
+  "latitude": -31.79005,
+  "longitude": 115.81883,
+  "category_id": 18320,
+  "posted_text": "11 minutes ago",
+  "status": "ACTIVE",
+  "view_count": 28,
+  "reply_count": 0,
+  "attributes": [
+    { "key": "Make", "label": null, "value": "Holden", "unit": null },
+    { "key": "Model", "label": null, "value": "Commodore", "unit": null },
+    { "key": "Variant", "label": null, "value": "RS", "unit": null },
+    { "key": "Year", "label": null, "value": "2018", "unit": null },
+    { "key": "Odometer", "label": null, "value": "89168", "unit": null }
+  ],
+  "seller": {
+    "name": "Wangara Motors",
+    "user_id": "6242444948108",
+    "type": "Trade",
+    "is_pro": true,
+    "member_since_year": 2015,
+    "total_listings": 215,
+    "phone_masked": null
+  },
+  "seller_listings_url": "https://www.gumtree.com.au/web/s-user/6242444948108"
+}
+```
+
 <Note>
   **Phone numbers are masked.** `seller.phone_masked` is the masked form shown
-  on the public listing page (e.g. `0794997XXXX`), or `null` when the seller
-  shows none. The full number is never returned.
+  on the public listing page (e.g. `0794997XXXX` in the UK, `068*******` in
+  South Africa), or `null` when the seller shows none — always `null` in
+  Australia, where Gumtree puts phone numbers behind a login. The full number
+  is never returned.
 </Note>
 
 <Tip>
@@ -240,5 +360,6 @@ listing = res.json()
 
 | Status | Meaning |
 | ------ | ------- |
+| `400` | The `listing_id` belongs to another market — a 26-digit id with `uk` / `au`, or a short id with `za`. |
 | `404` | Listing does not exist or has been removed. |
-| `422` | `listing_id` is not 5–12 digits, or Gumtree temporarily refused the request. **Not billed** — retry the latter shortly. |
+| `422` | `listing_id` is not 5–30 digits, or Gumtree temporarily refused the request. **Not billed** — retry the latter shortly. |

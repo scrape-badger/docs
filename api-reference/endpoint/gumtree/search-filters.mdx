@@ -9,8 +9,15 @@ mileage range, bedrooms, job type and so on — with a **live result count** per
 value, plus the available sort orders and search radii. Feed a filter's `key`
 and an option's `value` straight back into
 [`/search`](/api-reference/endpoint/gumtree/search) as `filters=key:value`.
+Filter keys are each site's own, so always ask with the `market` you will
+search.
 
-**Credits:** 5
+**Credits:** 5 (`uk`, `za`) · 10 (`au`)
+
+<Note>
+  On `au` this call renders a real browser past gumtree.com.au's JavaScript
+  challenge, so it costs 10 credits and takes 10–20 seconds.
+</Note>
 
 ## Authorization
 
@@ -20,22 +27,36 @@ and an option's `value` straight back into
 
 ## Query Parameters
 
+<ParamField query="market" type="string" default="uk">
+  `uk` (gumtree.com), `au` (gumtree.com.au) or `za` (gumtree.co.za).
+</ParamField>
+
 <ParamField query="category" type="string" default="all">
-  Category slug, e.g. `cars`, `property-to-rent`, `jobs`. Filters are
+  `uk`: category slug, e.g. `cars`, `property-to-rent`, `jobs`. `au` / `za`:
+  numeric category id, e.g. `18320` (AU cars) or `9077` (ZA cars). Filters are
   category-specific, so pass the category you intend to search.
 </ParamField>
 
-<ParamField query="location" type="string" default="uk">
-  Location slug, town name or UK postcode. Scopes the counts.
+<ParamField query="location" type="string">
+  `uk`: location slug, town name or UK postcode. `au` / `za`: numeric location
+  id. Scopes the counts. Omit for the whole country.
 </ParamField>
 
 <ParamField query="query" type="string">
   Optional keywords to scope the counts.
 </ParamField>
 
+<ParamField query="filters" type="string">
+  `za` only: filters already applied, as `key:value` pairs. gumtree.co.za
+  offers dependent filters only once their parent is set — e.g. `ma:toyota`
+  makes the `mo` (model) filter appear with Toyota's models (`hilux`,
+  `corolla` …).
+</ParamField>
+
 ## Response
 
-<ResponseField name="category" type="string">Category slug.</ResponseField>
+<ResponseField name="market" type="string">`uk`, `au` or `za`.</ResponseField>
+<ResponseField name="category" type="string">Category slug (`uk`) or id (`au`, `za`).</ResponseField>
 <ResponseField name="category_name" type="string">e.g. `Cars`.</ResponseField>
 <ResponseField name="total_results" type="integer">Matching listings before any filter.</ResponseField>
 <ResponseField name="filters" type="SearchFilter[]">
@@ -44,7 +65,7 @@ and an option's `value` straight back into
   <Expandable title="SearchFilter">
     <ResponseField name="key" type="string">Filter key for `filters=key:value`, e.g. `vehicle_make`.</ResponseField>
     <ResponseField name="label" type="string">e.g. `Make`.</ResponseField>
-    <ResponseField name="type" type="string">`enum`, `multiple_selection`, `enum_range`, `range_freeform` or `boolean`.</ResponseField>
+    <ResponseField name="type" type="string">`enum`, `multiple_selection`, `enum_range`, `range`, `range_freeform` or `boolean`.</ResponseField>
     <ResponseField name="min_key" type="string">Range filters: the lower-bound key when Gumtree names it explicitly (e.g. `min_price`). Otherwise it is `min_` + `key`.</ResponseField>
     <ResponseField name="max_key" type="string">Range filters: the upper-bound key, likewise `max_` + `key` when null.</ResponseField>
     <ResponseField name="options" type="FilterOption[]">`label`, `value`, `count` — `value` is what `/search` takes. Empty for range filters.</ResponseField>
@@ -55,8 +76,8 @@ and an option's `value` straight back into
 <ResponseField name="sort_options" type="SortOption[]">
   Sort orders Gumtree offers for the category — `value`, `label`.
 </ResponseField>
-<ResponseField name="distance_options" type="number[]">Search radius values in miles.</ResponseField>
-<ResponseField name="category_facets" type="CategoryFacet[]">Sub-categories with counts — `name`, `slug`, `count`.</ResponseField>
+<ResponseField name="distance_options" type="number[]">Search radius values in miles (`uk`). Empty for `au` (any km value up to `1000` is accepted) and `za` (no radius search).</ResponseField>
+<ResponseField name="category_facets" type="CategoryFacet[]">Sub-categories with counts — `id`, `name`, `slug`, `count`.</ResponseField>
 
 ## Example
 
@@ -91,6 +112,7 @@ filters = res.json()["filters"]
 
 ```json Response
 {
+  "market": "uk",
   "category": "cars",
   "category_name": "Cars",
   "total_results": 139812,
@@ -149,11 +171,83 @@ filters = res.json()["filters"]
 | Filter `type` | Pass to `/search` as |
 | ------------- | -------------------- |
 | `enum`, `multiple_selection` | `filters=vehicle_make:bmw` — repeat the key for several values: `vehicle_make:bmw,vehicle_make:audi` |
-| `enum_range` | `filters=min_vehicle_mileage:10000,max_vehicle_mileage:50000` (`min_` / `max_` + `key`) |
+| `enum_range`, `range` | `filters=min_vehicle_mileage:10000,max_vehicle_mileage:50000` (`min_` / `max_` + `key`, or the explicit `min_key` / `max_key`) |
 
 `price`, `seller_type`, `photos_filter` and `urgent_filter` also appear in this
-list; on `/search` use the dedicated `min_price` / `max_price`, `seller_type`,
-`with_photos` and `urgent_only` parameters for them.
+list for `uk`; on `/search` use the dedicated `min_price` / `max_price`,
+`seller_type`, `with_photos` and `urgent_only` parameters for them.
+
+### South Africa
+
+With a make already applied, the model filter (`mo`) lists that make's models
+(Toyota cars in Gauteng):
+
+```bash
+curl "https://scrapebadger.com/v1/gumtree/search/filters?market=za&category=9077&location=3100003&filters=ma:toyota" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```json Response (abridged)
+{
+  "market": "za",
+  "category": "9077",
+  "category_name": "Toyota in Cars & Bakkies in Gauteng",
+  "total_results": 500,
+  "filters": [
+    {
+      "key": "price_type",
+      "label": "Price Type",
+      "type": "enum",
+      "options": [
+        { "label": "Amount", "value": "FIXED", "count": 465 },
+        { "label": "Negotiable", "value": "MAKE_OFFER", "count": 24 },
+        { "label": "Contact for Price", "value": "CONTACT_ME", "count": 11 }
+      ]
+    },
+    {
+      "key": "mo",
+      "type": "enum",
+      "options": [
+        { "label": "Hilux", "value": "hilux", "count": 114 },
+        { "label": "Corolla", "value": "corolla", "count": 69 }
+      ]
+    },
+    {
+      "key": "cy",
+      "label": "Year",
+      "type": "range",
+      "min_key": "min_cy",
+      "max_key": "max_cy",
+      "min_options": [{ "label": "2015", "value": "2015", "count": null }],
+      "max_options": [{ "label": "2020", "value": "2020", "count": null }]
+    }
+  ],
+  "sort_options": [
+    { "value": "relevance", "label": "Relevance" },
+    { "value": "date", "label": "Most recent" },
+    { "value": "price_asc", "label": "Lowest price" },
+    { "value": "price_desc", "label": "Highest price" }
+  ],
+  "distance_options": []
+}
+```
+
+South African keys: `ma` make, `mo` model, `fu` fuel, `tr` transmission, `bt`
+body type, `co` colour, `km` mileage (`min_km` / `max_km`), `cy` year
+(`min_cy` / `max_cy`) and `price_type`. Each key takes one value.
+
+### Australia
+
+Australian keys are namespaced by category, e.g. for cars (`18320`):
+`cars.carmake_s` (make), `cars.carbodytype_s`, `cars.caryear_i` (a `range` —
+`min_cars.caryear_i` / `max_cars.caryear_i`), `cars.fueltype_s`,
+`cars.cartransmission_s`, `cars.forsaleby_s` (private or dealer) and
+`priceType` (`FIXED`, `NEGOTIABLE` …).
+
+```bash
+curl "https://scrapebadger.com/v1/gumtree/search/filters?market=au&category=18320" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
 
 <Tip>
   Use this endpoint to size a search before paging it: the per-value counts
@@ -165,4 +259,5 @@ list; on `/search` use the dedicated `min_price` / `max_price`, `seller_type`,
 
 | Status | Meaning |
 | ------ | ------- |
+| `400` | An unknown `category` or `location` id, malformed `filters`, or `filters` with `market=uk`. |
 | `422` | Gumtree temporarily refused the request — **not billed**. Retry shortly. |

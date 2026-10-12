@@ -1,12 +1,13 @@
 ---
 title: "Get Seller Listings"
 api: "GET https://scrapebadger.com/v1/gumtree/listings/{listing_id}/seller-listings"
-description: "Every live listing by the seller of a Gumtree listing."
+description: "Every live listing by the seller of a Gumtree listing, in the UK, Australia or South Africa."
 ---
 
 List every live ad posted by the seller of `listing_id`. Gumtree keys a
 seller's ad list by one of their ads, so **any listing id of theirs works** —
-there is no separate seller id to look up.
+there is no separate seller id to look up. On `au` and `za` the seller is
+looked up from the listing first.
 
 **Credits:** 5
 
@@ -19,10 +20,16 @@ there is no separate seller id to look up.
 ## Path Parameters
 
 <ParamField path="listing_id" type="string" required>
-  Any Gumtree listing id by the seller, e.g. `1803293391`.
+  Any Gumtree listing id by the seller, e.g. `1803293391` (`uk`), `1339574407`
+  (`au`) or the 26-digit `10013681289561010209976109` (`za`).
 </ParamField>
 
 ## Query Parameters
+
+<ParamField query="market" type="string" default="uk">
+  `uk` (gumtree.com), `au` (gumtree.com.au) or `za` (gumtree.co.za). Must match
+  the site the listing id comes from.
+</ParamField>
 
 <ParamField query="page" type="integer" default="1">
   Result page, `1`–`50`.
@@ -30,11 +37,15 @@ there is no separate seller id to look up.
 
 ## Response
 
+<ResponseField name="market" type="string">`uk`, `au` or `za`.</ResponseField>
 <ResponseField name="listing_id" type="string">Echo of the listing id the lookup started from.</ResponseField>
 <ResponseField name="seller_name" type="string">The seller's display name.</ResponseField>
-<ResponseField name="total_results" type="integer">Live listings by this seller.</ResponseField>
+<ResponseField name="total_results" type="integer">
+  Live listings by this seller (`uk`, `au`). `null` on `za`, where the site gives no total — use `has_next`.
+</ResponseField>
 <ResponseField name="page" type="integer">The page returned.</ResponseField>
-<ResponseField name="total_pages" type="integer" />
+<ResponseField name="total_pages" type="integer">`null` on `za`.</ResponseField>
+<ResponseField name="has_next" type="boolean">`za`: whether another page follows. `null` elsewhere.</ResponseField>
 <ResponseField name="result_count" type="integer">Listings on this page.</ResponseField>
 <ResponseField name="listings" type="ListingSummary[]">
   The seller's listings, in the same shape as
@@ -72,6 +83,7 @@ data = res.json()
 
 ```json Response
 {
+  "market": "uk",
   "listing_id": "1803293391",
   "seller_name": "Allan",
   "total_results": 12,
@@ -107,9 +119,50 @@ data = res.json()
 }
 ```
 
+### South Africa
+
+```bash
+curl "https://scrapebadger.com/v1/gumtree/listings/10013681289561010209976109/seller-listings?market=za" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```json Response (abridged)
+{
+  "market": "za",
+  "listing_id": "10013681289561010209976109",
+  "seller_name": "Paul",
+  "total_results": null,
+  "page": 1,
+  "total_pages": null,
+  "has_next": true,
+  "result_count": 20,
+  "listings": [
+    {
+      "id": "10013681289561010209976109",
+      "short_id": "1368128956",
+      "title": "Bunkbed Pine Wood Single R2600",
+      "price": 2600.0,
+      "price_text": "R 2,600",
+      "price_type": "FIXED",
+      "currency": "ZAR",
+      "location": "Centurion",
+      "location_id": "3100247",
+      "latitude": -25.862281,
+      "longitude": 28.088474,
+      "category_id": 9272,
+      "image_count": 3,
+      "posted_at": "2026-10-12T06:45:39Z",
+      "seller_id": "102099761",
+      "seller_name": "Paul"
+    }
+  ]
+}
+```
+
 ## Errors
 
 | Status | Meaning |
 | ------ | ------- |
+| `400` | The `listing_id` belongs to another market — a 26-digit id with `uk` / `au`, or a short id with `za`. |
 | `404` | Listing does not exist or has been removed. |
-| `422` | `listing_id` is not 5–12 digits, or Gumtree temporarily refused the request. **Not billed** — retry the latter shortly. |
+| `422` | `listing_id` is not 5–30 digits, or Gumtree temporarily refused the request. **Not billed** — retry the latter shortly. |

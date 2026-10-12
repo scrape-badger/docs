@@ -1,14 +1,23 @@
 ---
 title: "List Locations"
 api: "GET https://scrapebadger.com/v1/gumtree/locations"
-description: "Browse Gumtree's UK location tree: United Kingdom, nations, counties, towns."
+description: "Browse Gumtree's location tree in the UK, Australia or South Africa: nations, states or provinces down to towns."
 ---
 
-Browse Gumtree's location tree one level at a time — United Kingdom → nations →
-counties → towns. Each child's `slug` is a valid `location` for
-[`/search`](/api-reference/endpoint/gumtree/search).
+Browse Gumtree's location tree one level at a time. Each child's `slug` is a
+valid `location` for [`/search`](/api-reference/endpoint/gumtree/search) — a
+name slug on `uk`, the numeric id on `au` and `za`.
 
-**Credits:** 1
+- `uk`: United Kingdom → nations → counties → towns.
+- `au`: Australia → states → regions → areas, each with its live ad count.
+- `za`: South Africa → provinces → towns.
+
+**Credits:** 1 (`uk`, `za`) · 5 (`au`)
+
+<Note>
+  On `au` this call renders a real browser past gumtree.com.au's JavaScript
+  challenge, so it costs 5 credits and takes 10–20 seconds.
+</Note>
 
 ## Authorization
 
@@ -18,13 +27,19 @@ counties → towns. Each child's `slug` is a valid `location` for
 
 ## Query Parameters
 
-<ParamField query="parent_id" type="integer" default="10000392">
-  Location id to list the children of. `10000392` (the default) is the United
-  Kingdom. Then drill down by `id`, e.g. `10000393` for England.
+<ParamField query="market" type="string" default="uk">
+  `uk` (gumtree.com), `au` (gumtree.com.au) or `za` (gumtree.co.za).
+</ParamField>
+
+<ParamField query="parent_id" type="integer">
+  Location id to list the children of. Omit it for the whole country (`uk`
+  root `10000392`, `za` root `201`). Then drill down by `id`, e.g. `10000393`
+  for England, `3003435` for the Sydney Region, `3100003` for Gauteng.
 </ParamField>
 
 ## Response
 
+<ResponseField name="market" type="string">`uk`, `au` or `za`.</ResponseField>
 <ResponseField name="id" type="integer">The parent location id.</ResponseField>
 <ResponseField name="name" type="string">e.g. `England`.</ResponseField>
 <ResponseField name="slug" type="string">e.g. `england`.</ResponseField>
@@ -35,7 +50,7 @@ counties → towns. Each child's `slug` is a valid `location` for
   <Expandable title="TreeNode">
     <ResponseField name="id" type="integer">Pass as `parent_id` to go one level deeper.</ResponseField>
     <ResponseField name="name" type="string" />
-    <ResponseField name="slug" type="string">The `/search` `location` value.</ResponseField>
+    <ResponseField name="slug" type="string">The `/search` `location` value (the id itself on `au` / `za`).</ResponseField>
     <ResponseField name="has_children" type="boolean" />
   </Expandable>
 </ResponseField>
@@ -73,6 +88,7 @@ children = res.json()["children"]
 
 ```json Response
 {
+  "market": "uk",
   "id": 10000393,
   "name": "England",
   "slug": "england",
@@ -84,3 +100,35 @@ children = res.json()["children"]
   ]
 }
 ```
+
+### Australia
+
+```bash
+curl "https://scrapebadger.com/v1/gumtree/locations?market=au&parent_id=3003435" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```json Response (abridged)
+{
+  "market": "au",
+  "id": 3003435,
+  "name": "Sydney Region",
+  "slug": "3003435",
+  "result_count": 38,
+  "children": [
+    { "id": 3003812, "name": "Ku-ring-gai Area", "slug": "3003812", "has_children": null },
+    { "id": 3003771, "name": "Inner Sydney", "slug": "3003771", "has_children": null },
+    { "id": 3003633, "name": "Eastern Suburbs", "slug": "3003633", "has_children": null }
+  ]
+}
+```
+
+On `za`, the root (`parent_id` omitted, id `201`) lists the 9 provinces —
+`3100003` Gauteng, `3100002` KwaZulu-Natal, `3100197` Eastern Cape …
+
+## Errors
+
+| Status | Meaning |
+| ------ | ------- |
+| `404` | `parent_id` is not a location of this market (`au`, `za`). |
+| `422` | Gumtree temporarily refused the request — **not billed**. Retry shortly. |
