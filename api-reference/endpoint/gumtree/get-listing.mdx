@@ -22,22 +22,21 @@ Property, jobs, pets and services listings carry their own attribute sets.
 ## Path Parameters
 
 <ParamField path="listing_id" type="string" required>
-  Gumtree listing id — the number at the end of the listing URL, returned as
-  `id` by [`/search`](/api-reference/endpoint/gumtree/search):
+  Gumtree listing id from the end of the listing URL, returned as `id` by
+  [`/search`](/api-reference/endpoint/gumtree/search):
 
   - `uk`: ~10 digits, e.g. `1803293391`.
   - `au`: ~10 digits, e.g. `1344981847`.
-  - `za`: the full 26-digit ad id at the end of a `gumtree.co.za` URL, e.g.
-    `10013681289561010209976109` — not the 10-digit `short_id` the site
-    displays.
+  - `za`: the listing ref at the end of a `gumtree.co.za/listing/<ref>` URL,
+    e.g. `ls26bvmcpnsqmz7l9jz`.
 </ParamField>
 
 ## Query Parameters
 
 <ParamField query="market" type="string" default="uk">
   `uk` (gumtree.com), `au` (gumtree.com.au) or `za` (gumtree.co.za). Must match
-  the site the listing id comes from — a 26-digit id with `uk` / `au`, or a
-  short id with `za`, is a `400`.
+  the site the listing id comes from — a `za` ref with `uk` / `au`, or a
+  numeric id with `za`, is a `400`.
 </ParamField>
 
 ## Response
@@ -48,9 +47,9 @@ Property, jobs, pets and services listings carry their own attribute sets.
 <ResponseField name="url" type="string" />
 <ResponseField name="description" type="string">Full description text.</ResponseField>
 <ResponseField name="price" type="number">Numeric price in `currency`; `null` for negotiable or contact-for-price ads.</ResponseField>
-<ResponseField name="price_text" type="string">Price as shown, e.g. `£5,699.00`, `$16,990`, `R 2,600`.</ResponseField>
+<ResponseField name="price_text" type="string">Price as shown, e.g. `£5,699.00`, `$16,990`, `R190,000`.</ResponseField>
 <ResponseField name="price_frequency" type="string">`pm` / `pw` for rentals.</ResponseField>
-<ResponseField name="price_type" type="string">`au` / `za`: `FIXED`, `NEGOTIABLE` / `MAKE_OFFER`, `CONTACT_ME`, `FREE`, `SWAP_TRADE` …</ResponseField>
+<ResponseField name="price_type" type="string">`au`: `FIXED`, `NEGOTIABLE`, `CONTACT_ME`, `FREE`, `SWAP_TRADE` … `za`: `ASKING_PRICE`, `POA` …</ResponseField>
 <ResponseField name="currency" type="string">`GBP`, `AUD` or `ZAR`.</ResponseField>
 <ResponseField name="vat" type="string">Motors trade listings: `Inc VAT` / `No VAT`.</ResponseField>
 <ResponseField name="location" type="string">e.g. `Larkhall, South Lanarkshire`.</ResponseField>
@@ -60,9 +59,9 @@ Property, jobs, pets and services listings carry their own attribute sets.
 <ResponseField name="postcode" type="string" />
 <ResponseField name="latitude" type="number" />
 <ResponseField name="longitude" type="number" />
-<ResponseField name="category_id" type="integer" />
+<ResponseField name="category_id" type="integer | string">Integer on `uk` / `au`, ref string on `za` (e.g. `p6dnh`).</ResponseField>
 <ResponseField name="category_name" type="string" />
-<ResponseField name="category_ids" type="integer[]">Root-to-leaf category ids.</ResponseField>
+<ResponseField name="category_ids" type="(integer | string)[]">Root-to-leaf category ids (refs on `za`).</ResponseField>
 <ResponseField name="breadcrumbs" type="Breadcrumb[]">`name`, `url`.</ResponseField>
 <ResponseField name="image_urls" type="string[]" />
 <ResponseField name="video_urls" type="string[]" />
@@ -74,7 +73,7 @@ Property, jobs, pets and services listings carry their own attribute sets.
 <ResponseField name="updated_utc" type="number" />
 <ResponseField name="updated_at" type="string" />
 <ResponseField name="expires_at" type="string">Date the ad is valid through (`YYYY-MM-DD`).</ResponseField>
-<ResponseField name="status" type="string">`au` / `za`: e.g. `ACTIVE`.</ResponseField>
+<ResponseField name="status" type="string">`au`: e.g. `ACTIVE`. `za`: e.g. `PUBLISHED`.</ResponseField>
 <ResponseField name="view_count" type="integer">`au` / `za`: views of this ad.</ResponseField>
 <ResponseField name="reply_count" type="integer">`au`: replies to this ad.</ResponseField>
 <ResponseField name="is_featured" type="boolean" />
@@ -97,20 +96,20 @@ Property, jobs, pets and services listings carry their own attribute sets.
     <ResponseField name="type" type="string">`Private`, `Trade` or `Agency`.</ResponseField>
     <ResponseField name="is_pro" type="boolean" />
     <ResponseField name="posting_since" type="string">e.g. `6+ years`.</ResponseField>
-    <ResponseField name="member_since_year" type="integer">`au`: year the account opened.</ResponseField>
+    <ResponseField name="member_since_year" type="integer">`au` / `za`: year the account opened.</ResponseField>
     <ResponseField name="last_active_text" type="string">`au`: e.g. `yesterday`.</ResponseField>
     <ResponseField name="last_active_utc" type="number" />
     <ResponseField name="last_active_at" type="string" />
     <ResponseField name="total_listings" type="integer">Live listings right now.</ResponseField>
-    <ResponseField name="lifetime_listings" type="integer">`za`: ads ever posted.</ResponseField>
-    <ResponseField name="total_views" type="integer">`za`: views across all their ads.</ResponseField>
+    <ResponseField name="lifetime_listings" type="integer">Ads ever posted. No market publishes it at present (`null`).</ResponseField>
+    <ResponseField name="total_views" type="integer">Views across all their ads. No market publishes it at present (`null`).</ResponseField>
     <ResponseField name="listings_last_year" type="integer" />
     <ResponseField name="listings_by_category" type="object">Category name → live listing count.</ResponseField>
     <ResponseField name="reply_speed" type="string" />
     <ResponseField name="reply_rate" type="string" />
     <ResponseField name="rating" type="object">`average`, `total`, and a per-star `breakdown`.</ResponseField>
-    <ResponseField name="verification" type="object">`status`, `label` (e.g. `Business Verified`) and the `checks` Gumtree ran.</ResponseField>
-    <ResponseField name="phone_masked" type="string">The masked phone number shown on the listing page, e.g. `0794997XXXX` (`uk`) or `068*******` (`za`); always `null` on `au`. Full numbers are never returned.</ResponseField>
+    <ResponseField name="verification" type="object">`status`, `label` (e.g. `Business Verified`) and the `checks` Gumtree ran (`za`: e.g. `identity`, `mobileNumber`).</ResponseField>
+    <ResponseField name="phone_masked" type="string">The masked phone number shown on the listing page, e.g. `0794997XXXX` (`uk`); always `null` on `au` and `za`. Full numbers are never returned.</ResponseField>
     <ResponseField name="website_url" type="string" />
     <ResponseField name="avatar_url" type="string" />
     <ResponseField name="logo_url" type="string" />
@@ -248,49 +247,52 @@ listing = res.json()
 ### South Africa
 
 ```bash
-curl "https://scrapebadger.com/v1/gumtree/listings/10013681289561010209976109?market=za" \
+curl "https://scrapebadger.com/v1/gumtree/listings/ls26bvmcpnsqmz7l9jz?market=za" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ```json Response (abridged)
 {
   "market": "za",
-  "id": "10013681289561010209976109",
-  "title": "Bunkbed Pine Wood Single R2600",
-  "url": "https://www.gumtree.co.za/a-beds-headboards/centurion/bunkbed-pine-wood-single-r2600/10013681289561010209976109",
-  "description": "Second hand Single Size Bunkbed in Painted Pine Wood with matching Pedestal available in lyttelton Centurion.",
-  "price": 2600.0,
-  "price_text": "R 2,600",
-  "price_type": "FIXED",
+  "id": "ls26bvmcpnsqmz7l9jz",
+  "title": "Toyota Yaris",
+  "url": "https://www.gumtree.co.za/listing/ls26bvmcpnsqmz7l9jz",
+  "description": "2018 Toyota Yaris …",
+  "price": 190000.0,
+  "price_text": "R190,000",
+  "price_type": "ASKING_PRICE",
   "currency": "ZAR",
-  "location": "Centurion",
+  "location": "Weltevreden Park",
   "area": "Gauteng",
-  "sub_area": "Pretoria / Tshwane",
-  "location_id": "3100247",
-  "latitude": -25.862281,
-  "longitude": 28.088474,
-  "category_id": 9272,
-  "category_name": "Beds & Headboards",
-  "posted_at": "2026-10-12T06:45:39Z",
-  "expires_at": "2026-11-11",
-  "status": "ACTIVE",
-  "view_count": 65,
+  "location_id": "mxm68",
+  "category_id": "p6dnh",
+  "category_name": "Cars & Bakkies",
+  "category_ids": ["kyzkk", "l4dq6", "p6dnh"],
+  "posted_at": "2026-10-13T17:34:24.365000Z",
+  "expires_at": "2026-11-12",
+  "status": "PUBLISHED",
+  "view_count": 3,
   "attributes": [
-    { "key": "Condition", "label": null, "value": "used", "unit": null },
-    { "key": "BedMattressesSize", "label": null, "value": "single", "unit": null },
-    { "key": "Material", "label": null, "value": "wood", "unit": null }
+    { "key": "sellerType", "label": "Seller Type", "value": "Owner", "unit": null },
+    { "key": "make", "label": "Make", "value": "Toyota", "unit": null },
+    { "key": "model", "label": "Model", "value": "Yaris", "unit": null },
+    { "key": "year", "label": "Year", "value": "2018", "unit": null },
+    { "key": "mileageKm", "label": "Kilometres", "value": "85000", "unit": null },
+    { "key": "transmission", "label": "Transmission", "value": "Automatic", "unit": null }
   ],
   "seller": {
-    "name": "Paul",
-    "user_id": "102099761",
-    "type": "Trade",
-    "posting_since": "Selling for 12+ years",
-    "total_listings": 183,
-    "lifetime_listings": 3100,
-    "total_views": 263430,
-    "phone_masked": "068*******"
-  },
-  "seller_listings_url": "https://www.gumtree.co.za/u-seller-listings/x/v1u102099761p1"
+    "name": "Thanuj",
+    "user_id": "s16zcgy0ntjnvg2",
+    "public_id": "s16zcgy0ntjnvg2",
+    "type": "Private",
+    "member_since_year": 2016,
+    "verification": {
+      "status": null,
+      "label": null,
+      "checks": ["identity", "mobileNumber"]
+    },
+    "phone_masked": null
+  }
 }
 ```
 
@@ -342,10 +344,10 @@ curl "https://scrapebadger.com/v1/gumtree/listings/1344981847?market=au" \
 
 <Note>
   **Phone numbers are masked.** `seller.phone_masked` is the masked form shown
-  on the public listing page (e.g. `0794997XXXX` in the UK, `068*******` in
-  South Africa), or `null` when the seller shows none — always `null` in
-  Australia, where Gumtree puts phone numbers behind a login. The full number
-  is never returned.
+  on the public listing page (e.g. `0794997XXXX` in the UK), or `null` when
+  the seller shows none — always `null` in Australia and South Africa, where
+  Gumtree puts phone numbers behind a login. The full number is never
+  returned.
 </Note>
 
 <Tip>
@@ -360,6 +362,6 @@ curl "https://scrapebadger.com/v1/gumtree/listings/1344981847?market=au" \
 
 | Status | Meaning |
 | ------ | ------- |
-| `400` | The `listing_id` belongs to another market — a 26-digit id with `uk` / `au`, or a short id with `za`. |
+| `400` | The `listing_id` belongs to another market — a `za` ref with `uk` / `au`, or a numeric id with `za`. |
 | `404` | Listing does not exist or has been removed. |
-| `422` | `listing_id` is not 5–30 digits, or Gumtree temporarily refused the request. **Not billed** — retry the latter shortly. |
+| `422` | `listing_id` is not 5–30 lowercase letters and digits, or Gumtree temporarily refused the request. **Not billed** — retry the latter shortly. |

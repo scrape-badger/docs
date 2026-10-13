@@ -6,7 +6,7 @@ description: "Gumtree search-box keyword suggestions for a partial term, each wi
 
 Expand a partial search term into Gumtree's own search-box suggestions. Where
 Gumtree attaches categories to a suggestion, they come back with their `slug`
-(`uk`) or `id` (`au`, `za`), ready to pass to
+(`uk`) or `id` (`au`; a ref like `p6dnh` on `za`), ready to pass to
 [`/search`](/api-reference/endpoint/gumtree/search) as `category`.
 
 **Credits:** 1
@@ -37,8 +37,8 @@ Gumtree attaches categories to a suggestion, they come back with their `slug`
 
   <Expandable title="Suggestion">
     <ResponseField name="query" type="string">The suggested search term — feed straight into `/search`.</ResponseField>
-    <ResponseField name="highlighted" type="string">The term with the matched part highlighted as the site does it — `<em>` (`uk`), `<strong>` (`au`) or the suggestion with its category (`za`).</ResponseField>
-    <ResponseField name="categories" type="CategoryRef[]">`id`, `name`, `slug` of the categories Gumtree suggests for the term. On `au` / `za` pass the `id` to `/search` as `category`.</ResponseField>
+    <ResponseField name="highlighted" type="string">The term with the matched part highlighted as the site does it — `<em>` (`uk`) or `<strong>` (`au`); `null` on `za`.</ResponseField>
+    <ResponseField name="categories" type="CategoryRef[]">`id`, `name`, `slug` of the categories Gumtree suggests for the term. On `au` / `za` pass the `id` (a ref on `za`) to `/search` as `category`.</ResponseField>
   </Expandable>
 </ResponseField>
 
@@ -96,25 +96,30 @@ data = res.json()
 ### South Africa
 
 ```bash
-curl "https://scrapebadger.com/v1/gumtree/autocomplete?market=za&query=mountain" \
+curl "https://scrapebadger.com/v1/gumtree/autocomplete?market=za&query=toyota" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ```json Response (abridged)
 {
   "market": "za",
-  "query": "mountain",
-  "result_count": 10,
+  "query": "toyota",
+  "result_count": 5,
   "suggestions": [
     {
-      "query": "mountain view",
-      "highlighted": "mountain view in Flats for Rent",
-      "categories": [{ "id": 9071, "name": "Flats for Rent", "slug": null }]
+      "query": "Toyota",
+      "highlighted": null,
+      "categories": [{ "id": "p6dnh", "name": "Cars & Bakkies", "slug": null }]
     },
     {
-      "query": "houses for sale in mountain rise",
-      "highlighted": "houses for sale in mountain rise in Houses & Flats for Sale",
-      "categories": [{ "id": 9074, "name": "Houses & Flats for Sale", "slug": null }]
+      "query": "toyota",
+      "highlighted": null,
+      "categories": [{ "id": "kdtkk", "name": "Car Parts & Spares", "slug": null }]
+    },
+    {
+      "query": "Toyota Hilux",
+      "highlighted": null,
+      "categories": [{ "id": "p6dnh", "name": "Cars & Bakkies", "slug": null }]
     }
   ]
 }

@@ -29,12 +29,12 @@ so existing UK integrations keep working unchanged.
   come in the market's `currency` (GBP, AUD, ZAR). A field a site does not
   publish is simply `null` there.
 - **Every vertical** — For Sale, Motors, Property, Jobs, Services, Pets and
-  Community. 25 (UK), 24 (AU) or 20 (ZA) listings per search page, up to 50
-  pages.
+  Community. 25 (UK) or 24 (AU) listings per search page, up to 50 pages;
+  20 (ZA) per page across the first 375 matches.
 - **Location search** — UK `location` takes a town slug, a town name or a full
   UK postcode (`SW1A 1AA`) with a `distance` in miles; Australia takes a
-  numeric location id with a `distance` in km; South Africa takes a numeric
-  province or town id.
+  numeric location id with a `distance` in km; South Africa takes a province
+  or town ref such as `dkp8y` (Gauteng).
 - **Category filters with live counts** —
   [`/search/filters`](/api-reference/endpoint/gumtree/search-filters) lists
   every filter Gumtree offers for a category (make, model, fuel type, mileage
@@ -44,9 +44,9 @@ so existing UK integrations keep working unchanged.
   transmission, body type and engine; the UK adds MPG, CO2, insurance group,
   previous keepers and the history-check flags, Australia adds variant,
   odometer, VIN and rego where the seller shows them.
-- **Seller profile** — private or trade, rating, verification (UK), posting
-  since, member since (AU), live and lifetime listing counts and total views
-  (ZA), and the masked phone number.
+- **Seller profile** — private or trade, rating, verification (UK; ZA lists
+  the identity and mobile-number checks), posting since, member since (AU, ZA),
+  live listing counts, and the masked phone number (UK).
 - **Promotion flags** — `is_featured`, `is_urgent`, `is_bumped_up`,
   `is_standout` and `favourite_count` where the site publishes them.
 - **Dates in both forms** — every timestamp ships as Unix seconds (`*_utc`) and
@@ -58,8 +58,8 @@ so existing UK integrations keep working unchanged.
 
 <Note>
   **Phone numbers are masked.** Only the masked form Gumtree shows on the public
-  listing page is returned (e.g. `0794997XXXX` in the UK, `068*******` in South
-  Africa; Australia shows none). Full numbers are never returned.
+  listing page is returned (e.g. `0794997XXXX` in the UK; Australia and South
+  Africa show none). Full numbers are never returned.
 </Note>
 
 ## Markets
@@ -72,7 +72,7 @@ location and listing ids from one market mean nothing in another. List them with
 | -------- | ------- | ------ | -------- | ----------------------- | ---------- | ---------------- |
 | `uk` (default) | United Kingdom | gumtree.com | GBP | Slugs — `cars`, `london`, or a UK postcode | miles | 25 + featured |
 | `au` | Australia | gumtree.com.au | AUD | Numeric ids — `18320` (cars), `3003435` (Sydney Region) | km | 24 + up to 6 featured |
-| `za` | South Africa | gumtree.co.za | ZAR | Numeric ids — `9077` (cars), `3100003` (Gauteng) | not supported | 20 |
+| `za` | South Africa | gumtree.co.za | ZAR | Refs — `p6dnh` (Cars & Bakkies), `dkp8y` (Gauteng) | not supported | 20 |
 
 <Tip>
   For `au` and `za`, get ids from
@@ -86,9 +86,8 @@ location and listing ids from one market mean nothing in another. List them with
 
 - **UK and Australia** — the ~10-digit number at the end of a listing URL, e.g.
   `1803293391` (UK) or `1344981847` (AU).
-- **South Africa** — the full 26-digit number at the end of a `gumtree.co.za`
-  URL, e.g. `10013681289561010209976109`. The 10-digit id the site displays is
-  returned as `short_id`; `/listings/{listing_id}` takes the long one.
+- **South Africa** — the listing ref at the end of a
+  `gumtree.co.za/listing/<ref>` URL, e.g. `ls26bvmcpnsqmz7l9jz`.
 
 ## Credit Costs
 
@@ -121,7 +120,7 @@ curl "https://scrapebadger.com/v1/gumtree/search?category=cars&location=manchest
   -H "X-API-Key: YOUR_API_KEY"
 
 # South Africa: petrol Toyotas in Gauteng between R50,000 and R300,000
-curl "https://scrapebadger.com/v1/gumtree/search?market=za&category=9077&location=3100003&filters=ma:toyota,fu:petrol&min_price=50000&max_price=300000&sort=price_asc" \
+curl "https://scrapebadger.com/v1/gumtree/search?market=za&category=p6dnh&location=dkp8y&filters=make:toyota,fuelType:petrol&min_price=50000&max_price=300000&sort=price_asc" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
@@ -164,8 +163,8 @@ print(res.json()["total_results"], "listings")
    in the workflow.
 2. **Pick a category** — [`/categories`](/api-reference/endpoint/gumtree/list-categories)
    or [`/autocomplete`](/api-reference/endpoint/gumtree/autocomplete) give you
-   the `slug` (UK: `cars`, `property-to-rent` …) or numeric `id` (AU/ZA:
-   `18320`, `9077` …).
+   the `slug` (UK: `cars`, `property-to-rent` …) or `id` (AU: `18320` …;
+   ZA: `p6dnh` …).
 3. **Pick a location** (optional) —
    [`/locations/autocomplete`](/api-reference/endpoint/gumtree/location-autocomplete)
    or [`/locations`](/api-reference/endpoint/gumtree/list-locations). Without
@@ -183,9 +182,11 @@ print(res.json()["total_results"], "listings")
 
 ## Limits
 
-- **50 pages per result set.** To go deeper, narrow by sub-category, location
-  and `distance`, price band or filters. A page past the end comes back empty
-  and is not billed.
+- **50 pages per result set** (UK, AU). gumtree.co.za pages through only the
+  first 375 matches (19 pages of 20), while `total_results` still reports the
+  full count. To go deeper, narrow by sub-category, location and `distance`,
+  price band or filters. A page past the end comes back empty and is not
+  billed.
 - **UK price filters need a category.** `min_price` / `max_price` are refused
   with `category=all` in the UK, where Gumtree would ignore them.
 - **Market-specific parameters.** `urgent_only` and `with_photos` are UK only.
@@ -203,7 +204,7 @@ print(res.json()["total_results"], "listings")
 
 | Status | Meaning |
 | ------ | ------- |
-| `400` | Bad input the site would silently ignore — malformed `filters`, an unknown category or location id, a parameter the `market` does not support, a South African filter Gumtree would drop, or a listing id from another market. |
+| `400` | Bad input the site would silently ignore — malformed `filters`, an unknown category or location id, a parameter the `market` does not support, a South African filter key or ref gumtree.co.za rejects (including the old numeric ids), or a listing id from another market. |
 | `404` | Listing does not exist or has been removed. |
 | `422` | Invalid parameter, or Gumtree temporarily refused the request. **Not billed** — retry the latter shortly. |
 

@@ -4,11 +4,11 @@ api: "GET https://scrapebadger.com/v1/gumtree/categories"
 description: "Browse Gumtree's category tree in the UK, Australia or South Africa. A node's slug is the category value /search takes."
 ---
 
-Browse Gumtree's category tree one level at a time. Each child's `slug` is the
-value [`/search`](/api-reference/endpoint/gumtree/search) and
-[`/search/filters`](/api-reference/endpoint/gumtree/search-filters) take as
-`category` — a name slug on `uk` (`cars`), the numeric id on `au` and `za`
-(`18320`, `9077`).
+Browse Gumtree's category tree one level at a time. On `uk` and `au` each
+child's `slug` is the value [`/search`](/api-reference/endpoint/gumtree/search)
+and [`/search/filters`](/api-reference/endpoint/gumtree/search-filters) take as
+`category` — a name slug on `uk` (`cars`), the numeric id on `au` (`18320`).
+On `za` pass the child's `id`, a ref such as `p6dnh` (Cars & Bakkies).
 
 **Credits:** 1
 
@@ -24,17 +24,18 @@ value [`/search`](/api-reference/endpoint/gumtree/search) and
   `uk` (gumtree.com), `au` (gumtree.com.au) or `za` (gumtree.co.za).
 </ParamField>
 
-<ParamField query="parent_id" type="integer">
-  Category id to list the children of. Omit it for the market's root — all
-  categories (`uk` root id `1`, `au` and `za` root id `0`; the `au` root has 16
-  top-level categories, `za` 17). Then drill down by `id`, e.g. `2551` for UK
-  Motors, `9299` for AU Cars & Vehicles, `5` for ZA Automotive Vehicles.
+<ParamField query="parent_id" type="string">
+  Category id (`uk`, `au`: a number) or ref (`za`) to list the children of.
+  Omit it for the market's root — all categories (`uk` root id `1`, `au` root
+  id `0` with 16 top-level categories, `za` root ref `kyzkk` with 17). Then
+  drill down by `id`, e.g. `2551` for UK Motors, `9299` for AU Cars &
+  Vehicles, `l4dq6` for ZA Vehicles.
 </ParamField>
 
 ## Response
 
 <ResponseField name="market" type="string">`uk`, `au` or `za`.</ResponseField>
-<ResponseField name="id" type="integer">The parent category id.</ResponseField>
+<ResponseField name="id" type="integer | string">The parent category id — a ref string on `za`.</ResponseField>
 <ResponseField name="name" type="string">e.g. `Motors`.</ResponseField>
 <ResponseField name="slug" type="string">e.g. `cars-vans-motorbikes`.</ResponseField>
 <ResponseField name="result_count" type="integer">Number of children.</ResponseField>
@@ -42,9 +43,9 @@ value [`/search`](/api-reference/endpoint/gumtree/search) and
   Child categories.
 
   <Expandable title="TreeNode">
-    <ResponseField name="id" type="integer">Pass as `parent_id` to go one level deeper.</ResponseField>
+    <ResponseField name="id" type="integer | string">Pass as `parent_id` to go one level deeper. On `za` (a ref like `p6dnh`) it is also the `/search` `category` value.</ResponseField>
     <ResponseField name="name" type="string" />
-    <ResponseField name="slug" type="string">The `/search` `category` value (the id itself on `au` / `za`).</ResponseField>
+    <ResponseField name="slug" type="string">The `/search` `category` value on `uk` (the id itself on `au`). On `za`, the site's URL segment (e.g. `cars-bakkies`) — search with the `id` instead.</ResponseField>
     <ResponseField name="has_children" type="boolean" />
   </Expandable>
 </ResponseField>
@@ -99,24 +100,27 @@ children = res.json()["children"]
 ### South Africa
 
 ```bash
-curl "https://scrapebadger.com/v1/gumtree/categories?market=za&parent_id=5" \
+curl "https://scrapebadger.com/v1/gumtree/categories?market=za&parent_id=l4dq6" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
-```json Response
+```json Response (abridged)
 {
   "market": "za",
-  "id": 5,
-  "name": "Automotive Vehicles",
-  "slug": "5",
+  "id": "l4dq6",
+  "name": "Vehicles",
+  "slug": "vehicles",
   "result_count": 8,
   "children": [
-    { "id": 9077, "name": "Cars & Bakkies", "slug": "9077", "has_children": false },
-    { "id": 9026, "name": "Auto Parts & Accessories", "slug": "9026", "has_children": false },
-    { "id": 9027, "name": "Motorcycles & Scooters", "slug": "9027", "has_children": false }
+    { "id": "c07q9", "name": "Auto Parts & Accessories", "slug": "auto-parts-accessories", "has_children": true },
+    { "id": "p6dnh", "name": "Cars & Bakkies", "slug": "cars-bakkies", "has_children": false },
+    { "id": "b8stt", "name": "Motorcycles & Scooters", "slug": "motorcycles-scooters", "has_children": false }
   ]
 }
 ```
+
+Pass `p6dnh` as `category` to `/search?market=za` — the `slug` (`cars-bakkies`)
+is the site's URL segment, not the value `/search` takes.
 
 On `au`, `parent_id=9299` (Cars & Vehicles) lists `18320` (Cars, Vans & Utes)
 among its children.
@@ -125,5 +129,6 @@ among its children.
 
 | Status | Meaning |
 | ------ | ------- |
+| `400` | `parent_id` is not a number (`uk`, `au`) or not a ref (`za` — including the old numeric ids). |
 | `404` | `parent_id` is not a category of this market (`au`, `za`). |
 | `422` | Gumtree temporarily refused the request — **not billed**. Retry shortly. |
