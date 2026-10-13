@@ -51,13 +51,25 @@ Quickly scan a URL to identify which anti-bot and CAPTCHA systems are in use. Re
 
   <Expandable>
     <ResponseField name="system" type="string">
-      System name: `cloudflare_turnstile`, `recaptcha_v2`, `recaptcha_v3`, `hcaptcha` or `geetest`.
+      System name: `cloudflare_turnstile`, `recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, `geetest`, `funcaptcha`, `aws_waf_captcha`, `friendly_captcha`, `mtcaptcha`, `yandex_smartcaptcha`, `tencent_captcha`, `alibaba_slider`, `lemin`, `datadome_captcha`, `perimeterx_press_hold` or `image_captcha`.
     </ResponseField>
     <ResponseField name="confidence" type="number">
       Confidence score from `0.0` to `1.0`.
     </ResponseField>
     <ResponseField name="details" type="string">
       Additional detection details.
+    </ResponseField>
+    <ResponseField name="version" type="string">
+      The variant, when it can be told apart (e.g. `v2_checkbox`, `v2_invisible`, `v3`, `enterprise`; GeeTest `v3`/`v4`).
+    </ResponseField>
+    <ResponseField name="gate" type="boolean">
+      `true` when the CAPTCHA is what blocks the page rather than a widget embedded in an ordinary page.
+    </ResponseField>
+    <ResponseField name="solvable" type="boolean">
+      `true` when ScrapeBadger has a solver for this CAPTCHA type.
+    </ResponseField>
+    <ResponseField name="params" type="object">
+      The parameters a solver needs, when present (e.g. `sitekey`, `action`, `gt`/`challenge`, `captcha_id`, `public_key`), plus `page_url`.
     </ResponseField>
   </Expandable>
 </ResponseField>
