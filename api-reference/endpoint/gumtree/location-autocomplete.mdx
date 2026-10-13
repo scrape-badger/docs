@@ -6,8 +6,8 @@ description: "Resolve a town, area or postcode prefix to Gumtree locations in th
 
 Resolve a place name or postcode prefix to the locations Gumtree knows. Pass a
 result to [`/search`](/api-reference/endpoint/gumtree/search) as `location`:
-its `name` (a town) or a postcode on `uk`, its numeric `id` on `au` and `za`.
-UK results carry coordinates.
+its `name` (a town) or a postcode on `uk`, its numeric `id` on `au`, its ref
+`id` on `za`. UK and South African results carry coordinates.
 
 **Credits:** 1
 
@@ -37,11 +37,11 @@ UK results carry coordinates.
   Matching locations.
 
   <Expandable title="LocationSuggestion">
-    <ResponseField name="id" type="integer">Gumtree location id — the `/search` `location` on `au` and `za`.</ResponseField>
-    <ResponseField name="name" type="string">e.g. `Leeds City Centre, West Yorkshire`, `Sydney Region, NSW`, `Pretoria / Tshwane, Gauteng`.</ResponseField>
-    <ResponseField name="type" type="string">`uk`: `location`, `outcode` or `postcode`. `au` / `za`: `region`, `area` or `postcode`.</ResponseField>
-    <ResponseField name="latitude" type="number">`uk` only.</ResponseField>
-    <ResponseField name="longitude" type="number">`uk` only.</ResponseField>
+    <ResponseField name="id" type="integer | string">Gumtree location id — the `/search` `location` on `au` (a number) and `za` (a ref like `pfw8k`).</ResponseField>
+    <ResponseField name="name" type="string">e.g. `Leeds City Centre, West Yorkshire`, `Sydney Region, NSW`, `Western Cape > Cape Town`.</ResponseField>
+    <ResponseField name="type" type="string">`uk`: `location`, `outcode` or `postcode`. `au`: `region`, `area` or `postcode`. `za`: `region` (a province) or `area`.</ResponseField>
+    <ResponseField name="latitude" type="number">`uk` and `za`.</ResponseField>
+    <ResponseField name="longitude" type="number">`uk` and `za`.</ResponseField>
   </Expandable>
 </ResponseField>
 
@@ -100,29 +100,41 @@ locations = res.json()["locations"]
 }
 ```
 
-### Australia and South Africa
+### South Africa
 
 ```bash
-curl "https://scrapebadger.com/v1/gumtree/locations/autocomplete?market=za&query=pret" \
+curl "https://scrapebadger.com/v1/gumtree/locations/autocomplete?market=za&query=cape%20town" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
-```json Response
+```json Response (abridged)
 {
   "market": "za",
-  "query": "pret",
-  "result_count": 1,
+  "query": "cape town",
+  "result_count": 10,
   "locations": [
     {
-      "id": 3100094,
-      "name": "Pretoria / Tshwane, Gauteng",
+      "id": "pfw8k",
+      "name": "Western Cape > Cape Town",
       "type": "area",
-      "latitude": null,
-      "longitude": null
+      "latitude": -33.81945,
+      "longitude": 18.48657
+    },
+    {
+      "id": "zcdv5",
+      "name": "Western Cape > Cape Town > Cape Town City Centre",
+      "type": "area",
+      "latitude": -33.92427,
+      "longitude": 18.4187
     }
   ]
 }
 ```
+
+Pass the `id` (`pfw8k`) to `/search?market=za` as `location`. gumtree.co.za
+matches on the first 12 characters of the query.
+
+### Australia
 
 On `au`, `query=sydney` returns `Sydney Region, NSW` (`3003435`), `Inner
 Sydney, NSW` (`3003771`), postcodes such as `North Sydney 2060, NSW` and more.

@@ -27,14 +27,16 @@ search.
 </ParamField>
 
 <ParamField query="category" type="string" default="all">
-  `uk`: category slug, e.g. `cars`, `property-to-rent`, `jobs`. `au` / `za`:
-  numeric category id, e.g. `18320` (AU cars) or `9077` (ZA cars). Filters are
-  category-specific, so pass the category you intend to search.
+  `uk`: category slug, e.g. `cars`, `property-to-rent`, `jobs`. `au`: numeric
+  category id, e.g. `18320` (cars). `za`: category ref, e.g. `p6dnh` (Cars &
+  Bakkies). Filters are category-specific, so pass the category you intend to
+  search.
 </ParamField>
 
 <ParamField query="location" type="string">
-  `uk`: location slug, town name or UK postcode. `au` / `za`: numeric location
-  id. Scopes the counts. Omit for the whole country.
+  `uk`: location slug, town name or UK postcode. `au`: numeric location id.
+  `za`: location ref, e.g. `dkp8y` (Gauteng). Scopes the counts. Omit for the
+  whole country.
 </ParamField>
 
 <ParamField query="query" type="string">
@@ -42,16 +44,15 @@ search.
 </ParamField>
 
 <ParamField query="filters" type="string">
-  `za` only: filters already applied, as `key:value` pairs. gumtree.co.za
-  offers dependent filters only once their parent is set — e.g. `ma:toyota`
-  makes the `mo` (model) filter appear with Toyota's models (`hilux`,
-  `corolla` …).
+  `za` only: filters already applied, as `key:value` pairs. The counts follow
+  them — e.g. `make:toyota` narrows the `model` filter to Toyota's models
+  (`HILUX`, `COROLLA` …).
 </ParamField>
 
 ## Response
 
 <ResponseField name="market" type="string">`uk`, `au` or `za`.</ResponseField>
-<ResponseField name="category" type="string">Category slug (`uk`) or id (`au`, `za`).</ResponseField>
+<ResponseField name="category" type="string">Category slug (`uk`), id (`au`) or ref (`za`).</ResponseField>
 <ResponseField name="category_name" type="string">e.g. `Cars`.</ResponseField>
 <ResponseField name="total_results" type="integer">Matching listings before any filter.</ResponseField>
 <ResponseField name="filters" type="SearchFilter[]">
@@ -174,51 +175,50 @@ list for `uk`; on `/search` use the dedicated `min_price` / `max_price`,
 
 ### South Africa
 
-With a make already applied, the model filter (`mo`) lists that make's models
-(Toyota cars in Gauteng):
+With a make applied, the counts — and the models listed — narrow to that make
+(Toyota cars in Gauteng). The `make` filter itself keeps every make's count so
+you can switch:
 
 ```bash
-curl "https://scrapebadger.com/v1/gumtree/search/filters?market=za&category=9077&location=3100003&filters=ma:toyota" \
+curl "https://scrapebadger.com/v1/gumtree/search/filters?market=za&category=p6dnh&location=dkp8y&filters=make:toyota" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ```json Response (abridged)
 {
   "market": "za",
-  "category": "9077",
-  "category_name": "Toyota in Cars & Bakkies in Gauteng",
-  "total_results": 500,
+  "category": "p6dnh",
+  "category_name": "Cars & Bakkies",
+  "total_results": 429,
   "filters": [
     {
-      "key": "price_type",
-      "label": "Price Type",
+      "key": "make",
+      "label": "Make",
       "type": "enum",
       "options": [
-        { "label": "Amount", "value": "FIXED", "count": 465 },
-        { "label": "Negotiable", "value": "MAKE_OFFER", "count": 24 },
-        { "label": "Contact for Price", "value": "CONTACT_ME", "count": 11 }
+        { "label": "Toyota", "value": "TOYOTA", "count": 429 },
+        { "label": "Volkswagen", "value": "VOLKSWAGEN", "count": 407 }
       ]
     },
     {
-      "key": "mo",
+      "key": "model",
+      "label": "Model",
       "type": "enum",
       "options": [
-        { "label": "Hilux", "value": "hilux", "count": 114 },
-        { "label": "Corolla", "value": "corolla", "count": 69 }
+        { "label": "Hilux", "value": "HILUX", "count": 98 },
+        { "label": "Corolla", "value": "COROLLA", "count": 58 }
       ]
     },
     {
-      "key": "cy",
+      "key": "year",
       "label": "Year",
-      "type": "range",
-      "min_key": "min_cy",
-      "max_key": "max_cy",
-      "min_options": [{ "label": "2015", "value": "2015", "count": null }],
-      "max_options": [{ "label": "2020", "value": "2020", "count": null }]
+      "type": "range_freeform",
+      "min_key": "min_year",
+      "max_key": "max_year"
     }
   ],
   "sort_options": [
-    { "value": "relevance", "label": "Relevance" },
+    { "value": "relevance", "label": "Best match" },
     { "value": "date", "label": "Most recent" },
     { "value": "price_asc", "label": "Lowest price" },
     { "value": "price_desc", "label": "Highest price" }
@@ -227,9 +227,11 @@ curl "https://scrapebadger.com/v1/gumtree/search/filters?market=za&category=9077
 }
 ```
 
-South African keys: `ma` make, `mo` model, `fu` fuel, `tr` transmission, `bt`
-body type, `co` colour, `km` mileage (`min_km` / `max_km`), `cy` year
-(`min_cy` / `max_cy`) and `price_type`. Each key takes one value.
+South African keys on Cars & Bakkies (`p6dnh`): `make`, `model`, `bodyType`,
+`driveType`, `transmission`, `fuelType`, `colour`, and the ranges `year`
+(`min_year` / `max_year`) and `mileageKm` (`min_mileageKm` / `max_mileageKm`).
+Each key takes one value. Price and seller type are the `/search` parameters
+`min_price` / `max_price` and `seller_type`, so they are not listed here.
 
 ### Australia
 
@@ -254,5 +256,5 @@ curl "https://scrapebadger.com/v1/gumtree/search/filters?market=au&category=1832
 
 | Status | Meaning |
 | ------ | ------- |
-| `400` | An unknown `category` or `location` id, malformed `filters`, or `filters` with `market=uk`. |
+| `400` | An unknown `category` or `location` id or ref, malformed `filters`, or `filters` with `market=uk`. |
 | `422` | Gumtree temporarily refused the request — **not billed**. Retry shortly. |

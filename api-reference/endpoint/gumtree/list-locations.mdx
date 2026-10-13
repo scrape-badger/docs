@@ -4,13 +4,15 @@ api: "GET https://scrapebadger.com/v1/gumtree/locations"
 description: "Browse Gumtree's location tree in the UK, Australia or South Africa: nations, states or provinces down to towns."
 ---
 
-Browse Gumtree's location tree one level at a time. Each child's `slug` is a
-valid `location` for [`/search`](/api-reference/endpoint/gumtree/search) — a
-name slug on `uk`, the numeric id on `au` and `za`.
+Browse Gumtree's location tree one level at a time. On `uk` and `au` each
+child's `slug` is a valid `location` for
+[`/search`](/api-reference/endpoint/gumtree/search) — a name slug on `uk`, the
+numeric id on `au`. On `za` pass the child's `id`, a ref such as `dkp8y`
+(Gauteng).
 
 - `uk`: United Kingdom → nations → counties → towns.
 - `au`: Australia → states → regions → areas, each with its live ad count.
-- `za`: South Africa → provinces → towns.
+- `za`: South Africa → provinces → towns and suburbs.
 
 **Credits:** 1
 
@@ -26,16 +28,17 @@ name slug on `uk`, the numeric id on `au` and `za`.
   `uk` (gumtree.com), `au` (gumtree.com.au) or `za` (gumtree.co.za).
 </ParamField>
 
-<ParamField query="parent_id" type="integer">
-  Location id to list the children of. Omit it for the whole country (`uk`
-  root `10000392`, `za` root `201`). Then drill down by `id`, e.g. `10000393`
-  for England, `3003435` for the Sydney Region, `3100003` for Gauteng.
+<ParamField query="parent_id" type="string">
+  Location id (`uk`, `au`: a number) or ref (`za`) to list the children of.
+  Omit it for the whole country (`uk` root `10000392`, `za` root `gsptp`). Then
+  drill down by `id`, e.g. `10000393` for England, `3003435` for the Sydney
+  Region, `dkp8y` for Gauteng.
 </ParamField>
 
 ## Response
 
 <ResponseField name="market" type="string">`uk`, `au` or `za`.</ResponseField>
-<ResponseField name="id" type="integer">The parent location id.</ResponseField>
+<ResponseField name="id" type="integer | string">The parent location id — a ref string on `za`.</ResponseField>
 <ResponseField name="name" type="string">e.g. `England`.</ResponseField>
 <ResponseField name="slug" type="string">e.g. `england`.</ResponseField>
 <ResponseField name="result_count" type="integer">Number of children.</ResponseField>
@@ -43,9 +46,9 @@ name slug on `uk`, the numeric id on `au` and `za`.
   Child locations.
 
   <Expandable title="TreeNode">
-    <ResponseField name="id" type="integer">Pass as `parent_id` to go one level deeper.</ResponseField>
+    <ResponseField name="id" type="integer | string">Pass as `parent_id` to go one level deeper. On `za` (a ref like `dkp8y`) it is also the `/search` `location` value.</ResponseField>
     <ResponseField name="name" type="string" />
-    <ResponseField name="slug" type="string">The `/search` `location` value (the id itself on `au` / `za`).</ResponseField>
+    <ResponseField name="slug" type="string">The `/search` `location` value on `uk` (the id itself on `au`). `null` on `za` — search with the `id`.</ResponseField>
     <ResponseField name="has_children" type="boolean" />
   </Expandable>
 </ResponseField>
@@ -118,12 +121,33 @@ curl "https://scrapebadger.com/v1/gumtree/locations?market=au&parent_id=3003435"
 }
 ```
 
-On `za`, the root (`parent_id` omitted, id `201`) lists the 9 provinces —
-`3100003` Gauteng, `3100002` KwaZulu-Natal, `3100197` Eastern Cape …
+On `za`, the root (`parent_id` omitted, ref `gsptp` South Africa) lists the 9
+provinces — `dkp8y` Gauteng, `pys74` KwaZulu-Natal, `x0r1b` Western Cape … Each province lists its towns:
+
+```bash
+curl "https://scrapebadger.com/v1/gumtree/locations?market=za&parent_id=dkp8y" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```json Response (abridged)
+{
+  "market": "za",
+  "id": "dkp8y",
+  "name": "Gauteng",
+  "slug": null,
+  "result_count": 80,
+  "children": [
+    { "id": "yb4jd", "name": "Akasia", "slug": null, "has_children": true },
+    { "id": "m22ns", "name": "Alberton", "slug": null, "has_children": true },
+    { "id": "tvszd", "name": "Alexandra", "slug": null, "has_children": false }
+  ]
+}
+```
 
 ## Errors
 
 | Status | Meaning |
 | ------ | ------- |
+| `400` | `parent_id` is not a number (`uk`, `au`) or not a ref (`za` — including the old numeric ids). |
 | `404` | `parent_id` is not a location of this market (`au`, `za`). |
 | `422` | Gumtree temporarily refused the request — **not billed**. Retry shortly. |

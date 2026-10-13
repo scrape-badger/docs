@@ -21,7 +21,7 @@ looked up from the listing first.
 
 <ParamField path="listing_id" type="string" required>
   Any Gumtree listing id by the seller, e.g. `1803293391` (`uk`), `1339574407`
-  (`au`) or the 26-digit `10013681289561010209976109` (`za`).
+  (`au`) or the listing ref `ls26bvmcpnsqmz7l9jz` (`za`).
 </ParamField>
 
 ## Query Parameters
@@ -40,11 +40,9 @@ looked up from the listing first.
 <ResponseField name="market" type="string">`uk`, `au` or `za`.</ResponseField>
 <ResponseField name="listing_id" type="string">Echo of the listing id the lookup started from.</ResponseField>
 <ResponseField name="seller_name" type="string">The seller's display name.</ResponseField>
-<ResponseField name="total_results" type="integer">
-  Live listings by this seller (`uk`, `au`). `null` on `za`, where the site gives no total — use `has_next`.
-</ResponseField>
+<ResponseField name="total_results" type="integer">Live listings by this seller.</ResponseField>
 <ResponseField name="page" type="integer">The page returned.</ResponseField>
-<ResponseField name="total_pages" type="integer">`null` on `za`.</ResponseField>
+<ResponseField name="total_pages" type="integer">Pages of seller listings.</ResponseField>
 <ResponseField name="has_next" type="boolean">`za`: whether another page follows. `null` elsewhere.</ResponseField>
 <ResponseField name="result_count" type="integer">Listings on this page.</ResponseField>
 <ResponseField name="listings" type="ListingSummary[]">
@@ -122,38 +120,36 @@ data = res.json()
 ### South Africa
 
 ```bash
-curl "https://scrapebadger.com/v1/gumtree/listings/10013681289561010209976109/seller-listings?market=za" \
+curl "https://scrapebadger.com/v1/gumtree/listings/ls26bvmcpnsqmz7l9jz/seller-listings?market=za" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ```json Response (abridged)
 {
   "market": "za",
-  "listing_id": "10013681289561010209976109",
-  "seller_name": "Paul",
-  "total_results": null,
+  "listing_id": "ls26bvmcpnsqmz7l9jz",
+  "seller_name": "Thanuj",
+  "total_results": 1,
   "page": 1,
-  "total_pages": null,
-  "has_next": true,
-  "result_count": 20,
+  "total_pages": 1,
+  "has_next": false,
+  "result_count": 1,
   "listings": [
     {
-      "id": "10013681289561010209976109",
-      "short_id": "1368128956",
-      "title": "Bunkbed Pine Wood Single R2600",
-      "price": 2600.0,
-      "price_text": "R 2,600",
-      "price_type": "FIXED",
+      "id": "ls26bvmcpnsqmz7l9jz",
+      "title": "Toyota Yaris",
+      "url": "https://www.gumtree.co.za/listing/ls26bvmcpnsqmz7l9jz",
+      "price": 190000.0,
+      "price_text": "R190,000",
+      "price_type": "ASKING_PRICE",
       "currency": "ZAR",
-      "location": "Centurion",
-      "location_id": "3100247",
-      "latitude": -25.862281,
-      "longitude": 28.088474,
-      "category_id": 9272,
-      "image_count": 3,
-      "posted_at": "2026-10-12T06:45:39Z",
-      "seller_id": "102099761",
-      "seller_name": "Paul"
+      "location": "Weltevreden Park",
+      "location_id": "mxm68",
+      "category_id": "p6dnh",
+      "image_count": 1,
+      "posted_at": "2026-10-13T17:34:24.365000Z",
+      "seller_id": "s16zcgy0ntjnvg2",
+      "seller_name": "Thanuj"
     }
   ]
 }
@@ -163,6 +159,6 @@ curl "https://scrapebadger.com/v1/gumtree/listings/10013681289561010209976109/se
 
 | Status | Meaning |
 | ------ | ------- |
-| `400` | The `listing_id` belongs to another market — a 26-digit id with `uk` / `au`, or a short id with `za`. |
+| `400` | The `listing_id` belongs to another market — a `za` ref with `uk` / `au`, or a numeric id with `za`. |
 | `404` | Listing does not exist or has been removed. |
-| `422` | `listing_id` is not 5–30 digits, or Gumtree temporarily refused the request. **Not billed** — retry the latter shortly. |
+| `422` | `listing_id` is not 5–30 lowercase letters and digits, or Gumtree temporarily refused the request. **Not billed** — retry the latter shortly. |
