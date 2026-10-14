@@ -339,9 +339,32 @@ the `credits_used` body field — trust those over any estimate. A request
 rejected before scraping (`400`, `422`) is charged **0**.
 
 <Tip>
-Set [`max_cost`](#param-max-cost) to put a hard ceiling on a request. It is
-checked against the estimate *including* the proxy surcharge.
+Set [`max_cost`](#param-max-cost) to put a ceiling on a request. It is checked
+against the engine's cost, plus anything a per-host override adds (a higher
+proxy tier than you asked for, or a browser engine). The proxy tier you chose
+yourself is not part of the check, so compare `max_cost` with the engine price.
 </Tip>
+
+## Per-host overrides and automatic unblocking
+
+Some sites only answer a specific setup: a particular proxy tier or country, a
+warm-up visit, or a real browser. ScrapeBadger keeps a working configuration
+per host and applies it for you:
+
+- **On a host with an override**, its access settings (engine chain, proxy
+  tier/type/country, warm-up and injected headers) are used instead of yours.
+  Your output settings (`render_js`, `wait_for`, `js_scenario`, `format`,
+  `screenshot`, …) are still honoured. You are billed for the configuration
+  actually used; the `X-Proxy-Tier-Effective` response header names the tier.
+- **On a host without one**, your parameters are used as sent. If the host keeps
+  blocking requests, ScrapeBadger starts searching in the background for the
+  cheapest configuration that reliably gets through, and applies it to later
+  requests automatically. The blocked request still returns its `422` straight
+  away, with the search state in the `X-Unblock` header and the `unblock` body
+  field: `discovering` (a search is running), `cooldown` (a recent search found
+  nothing; retried later) or `none`.
+- **When an override stops working**, the search runs again and replaces it only
+  if the new configuration does measurably better.
 
 ## Response
 
@@ -765,7 +788,7 @@ Infinite scroll:
 |--------|-------------|
 | `400` | Invalid URL, cost exceeds `max_cost`, or requested engine not available |
 | `402` | Insufficient credits |
-| `422` | Blocking detected after all retries exhausted (`error: "blocking_page_detected"`, with `block_kind`, `vendor` and, for a CAPTCHA wall, the gating `captcha` at the top level; the scrape result is in `data`); the `wait_for` selector never appeared (`error: "wait_for_timeout"`); a `js_scenario` step failed (`error: "js_scenario_failed"`); or the body contained an unknown field (`error: "unknown_request_field"`). Never charged. |
+| `422` | Blocking detected after all retries exhausted (`error: "blocking_page_detected"`, with `block_kind`, `vendor`, `unblock` and, for a CAPTCHA wall, the gating `captcha` at the top level; the scrape result is in `data`); the `wait_for` selector never appeared (`error: "wait_for_timeout"`); a `js_scenario` step failed (`error: "js_scenario_failed"`); or the body contained an unknown field (`error: "unknown_request_field"`). Never charged. |
 | `429` | Rate limit exceeded |
 | `500` | Unexpected server error |
 
@@ -856,6 +879,7 @@ There is no `return_cookies` or `form_data` parameter. To read cookies use
   "detail": "All retry attempts exhausted — blocking page still detected.",
   "block_kind": "captcha",
   "vendor": "perimeterx",
+  "unblock": "discovering",
   "captcha": {
     "system": "perimeterx_press_hold",
     "confidence": 0.95,
