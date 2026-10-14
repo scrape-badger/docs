@@ -435,6 +435,15 @@ checked against the estimate *including* the proxy surcharge.
     <ResponseField name="details" type="string">
       Human-readable description of the block.
     </ResponseField>
+    <ResponseField name="vendor" type="string">
+      The protection vendor that served the block: `cloudflare`, `datadome`, `akamai`, `kasada`, `incapsula`, `perimeterx`, `aws_waf`, `f5`, `peakhour`, `reblaze`, `castle`, `radware`, `ddos_guard`, `sucuri`, `anubis`, `vercel`, `netacea`, `alibaba`, `google`, `fastly` or `other`. Omitted when unknown.
+    </ResponseField>
+    <ResponseField name="kind" type="string">
+      What kind of wall it is: `antibot`, `captcha`, `rate_limit`, `ip_ban`, `geo_block`, `auth_wall`, `empty` (an empty or script-only page) or `other`.
+    </ResponseField>
+    <ResponseField name="signals" type="array">
+      The detector signals that matched, for diagnostics (e.g. `["cf-mitigated header", "challenge title"]`).
+    </ResponseField>
   </Expandable>
 </ResponseField>
 
@@ -459,13 +468,25 @@ checked against the estimate *including* the proxy surcharge.
 
   <Expandable>
     <ResponseField name="system" type="string">
-      System name (e.g., `recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, `geetest`).
+      System name: `recaptcha_v2`, `recaptcha_v3`, `hcaptcha`, `geetest`, `cloudflare_turnstile`, `funcaptcha`, `aws_waf_captcha`, `friendly_captcha`, `mtcaptcha`, `yandex_smartcaptcha`, `tencent_captcha`, `alibaba_slider`, `lemin`, `datadome_captcha`, `perimeterx_press_hold` or `image_captcha`.
     </ResponseField>
     <ResponseField name="confidence" type="number">
       Confidence score from `0.0` to `1.0`.
     </ResponseField>
     <ResponseField name="details" type="string">
       Additional detection details.
+    </ResponseField>
+    <ResponseField name="version" type="string">
+      The variant, when it can be told apart: e.g. `v2_checkbox`, `v2_invisible`, `v3` or `enterprise` (reCAPTCHA), `v3` or `v4` (GeeTest), `standalone` or `challenge` (Turnstile).
+    </ResponseField>
+    <ResponseField name="gate" type="boolean">
+      `true` when this CAPTCHA is what blocks the page. A widget embedded in an ordinary page, such as a login or contact form, is reported with `gate: false` and does not count as a block.
+    </ResponseField>
+    <ResponseField name="solvable" type="boolean">
+      `true` when ScrapeBadger has a solver for this CAPTCHA type.
+    </ResponseField>
+    <ResponseField name="params" type="object">
+      The parameters a solver needs, when present on the page: e.g. `sitekey`, `action`, `enterprise` (reCAPTCHA), `sitekey`, `rqdata` (hCaptcha), `gt`, `challenge`, `captcha_id` (GeeTest), `public_key`, `surl` (Arkose), plus `page_url`.
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -744,7 +765,7 @@ Infinite scroll:
 |--------|-------------|
 | `400` | Invalid URL, cost exceeds `max_cost`, or requested engine not available |
 | `402` | Insufficient credits |
-| `422` | Blocking detected after all retries exhausted (`success: false`, `blocking_details` populated); the `wait_for` selector never appeared (`error: "wait_for_timeout"`); a `js_scenario` step failed (`error: "js_scenario_failed"`); or the body contained an unknown field (`error: "unknown_request_field"`). Never charged. |
+| `422` | Blocking detected after all retries exhausted (`error: "blocking_page_detected"`, with `block_kind`, `vendor` and, for a CAPTCHA wall, the gating `captcha` at the top level; the scrape result is in `data`); the `wait_for` selector never appeared (`error: "wait_for_timeout"`); a `js_scenario` step failed (`error: "js_scenario_failed"`); or the body contained an unknown field (`error: "unknown_request_field"`). Never charged. |
 | `429` | Rate limit exceeded |
 | `500` | Unexpected server error |
 
@@ -831,35 +852,47 @@ There is no `return_cookies` or `form_data` parameter. To read cookies use
 
 ```json 422 — Blocked
 {
-  "success": false,
-  "url": "https://protected-site.com",
-  "status_code": 403,
-  "content": null,
-  "format": "markdown",
-  "engine_used": "http",
-  "credits_used": 0,
-  "duration_ms": 5230,
-  "retries_used": 3,
-  "content_length": 0,
-  "screenshot_url": null,
-  "video_url": null,
-  "headers": {},
-  "blocking_detected": true,
-  "blocking_details": {
-    "is_blocked": true,
-    "block_type": "cloudflare",
+  "error": "blocking_page_detected",
+  "detail": "All retry attempts exhausted — blocking page still detected.",
+  "block_kind": "captcha",
+  "vendor": "perimeterx",
+  "captcha": {
+    "system": "perimeterx_press_hold",
     "confidence": 0.95,
-    "details": "Cloudflare challenge page detected"
+    "details": "px-captcha element; 'Press & Hold' prompt; _pxAppId",
+    "gate": true,
+    "params": { "app_id": "PXxOR1K5b6", "page_url": "https://protected-site.com/" }
   },
-  "antibot_systems": [
-    { "system": "cloudflare_turnstile", "confidence": 0.95, "details": null }
-  ],
-  "captcha_systems": [],
-  "anti_bot_solved": false,
-  "solver_used": null,
-  "ai_extraction": null,
-  "ai_model": null,
-  "ai_error": null
+  "data": {
+    "success": false,
+    "url": "https://protected-site.com/",
+    "status_code": 403,
+    "engine_used": "http",
+    "credits_used": 0,
+    "retries_used": 3,
+    "blocking_detected": true,
+    "blocking_details": {
+      "is_blocked": true,
+      "block_type": "perimeterx",
+      "confidence": 0.95,
+      "details": "PerimeterX block interstitial detected",
+      "vendor": "perimeterx",
+      "kind": "captcha",
+      "signals": ["px-captcha", "press & hold", "access denied page"]
+    },
+    "antibot_systems": [
+      { "system": "perimeterx", "confidence": 0.95, "details": "_px cookies; px-captcha" }
+    ],
+    "captcha_systems": [
+      {
+        "system": "perimeterx_press_hold",
+        "confidence": 0.95,
+        "details": "px-captcha element; 'Press & Hold' prompt; _pxAppId",
+        "gate": true,
+        "params": { "app_id": "PXxOR1K5b6", "page_url": "https://protected-site.com/" }
+      }
+    ]
+  }
 }
 ```
 
