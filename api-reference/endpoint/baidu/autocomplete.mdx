@@ -1,7 +1,7 @@
 ---
 title: "Baidu Autocomplete"
 api: "GET https://scrapebadger.com/v1/baidu/autocomplete"
-description: "Baidu search-box suggestions for a partial term — the cheapest call in the Baidu API at 1 credit."
+description: "Baidu search-box suggestions for a partial term — the cheapest call in the Baidu API at 2 credits."
 ---
 
 Baidu's search-box suggestions for a partial term — what the dropdown on
@@ -82,10 +82,10 @@ data = res.json()
 
 Autocomplete is the cheap half of a two-step keyword workflow:
 
-1. Call `/autocomplete` on the seed term (1 credit) to get Baidu's real query
+1. Call `/autocomplete` on the seed term (2 credits) to get Baidu's real query
    variants.
 2. Call [`/search`](/api-reference/endpoint/baidu/search) on each variant
-   (5 credits) and merge results on `url`.
+   (7 credits) and merge results on `url`.
 
 That covers a topic far more broadly than paging one query toward its page-76
 wall, for fewer credits. The `related_searches` block on every `/search`

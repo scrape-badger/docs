@@ -67,12 +67,12 @@ openapi: POST /v1/web/scrape
 
   | Value | Pool | Surcharge |
   |-------|------|-----------|
-  | `simple` | Datacenter | **+1 credit** |
-  | `premium` | Residential | **+8 credits** |
-  | `ultra` | Premium residential / mobile | **+8 credits** |
+  | `simple` | Datacenter | **+2 credits** |
+  | `premium` | Residential | **+5 credits** |
+  | `ultra` | Premium residential / mobile | **+12 credits** |
 
   Stay on `simple` unless the target actually blocks datacenter IPs — moving to
-  `premium` makes a browser scrape 13 credits instead of 6. Use
+  `premium` makes a browser scrape 10 credits instead of 7. Use
   [`max_cost`](#param-max-cost) if you want a hard ceiling.
 </ParamField>
 
@@ -296,7 +296,7 @@ openapi: POST /v1/web/scrape
 </ParamField>
 
 <ParamField body="ai_extract" type="boolean" default={false}>
-  Run AI-powered extraction on the scraped content using the instruction in `ai_prompt`. Adds **+10 credits** to the request cost. The scrape result is still returned even if AI extraction fails, and a failed extraction is not charged.
+  Run AI-powered extraction on the scraped content using the instruction in `ai_prompt`. Adds **+2 credits** to the request cost. The scrape result is still returned even if AI extraction fails, and a failed extraction is not charged.
 </ParamField>
 
 <ParamField body="ai_prompt" type="string">
@@ -319,9 +319,10 @@ charged on every request, which is why nothing costs 1 credit in practice.
 |-----------|---------|
 | HTTP engine (`http`) | 1 |
 | Browser engine (`browser`) | 5 |
-| `proxy_tier: simple` (default) | +1 |
-| `proxy_tier: premium` / `ultra` | +8 |
-| `ai_extract` | +10 |
+| `proxy_tier: simple` (default) | +2 |
+| `proxy_tier: premium` | +5 |
+| `proxy_tier: ultra` | +12 |
+| `ai_extract` | +2 |
 | `anti_bot`, when a solver is actually invoked | +5 |
 | `screenshot`, `video`, `js_scenario`, `eval_js`, `wait_for` | +0 |
 
@@ -329,10 +330,10 @@ Common totals:
 
 | Request | Total |
 |---------|-------|
-| Simple page, default tier | **2** |
-| JS-rendered page, default tier | **6** |
-| JS-rendered page, `premium` tier | **13** |
-| Simple page + `ai_extract` | **12** |
+| Simple page, default tier | **3** |
+| JS-rendered page, default tier | **7** |
+| JS-rendered page, `premium` tier | **10** |
+| Simple page + `ai_extract` | **5** |
 
 The exact amount charged is always in the `X-Credits-Used` response header and
 the `credits_used` body field — trust those over any estimate. A request

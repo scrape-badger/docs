@@ -93,14 +93,14 @@ location and listing ids from one market mean nothing in another. List them with
 
 | Endpoint | Path | Credits |
 | -------- | ---- | ------- |
-| Search listings | `GET /v1/gumtree/search` | 5 credits |
-| Get search filters | `GET /v1/gumtree/search/filters` | 5 credits |
-| Get listing | `GET /v1/gumtree/listings/{listing_id}` | 5 credits |
-| Get seller listings | `GET /v1/gumtree/listings/{listing_id}/seller-listings` | 5 credits |
-| Autocomplete | `GET /v1/gumtree/autocomplete` | 1 credit |
-| Location autocomplete | `GET /v1/gumtree/locations/autocomplete` | 1 credit |
-| List locations | `GET /v1/gumtree/locations` | 1 credit |
-| List categories | `GET /v1/gumtree/categories` | 1 credit |
+| Search listings | `GET /v1/gumtree/search` | 8 credits |
+| Get search filters | `GET /v1/gumtree/search/filters` | 8 credits |
+| Get listing | `GET /v1/gumtree/listings/{listing_id}` | 8 credits |
+| Get seller listings | `GET /v1/gumtree/listings/{listing_id}/seller-listings` | 8 credits |
+| Autocomplete | `GET /v1/gumtree/autocomplete` | 2 credits |
+| Location autocomplete | `GET /v1/gumtree/locations/autocomplete` | 2 credits |
+| List locations | `GET /v1/gumtree/locations` | 2 credits |
+| List categories | `GET /v1/gumtree/categories` | 2 credits |
 | List markets | `GET /v1/gumtree/markets` | 0 credits |
 | Health | `GET /v1/gumtree/health` | 0 credits |
 
@@ -210,7 +210,7 @@ print(res.json()["total_results"], "listings")
 
 <Tip>
   The reference endpoints — autocomplete, location autocomplete and categories
-  (and locations in the UK and South Africa) — cost 1 credit each. Use them to
+  (and locations in the UK and South Africa) — cost 2 credits each. Use them to
   build the right `category` and `location` before spending credits on a
   search.
 </Tip>

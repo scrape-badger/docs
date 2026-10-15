@@ -30,7 +30,7 @@ absolute publish timestamps, and search-box autocomplete.
 - **News search** — headline, publisher, snippet and **absolute publish
   times** (`published_at` ISO 8601 plus `published_utc` Unix), with a
   `freshness` filter of `day`, `week` or `month`.
-- **Autocomplete** — Bing's search-box suggestions for 1 credit.
+- **Autocomplete** — Bing's search-box suggestions for 2 credits.
 - **SafeSearch control** — `safe_search=off|moderate|strict` on search,
   images and videos.
 
@@ -124,7 +124,7 @@ server-rendered densely, so the default `count=35` is genuinely reachable.
 
 <Tip>
   Start from [`/autocomplete`](/api-reference/endpoint/bing/autocomplete)
-  (1 credit) to expand a seed term into real Bing queries, then run
+  (2 credits) to expand a seed term into real Bing queries, then run
   [`/search`](/api-reference/endpoint/bing/search) on each suggestion.
 </Tip>
 
