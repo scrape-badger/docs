@@ -450,7 +450,7 @@ per host and applies it for you:
       Whether the page is confirmed as a blocking page.
     </ResponseField>
     <ResponseField name="block_type" type="string">
-      Type of block detected (e.g., `cloudflare`, `datadome`, `akamai`, `kasada`, `forbidden_shell`: an HTTP 403 whose page is only scripts, with no content, or `rate_limited`: an HTTP 429 that refuses the request instead of returning the page). Blocked responses, these included, are not charged.
+      Type of block detected (e.g., `cloudflare`, `datadome`, `akamai`, `kasada`, `forbidden_shell`: an HTTP 403 whose page is only scripts, with no content, `rate_limited`: an HTTP 429 that refuses the request instead of returning the page, or `login_wall`: the site redirected to its login page instead of the requested page). Blocked responses, these included, are not charged.
     </ResponseField>
     <ResponseField name="confidence" type="number">
       Confidence score from `0.0` to `1.0`.
