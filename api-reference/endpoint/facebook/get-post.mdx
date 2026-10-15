@@ -56,13 +56,13 @@ Returns a single `Post` object.
 <CodeGroup>
 
 ```bash cURL
-curl "https://scrapebadger.com/v1/facebook/posts/0?url=https://www.facebook.com/NASA/posts/pfbid02Kx9YqLmN4vT7wJ3hR8sQ2fZ1nB6cD5" \
+curl "https://scrapebadger.com/v1/facebook/posts/0?url=https://www.facebook.com/reel/2166091230582141" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
 
 ```javascript Node.js
 const res = await fetch(
-  "https://scrapebadger.com/v1/facebook/posts/1094832771620487",
+  "https://scrapebadger.com/v1/facebook/posts/1393461115481927",
   { headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY } },
 );
 const post = await res.json();
@@ -72,7 +72,7 @@ const post = await res.json();
 import requests
 
 res = requests.get(
-    "https://scrapebadger.com/v1/facebook/posts/1094832771620487",
+    "https://scrapebadger.com/v1/facebook/posts/1393461115481927",
     headers={"X-API-Key": "YOUR_API_KEY"},
 )
 post = res.json()
