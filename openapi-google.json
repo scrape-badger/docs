@@ -4920,8 +4920,23 @@
   "components": {
     "schemas": {
       "AdResult": {
+        "description": "A sponsored text ad (\"Sponsored\" / \"Gesponsert\" / \"Anzeige\").",
         "properties": {
           "position": {
+            "title": "Position",
+            "type": "integer"
+          },
+          "block": {
+            "description": "Where the ad block sits: above, between or below the organic results.",
+            "enum": [
+              "top",
+              "middle",
+              "bottom"
+            ],
+            "title": "Block",
+            "type": "string"
+          },
+          "block_position": {
             "anyOf": [
               {
                 "type": "integer"
@@ -4930,15 +4945,18 @@
                 "type": "null"
               }
             ],
-            "title": "Position"
+            "default": null,
+            "description": "1-based rank within its block.",
+            "title": "Block Position"
           },
           "title": {
-            "type": "string",
-            "title": "Title"
+            "title": "Title",
+            "type": "string"
           },
           "link": {
-            "type": "string",
-            "title": "Link"
+            "description": "Advertiser landing page, unwrapped from Google's click tracker.",
+            "title": "Link",
+            "type": "string"
           },
           "displayed_link": {
             "anyOf": [
@@ -4949,7 +4967,33 @@
                 "type": "null"
               }
             ],
+            "default": null,
             "title": "Displayed Link"
+          },
+          "domain": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Domain"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Advertiser name as Google shows it.",
+            "title": "Source"
           },
           "description": {
             "anyOf": [
@@ -4960,23 +5004,32 @@
                 "type": "null"
               }
             ],
+            "default": null,
             "title": "Description"
+          },
+          "sitelinks": {
+            "items": {
+              "$ref": "#/components/schemas/Sitelink"
+            },
+            "title": "Sitelinks",
+            "type": "array"
           },
           "extensions": {
             "items": {
               "type": "string"
             },
-            "type": "array",
-            "title": "Extensions"
+            "title": "Extensions",
+            "type": "array"
           }
         },
-        "type": "object",
         "required": [
+          "position",
+          "block",
           "title",
           "link"
         ],
         "title": "AdResult",
-        "description": "A sponsored/ad result."
+        "type": "object"
       },
       "AiModeResponse": {
         "properties": {
@@ -6252,7 +6305,8 @@
               "$ref": "#/components/schemas/AdResult"
             },
             "type": "array",
-            "title": "Ads"
+            "title": "Ads",
+            "description": "Sponsored text ads in page order, when Google shows them. Always empty for mode=fast."
           },
           "knowledge_graph": {
             "anyOf": [
