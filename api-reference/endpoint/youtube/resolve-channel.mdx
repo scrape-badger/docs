@@ -39,7 +39,7 @@ description: "Resolve a YouTube handle, custom URL, or any YouTube URL to its ca
 ```
 
 <Note>
-  A resolve request costs **2 credits**. Failed requests are not charged.
+  A resolve request costs **3 credits**. Failed requests are not charged.
 </Note>
 
 ## Reference & Utility Endpoints
@@ -48,7 +48,7 @@ These low-cost helper endpoints share this section.
 
 ### oEmbed
 
-`GET /v1/youtube/oembed?url=...` returns YouTube's public oEmbed metadata for a video or playlist URL — `title`, `author_name`, `author_url`, `thumbnail_url`, `html` embed snippet, and dimensions. **Costs 1 credit.**
+`GET /v1/youtube/oembed?url=...` returns YouTube's public oEmbed metadata for a video or playlist URL — `title`, `author_name`, `author_url`, `thumbnail_url`, `html` embed snippet, and dimensions. **Costs 2 credits.**
 
 ```json
 {
@@ -94,5 +94,5 @@ These low-cost helper endpoints share this section.
 `GET /v1/youtube/markets` returns the supported markets reference (region + language pairings). **Free (0 credits).**
 
 <Note>
-  oEmbed costs **1 credit**; categories, languages, regions, and markets are **free** reference endpoints (0 credits). Failed requests are not charged.
+  oEmbed costs **2 credits**; categories, languages, regions, and markets are **free** reference endpoints (0 credits). Failed requests are not charged.
 </Note>

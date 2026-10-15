@@ -187,7 +187,9 @@ def selftest() -> None:
     page = DOCS / "api-reference/endpoint/youtube/video-transcript.mdx"
     if page.exists():
         parsed = parse_endpoint_page(page)
-        assert parsed and 5 in parsed[2], f"transcript page should quote 5 credits, got {parsed}"
+        # Its own price and the sibling's, without pinning a live price (a
+        # repricing broke a hard-coded 5 here, SCR-346).
+        assert parsed and len(parsed[2]) > 1, f"transcript page should quote two prices, got {parsed}"
 
     print("selftest ok")
 
