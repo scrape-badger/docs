@@ -450,7 +450,7 @@ per host and applies it for you:
       Whether the page is confirmed as a blocking page.
     </ResponseField>
     <ResponseField name="block_type" type="string">
-      Type of block detected (e.g., `cloudflare`, `datadome`, `akamai`, `kasada`).
+      Type of block detected (e.g., `cloudflare`, `datadome`, `akamai`, `kasada`, or `forbidden_shell`: an HTTP 403 whose page is only scripts, with no content).
     </ResponseField>
     <ResponseField name="confidence" type="number">
       Confidence score from `0.0` to `1.0`.
@@ -475,7 +475,7 @@ per host and applies it for you:
 
   <Expandable>
     <ResponseField name="system" type="string">
-      System name (e.g., `cloudflare_turnstile`, `datadome`, `akamai`, `kasada`, `amazon_waf`).
+      System name (e.g., `cloudflare_turnstile`, `datadome`, `akamai`, `kasada`, `amazon_waf`). `perimeterx_sensor` means PerimeterX's sensor script is on the page, which is not itself a block.
     </ResponseField>
     <ResponseField name="confidence" type="number">
       Confidence score from `0.0` to `1.0`.
@@ -788,7 +788,7 @@ Infinite scroll:
 |--------|-------------|
 | `400` | Invalid URL, cost exceeds `max_cost`, or requested engine not available |
 | `402` | Insufficient credits |
-| `422` | Blocking detected after all retries exhausted (`error: "blocking_page_detected"`, with `block_kind`, `vendor`, `unblock` and, for a CAPTCHA wall, the gating `captcha` at the top level; the scrape result is in `data`); the `wait_for` selector never appeared (`error: "wait_for_timeout"`); a `js_scenario` step failed (`error: "js_scenario_failed"`); or the body contained an unknown field (`error: "unknown_request_field"`). Never charged. |
+| `422` | Blocking detected after all retries exhausted (`error: "blocking_page_detected"`, with `block_kind`, `vendor`, `vendors`, `unblock` and, for a CAPTCHA wall, the gating `captcha` at the top level; the scrape result is in `data`). `vendors` lists every protection vendor seen on the page, the block's own first: a site can put two in front of one page, such as a Cloudflare challenge before PerimeterX. A request that runs out of time while retrying (about 165 s) returns this 422 rather than a gateway timeout; the `wait_for` selector never appeared (`error: "wait_for_timeout"`); a `js_scenario` step failed (`error: "js_scenario_failed"`); or the body contained an unknown field (`error: "unknown_request_field"`). Never charged. |
 | `429` | Rate limit exceeded |
 | `500` | Unexpected server error |
 
@@ -879,6 +879,7 @@ There is no `return_cookies` or `form_data` parameter. To read cookies use
   "detail": "All retry attempts exhausted — blocking page still detected.",
   "block_kind": "captcha",
   "vendor": "perimeterx",
+  "vendors": ["perimeterx", "cloudflare"],
   "unblock": "discovering",
   "captcha": {
     "system": "perimeterx_press_hold",
