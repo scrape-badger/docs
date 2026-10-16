@@ -70,7 +70,7 @@ The most reliable way to get a `catalog_id` is from a Google Shopping product UR
 2. A Google **web search** resolves the barcode to a product (the matched product name is returned as `resolved_query` / `product_title`).
 3. A Google **Shopping** fetch for that product returns the per-merchant offers.
 
-Because this performs **two Google fetches**, each call costs **14 credits**.
+Because this performs **two Google fetches**, each call costs **25 credits**.
 
 ## Query Parameters
 
@@ -198,7 +198,7 @@ const result = await client.google.shopping.offers({
 
 ## Pricing
 
-Each call costs **14 credits**, whichever identifier you pass.
+Each call costs **25 credits**, whichever identifier you pass.
 
 ## Errors
 

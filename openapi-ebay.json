@@ -563,7 +563,7 @@
       "post": {
         "operationId": "searchEbayByImage",
         "summary": "Search by Image",
-        "description": "Search active listings by image, running eBay's own visual search — the camera icon in eBay's search bar. Returns the same shape as `/v1/ebay/search`, with `query` set to null. There is deliberately no `sort_by`: eBay ignores sorting on a visual results page. Costs 10 credits (two round trips to eBay); failed requests are free.",
+        "description": "Search active listings by image, running eBay's own visual search — the camera icon in eBay's search bar. Returns the same shape as `/v1/ebay/search`, with `query` set to null. There is deliberately no `sort_by`: eBay ignores sorting on a visual results page. Costs 16 credits (two round trips to eBay); failed requests are free.",
         "tags": [
           "eBay Search"
         ],
@@ -1085,7 +1085,7 @@
       "get": {
         "operationId": "searchEbayCompleted",
         "summary": "Completed / Sold Listings",
-        "description": "Search eBay completed (sold) listings — the closing prices buyers actually paid, with the date each item sold. `sold` is `true` on the envelope and each result's `price` is the final sold price. Served via an authenticated eBay session. Costs 5 credits; failed requests are free.",
+        "description": "Search eBay completed (sold) listings — the closing prices buyers actually paid, with the date each item sold. `sold` is `true` on the envelope and each result's `price` is the final sold price. Served via an authenticated eBay session. Costs 8 credits; failed requests are free.",
         "tags": [
           "eBay Search"
         ],

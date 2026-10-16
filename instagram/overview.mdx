@@ -64,13 +64,17 @@ paginated `comments`.
 | Endpoint group | Example path | Credits |
 | -------------- | ------------ | ------- |
 | Health / reference | `GET /v1/instagram/health` | 0 |
-| Standard read | `GET /v1/instagram/users/{username}` | 5 |
-| Paginated listings | `GET /v1/instagram/users/{username}/posts` | 8 |
+| Standard read | `GET /v1/instagram/users/{username}` | 8 |
+| Paginated listings | `GET /v1/instagram/users/{username}/posts` | 12 |
+| Search suggestions | `GET /v1/instagram/search/hashtags` | 3 |
+| Followers / following | `GET /v1/instagram/users/{username}/followers` | 15 |
+| Stories / highlights | `GET /v1/instagram/users/{username}/stories` | 23 |
 
 <Info>
-  Standard read (5) covers profile and media detail. Paginated listings (8)
-  cover `posts` and `comments`. A `503 temporarily_unavailable` from a gated
-  endpoint costs 0 credits.
+  Standard read (8) covers profile and media detail. Paginated listings (12)
+  cover `posts`, `reels`, `tagged` and `comments`. The live per-endpoint price is
+  published at `GET /api/public/pricing`. A `503 temporarily_unavailable` from a
+  gated endpoint costs 0 credits.
 </Info>
 
 ## Quickstart
