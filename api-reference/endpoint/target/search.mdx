@@ -42,6 +42,22 @@ Sort. Allowed values: `relevance`, `PriceLow`, `PriceHigh`, `RatingHigh`, `bests
 
 ```json
 {
+  "matching_mode": "native",
+  "warnings": [
+    "Target may return semantic or recommended matches, including for queries with no literal matches."
+  ],
+  "search_metadata": {
+    "response_ids": [
+      "search-27e71f0c-d166-4020-8328-55b7822ca708"
+    ],
+    "count": 24,
+    "current_page": 1,
+    "keyword": "laptop",
+    "offset": 0,
+    "sort_by": "relevance",
+    "total_pages": 50,
+    "total_results": 1241
+  },
   "query": "laptop",
   "category": null,
   "page": 1,
@@ -106,7 +122,174 @@ Sort. Allowed values: `relevance`, `PriceLow`, `PriceHigh`, `RatingHigh`, `bests
           "id": "10019361"
         }
       ],
-      "is_sponsored": true
+      "is_sponsored": false,
+      "raw": {
+        "__typename": "ProductSummary",
+        "tcin": "1012829149",
+        "fast_selling": {
+          "fast_selling": false,
+          "queue_gated": false
+        },
+        "original_tcin": "1012829149",
+        "item": {
+          "cart_add_on_threshold": 35.0,
+          "relationship_type": "Variation Child",
+          "relationship_type_code": "VC",
+          "merchandise_classification": {
+            "class_id": 1,
+            "department_id": 56
+          },
+          "enrichment": {
+            "buy_url": "https://www.target.com/p/hp-essential-14-hd-laptop-intel-n-series-n150-intel-graphics-4gb-ram-128gb-emmc-wi-fi-6-windows-11-home-rose/-/A-1012829149",
+            "image_info": {
+              "base_url": "//target.scene7.com/is/image/Target/",
+              "primary_image": {},
+              "alternate_images": [],
+              "swatch_image": {}
+            },
+            "videos": [
+              {}
+            ]
+          },
+          "product_classification": {
+            "item_type": {
+              "name": "Laptop Computers",
+              "type": "245237"
+            }
+          },
+          "compliance": {},
+          "wellness_merchandise_attributes": [
+            {
+              "badge_url": "https://target.scene7.com/is/image/Target/GUEST_69e6bc10-ff55-4e62-9c7d-737e2c21b3b1",
+              "parent_id": "1225338992",
+              "parent_name": "Microphone",
+              "value_id": "843709",
+              "value_name": "Built-In Microphone",
+              "wellness_description": "Comes with a microphone that is used for recording"
+            }
+          ],
+          "product_description": {
+            "title": "HP Essential 14\" HD Laptop, Intel N150, 4GB RAM, 128GB eMMC, Wi-Fi 6, Windows 11 Home, 1-Year Microsoft 365 Included, Rose",
+            "bullet_descriptions": [
+              "<B>Dimensions (Overall):</B> .71 inches (H) x 12.76 inches (W) x 8.86 inches (D)"
+            ],
+            "soft_bullets": {
+              "bullets": []
+            }
+          },
+          "product_vendors": [
+            {
+              "vendor_name": "PCOnline",
+              "id": "10019361"
+            }
+          ],
+          "fulfillment": {
+            "is_marketplace": true
+          },
+          "primary_brand": {
+            "name": "HP Inc."
+          },
+          "ribbons": [
+            "New At Target"
+          ],
+          "variation_info": {}
+        },
+        "parent": {
+          "__typename": "ParentProductSummary",
+          "tcin": "1013205909",
+          "item": {
+            "cart_add_on_threshold": 35.0,
+            "relationship_type": "Variation Parent",
+            "relationship_type_code": "VAP",
+            "merchandise_classification": {
+              "class_id": 1,
+              "department_id": 56
+            },
+            "enrichment": {
+              "buy_url": "https://www.target.com/p/hp-essential-14-hd-laptop-intel-n150-4gb-ram-128gb-emmc-windows-11-home-1-year-microsoft-365-included/-/A-1013205909",
+              "image_info": {},
+              "videos": []
+            },
+            "has_extended_sizing": false,
+            "wellness_merchandise_attributes": [
+              {}
+            ],
+            "product_description": {
+              "title": "HP Essential 14\" HD Laptop, Intel N150, 4GB RAM, 128GB eMMC, Windows 11 Home, 1-Year Microsoft 365 Included",
+              "bullet_descriptions": [],
+              "soft_bullets": {}
+            },
+            "product_classification": {
+              "item_type": {}
+            },
+            "product_vendors": [
+              {}
+            ],
+            "fulfillment": {
+              "is_marketplace": true
+            },
+            "primary_brand": {
+              "name": "HP Inc."
+            },
+            "ribbons": [
+              "New At Target"
+            ],
+            "variation_info": {}
+          },
+          "promotions": [],
+          "price": {
+            "formatted_comparison_price": "$483.32 - $499.98",
+            "formatted_comparison_price_type": "reg",
+            "formatted_current_price": "$289.99 - $299.99",
+            "formatted_current_price_type": "sale",
+            "location_id": 3991
+          },
+          "ratings_and_reviews": {
+            "statistics": {
+              "rating": {}
+            }
+          },
+          "variation_summary": {
+            "themes": [
+              {}
+            ]
+          }
+        },
+        "desirability_cues": [
+          {
+            "code": "social_proofing",
+            "display": "100+ bought in last month",
+            "long_description": "This item was bought over 100 times this month."
+          }
+        ],
+        "ornaments": [
+          {
+            "ornament": "trending",
+            "display": "Trending",
+            "long_description": "This item is seeing a recent spike in sales and views compared to usual.",
+            "ornament_type": "guest",
+            "template_type": "light_marker_with_fire",
+            "metadata": "{\"experiments\":[{\"factor\":\"trending_ornament_factor\",\"value\":\"treatment_1\",\"default\":false,\"ios_treatment_id\":\"fb39e52a-dcbd-4dc8-9be2-b331e242bcec\",\"hide_on_control_value\":\"control\",\"ios_hide_on_control_treatment_id\":\"420e4dcd-d3a8-4a59-adb1-a3c4f2eacfe1\"}]}"
+          }
+        ],
+        "promotions": [],
+        "price": {
+          "current_retail": 289.99,
+          "display_was_now": false,
+          "formatted_comparison_price": "$483.32",
+          "formatted_comparison_price_type": "reg",
+          "formatted_current_price": "$289.99",
+          "formatted_current_price_type": "sale",
+          "reg_retail": 483.32,
+          "save_dollar": 193.33,
+          "save_percent": 40.0,
+          "location_id": 3991
+        },
+        "category": {
+          "category_id": "6k98r",
+          "parent_category_id": "5xtf4"
+        }
+      }
     }
   ],
   "facets": [
