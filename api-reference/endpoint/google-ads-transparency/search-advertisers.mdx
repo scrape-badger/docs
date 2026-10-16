@@ -9,7 +9,7 @@ take. This is the **entry point for brand-name lookups** — free-text search on
 [`/ads/search`](/api-reference/endpoint/google-ads-transparency/search-ads) is
 domain-based and will not find a brand by name.
 
-**Credits:** 5 — or 15 with `fuzzy=true`. An empty result is not billed.
+**Credits:** 15 — or 45 with `fuzzy=true`. An empty result is not billed.
 
 <Note>
   Google's own matching has **no typo tolerance**: advertiser names match by
@@ -58,7 +58,7 @@ domain-based and will not find a brand by name.
   Find misspelled and look-alike advertisers. Searches up to 7 variants of the
   query (shorter prefixes, overlapping halves, swapped leading letters),
   resolves the closest look-alike domains to the advertisers running ads on
-  them, drops weak matches, and ranks every row by `similarity`. Billed 15
+  them, drops weak matches, and ranks every row by `similarity`. Billed 45
   credits (3 lookups), however many variants run.
 </ParamField>
 
