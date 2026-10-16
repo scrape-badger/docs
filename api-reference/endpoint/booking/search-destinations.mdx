@@ -40,20 +40,15 @@ target an exact area instead of relying on free-text geocoding.
     <ResponseField name="region" type="string">Region or province, or `null`.</ResponseField>
     <ResponseField name="country" type="string">Country name.</ResponseField>
     <ResponseField name="country_code" type="string">ISO country code, e.g. `nl`.</ResponseField>
-    <ResponseField name="property_count" type="integer">
-  Total bookable properties in this destination — `hotel_count` + `home_count`.
-  This is Booking's own inventory count and is the right number to size a crawl
-  against; `total_results` on `/search` is an estimate and moves between
-  identical calls.
+    <ResponseField name="property_count" type="integer | null">
+  Always `null` since 16 October 2026. Booking retired the lookup that supplied
+  its per-destination inventory counts. The field is kept so existing clients
+  don't break.
 </ResponseField>
 
-<ResponseField name="hotel_count" type="integer">
-  Hotels, hostels, guesthouses and similar in this destination.
-</ResponseField>
+<ResponseField name="hotel_count" type="integer | null">Always `null` (see `property_count`).</ResponseField>
 
-<ResponseField name="home_count" type="integer">
-  Apartments, villas and other entire-home listings in this destination.
-</ResponseField>
+<ResponseField name="home_count" type="integer | null">Always `null` (see `property_count`).</ResponseField>
 
 <ResponseField name="latitude" type="number" />
     <ResponseField name="longitude" type="number" />
