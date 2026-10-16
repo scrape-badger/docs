@@ -156,6 +156,26 @@
           }
         },
         "responses": {
+          "400": {
+            "description": "Invalid URL, cost exceeds max_cost, or requested engine not available. A hostname is rejected as nonexistent only when two independent DNS resolvers confirm NXDOMAIN. NODATA, timeouts, SERVFAIL, other resolver errors, and resolver disagreement continue through the normal scraping and retry path. No credits are charged.",
+            "headers": {
+              "X-Credits-Used": {
+                "description": "Credits charged for this rejected request.",
+                "schema": { "type": "integer", "enum": [0] }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": { "type": "string" },
+                    "detail": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
           "200": {
             "description": "Successful scrape",
             "content": {

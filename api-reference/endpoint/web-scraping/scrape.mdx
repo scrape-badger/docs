@@ -787,11 +787,23 @@ Infinite scroll:
 
 | Status | Description |
 |--------|-------------|
-| `400` | Invalid URL, cost exceeds `max_cost`, or requested engine not available |
+| `400` | Invalid URL (including a hostname confirmed not to exist), cost exceeds `max_cost`, or requested engine not available. Never charged. |
 | `402` | Insufficient credits |
 | `422` | Blocking detected after all retries exhausted (`error: "blocking_page_detected"`, with `block_kind`, `vendor`, `vendors`, `unblock` and, for a CAPTCHA wall, the gating `captcha` at the top level; the scrape result is in `data`). `vendors` lists every protection vendor seen on the page, the block's own first: a site can put two in front of one page, such as a Cloudflare challenge before PerimeterX. A request that runs out of time while retrying (about 165 s) returns this 422 rather than a gateway timeout; the `wait_for` selector never appeared (`error: "wait_for_timeout"`); a `js_scenario` step failed (`error: "js_scenario_failed"`); or the body contained an unknown field (`error: "unknown_request_field"`). Never charged. |
 | `429` | Rate limit exceeded |
 | `500` | Unexpected server error |
+
+### Hostname does not exist
+
+If two independent DNS resolvers confirm that your URL's hostname does not
+exist (`NXDOMAIN`), the request returns `400` with `error: "Invalid URL"`
+before scraping. You are charged **0 credits** (`X-Credits-Used: 0`). Check
+the hostname for typos and confirm that the domain exists before retrying.
+
+A hostname with no address records (`NODATA`) is not enough to trigger this
+rejection. DNS timeouts, `SERVFAIL`, other resolver errors, and disagreement
+between resolvers also do not trigger it; the request continues through the
+normal scraping and retry path.
 
 ### Unknown request fields
 
