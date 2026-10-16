@@ -1,0 +1,174 @@
+---
+title: "Search products"
+api: "GET https://scrapebadger.com/v1/bestbuy/search"
+description: "Search products."
+---
+
+Search products.
+
+**Credits:** 10 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField query="query" type="string" required>
+Query. Minimum length: 1.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+Page. Minimum: 1. Maximum: 100.
+</ParamField>
+
+<ParamField query="sort" type="string" default="best_match">
+Sort. Allowed values: `best_match`, `best_selling`, `price_low`, `price_high`, `rating`, `newest`.
+</ParamField>
+
+## Response
+
+```json
+{
+  "query": "laptop",
+  "page": 1,
+  "total_results": 7120,
+  "products": [
+    {
+      "sku": "6668412",
+      "bsin": "JJGH3R7P6C",
+      "title": "Lenovo - IdeaPad Slim 3i 15.6\" Full HD Laptop - Intel Processor N150 2024- 8GB Memory 128GB Storage - Arctic Grey",
+      "url": "https://www.bestbuy.com/product/lenovo-ideapad-slim-3i-15-6-full-hd-laptop-intel-processor-n150-2024-8gb-memory-128gb-storage-arctic-grey/JJGH3R7P6C/sku/6668412",
+      "brand": "Lenovo",
+      "upc": "199273053452",
+      "description": {
+        "long": "Impossibly slim, the Lenovo IdeaPad Slim 3i is amazingly dynamic and remarkably smart to take your work and play to the next level. Combined with an array of AI-driven productivity features, you’ve got the full works right in your hands."
+      },
+      "price": 269.99,
+      "regular_price": 399.99,
+      "savings": 130.0,
+      "currency": "USD",
+      "rating": 4.6,
+      "review_count": 106,
+      "images": [
+        {
+          "piscesHref": "https://pisces.bbystatic.com/image2/BestBuy_US/images/products/3200e090-612e-4446-83fc-eb2be0732fe3.jpg",
+          "altText": "FIC-1-QA-WSD1D-2i1D-7YFnL-Joe4-1K-3Ci-6-13d-ZxD-N-Intel INSIDE Lenovo",
+          "rel": "Front_Zoom"
+        }
+      ],
+      "specifications": [
+        {
+          "name": "Key Specs",
+          "specifications": [
+            {
+              "displayName": "Screen Type",
+              "value": "TN"
+            }
+          ]
+        }
+      ],
+      "features": [
+        {
+          "description": "Windows 11 Home OS smartly manages your hardware and runs routine applications efficiently.",
+          "title": "Windows 11 Home operating system"
+        }
+      ],
+      "fulfillment": {},
+      "buying_options": [
+        {
+          "type": "New",
+          "pdpUrl": "https://www.bestbuy.com/product/lenovo-ideapad-slim-3i-15-6-full-hd-laptop-intel-processor-n150-2024-8gb-memory-128gb-storage-arctic-grey/JJGH3R7P6C/sku/6668412",
+          "product": {
+            "skuId": "6668412",
+            "openBoxCondition": null,
+            "price": {
+              "customerPrice": 269.99
+            },
+            "name": {
+              "short": "Lenovo - IdeaPad Slim 3i 15.6\" Full HD Laptop - Intel Processor N150 2024- 8GB Memory 128GB Storage - Arctic Grey"
+            },
+            "primaryImage": {
+              "piscesHref": "https://pisces.bbystatic.com/image2/BestBuy_US/images/products/3200e090-612e-4446-83fc-eb2be0732fe3.jpg"
+            }
+          }
+        }
+      ],
+      "seller": {
+        "classification": "1P",
+        "id": "bby"
+      },
+      "badges": [
+        {
+          "displayName": "Core essentials PC",
+          "typeCode": "NA",
+          "startDate": "2026-09-18T22:30Z",
+          "endDate": "2028-09-17T04:45Z"
+        }
+      ],
+      "questions": {}
+    }
+  ],
+  "facets": [
+    {
+      "parentFacetField": null,
+      "displayName": "GIF-Same Day Shipping",
+      "facetDisplay": "true",
+      "facetField": "samedayshippingallcondition_facet",
+      "maxValue": 10,
+      "values": [
+        {
+          "count": 107,
+          "value": "55423",
+          "categoryPath": null,
+          "nestedValues": null,
+          "__typename": "SearchFacetValue"
+        }
+      ],
+      "__typename": "SearchFacet"
+    }
+  ],
+  "sort_options": [
+    {
+      "value": "Best-Match",
+      "displayName": "Best Match",
+      "__typename": "SearchSortOption"
+    }
+  ],
+  "applied_filters": {
+    "appliedFacets": [
+      {
+        "values": [
+          "abcat0502000"
+        ],
+        "id": "category_facet",
+        "autoFacet": "true",
+        "__typename": "SearchRequestInfoAppliedFacet"
+      }
+    ],
+    "categoryFacet": {
+      "categoryName": "Laptops",
+      "categoryPath": "abcat0502000",
+      "__typename": "SearchRequestInfoCategoryFacet"
+    },
+    "sort": {
+      "value": "Best-Match",
+      "displayName": "Best Match",
+      "__typename": "SearchRequestInfoSort"
+    },
+    "__typename": "SearchRequestInfo"
+  }
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/bestbuy/search' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'query=laptop' \
+  --data-urlencode 'page=1' \
+  --data-urlencode 'sort=best_match'
+```
+
+[Browse all Best Buy endpoints](/bestbuy/overview).

@@ -1,0 +1,62 @@
+---
+title: "Get categories"
+api: "GET https://scrapebadger.com/v1/target/categories"
+description: "Get categories."
+---
+
+Get categories.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField query="category_id" type="string" default="5xtly">
+Category id.
+</ParamField>
+
+## Response
+
+```json
+{
+  "related_categories": {
+    "category": {
+      "canonical_url": "/c/baby/-/N-5xtly",
+      "name": "Baby",
+      "category_id": "5xtly",
+      "parent_category_id": "root",
+      "image_url": "https://target.scene7.com/is/image/Target/Baby219475-200305_1583423490259-210803-1628012550597",
+      "deep_link": "target://product/listing?idType=ENDECA&id=5xtly&title=Baby",
+      "visibility": [
+        "WEB"
+      ]
+    },
+    "children": [
+      {
+        "canonical_url": "/c/baby-sale/-/N-558or",
+        "name": "Baby Deals",
+        "category_id": "558or",
+        "parent_category_id": "4xw74",
+        "image_url": "https://target.scene7.com/is/image/Target/GUEST_f6cf4676-de9a-47cd-b764-b659976b8f73",
+        "deep_link": "target://product/listing?idType=ENDECA&id=558or&title=Baby+Deals",
+        "visibility": [
+          "WEB"
+        ]
+      }
+    ]
+  }
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/target/categories' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'category_id=5xtly'
+```
+
+[Browse all Target endpoints](/target/overview).

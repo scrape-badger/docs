@@ -1,0 +1,309 @@
+---
+title: "Get ASOS product detail"
+api: "GET https://scrapebadger.com/v1/asos/products/{product_id}"
+description: "Get ASOS product detail."
+---
+
+Get ASOS product detail.
+
+**Credits:** 10 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField path="product_id" type="integer" required>
+Product id.
+</ParamField>
+
+<ParamField query="market" type="string" default="uk">
+Market.
+</ParamField>
+
+<ParamField query="store" type="string">
+Store.
+</ParamField>
+
+<ParamField query="country" type="string">
+Country.
+</ParamField>
+
+<ParamField query="currency" type="string">
+Currency.
+</ParamField>
+
+<ParamField query="language" type="string">
+Language.
+</ParamField>
+
+## Response
+
+```json
+{
+  "market": "uk",
+  "product": {
+    "id": 209555590,
+    "name": "ASOS DESIGN Leah mary jane ballets in chocolate suedette",
+    "productCode": "151703207",
+    "brandName": "ASOS DESIGN",
+    "brandId": 53,
+    "colour": null,
+    "colourWayId": null,
+    "price": {
+      "current": {
+        "value": 20.0,
+        "text": "£20.00",
+        "versionId": "REGP0000020002000000000000000",
+        "conversionId": "0"
+      },
+      "previous": {
+        "value": 20.0,
+        "text": "£20.00",
+        "versionId": "REGP0000020002000000000000000",
+        "conversionId": "0"
+      },
+      "rrp": {
+        "value": null,
+        "text": null,
+        "versionId": "REGP0000020002000000000000000",
+        "conversionId": "0"
+      },
+      "currency": "GBP",
+      "isMarkedDown": false,
+      "isOutletPrice": false,
+      "discountPercentage": 0.0,
+      "xrp": {
+        "value": 20,
+        "text": "£20.00",
+        "versionId": "REGP0000020002000000000000000",
+        "conversionId": "0"
+      },
+      "startDateTime": "2026-10-09T02:52:36Z",
+      "previousEndDate": null,
+      "lowestPriceInLast30DaysValue": null,
+      "lowestPriceInLast30DaysText": null,
+      "lowestPriceInLast30DaysEndDate": null,
+      "lowestPriceInLast30DaysPercentage": null,
+      "context": null,
+      "additionalContexts": [],
+      "start_utc": 1791514356.0,
+      "start_at": "2026-10-09T02:52:36Z"
+    },
+    "url": "https://www.asos.com/asos-design/asos-design-leah-mary-jane-ballets-in-chocolate-suedette/prd/209555590",
+    "imageUrl": null,
+    "additionalImageUrls": [],
+    "images": [
+      {
+        "isPrimary": true,
+        "colour": "CHOC SUEDETTE",
+        "colourWayId": 209555591,
+        "imageType": "Standard1",
+        "aiAssetType": null,
+        "url": "https://images.asos-media.com/products/asos-design-leah-mary-jane-ballets-in-chocolate-suedette/209555590-1-chocsuedette",
+        "productId": 209555590,
+        "alternateText": "Thumbnail 1 of 4",
+        "isVisible": true
+      }
+    ],
+    "variants": [
+      {
+        "variantId": 209555592,
+        "id": 209555592,
+        "size": "UK 2",
+        "brandSize": "UK 2",
+        "sizeId": 388519,
+        "colour": "CHOC SUEDETTE",
+        "colourWayId": 209555591,
+        "sku": "151703248",
+        "isAvailable": true,
+        "isInStock": true,
+        "isLowInStock": false,
+        "isRestockingSoon": false,
+        "price": {
+          "current": {
+            "value": 20.0,
+            "text": "£20.00",
+            "versionId": "REGP0000020002000000000000000",
+            "conversionId": "0"
+          },
+          "previous": {
+            "value": 20.0,
+            "text": "£20.00",
+            "versionId": "REGP0000020002000000000000000",
+            "conversionId": "0"
+          },
+          "rrp": {
+            "value": null,
+            "text": null,
+            "versionId": "REGP0000020002000000000000000",
+            "conversionId": "0"
+          },
+          "currency": "GBP",
+          "isMarkedDown": false,
+          "isOutletPrice": false,
+          "discountPercentage": 0.0,
+          "xrp": {
+            "value": 20,
+            "text": "£20.00",
+            "versionId": "REGP0000020002000000000000000",
+            "conversionId": "0"
+          },
+          "startDateTime": "2026-10-09T02:58:00Z",
+          "previousEndDate": null,
+          "lowestPriceInLast30DaysValue": null,
+          "lowestPriceInLast30DaysText": null,
+          "lowestPriceInLast30DaysEndDate": null,
+          "lowestPriceInLast30DaysPercentage": null,
+          "context": null,
+          "additionalContexts": [],
+          "start_utc": 1791514680.0,
+          "start_at": "2026-10-09T02:58:00Z"
+        },
+        "hasIngredients": false,
+        "isPrimary": true,
+        "sizeOrder": 10,
+        "stockLastUpdatedDate": "2026-10-12T09:04:39.861Z",
+        "warehouse": null,
+        "source": null,
+        "seller": null,
+        "showShippedByMessage": true,
+        "stockLastUpdated_utc": 1791795879.861,
+        "stockLastUpdated_at": "2026-10-12T09:04:39.861000Z"
+      }
+    ],
+    "isSellingFast": null,
+    "isRestockingSoon": null,
+    "isInStock": true,
+    "gender": "Women",
+    "description": {
+      "productDescriptionVisible": true,
+      "productDescription": "<a href=\"https://www.asos.com/women/shoes/cat/?cid=4172\"><strong>Shoes</strong></a> by <a href=\"https://www.asos.com/women/a-to-z-of-brands/asos-design/cat/?cid=27869\"><strong>ASOS DESIGN</strong></a><br><ul><li>Adjustable strap</li><li>Pin-buckle fastening</li><li>Round toe</li><li>Flat sole</li></ul>",
+      "brandDescriptionVisible": true,
+      "brandDescription": "This is <a href=\"https://www.asos.com/women/a-to-z-of-brands/asos-design/cat/?cid=27869\"><strong>ASOS DESIGN</strong></a> – your go-to for all the latest trends, no matter who you are, where you’re from and what you’re up to. Exclusive to ASOS, our universal brand is here for you, and comes in all our fit ranges: ASOS Curve, Tall, Petite and Maternity. Created by us, styled by you.",
+      "moreInfoVisible": false,
+      "badges": [],
+      "sizeAndFitVisible": false,
+      "sizeAndFit": "",
+      "careInfoVisible": true,
+      "careInfo": "Wipe clean with a damp cloth or sponge",
+      "aboutMeVisible": true,
+      "aboutMe": "Soft, textured upper<br><br>Lining sock: 50% Polyurethane, 50% Textile, Sole: 100% Thermoplastic Polyurethane, Upper: 100% Polyurethane."
+    },
+    "ratings": {
+      "totalReviewCount": 45,
+      "averageOverallRating": 3.2,
+      "ratingDistribution": [
+        {
+          "ratingsValue": 5,
+          "count": 15
+        }
+      ]
+    },
+    "breadcrumbs": [
+      {
+        "Label": "Home",
+        "Url": "https://www.asos.com/?hrd=1",
+        "id": -1
+      }
+    ],
+    "isNoSize": false,
+    "isOneSize": false,
+    "isDiscontinued": false,
+    "pdpLayout": "Footwear",
+    "hasVariantsWithProp65Risk": true,
+    "productType": {
+      "id": 8609,
+      "name": "Shoes"
+    },
+    "totalNumberOfColours": 1,
+    "media": {
+      "catwalkUrl": null
+    },
+    "sizeGuideVisible": true,
+    "sizeGuide": "https://www.asos.com/web/pages/size-guides/index.html?sizeSchema=UK&data=https://www.asos.com/api/sizing/sizeapi/v1/SizeGuide/710%3flanguage%3den-GB",
+    "shippingRestrictions": {
+      "shippingRestrictionsLabel": "This product has shipping restrictions.",
+      "shippingRestrictionsVisible": true,
+      "shippingRestrictionsIncludedCountries": [
+        "AD"
+      ]
+    },
+    "plpIds": [
+      {
+        "id": 4172,
+        "type": "SEO"
+      }
+    ],
+    "looks": [
+      {
+        "url": "https://api.asos.com/product/catalogue/v4/productlooks?lookIds=210429638&store=COM",
+        "type": "stylingLook",
+        "id": 210429638
+      }
+    ],
+    "showUpSell": true,
+    "showCmaTitle": false,
+    "earlyAccess": null,
+    "countryOfManufacture": "CN",
+    "fitType": null,
+    "sellingFast": true,
+    "paymentPromotions": {
+      "clearpay": {
+        "gb": {
+          "gbp": {
+            "minimumTransactionAmount": 1,
+            "maximumTransactionAmount": 800
+          }
+        }
+      },
+      "payPalPayIn3": {
+        "gb": {
+          "gbp": {
+            "minimumTransactionAmount": 20,
+            "maximumTransactionAmount": 3000
+          }
+        }
+      }
+    },
+    "hasPaymentPromotionAvailable": true,
+    "facetGroup": {
+      "facetGroupId": 210539231,
+      "facetGroupName": "LEAH",
+      "facetGroupProfileId": "1",
+      "facetGroupProfileDescription": "Grouping by Colour - excluding Face & Body",
+      "facets": [
+        {
+          "type": "SupplierColour",
+          "products": [
+            {
+              "productId": 208552636,
+              "brandName": "ASOS DESIGN",
+              "name": "ASOS DESIGN Leah mary jane ballets in black patent",
+              "description": "BLACK PATENT",
+              "imageUrl": "images.asos-media.com/products/asos-design-leah-mary-jane-ballets-in-black-patent/208552636-1-blackpatent",
+              "isSelected": false,
+              "isInStock": true,
+              "flatlayImages": []
+            }
+          ]
+        }
+      ]
+    },
+    "saveCount": {
+      "canShowSaveCount": false
+    },
+    "hasVariantsWithIngredients": false
+  }
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/asos/products/209555590' \
+  --header 'X-API-Key: YOUR_API_KEY'
+```
+
+[Browse all ASOS endpoints](/asos/overview).

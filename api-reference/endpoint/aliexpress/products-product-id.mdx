@@ -1,0 +1,581 @@
+---
+title: "Get product detail"
+api: "GET https://scrapebadger.com/v1/aliexpress/products/{product_id}"
+description: "Get product detail."
+---
+
+Get product detail.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField path="product_id" type="string" required>
+Product id.
+</ParamField>
+
+<ParamField query="country" type="string" default="US">
+Country.
+</ParamField>
+
+<ParamField query="currency" type="string" default="USD">
+Currency.
+</ParamField>
+
+<ParamField query="language" type="string" default="en_US">
+Language.
+</ParamField>
+
+## Response
+
+```json
+{
+  "product_id": "3256806816805325",
+  "title": "ATTACK SHARK X11 Lightweight Wireless Gaming Mouse with RGB Backlight Charging, Up to 22K DPI, PAW3311 Optical Sensor, HUYU Swit",
+  "url": "https://www.aliexpress.com/item/3256806816805325.html",
+  "images": [
+    "https://ae-pic-a1.aliexpress-media.com/kf/Sa1b672d12ef746c686e83455e2511e58h.jpg"
+  ],
+  "videos": {
+    "posterUrl": "https://ae-pic-a1.aliexpress-media.com/kf/S6984affb30b245b5990960a6ede007317.jpg",
+    "videoId": 5000111458595,
+    "videoPlayInfo": {
+      "androidPhoneUrl": "https://video.aliexpress-media.com/play/u/ae_sg_item/3000902715985/p/1/e/6/t/10301/5000111458595.mp4",
+      "iphoneUrl": "https://video.aliexpress-media.com/play/u/ae_sg_item/3000902715985/p/1/e/6/t/10301/5000111458595.mp4",
+      "webUrl": "https://video.aliexpress-media.com/play/u/ae_sg_item/3000902715985/p/1/e/6/t/10301/5000111458595.mp4"
+    }
+  },
+  "rating": 4.8,
+  "review_count": 204,
+  "sold_text": "1,000+ sold",
+  "selected_sku_id": "12000039021192609",
+  "sku_properties": [
+    {
+      "hasSkuImage": true,
+      "isShowTypeColor": false,
+      "showType": "none",
+      "showTypeColor": false,
+      "sizeInfo": {
+        "hasSizeInfo": false,
+        "icon": "https://ae-pic-a1.aliexpress-media.com/kf/Sbc534a10bc2044448f9aa271540236800/36x36.png",
+        "sizeInfoUrl": "https://www.aliexpress.com/p/secondaryPage/size-chart.html?_pid=3256806816805325&mid=2683395990&_locale=en_US&version=2",
+        "title": "Size Chart"
+      },
+      "skuPropertyId": 14,
+      "skuPropertyName": "Color",
+      "skuPropertyValues": [
+        {
+          "propertyImages": [
+            "https://ae-pic-a1.aliexpress-media.com/kf/Sb6a4069058ea43a1aa541e81efb20b69F.jpg_.webp"
+          ],
+          "propertyValueDisplayName": "black",
+          "propertyValueIdLong": 193,
+          "propertyValueName": "black",
+          "showHot": false,
+          "skuColorValue": "#000000",
+          "skuPropertyImagePath": "https://ae-pic-a1.aliexpress-media.com/kf/Sb6a4069058ea43a1aa541e81efb20b69F.jpg",
+          "skuPropertyImageSummPath": "https://ae-pic-a1.aliexpress-media.com/kf/Sb6a4069058ea43a1aa541e81efb20b69F.jpg_120x120.jpg_.webp"
+        }
+      ]
+    }
+  ],
+  "skus": [
+    {
+      "path": "14:193;200007763:201336343",
+      "salable": false,
+      "skuAttr": "14:193;200007763:201336343",
+      "skuId": 12000048051996989,
+      "skuIdStr": "12000048051996989",
+      "skuStock": 0
+    }
+  ],
+  "prices": {
+    "discountExt": "{\"p0\":\"local_supply\",\"p1\":\"YM_US\",\"p3\":12000039021192609}",
+    "isLot": false,
+    "priceLocalConfig": "{\"from\":{\"currencySymbol\":\"$\",\"currencySymbolAndPriceAddBlank\":false,\"currencySymbolPosition\":\"front\",\"decimalPointChar\":\".\",\"showDecimal\":true,\"thousandsChar\":\",\"},\"roundOffZero\":false,\"separatorStr\":\" - \",\"single\":{\"currencySymbol\":\"$\",\"currencySymbolAndPriceAddBlank\":false,\"currencySymbolPosition\":\"front\",\"decimalPointChar\":\".\",\"showDecimal\":true,\"thousandsChar\":\",\"},\"to\":{\"currencySymbol\":\"$\",\"currencySymbolAndPriceAddBlank\":false,\"currencySymbolPosition\":\"front\",\"decimalPointChar\":\".\",\"showDecimal\":true,\"thousandsChar\":\",\"},\"useful\":true,\"version\":\"v1\"}",
+    "productId": 3256806816805325,
+    "region": "US",
+    "reverseDiscountAndPrice": false,
+    "selectedSkuId": 12000039021192609,
+    "skuIdStrPriceInfoMap": {
+      "12000048051996983": {
+        "originalPrice": {
+          "currency": "USD",
+          "formatedAmount": "$70.28",
+          "value": 70.28
+        },
+        "priceFontColor": "#000000",
+        "salePriceLocal": "$28.14|28|14",
+        "salePriceString": "$28.14",
+        "sellerByLot": false
+      }
+    },
+    "skuPriceInfoMap": {
+      "12000048051996989": {
+        "originalPrice": {
+          "currency": "USD",
+          "formatedAmount": "$70.28",
+          "value": 70.28
+        },
+        "priceFontColor": "#000000",
+        "salePriceLocal": "$24.97|24|97",
+        "salePriceString": "$24.97",
+        "sellerByLot": false
+      }
+    },
+    "skuSecondPriceInfoMap": {},
+    "targetSkuPriceInfo": {
+      "originalPrice": {
+        "currency": "USD",
+        "formatedAmount": "$60.82",
+        "value": 60.82
+      },
+      "priceFontColor": "#EB281F",
+      "salePriceLocal": "$19.46|19|46",
+      "salePriceString": "$19.46",
+      "sellerByLot": false
+    }
+  },
+  "shipping": {
+    "bgColor": "#FFFFFF",
+    "deliveryExt": "[{\"d0\":\"144.88\",\"d1\":\"CNY\",\"itemScene\":\"newGlobal\",\"p0\":\"12000048051996990\",\"p1\":\"138.76\",\"p10\":[218119,2061850,681871,2061848,2080408,217096,2022549,2077716,1962641,348808,299658,648839,2061840,2075535,243218,2075534,2075533,2075528,2073478,2075526,2075525,1976581,2075523,680867,2073268,2073266,2073265,2006320,2073264,2073263,2034478,339135,1961383,526666,721998,721997,382153,2078289,526940,2073291,2065739,381904,2019016,2000201,2080456,1998022,1998021,2075519,2075518,721001,56804,2073210,2061945,2075513,2080248,2078072,1098872,2061943,2073207,2061942,2073206,2080246,2061941,2080244,2080243,2080240,1517927,2080237,2080236,1961321,273138,111478,719986,2073190,2080230,2073189,2078050],\"p16\":true,\"p18\":\"default\",\"p24\":\"{\\\"scenario\\\":\\\"pcMainScreen\\\"}\",\"p25\":\"\",\"p3\":\"CNY\",\"p5\":\"0\",\"p6\":\"null\",\"p7\":\"{\\\"scItemId\\\":\\\"1041092152576\\\"}\",\"p8\":\"DE\",\"p9\":\"CN￥ 138.76\"},{\"d0\":\"152.60\",\"d1\":\"CNY\",\"itemScene\":\"newGlobal\",\"p0\":\"12000048051996992\",\"p1\":\"146.23\",\"p10\":[218119,2061850,681871,2061848,2080408,217096,2022549,2077716,1962641,348808,299658,648839,2061840,2075535,243218,2075534,2075533,2075528,2073478,2075526,2075525,1976581,2075523,680867,2073268,2073266,2073265,2006320,2073264,2073263,2034478,339135,1961383,526666,382153,2078289,526940,2073291,2065739,381904,2019016,2000201,2080456,1998022,1998021,2075519,2075518,721001,56804,2073210,2061945,2075513,2080248,2078072,1098872,2061943,2073207,2061942,2073206,2080246,2061941,2080244,2080243,2080240,1517927,2080237,2080236,1961321,273138",
+    "deliveryLayoutInfo": [
+      {
+        "additionLayout": [
+          {
+            "blockGroup": "others-0",
+            "blockType": "others",
+            "componentId": "132371",
+            "content": "Tracking available",
+            "displayCondition": "tracking=visible",
+            "distance": 1,
+            "medusaKey": "tracking_available@others",
+            "order": 4,
+            "type": "textWithMark",
+            "useInDeliveryOptionPanel": true,
+            "useInDetailFirstScreen": false,
+            "useInSkuSwitch": false
+          }
+        ],
+        "bizData": {
+          "patternId": 2720001,
+          "discount": 100.0,
+          "shipFromWarehouseCode": {
+            "US": [
+              "ae_marketplace"
+            ]
+          },
+          "tracking": "visible",
+          "workDayOneFourBeforeCutTime": "no",
+          "gtpProvider": "ALGORITHM",
+          "displayTomorrow": "no",
+          "itemScene": "newGlobal",
+          "shipToCode": "US",
+          "thresholdOverZero": "yes",
+          "shipFrom": "United States",
+          "deliveryDayMax": 10,
+          "displayEtaMinDate": "Oct. 19",
+          "guaranteedDeliveryTime": 20,
+          "etaVersionDisplayType": "deliveryDateInterval",
+          "freightCommitDay": "20",
+          "etaTraceId": "3#10#ALGORITHM#1792447632122#1793052432122#YM_US#ae_marketplace#US#1792188432122#NON#LOCAL_SERVICE_STORE_OWNED#7200180#NON#US#228#d3aedbd41d77b2a2da19b6b7a05f40f2_20261015#NON#",
+          "etaVersionStrategyId": 98,
+          "gtpEtaTraceId": "3#10#ALGORITHM#1792447632122#1793052432122#YM_US#ae_marketplace#US#1792188432122#NON#LOCAL_SERVICE_STORE_OWNED#7200180#NON#US#228#d3aedbd41d77b2a2da19b6b7a05f40f2_20261015#NON#",
+          "workDayOneFiveBeforeCutTime": "no",
+          "itemId": 1005007003120077,
+          "solutionBusinessType": "local_supply",
+          "etaVersionSceneId": 198,
+          "shippingFee": "free",
+          "displayEtaMaxDate": "Oct. 26",
+          "deliveryDayMin": 3,
+          "warehouseType": "dropshipping",
+          "solutionId": 2886001,
+          "deliveryOptionCode": "YM_US",
+          "leadTimeSort": [
+            600
+          ],
+          "deliveryProviderName": "YM_US",
+          "useTimeType": "algorithm",
+          "utParams": "{\"buyerId\":0,\"categoryId\":70805,\"cmd\":false,\"crowdTypes\":\"{\\\"eta_sensitive_tag\\\":\\\"-730838169\\\",\\\"shipping_cost_sensitive\\\":\\\"-1315857875\\\"}\",\"currency\":\"CNY\",\"deliveryDate\":\"2026-10-26\",\"deliveryDateMin\":\"2026-10-19\",\"deliveryDayMax\":10,\"deliveryDayMin\":3,\"fAmount\":0.0,\"fCurrency\":\"CNY\",\"gtpEtaTraceId\":\"3#10#ALGORITHM#1792447632122#1793052432122#YM_US#ae_marketplace#US#1792188432122#NON#LOCAL_SERVICE_STORE_OWNED#7200180#NON#US#228#d3aedbd41d77b2a2da19b6b7a05f40f2_20261015#NON#\",\"itemId\":1005007003120077,\"preOrder\":false,\"productId\":1005007003120077,\"provider\":\"operator\",\"serviceName\":\"YM_US\",\"shipFrom\":\"US\",\"shipToCountry\":\"US\",\"shippingFee\":\"0\",\"traceId\":\"0b884c0217921884317373165e0d27\",\"trackingAvailable\":true}",
+          "warehouseCode": "ae_marketplace",
+          "existEtaMinTime": "yes",
+          "dayOfWeek": "Monday",
+          "provider": "operator",
+          "itemShipFromType": "same",
+          "identityType": "LOCAL_SERVICE_STORE_OWNED",
+          "currency": "CNY",
+          "company": "YM_US",
+          "deliveryDate": "Oct. 26",
+          "quantity": 9,
+          "leadTimeType": "Overseas_tuoguan",
+          "showMoreCount": "1",
+          "existEtaMaxTime": "yes",
+          "solutionBusinessXDays": 0,
+          "guaranteedDeliveryTimeProviderName": "decision_committed_time",
+          "itemPrice": "CN￥ 120.25",
+          "showXDayDeliveryTips": "yes",
+          "shipFromCode": "US",
+          "deliveryProviderCode": "YM_US",
+          "shipTo": "United States"
+        },
+        "contentLayout": [
+          [
+            {
+              "blockGroup": "freight-0",
+              "blockType": "freight",
+              "componentId": "132342",
+              "content": "<span style=\"color: #191919;\"><strong>Delivery: Oct 19 - 26</strong></span>",
+              "displayCondition": "default=visible",
+              "distance": 1,
+              "medusaKey": "eta_content_Local_Plus_2",
+              "order": 1,
+              "type": "htmlText",
+              "useInDeliveryOptionPanel": true,
+              "useInDetailFirstScreen": true,
+              "useInSkuSwitch": true
+            }
+          ]
+        ],
+        "deliveryOptionPanelDisplayList": [
+          "132361"
+        ],
+        "detailFirstScreenDisplayList": [
+          "132361"
+        ],
+        "finalPatternId": 2720001,
+        "skuSwitchDisplayList": [
+          "132361"
+        ],
+        "titleLayout": [
+          [
+            {
+              "blockGroup": "title-1",
+              "blockType": "title",
+              "componentId": "132361",
+              "content": "<span style=\"color: #191919;\"><strong>Free shipping</strong></span>",
+              "displayCondition": "shippingFee=free||(localSupplyFreeShipping=yes&&smfst=yes)",
+              "distance": 1,
+              "medusaKey": "Global_Version_freeshipping@freightCost",
+              "order": 1,
+              "type": "htmlText",
+              "useInDeliveryOptionPanel": true,
+              "useInDetailFirstScreen": true,
+              "useInSkuSwitch": true
+            }
+          ]
+        ]
+      }
+    ],
+    "hideDelivery": false,
+    "icon": "https://ae-pic-a1.aliexpress-media.com/kf/S31218146a211466eb3d67e4be5119d21T.png",
+    "originalLayoutResultList": [
+      {
+        "additionLayout": [
+          {
+            "blockGroup": "others-0",
+            "blockType": "others",
+            "componentId": "132371",
+            "content": "Tracking available",
+            "displayCondition": "tracking=visible",
+            "distance": 1,
+            "medusaKey": "tracking_available@others",
+            "order": 4,
+            "type": "textWithMark",
+            "useInDeliveryOptionPanel": true,
+            "useInDetailFirstScreen": false,
+            "useInSkuSwitch": false
+          }
+        ],
+        "bizData": {
+          "patternId": 2720001,
+          "discount": 100.0,
+          "shipFromWarehouseCode": {
+            "US": [
+              "ae_marketplace"
+            ]
+          },
+          "tracking": "visible",
+          "workDayOneFourBeforeCutTime": "no",
+          "gtpProvider": "ALGORITHM",
+          "displayTomorrow": "no",
+          "itemScene": "newGlobal",
+          "shipToCode": "US",
+          "thresholdOverZero": "yes",
+          "shipFrom": "United States",
+          "deliveryDayMax": 10,
+          "displayEtaMinDate": "Oct. 19",
+          "guaranteedDeliveryTime": 20,
+          "etaVersionDisplayType": "deliveryDateInterval",
+          "freightCommitDay": "20",
+          "etaTraceId": "3#10#ALGORITHM#1792447632122#1793052432122#YM_US#ae_marketplace#US#1792188432122#NON#LOCAL_SERVICE_STORE_OWNED#7200180#NON#US#228#d3aedbd41d77b2a2da19b6b7a05f40f2_20261015#NON#",
+          "etaVersionStrategyId": 98,
+          "gtpEtaTraceId": "3#10#ALGORITHM#1792447632122#1793052432122#YM_US#ae_marketplace#US#1792188432122#NON#LOCAL_SERVICE_STORE_OWNED#7200180#NON#US#228#d3aedbd41d77b2a2da19b6b7a05f40f2_20261015#NON#",
+          "workDayOneFiveBeforeCutTime": "no",
+          "itemId": 1005007003120077,
+          "solutionBusinessType": "local_supply",
+          "etaVersionSceneId": 198,
+          "shippingFee": "free",
+          "displayEtaMaxDate": "Oct. 26",
+          "deliveryDayMin": 3,
+          "warehouseType": "dropshipping",
+          "solutionId": 2886001,
+          "deliveryOptionCode": "YM_US",
+          "leadTimeSort": [
+            600
+          ],
+          "deliveryProviderName": "YM_US",
+          "useTimeType": "algorithm",
+          "utParams": "{\"buyerId\":0,\"categoryId\":70805,\"cmd\":false,\"crowdTypes\":\"{\\\"eta_sensitive_tag\\\":\\\"-730838169\\\",\\\"shipping_cost_sensitive\\\":\\\"-1315857875\\\"}\",\"currency\":\"CNY\",\"deliveryDate\":\"2026-10-26\",\"deliveryDateMin\":\"2026-10-19\",\"deliveryDayMax\":10,\"deliveryDayMin\":3,\"fAmount\":0.0,\"fCurrency\":\"CNY\",\"gtpEtaTraceId\":\"3#10#ALGORITHM#1792447632122#1793052432122#YM_US#ae_marketplace#US#1792188432122#NON#LOCAL_SERVICE_STORE_OWNED#7200180#NON#US#228#d3aedbd41d77b2a2da19b6b7a05f40f2_20261015#NON#\",\"itemId\":1005007003120077,\"preOrder\":false,\"productId\":1005007003120077,\"provider\":\"operator\",\"serviceName\":\"YM_US\",\"shipFrom\":\"US\",\"shipToCountry\":\"US\",\"shippingFee\":\"0\",\"traceId\":\"0b884c0217921884317373165e0d27\",\"trackingAvailable\":true}",
+          "warehouseCode": "ae_marketplace",
+          "existEtaMinTime": "yes",
+          "dayOfWeek": "Monday",
+          "provider": "operator",
+          "itemShipFromType": "same",
+          "identityType": "LOCAL_SERVICE_STORE_OWNED",
+          "currency": "CNY",
+          "company": "YM_US",
+          "deliveryDate": "Oct. 26",
+          "quantity": 9,
+          "leadTimeType": "Overseas_tuoguan",
+          "showMoreCount": "1",
+          "existEtaMaxTime": "yes",
+          "solutionBusinessXDays": 0,
+          "guaranteedDeliveryTimeProviderName": "decision_committed_time",
+          "itemPrice": "CN￥ 120.25",
+          "showXDayDeliveryTips": "yes",
+          "shipFromCode": "US",
+          "deliveryProviderCode": "YM_US",
+          "shipTo": "United States"
+        },
+        "contentLayout": [
+          [
+            {
+              "blockGroup": "freight-0",
+              "blockType": "freight",
+              "componentId": "132342",
+              "content": "<span style=\"color: #191919;\"><strong>Delivery: Oct 19 - 26</strong></span>",
+              "displayCondition": "default=visible",
+              "distance": 1,
+              "medusaKey": "eta_content_Local_Plus_2",
+              "order": 1,
+              "type": "htmlText",
+              "useInDeliveryOptionPanel": true,
+              "useInDetailFirstScreen": true,
+              "useInSkuSwitch": true
+            }
+          ]
+        ],
+        "deliveryOptionPanelDisplayList": [
+          "132361"
+        ],
+        "detailFirstScreenDisplayList": [
+          "132361"
+        ],
+        "finalPatternId": 2720001,
+        "skuSwitchDisplayList": [
+          "132361"
+        ],
+        "titleLayout": [
+          [
+            {
+              "blockGroup": "title-1",
+              "blockType": "title",
+              "componentId": "132361",
+              "content": "<span style=\"color: #191919;\"><strong>Free shipping</strong></span>",
+              "displayCondition": "shippingFee=free||(localSupplyFreeShipping=yes&&smfst=yes)",
+              "distance": 1,
+              "medusaKey": "Global_Version_freeshipping@freightCost",
+              "order": 1,
+              "type": "htmlText",
+              "useInDeliveryOptionPanel": true,
+              "useInDetailFirstScreen": true,
+              "useInSkuSwitch": true
+            }
+          ]
+        ]
+      }
+    ],
+    "selectedDeliveryOptionCode": "YM_US",
+    "styleCode": "default",
+    "systemFeature": {
+      "hideShipFrom": true
+    },
+    "title": "Shipping"
+  },
+  "store": {
+    "benefitInfoList": [
+      {
+        "title": "# sold in 180 days ",
+        "value": "3,000+"
+      }
+    ],
+    "businessInfo": {
+      "actionTarget": "https://shoprenderview.aliexpress.com/credential/showcredential.htm?storeNum=1103608546&_lang=en_US&_currency=USD",
+      "bgColor": "#F0F3F7",
+      "text": "Seller info"
+    },
+    "fontColor": "#000000",
+    "hasStoreFeedback": false,
+    "licenseInfo": {
+      "actionTarget": "https://shoprenderview.aliexpress.com/credential/showcredential.htm?storeNum=1103608546&_lang=en_US&_currency=USD",
+      "text": "Business info"
+    },
+    "logo": "https://ae-pic-a1.aliexpress-media.com/kf/S7e6c716316b7479d87ce43f135ded5c07.jpg",
+    "sellerInfo": {
+      "adminSeq": 2683395990,
+      "aeRuSelfOperation": false,
+      "boutiqueSeller": false,
+      "companyId": 2683395990,
+      "countryCompleteName": "China",
+      "esRetailOrConsignment": false,
+      "formatOpenTime": "Mar 20, 2024",
+      "hasStore": false,
+      "localSeller": false,
+      "openTime": "2024-03-20 00:57:18",
+      "openedYear": 2,
+      "payPalAccount": false,
+      "plazaElectronicSeller": false,
+      "province": "",
+      "ruConsignmentAndMarketPlace": false,
+      "ruSelfOperation": false,
+      "showPlazaHeader": false,
+      "spanishPlaza": false,
+      "storeNum": 1103609491,
+      "storeURL": "//www.aliexpress.com/store/1103608546",
+      "topRatedSeller": false
+    },
+    "sellerLevel": "22-s",
+    "sellerPositiveNum": 552,
+    "sellerPositiveRate": "92.3",
+    "sellerScore": 1355,
+    "sellerTotalNum": 1681,
+    "showStoreInfo": true,
+    "storeAllProductPage": "https://campaign.aliexpress.com/wow/gcp/shop-framework/index?wx_navbar_hidden=true&wx_navbar_transparent=true&shopId=1103609491&sellerId=2683395990&extParams=&productIds=&expAppPageFrameVersion=&pagePath=allProduct.htm&invitationCode=&wh_weex=true",
+    "storeHeaderResult": {
+      "tabList": []
+    },
+    "storeHomePage": "https://m.aliexpress.com/store/storeHome.htm?sellerAdminSeq=2683395990",
+    "storeName": "ATTACK SHARK GAMING Store",
+    "storeNameKey": "Sold By",
+    "storeStyle": "DEFAULT"
+  },
+  "specifications": {
+    "outerProps": [
+      {
+        "attrName": "High-concerned chemical",
+        "attrValue": "none"
+      }
+    ],
+    "propGroups": [],
+    "sexy": false,
+    "showOnAbove": false,
+    "showPropGroups": false,
+    "showPropOuter": false,
+    "showedProps": [
+      {
+        "attrName": "High-concerned chemical",
+        "attrValue": "none"
+      }
+    ],
+    "showedPropsMap": {
+      "200006730": {
+        "attrName": "Number of Rollers",
+        "attrValue": "1 pcs"
+      }
+    },
+    "textCertifications": [
+      {
+        "attrName": "FCC ID",
+        "attrValue": "2AZBD-X3"
+      }
+    ]
+  },
+  "description": {
+    "descFoldThreshold": 8,
+    "instructionInfo": {
+      "action": "View",
+      "bgColor": "#F5F5F5",
+      "content": "<img src=\"https://ae-pic-a1.aliexpress-media.com/kf/Sec420491725f48ef91567f656f935860R/96x96.png\" width=\"19\" height=\"15\"> User manual (PDF)",
+      "mediaType": "PDF",
+      "mediaUrl": "https://ae-pic-a1.aliexpress-media.com/kf/Sa2111936882941c1aaf9d5430360c0beL.pdf",
+      "title": "Item guides & documents"
+    },
+    "isLocalSeller": false,
+    "msiteDescUrl": "https://pdp.aliexpress-media.com/product/description/msite/v2/en_US/desc.htm?productId=1005007003120077&key=S1019897a680e4c04adf117d13f0b3225N.zip&token=4a08fc53819f663d708fd8992655101a&sellerId=2683395990",
+    "nativeDescUrl": "https://pdp.aliexpress-media.com/product/description/stdmobile/v2/en_US/desc.json?productId=1005007003120077&key=S3b1429c189ef493b8a95cdc62a3941210.json&token=eac0dddf0778d73d5fd3a379314a8c45&sellerId=2683395990",
+    "pcDescUrl": "https://pdp.aliexpress-media.com/product/description/pc/v2/en_US/desc.htm?productId=1005007003120077&key=S1019897a680e4c04adf117d13f0b3225N.zip&token=4a08fc53819f663d708fd8992655101a&sellerId=2683395990",
+    "reportText": "<span style=\"color: #000000;\"><strong>Report this item or seller</strong></span>",
+    "sellingPointInfo": {
+      "limitCnt": 3,
+      "title": "Highlights",
+      "viewLessText": "view less",
+      "viewMoreText": "View More"
+    },
+    "storeId": 1103608546,
+    "title": "Product details",
+    "urlMatchList": [
+      "^(https?:\\/\\/)?([a-zA-Z0-9-]+\\.)*aliexpress\\.us(?:/.*)?$"
+    ]
+  },
+  "quantity": {
+    "allSkuQuantityView": {
+      "12000048051996989": {
+        "currentCount": 1,
+        "maxBuyCount": 0,
+        "maxBuyCountStr": "Sold out"
+      }
+    },
+    "currentSkuQuantityView": {
+      "currentCount": 1,
+      "hintText": "Max. 1 pcs/shopper",
+      "maxBuyCount": 1
+    },
+    "title": "Qty",
+    "totalAvailableInventory": 340
+  },
+  "services": {
+    "SUSTAINABILITY_SERVICE_BLOCK": {
+      "icon": "https://ae-pic-a1.aliexpress-media.com/kf/S681370540ea14a398c9ab8c8a009d859e.png",
+      "params": {
+        "sceneType": "LOCAL_PLUS",
+        "promiseIds": "38",
+        "extParams": "{51:{\"productId\":\"1005007003120077\",\"CROWD_TYPE_threeOrderNewUser\":\"threeOrderNewUser\",\"promiseIds\":\"51\",\"platformType\":\"DESKTOP\",\"extendPlatform\":\"PC\",\"crowdValueList\":\"-29900,-29910,-29883\",\"userId\":9999,\"countryTo\":\"US\",\"scene\":\"detail\",\"sceneType\":\"LOCAL_PLUS\",\"currency\":\"USD\",\"sellerRegion\":\"CN\",\"status\":\"0\",\"shipTo\":\"US\"},36:{\"CROWD_TYPE_threeOrderNewUser\":\"threeOrderNewUser\",\"promiseIds\":\"36\",\"platformType\":\"DESKTOP\",\"extendPlatform\":\"PC\",\"crowdValueList\":\"-29900,-29910,-29883\",\"userId\":9999,\"countryTo\":\"US\",\"scene\":\"detail\",\"sceneType\":\"LOCAL_PLUS\",\"currency\":\"USD\",\"sellerRegion\":\"CN\",\"status\":\"0\",\"shipTo\":\"US\"},38:{\"CROWD_TYPE_threeOrderNewUser\":\"threeOrderNewUser\",\"promiseIds\":\"38\",\"platformType\":\"DESKTOP\",\"extendPlatform\":\"PC\",\"crowdValueList\":\"-29900,-29910,-29883\",\"userId\":9999,\"countryTo\":\"US\",\"scene\":\"detail\",\"sceneType\":\"LOCAL_PLUS\",\"currency\":\"USD\",\"sellerRegion\":\"CN\",\"status\":\"0\",\"shipTo\":\"US\"},39:{\"CROWD_TYPE_threeOrderNewUser\":\"threeOrderNewUser\",\"promiseIds\":\"39\",\"platformType\":\"DESKTOP\",\"extendPlatform\":\"PC\",\"crowdValueList\":\"-29900,-29910,-29883\",\"userId\":9999,\"countryTo\":\"US\",\"scene\":\"detail\",\"sceneType\":\"LOCAL_PLUS\",\"currency\":\"USD\",\"sellerRegion\":\"CN\",\"status\":\"0\",\"shipTo\":\"US\"},27:{\"freeReturnsDisplayDays\":\"withDays\",\"displayNode\":\"after_placed\",\"CROWD_TYPE_threeOrderNewUser\":\"threeOrderNewUser\",\"promiseIds\":\"27\",\"platformType\":\"DESKTOP\",\"extendPlatform\":\"PC\",\"crowdValueList\":\"-29900,-29910,-29883\",\"userId\":9999,\"countryTo\":\"US\",\"scene\":\"detail\",\"sc",
+        "scene": "popup"
+      },
+      "popupTitle": "Sustainability at AliExpress",
+      "promiseId": 38,
+      "title": "Shop sustainably",
+      "titleBold": true,
+      "titleColor": "#000000"
+    },
+    "AFTER_SALE_SERVICE_BLOCK": {
+      "icon": "https://ae-pic-a1.aliexpress-media.com/kf/S38b1dbf5dfb7428fb71c031485cf9641u.png",
+      "params": {
+        "sceneType": "LOCAL_PLUS",
+        "promiseIds": "27",
+        "extParams": "{51:{\"productId\":\"1005007003120077\",\"CROWD_TYPE_threeOrderNewUser\":\"threeOrderNewUser\",\"promiseIds\":\"51\",\"platformType\":\"DESKTOP\",\"extendPlatform\":\"PC\",\"crowdValueList\":\"-29900,-29910,-29883\",\"userId\":9999,\"countryTo\":\"US\",\"scene\":\"detail\",\"sceneType\":\"LOCAL_PLUS\",\"currency\":\"USD\",\"sellerRegion\":\"CN\",\"status\":\"0\",\"shipTo\":\"US\"},36:{\"CROWD_TYPE_threeOrderNewUser\":\"threeOrderNewUser\",\"promiseIds\":\"36\",\"platformType\":\"DESKTOP\",\"extendPlatform\":\"PC\",\"crowdValueList\":\"-29900,-29910,-29883\",\"userId\":9999,\"countryTo\":\"US\",\"scene\":\"detail\",\"sceneType\":\"LOCAL_PLUS\",\"currency\":\"USD\",\"sellerRegion\":\"CN\",\"status\":\"0\",\"shipTo\":\"US\"},38:{\"CROWD_TYPE_threeOrderNewUser\":\"threeOrderNewUser\",\"promiseIds\":\"38\",\"platformType\":\"DESKTOP\",\"extendPlatform\":\"PC\",\"crowdValueList\":\"-29900,-29910,-29883\",\"userId\":9999,\"countryTo\":\"US\",\"scene\":\"detail\",\"sceneType\":\"LOCAL_PLUS\",\"currency\":\"USD\",\"sellerRegion\":\"CN\",\"status\":\"0\",\"shipTo\":\"US\"},39:{\"CROWD_TYPE_threeOrderNewUser\":\"threeOrderNewUser\",\"promiseIds\":\"39\",\"platformType\":\"DESKTOP\",\"extendPlatform\":\"PC\",\"crowdValueList\":\"-29900,-29910,-29883\",\"userId\":9999,\"countryTo\":\"US\",\"scene\":\"detail\",\"sceneType\":\"LOCAL_PLUS\",\"currency\":\"USD\",\"sellerRegion\":\"CN\",\"status\":\"0\",\"shipTo\":\"US\"},27:{\"freeReturnsDisplayDays\":\"withDays\",\"displayNode\":\"after_placed\",\"CROWD_TYPE_threeOrderNewUser\":\"threeOrderNewUser\",\"promiseIds\":\"27\",\"platformType\":\"DESKTOP\",\"extendPlatform\":\"PC\",\"crowdValueList\":\"-29900,-29910,-29883\",\"userId\":9999,\"countryTo\":\"US\",\"scene\":\"detail\",\"sc",
+        "scene": "popup"
+      },
+      "popupTitle": "Free returns within 90 days",
+      "promiseId": 27,
+      "shortTitle": "Free returns",
+      "title": "Free returns within 90 days",
+      "titleBold": true,
+      "titleColor": "#000000"
+    }
+  }
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/aliexpress/products/3256806816805325' \
+  --header 'X-API-Key: YOUR_API_KEY'
+```
+
+[Browse all AliExpress endpoints](/aliexpress/overview).

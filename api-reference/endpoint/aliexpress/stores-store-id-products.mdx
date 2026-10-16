@@ -1,0 +1,235 @@
+---
+title: "Get store products"
+api: "GET https://scrapebadger.com/v1/aliexpress/stores/{store_id}/products"
+description: "Get store products."
+---
+
+Get store products.
+
+**Credits:** 10 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField path="store_id" type="string" required>
+Store id.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+Page. Minimum: 1. Maximum: 1000.
+</ParamField>
+
+<ParamField query="page_size" type="integer" default="24">
+Page size. Minimum: 1. Maximum: 60.
+</ParamField>
+
+<ParamField query="country" type="string" default="US">
+Country.
+</ParamField>
+
+<ParamField query="currency" type="string" default="USD">
+Currency.
+</ParamField>
+
+<ParamField query="language" type="string" default="en">
+Language.
+</ParamField>
+
+<ParamField query="query" type="string" default="">
+Query. Maximum length: 250.
+</ParamField>
+
+<ParamField query="sort" type="string" default="bestmatch_sort">
+Sort. Allowed values: `bestmatch_sort`, `price_asc`, `price_desc`, `orders_desc`.
+</ParamField>
+
+## Response
+
+```json
+{
+  "store_id": "1103608546",
+  "products": [
+    {
+      "product_id": "1005007003120077",
+      "title": "ATTACK SHARK X11 Lightweight Wireless Gaming Mouse with RGB Backlight Charging, Up to 22K DPI, PAW3311 Optical Sensor, HUYU Swit",
+      "url": "https://www.aliexpress.com/item/3256806816805325.html?pdp_npi=4%40dis%21USD%21US%20%2460.82%21US%20%2419.46%21%21%21404.92%21129.55%21%400b88489f17921884412552705e0e20%2112000039021192609%21sh%21US%210%21X",
+      "price": 19.46,
+      "currency": "USD",
+      "original_price": 60.82,
+      "rating": 4.8,
+      "review_count": 204,
+      "sold_count": 1400,
+      "image": "https://ae-pic-a1.aliexpress-media.com/kf/Sa1b672d12ef746c686e83455e2511e58h.jpg_350x350.jpg",
+      "original": {
+        "atmosphere": [
+          {
+            "atmosphereDTOList": [
+              {}
+            ],
+            "position": 1,
+            "resourcePositionCode": "STORE_ITEM_TILTE_RESOURCE"
+          }
+        ],
+        "averageStar": 4.8,
+        "averageStarRate": 95.5,
+        "bigSaleProduct": false,
+        "evaluateInfo": {
+          "starWidth": 33,
+          "starUrl": "//ae-pic-a1.aliexpress-media.com/kf/S11cf9de183f941cbacef76fbe08ed1ae3/36x36.png",
+          "starHeight": 30,
+          "starRating": 4.8
+        },
+        "feedbacks": 204,
+        "formatedPiecePriceStr": "US $60.82",
+        "formatedPromotionPiecePriceStr": "US $19.46",
+        "id": 1005007003120077,
+        "image350Url": "https://ae-pic-a1.aliexpress-media.com/kf/Sa1b672d12ef746c686e83455e2511e58h.jpg_350x350.jpg",
+        "inPromotion": true,
+        "lot": false,
+        "modsStyle": {
+          "price": {
+            "decimal_point": ".",
+            "comma_style": ",",
+            "symbol_position": "left"
+          }
+        },
+        "orders": 1400,
+        "pcDetailUrl": "//www.aliexpress.com/item/3256806816805325.html?pdp_npi=4%40dis%21USD%21US%20%2460.82%21US%20%2419.46%21%21%21404.92%21129.55%21%400b88489f17921884412552705e0e20%2112000039021192609%21sh%21US%210%21X",
+        "piecePriceMoney": {
+          "amount": 60.82,
+          "cent": 6082,
+          "centFactor": 100,
+          "currency": "USD",
+          "currencyCode": "USD"
+        },
+        "pieceUnit": "",
+        "piecesPerLot": 0,
+        "priceLocalConfig": {
+          "single": {
+            "thousandsChar": ",",
+            "decimalPointChar": ".",
+            "currencySymbolPosition": "front",
+            "currencySymbol": "$",
+            "showDecimal": true,
+            "currencySymbolAndPriceAddBlank": false
+          },
+          "separatorStr": " - ",
+          "from": {
+            "thousandsChar": ",",
+            "decimalPointChar": ".",
+            "currencySymbolPosition": "front",
+            "currencySymbol": "$",
+            "showDecimal": true,
+            "currencySymbolAndPriceAddBlank": false
+          },
+          "to": {
+            "thousandsChar": ",",
+            "decimalPointChar": ".",
+            "currencySymbolPosition": "front",
+            "currencySymbol": "$",
+            "showDecimal": true,
+            "currencySymbolAndPriceAddBlank": false
+          },
+          "roundOffZero": false,
+          "useful": true,
+          "version": "v1"
+        },
+        "priceLocalInfo": {
+          "promotionPiecePriceStructure": "$19.46|19|46",
+          "piecePriceStructure": "$60.82|60|82",
+          "promotionPiecePriceFormat": "$19.46",
+          "piecePriceFormat": "$60.82"
+        },
+        "prices": {
+          "piecePrice": {
+            "amount": 60.82,
+            "currencyCode": "USD"
+          },
+          "promotionPiecePrice": {
+            "amount": 19.46,
+            "currencyCode": "USD"
+          },
+          "currentSymbol": "$"
+        },
+        "productExt": {
+          "summaryDebugQuery": null,
+          "isDsaRiskItem": false,
+          "riskType": null,
+          "category_id_path": "7,200001081,200001082,70805",
+          "umpCostTime": "45",
+          "pdpNpiTag": "[\"-2000\"]",
+          "spDebugQuery": "https://tppwork.taobao.com/us44pre/recommend?appid=10001&traceid=0b88489f17921884412552705e0e20&ucountry=LT&ship_searcher_idx=-US&osf=shop_general_search_buyer&advsort=ADVTAOBAO&_prohibited_selling_country_list=LT%2CUS&is_stress_test=0&dl=l&free_ship_summary_idx=-US&uuid=02833fa3-4941-4455-ad49-0c46b6bb9e7c&currency_code=USD&saas_region=aeg&scene=productGroup&hs_exp=bucket_id%3A5496%3Bmagneto_ab_no%3A486683%3Bfrontend_layer%3A5564%3Bqp_ab_no%3A5574%3Bsp_ab_no%3A5587%3Bp4p_ab_no%3A446705%3Bitem_diff_display_APP%3A5624&store_search_algo_pv_id=02833fa3-4941-4455-ad49-0c46b6bb9e7c&storesort=1&offertype=ae-shop-buyer-s033027073006.de81&discnt_et=1792188441&src=b2c-shop-33.27.73.6&terminal=pc&traffic_channel=main&traffic_source=shop_main&n=24&outfmt=json&site=glo&s=0&callSource=global-shop-center-s&pgnum=48&ali_id=2683395990&accessKey=Mz6Fbm&rankerid=0040&ship_to=US&call_source=shop",
+          "DISCOUNTED_PRICE_GAB_CODE": "DISCOUNTED_PRICE_ATMS_DEFAULT",
+          "super_deal_product": false
+        },
+        "promotionDiscount": 68,
+        "promotionPiecePriceMoney": {
+          "amount": 19.46,
+          "cent": 1946,
+          "centFactor": 100,
+          "currency": "USD",
+          "currencyCode": "USD"
+        },
+        "sales": "1,000+",
+        "scaleImageUrl": "https://ae-pic-a1.aliexpress-media.com/kf/Sa1b672d12ef746c686e83455e2511e58h.jpg_200x200.jpg",
+        "seoTitle": "ATTACK SHARK X11 Lightweight Wireless Gaming Mouse with RGB Backlight Charging, Up to 22K DPI, PAW3311 Optical Sensor, HUYU Swit",
+        "skuImageUrl": "https://ae-pic-a1.aliexpress-media.com/kf/S10b1ec64d8a148e3b6001675ee9acc90g.jpg_640x640.jpg",
+        "subject": "ATTACK SHARK X11 Lightweight Wireless Gaming Mouse with RGB Backlight Charging, Up to 22K DPI, PAW3311 Optical Sensor, HUYU Swit",
+        "summImageUrl": "https://ae-pic-a1.aliexpress-media.com/kf/Sa1b672d12ef746c686e83455e2511e58h.jpg_120x120.jpg",
+        "tagResultIds": [],
+        "trace": {
+          "utLogMap": {
+            "traceid": "0b88489f17921884412552705e0e20",
+            "x_object_type": "item",
+            "is_detail_next": 1,
+            "pageSize": 24,
+            "language": "en",
+            "sort_by": "default_default",
+            "mixrank_success": false,
+            "countryId": "US",
+            "algo_exp_id": "02833fa3-4941-4455-ad49-0c46b6bb9e7c-0",
+            "scene": "search",
+            "tpp_buckets": "687#2158#5496#533_687#2172#486683#279_687#2163#5564#457_687#2164#5574#41_687#2165#5587#887_687#2166#446705#301_687#2167#5624#757",
+            "pvid": "02833fa3-4941-4455-ad49-0c46b6bb9e7c",
+            "hitDocs": 29,
+            "listno": 0,
+            "star_rating": 4.8,
+            "traffic_diff_id": "shopSearch",
+            "currency": "USD",
+            "pagePos": 0,
+            "prod": 1005007003120077,
+            "algo_pvid": "02833fa3-4941-4455-ad49-0c46b6bb9e7c",
+            "hit_19_forbidden": false,
+            "query": "",
+            "bizScene": "shop_general_search_buyer",
+            "custom_group": 0,
+            "trafficChannel": "main",
+            "query_from": "shop_general_search_buyer",
+            "is_adult_certified": false,
+            "mixrank_enable": false,
+            "pageIndex": 1,
+            "list_style": "gallery",
+            "x_object_id": 1005007003120077
+          }
+        },
+        "unit": ""
+      }
+    }
+  ],
+  "page": 1,
+  "total_results": 29,
+  "total_pages": 2
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/aliexpress/stores/1103608546/products' \
+  --header 'X-API-Key: YOUR_API_KEY'
+```
+
+[Browse all AliExpress endpoints](/aliexpress/overview).

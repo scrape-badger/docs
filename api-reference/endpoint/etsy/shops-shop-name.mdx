@@ -1,0 +1,59 @@
+---
+title: "Get shop profile"
+api: "GET https://scrapebadger.com/v1/etsy/shops/{shop_name}"
+description: "Get shop profile."
+---
+
+Get shop profile.
+
+**Credits:** 10 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField path="shop_name" type="string" required>
+Shop name.
+</ParamField>
+
+<ParamField query="country" type="string" default="US">
+Country.
+</ParamField>
+
+<ParamField query="currency" type="string" default="USD">
+Currency.
+</ParamField>
+
+<ParamField query="language" type="string" default="en-US">
+Language.
+</ParamField>
+
+## Response
+
+```json
+{
+  "shop_id": "13626694",
+  "name": "GlazyLittleThings",
+  "url": "https://www.etsy.com/shop/GlazyLittleThings",
+  "description": "Shop items by GlazyLittleThings located in Shrewsbury, United Kingdom.",
+  "location": "Shrewsbury, United Kingdom",
+  "image": "https://i.etsystatic.com/13626694/r/isla/d81953/66503117/isla_500x500.66503117_o3i3oml5.jpg",
+  "banner": "https://i.etsystatic.com/13626694/r/isbl/fcc833/66261629/isbl_fullxfull.66261629_riogss2b.jpg",
+  "rating": 5.0,
+  "review_count": 411,
+  "listing_count": 73,
+  "sales_count": 1243,
+  "owner_user_id": "96844953"
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/etsy/shops/GlazyLittleThings' \
+  --header 'X-API-Key: YOUR_API_KEY'
+```
+
+[Browse all Etsy endpoints](/etsy/overview).

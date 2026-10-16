@@ -1,0 +1,77 @@
+---
+title: "Find nearby stores"
+api: "GET https://scrapebadger.com/v1/target/stores"
+description: "Find nearby stores."
+---
+
+Find nearby stores.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField query="zip_code" type="string" required>
+Zip code.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="10">
+Limit. Minimum: 1. Maximum: 20.
+</ParamField>
+
+## Response
+
+```json
+{
+  "stores": [
+    {
+      "store_id": "1375",
+      "name": "Mpls Nicollet Mall",
+      "status": "Open",
+      "distance": 0.67,
+      "phone": "612-338-0085",
+      "address": {
+        "address_line1": "900 Nicollet Mall",
+        "city": "Minneapolis",
+        "country_code": "US",
+        "region": "MN",
+        "state": "Minnesota",
+        "postal_code": "55403-2530"
+      },
+      "hours": {
+        "main_hours": {
+          "days": [
+            {
+              "is_open": true,
+              "date": "2026-10-16",
+              "day_name": "Friday",
+              "hours": []
+            }
+          ]
+        }
+      },
+      "timezone": {
+        "iso_time_zone_code": "America/Chicago",
+        "time_zone_code": "CST",
+        "time_zone_utc_offset_name": "UTC-06"
+      },
+      "services": []
+    }
+  ],
+  "count": 10
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/target/stores' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'zip_code=55403' \
+  --data-urlencode 'limit=10'
+```
+
+[Browse all Target endpoints](/target/overview).

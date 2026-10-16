@@ -1,0 +1,92 @@
+---
+title: "Get product questions"
+api: "GET https://scrapebadger.com/v1/bestbuy/products/{sku}/questions"
+description: "Get product questions."
+---
+
+Get product questions.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField path="sku" type="string" required>
+Sku.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+Page. Minimum: 1. Maximum: 1000.
+</ParamField>
+
+<ParamField query="page_size" type="integer" default="10">
+Page size. Minimum: 1. Maximum: 50.
+</ParamField>
+
+<ParamField query="query" type="string" default="">
+Query.
+</ParamField>
+
+## Response
+
+```json
+{
+  "skuId": "6668412",
+  "questionInfo": {
+    "aiQuestionCount": 7,
+    "aiAnswerCount": 7,
+    "answeredQuestionCount": 34,
+    "askAQuestionPage": "/site/questions/submission/6668412?campaignId=QA_&return=",
+    "isQnaEnabled": true,
+    "qnaStandalonePage": "/site/questions/lenovo-ideapad-slim-3i-15-6-full-hd-laptop-intel-processor-n150-2024-8gb-memory-128gb-storage-arctic-grey/6668412",
+    "totalAnswerCount": 44,
+    "totalQuestionCount": 45,
+    "aiSummary": "This laptop features 8 gigabytes of memory and UFS storage. It includes a 720p front-facing camera, a built-in microphone, and Dolby Audio technology. The device provides up to 12 hours of battery life and Wi-Fi 6 wireless connectivity. External displays are supported via HDMI and USB-C, with the ability to connect two monitors using a hub. The laptop includes a 65W round tip power adapter and a card reader for SD cards. Preinstalled software includes a 30-day trial membership for Office applications."
+  },
+  "questions": {
+    "results": [
+      {
+        "answerCount": 1,
+        "bazaarvoiceId": null,
+        "id": "0a702d6f-d126-360a-965b-94916d89e4e6",
+        "isAiGenerated": true,
+        "negativeFeedbackCount": 0,
+        "positiveFeedbackCount": 0,
+        "submissionTime": null,
+        "text": null,
+        "title": "How much memory does this Lenovo laptop have?",
+        "userNickname": null,
+        "answers": [
+          {
+            "brandImageUrl": null,
+            "id": "24d2b192-e664-3708-9abb-6f1fd4ef33c8",
+            "negativeFeedbackCount": 0,
+            "positiveFeedbackCount": 0,
+            "submissionTime": null,
+            "text": "This Lenovo laptop has 8 gigabytes of memory.",
+            "userNickname": null,
+            "badges": [],
+            "images": []
+          }
+        ],
+        "images": []
+      }
+    ]
+  }
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/bestbuy/products/6668412/questions' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'page_size=10' \
+  --data-urlencode 'query=' \
+  --data-urlencode 'page=1'
+```
+
+[Browse all Best Buy endpoints](/bestbuy/overview).

@@ -1,0 +1,150 @@
+---
+title: "Search products"
+api: "GET https://scrapebadger.com/v1/target/search"
+description: "Search products."
+---
+
+Search products.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField query="query" type="string" required>
+Query. Minimum length: 1.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+Page. Minimum: 1. Maximum: 50.
+</ParamField>
+
+<ParamField query="page_size" type="integer" default="24">
+Page size. Minimum: 1. Maximum: 24.
+</ParamField>
+
+<ParamField query="store_id" type="string" default="1375">
+Store id.
+</ParamField>
+
+<ParamField query="zip_code" type="string" default="55403">
+Zip code.
+</ParamField>
+
+<ParamField query="sort" type="string" default="relevance">
+Sort. Allowed values: `relevance`, `PriceLow`, `PriceHigh`, `RatingHigh`, `bestselling`, `newest`.
+</ParamField>
+
+## Response
+
+```json
+{
+  "query": "laptop",
+  "category": null,
+  "page": 1,
+  "page_size": 24,
+  "total_results": 1241,
+  "total_pages": 50,
+  "products": [
+    {
+      "tcin": "1012829149",
+      "requested_tcin": null,
+      "title": "HP Essential 14\" HD Laptop, Intel N150, 4GB RAM, 128GB eMMC, Wi-Fi 6, Windows 11 Home, 1-Year Microsoft 365 Included, Rose",
+      "url": "https://www.target.com/p/hp-essential-14-hd-laptop-intel-n-series-n150-intel-graphics-4gb-ram-128gb-emmc-wi-fi-6-windows-11-home-rose/-/A-1012829149",
+      "brand": "HP Inc.",
+      "description": null,
+      "price": {
+        "current_retail": 289.99,
+        "display_was_now": false,
+        "formatted_comparison_price": "$483.32",
+        "formatted_comparison_price_type": "reg",
+        "formatted_current_price": "$289.99",
+        "formatted_current_price_type": "sale",
+        "reg_retail": 483.32,
+        "save_dollar": 193.33,
+        "save_percent": 40.0,
+        "location_id": 3991
+      },
+      "currency": "USD",
+      "images": [
+        "https://target.scene7.com/is/image/Target/GUEST_b483eb5f-030e-4084-ae99-47e3fd6c0ca5"
+      ],
+      "videos": [
+        {
+          "is_list_page_eligible": false,
+          "video_files": [
+            {
+              "mime_type": "video/mp4",
+              "video_url": "https://target.scene7.com/is/content/Target/GUEST_0a019d04-fe5b-4ad7-96be-2aaa0d560b33"
+            }
+          ]
+        }
+      ],
+      "specifications": [
+        "<B>Dimensions (Overall):</B> .71 inches (H) x 12.76 inches (W) x 8.86 inches (D)"
+      ],
+      "highlights": [
+        "[HD Display Experience] Enjoy clear visuals on a 14 inch HD 1366 x 768 anti-glare display with micro-edge design. Watch videos, create presentations, and browse content comfortably indoors or outdoors with reduced reflections."
+      ],
+      "fulfillment": {
+        "is_marketplace": true
+      },
+      "promotions": [],
+      "ratings_and_reviews": {},
+      "category": {
+        "category_id": "6k98r",
+        "parent_category_id": "5xtf4"
+      },
+      "variants": [],
+      "variation_hierarchy": [],
+      "seller": [
+        {
+          "vendor_name": "PCOnline",
+          "id": "10019361"
+        }
+      ],
+      "is_sponsored": true
+    }
+  ],
+  "facets": [
+    {
+      "facet_id": "d_deals",
+      "type": "checkbox",
+      "display_name": "Deals",
+      "expand": true,
+      "options": [
+        {
+          "display_name": "All Deals",
+          "id": "akkos",
+          "url": "d_deals:all deals",
+          "value": "all deals"
+        }
+      ]
+    }
+  ],
+  "sort_options": [
+    {
+      "name": "relevance",
+      "value": "relevance"
+    }
+  ]
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/target/search' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'query=laptop' \
+  --data-urlencode 'page=1' \
+  --data-urlencode 'page_size=24' \
+  --data-urlencode 'store_id=1375' \
+  --data-urlencode 'zip_code=55403' \
+  --data-urlencode 'sort=relevance'
+```
+
+[Browse all Target endpoints](/target/overview).

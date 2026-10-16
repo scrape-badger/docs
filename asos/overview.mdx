@@ -1,0 +1,44 @@
+---
+title: "ASOS API \u2014 Overview"
+description: "Search ASOS fashion products, retrieve rich product detail, monitor stock and prices, and browse navigation and search facets across storefronts."
+---
+
+Search ASOS fashion products, retrieve rich product detail, monitor stock and prices, and browse navigation and search facets across storefronts.
+
+Authenticate with `X-API-Key`. Requests use `https://scrapebadger.com/v1/asos`.
+
+## Endpoints
+
+| Endpoint | Request | Credits |
+| --- | --- | ---: |
+| [Search ASOS products](/api-reference/endpoint/asos/search) | `GET /search` | 5 |
+| [Get ASOS product detail](/api-reference/endpoint/asos/products-product-id) | `GET /products/{product_id}` | 10 |
+| [Get ASOS stock and price](/api-reference/endpoint/asos/stock-price) | `GET /stock-price` | 10 |
+| [Get category navigation](/api-reference/endpoint/asos/categories) | `GET /categories` | 5 |
+| [Autocomplete ASOS searches](/api-reference/endpoint/asos/autocomplete) | `GET /autocomplete` | 3 |
+| [Get search facets](/api-reference/endpoint/asos/filters) | `GET /filters` | 5 |
+| [List ASOS storefronts](/api-reference/endpoint/asos/markets) | `GET /markets` | 0 |
+
+Credits apply to successful requests. Failed requests and empty result sets are not charged.
+
+## Markets
+
+Supported market codes: `uk`, `us`, `au`, `de`, `fr`, `it`, `es`, `nl`, `se`, `dk`, `pl`.
+
+Use the same market and location parameters across search, product and availability requests. Store availability and prices reflect the requested context at collection time.
+
+## Pagination
+
+Follow each endpoint’s pagination fields and retain product IDs to deduplicate results. Search counts and stock can change between calls.
+
+## Get started
+
+[Open the playground](https://scrapebadger.com/dashboard/asos-scraper) or use the [Python and Node.js SDKs](/sdks).
+
+## Search matching and price filters
+
+ASOS uses semantic search and may return approximate or related matches even for terms with no exact matches. The response exposes `search_mode` and ASOS search metadata; do not interpret a nonzero count as an exact keyword match.
+
+Minimum and maximum prices apply to the requested market currency. When you provide only a minimum, the API resolves the current price range before applying the bound. A zero maximum returns only genuinely zero-priced products.
+
+Product currency, country, store and language overrides refresh live stock and prices for that context. Use a supported storefront combination from List Markets.

@@ -1,0 +1,87 @@
+---
+title: "Get store profile"
+api: "GET https://scrapebadger.com/v1/aliexpress/stores/{store_id}"
+description: "Get store profile."
+---
+
+Get store profile.
+
+**Credits:** 10 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField path="store_id" type="string" required>
+Store id.
+</ParamField>
+
+<ParamField query="country" type="string" default="US">
+Country.
+</ParamField>
+
+<ParamField query="currency" type="string" default="USD">
+Currency.
+</ParamField>
+
+<ParamField query="language" type="string" default="en">
+Language.
+</ParamField>
+
+## Response
+
+```json
+{
+  "store_id": "1103608546",
+  "canonical_store_id": "1103609491",
+  "seller_id": "2683395990",
+  "url": "https://www.aliexpress.com/store/1103608546",
+  "profile": {
+    "businessLicenseTitle": "Business License",
+    "countryCode": "CN",
+    "countryName": "China",
+    "fans": false,
+    "followedButtonTitle": "Followed",
+    "follows": "330 followers",
+    "hasStore": true,
+    "since": "From Mar 20, 2024",
+    "storeLogo": "https://ae-pic-a1.aliexpress-media.com/kf/S7e6c716316b7479d87ce43f135ded5c07.jpg",
+    "storeName": "ATTACK SHARK GAMING Store",
+    "storeNum": "1103609491",
+    "successFollowedTip": "successfully followed",
+    "unfollowButtonTitle": "Follow",
+    "unfollowedTip": "successfully unfollowed"
+  },
+  "review_summary": {
+    "buyerEvaluationInfoTitle": "Customer reviews ",
+    "positiveFeedBackHigherLevel": false,
+    "positiveFeedBackTitle": "positive reviews",
+    "positiveFeedBackValue": "92.3",
+    "totalNegativeSixMonths": "50",
+    "totalNegativeTitle": "Negative",
+    "totalNeutralSixMonths": "26",
+    "totalNeutralTitle": "Neutral",
+    "totalNumSixMonths": "552",
+    "totalPositiveSixMonths": "476",
+    "totalPositiveTitle": "Positive"
+  },
+  "operating_scores": [
+    {
+      "higherLevel": false,
+      "title": "store rating",
+      "value": "4.8"
+    }
+  ]
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/aliexpress/stores/1103608546' \
+  --header 'X-API-Key: YOUR_API_KEY'
+```
+
+[Browse all AliExpress endpoints](/aliexpress/overview).

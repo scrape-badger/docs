@@ -1,0 +1,41 @@
+---
+title: "Etsy API \u2014 Overview"
+description: "Etsy public ecommerce search, product, seller and review data."
+---
+
+Etsy public ecommerce search, product, seller and review data.
+
+Authenticate with `X-API-Key`. Requests use `https://scrapebadger.com/v1/etsy`.
+
+## Endpoints
+
+| Endpoint | Request | Credits |
+| --- | --- | ---: |
+| [Search listings](/api-reference/endpoint/etsy/search) | `GET /search` | 10 |
+| [Get listing detail](/api-reference/endpoint/etsy/listings-listing-id) | `GET /listings/{listing_id}` | 10 |
+| [Get shop profile](/api-reference/endpoint/etsy/shops-shop-name) | `GET /shops/{shop_name}` | 10 |
+| [Get shop listings](/api-reference/endpoint/etsy/shops-shop-name-listings) | `GET /shops/{shop_name}/listings` | 10 |
+| [Get shop reviews](/api-reference/endpoint/etsy/shops-shop-name-reviews) | `GET /shops/{shop_name}/reviews` | 20 |
+| [Get categories](/api-reference/endpoint/etsy/categories) | `GET /categories` | 10 |
+| [Get listing reviews](/api-reference/endpoint/etsy/listings-listing-id-reviews) | `GET /listings/{listing_id}/reviews` | 20 |
+| [Get search suggestions](/api-reference/endpoint/etsy/autocomplete) | `GET /autocomplete` | 20 |
+
+Credits apply to successful requests. Failed requests and empty result sets are not charged.
+
+## Markets
+
+Supported market codes: `US`, `GB`.
+
+Use the same market and location parameters across search, product and availability requests. Store availability and prices reflect the requested context at collection time.
+
+## Pagination
+
+Follow each endpoint’s pagination fields and retain product IDs to deduplicate results. Search counts and stock can change between calls.
+
+## Get started
+
+[Open the playground](https://scrapebadger.com/dashboard/etsy-scraper) or use the [Python and Node.js SDKs](/sdks).
+
+## Search filters
+
+Keyword, price, sorting and pagination controls are available on Search. The Categories endpoints provide navigation data; category filtering is not offered on Search.

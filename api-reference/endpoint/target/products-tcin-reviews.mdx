@@ -1,0 +1,250 @@
+---
+title: "Get product reviews"
+api: "GET https://scrapebadger.com/v1/target/products/{tcin}/reviews"
+description: "Get product reviews."
+---
+
+Get product reviews.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField path="tcin" type="string" required>
+Tcin.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+Page. Minimum: 1.
+</ParamField>
+
+<ParamField query="page_size" type="integer" default="10">
+Page size. Minimum: 1. Maximum: 50.
+</ParamField>
+
+<ParamField query="sort" type="string" default="most_recent">
+Sort. Allowed values: `most_recent`, `most_helpful`, `highest_rated`, `lowest_rated`.
+</ParamField>
+
+## Response
+
+```json
+{
+  "statistics": {
+    "review_count": 1350,
+    "question_count": 157,
+    "recommended_count": 320,
+    "not_recommended_count": 165,
+    "recommended_percentage": 65,
+    "reviews_with_images_count": 70,
+    "reviews_with_videos_count": 0,
+    "rating": {
+      "distribution": {
+        "1": 214,
+        "2": 59,
+        "3": 100,
+        "4": 304,
+        "5": 2009
+      },
+      "average": 4.43,
+      "positive_percentage": 89,
+      "count": 2686,
+      "secondary_averages": [
+        {
+          "id": "quality",
+          "value": 3.94,
+          "label": "quality",
+          "type": "RATING",
+          "range": 5
+        }
+      ]
+    },
+    "incentivized_count": 652,
+    "calculated_at": "2026-10-13T02:05:48.895Z",
+    "calculated_utc": 1791857148.895
+  },
+  "reviews": {
+    "page": 0,
+    "size": 24,
+    "total_results": 1349,
+    "total_pages": 57,
+    "first_page": true,
+    "last_page": false,
+    "results": [
+      {
+        "id": "8eff505d-dd00-406e-914a-2458f4adf737",
+        "external_id": "46a47f43-01db-5342-ab94-0db1867cac88",
+        "channel": "TARGET",
+        "Tcin": "82286564",
+        "Rating": 5,
+        "RatingRange": 5,
+        "SecondaryRatingsOrder": [
+          "Comfort"
+        ],
+        "SecondaryRatings": {
+          "Comfort": {
+            "Id": "Comfort",
+            "Value": 5,
+            "Label": "comfort",
+            "ValueRange": 5,
+            "DisplayType": "NORMAL"
+          },
+          "Durable": {
+            "Id": "Durable",
+            "Value": 5,
+            "Label": "durable",
+            "ValueRange": 5,
+            "DisplayType": "NORMAL"
+          },
+          "Ease of cleaning": {
+            "Id": "Ease of cleaning",
+            "Value": 5,
+            "Label": "ease of cleaning",
+            "ValueRange": 5,
+            "DisplayType": "NORMAL"
+          },
+          "Ease of installation": {
+            "Id": "Ease of installation",
+            "Value": 5,
+            "Label": "ease of installation",
+            "ValueRange": 5,
+            "DisplayType": "NORMAL"
+          },
+          "Quality": {
+            "Id": "Quality",
+            "Value": 5,
+            "Label": "quality",
+            "ValueRange": 5,
+            "DisplayType": "NORMAL"
+          },
+          "Value": {
+            "Id": "Value",
+            "Value": 5,
+            "Label": "value",
+            "ValueRange": 5,
+            "DisplayType": "NORMAL"
+          }
+        },
+        "title": "Easy to install",
+        "text": "We love this car seat! It’s got sturdy material that is easy to remove for cleaning if need be. It has the should strap cushions which makes it easy to tighten the seat straps enough without them digging into the baby. The inserts for younger kids seem very cushiony and comfortable for long rides. The car seat is easy to install and easy instructions to follow for each stage of life. This is our third Graco convertible car seat we’ve purchased and we love it just as much as the other two seat models. Three different car sizes so three different models are needed for fit. That’s why we love graco.",
+        "is_recommended": true,
+        "is_verified": true,
+        "status": "APPROVED",
+        "photos": [],
+        "videos": [],
+        "BadgesOrder": [
+          "verifiedPurchaser"
+        ],
+        "Badges": {
+          "verifiedPurchaser": {
+            "Id": "verifiedPurchaser",
+            "ContentType": "REVIEW",
+            "BadgeType": "Custom"
+          }
+        },
+        "SourceClient": "targetcom",
+        "IsRatingsOnly": false,
+        "ClientResponseCount": 0,
+        "ClientResponses": [],
+        "Entities": [],
+        "tags": [],
+        "author": {
+          "external_id": "20025589297",
+          "nickname": "Lindsey"
+        },
+        "is_syndicated": false,
+        "feedback": {
+          "helpful": 0,
+          "unhelpful": 0,
+          "inappropriate": 0
+        },
+        "submitted_at": "2026-10-11T15:18:43.000+00:00",
+        "modified_at": "2026-10-13T11:32:28.000+00:00",
+        "reviewer_attributes": [],
+        "is_incentivized": false,
+        "submitted_utc": 1791731923.0,
+        "modified_utc": 1791891148.0
+      }
+    ]
+  },
+  "reviews_with_photos": {
+    "page": 0,
+    "size": 24,
+    "total_results": 70,
+    "total_pages": 3,
+    "first_page": true,
+    "last_page": false,
+    "results": [
+      {
+        "id": "4e2c9027-d0a6-4f45-9279-2a5f13469077",
+        "external_id": "63629ff8-2ca3-5125-8419-a79765446f7b",
+        "channel": "BV",
+        "Tcin": "82286564",
+        "Rating": 5,
+        "RatingRange": 5,
+        "SecondaryRatingsOrder": [],
+        "SecondaryRatings": {},
+        "title": "Great features",
+        "text": "I bought this a month ago and it’s perfect, super comfortable, easy to install.",
+        "is_verified": false,
+        "status": "APPROVED",
+        "photos": [
+          "https://target.scene7.com/is/image/Target/GUEST_30d0a0ed-7e22-4b19-9aa5-57823d3ec68c"
+        ],
+        "videos": [],
+        "BadgesOrder": [],
+        "Badges": {},
+        "SourceClient": "gracobaby.com",
+        "SyndicationSource": {
+          "id": "graco",
+          "logo": "https://photos-us.bazaarvoice.com/photo/2/cGhvdG86YXR0cmlidXRpb25sb2dvMg/0a18735a-83e9-4452-aeb2-22699a66e6c5",
+          "name": "gracobaby.com"
+        },
+        "IsRatingsOnly": false,
+        "ClientResponseCount": 0,
+        "ClientResponses": [],
+        "Entities": [],
+        "tags": [],
+        "author": {
+          "external_id": "0083e34e-efed-5553-9bbf-1bdccf963c36",
+          "nickname": "Daniela98"
+        },
+        "is_syndicated": true,
+        "feedback": {
+          "helpful": 0,
+          "unhelpful": 0,
+          "inappropriate": 0
+        },
+        "submitted_at": "2026-09-19T11:50:12.000+00:00",
+        "modified_at": "2026-09-23T11:06:35.000+00:00",
+        "reviewer_attributes": [],
+        "is_incentivized": false,
+        "submitted_utc": 1789818612.0,
+        "modified_utc": 1790161595.0
+      }
+    ]
+  },
+  "metadata": {
+    "has_verified": true,
+    "has_photos": true,
+    "has_videos": false,
+    "has_entities": false
+  }
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/target/products/82286564/reviews' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'page=1' \
+  --data-urlencode 'page_size=24' \
+  --data-urlencode 'sort=most_recent'
+```
+
+[Browse all Target endpoints](/target/overview).

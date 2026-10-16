@@ -1,0 +1,121 @@
+---
+title: "Get laptop and computer deals"
+api: "GET https://scrapebadger.com/v1/bestbuy/deals"
+description: "Get laptop and computer deals."
+---
+
+Get laptop and computer deals.
+
+**Credits:** 10 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField query="page" type="integer" default="1">
+Page. Minimum: 1. Maximum: 100.
+</ParamField>
+
+## Response
+
+```json
+{
+  "query": null,
+  "page": 1,
+  "total_results": 44,
+  "products": [
+    {
+      "sku": "6258027",
+      "bsin": "JCQ6HP32P5",
+      "title": "Microsoft - Office 365 Personal (1 Person) (12-Month Subscription) - Activation Required - Windows, Mac OS, Apple iOS, Android [Digital]",
+      "url": "https://www.bestbuy.com/product/microsoft-office-365-personal-1-person-12-month-subscription-activation-required-windows-mac-os-apple-ios-android-digital/JCQ6HP32P5/sku/6258027",
+      "brand": "Microsoft",
+      "upc": "400062580272",
+      "description": {
+        "long": "Microsoft 365 Personal is a 12-month automatically renewing subscription for 1 person that includes 1 TB (1000 GB) of cloud storage which allows you to access, edit, and share your files and photos across all your devices. It comes with powerful productivity and creativity apps with AI&#185; including Word, Excel, PowerPoint, Outlook, advanced security for your data and devices, and ongoing customer support. After the first year, this subscription renews automatically each year and your chosen payment card will be charged $99.99 for Microsoft 365 Personal or $129.99 for Microsoft 365 Family (as applicable), or then-current price, until cancelled. Cancel automatic renewals any time by calling 1-888-BEST BUY (1-888-237-8289) or online on your account Plans and Subscriptions page (Bestbuy.com/services/planlist). Access to your subscription will continue until the end of your then-current term at which time your subscription will expire."
+      },
+      "price": 99.99,
+      "regular_price": 99.99,
+      "savings": 0.0,
+      "currency": "USD",
+      "rating": 4.5,
+      "review_count": 38966,
+      "images": [
+        {
+          "piscesHref": "https://pisces.bbystatic.com/image2/BestBuy_US/images/products/fa90dd84-caf2-4bbe-86e9-18b037ea6563.jpg",
+          "altText": "Microsoft 365 Personal  \nWith Copilot in Microsoft 365  \n1 User  \n12 Month Subscription",
+          "rel": "Front_Zoom"
+        }
+      ],
+      "specifications": [
+        {
+          "name": "Key Specs",
+          "specifications": [
+            {
+              "displayName": "Number of Users",
+              "value": "1"
+            }
+          ]
+        }
+      ],
+      "features": [],
+      "fulfillment": {},
+      "buying_options": {},
+      "seller": {
+        "classification": "1P",
+        "id": "bby"
+      },
+      "badges": [],
+      "questions": {}
+    }
+  ],
+  "facets": [
+    {
+      "parentFacetField": null,
+      "displayName": "GIF-Same Day Shipping",
+      "facetDisplay": "true",
+      "facetField": "samedayshippingallcondition_facet",
+      "maxValue": 10,
+      "values": [
+        {
+          "count": 11,
+          "value": "55423",
+          "categoryPath": null,
+          "nestedValues": null,
+          "__typename": "SearchFacetValue"
+        }
+      ],
+      "__typename": "SearchFacet"
+    }
+  ],
+  "sort_options": [
+    {
+      "value": "Featured",
+      "displayName": "Featured",
+      "__typename": "SearchSortOption"
+    }
+  ],
+  "applied_filters": {
+    "appliedFacets": [],
+    "categoryFacet": null,
+    "sort": {
+      "value": "Best-Selling",
+      "displayName": "Best Selling",
+      "__typename": "SearchRequestInfoSort"
+    },
+    "__typename": "SearchRequestInfo"
+  }
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/bestbuy/deals' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'page=1'
+```
+
+[Browse all Best Buy endpoints](/bestbuy/overview).

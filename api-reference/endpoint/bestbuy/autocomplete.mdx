@@ -1,0 +1,71 @@
+---
+title: "Get search suggestions"
+api: "GET https://scrapebadger.com/v1/bestbuy/autocomplete"
+description: "Get search suggestions."
+---
+
+Get search suggestions.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField query="query" type="string" required>
+Query. Minimum length: 1.
+</ParamField>
+
+## Response
+
+```json
+{
+  "spellCheck": {
+    "correctedQuery": "",
+    "correctlySpelled": true,
+    "originalQuery": "lapt"
+  },
+  "count": 10,
+  "queryResponseTime": 16,
+  "suggestions": [
+    {
+      "isLLMSourced": "true",
+      "isLLMGenerated": "false",
+      "isAppended": "false",
+      "term": "laptop",
+      "category": [
+        {
+          "name": "All Laptops",
+          "id": "pcmcat138500050001"
+        }
+      ],
+      "products": [
+        {
+          "source": "ORGANIC",
+          "type": "searchSuggestion",
+          "skuId": "6668413"
+        }
+      ]
+    }
+  ],
+  "track": {
+    "variant": "A",
+    "location": {
+      "requested": "",
+      "applied": ""
+    }
+  }
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/bestbuy/autocomplete' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'query=laptop'
+```
+
+[Browse all Best Buy endpoints](/bestbuy/overview).

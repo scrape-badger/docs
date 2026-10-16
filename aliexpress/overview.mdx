@@ -1,0 +1,41 @@
+---
+title: "AliExpress API \u2014 Overview"
+description: "AliExpress public ecommerce search, product, seller and review data."
+---
+
+AliExpress public ecommerce search, product, seller and review data.
+
+Authenticate with `X-API-Key`. Requests use `https://scrapebadger.com/v1/aliexpress`.
+
+## Endpoints
+
+| Endpoint | Request | Credits |
+| --- | --- | ---: |
+| [Search products](/api-reference/endpoint/aliexpress/search) | `GET /search` | 5 |
+| [Get product detail](/api-reference/endpoint/aliexpress/products-product-id) | `GET /products/{product_id}` | 5 |
+| [Get product reviews](/api-reference/endpoint/aliexpress/products-product-id-reviews) | `GET /products/{product_id}/reviews` | 5 |
+| [Get store profile](/api-reference/endpoint/aliexpress/stores-store-id) | `GET /stores/{store_id}` | 10 |
+| [Get store products](/api-reference/endpoint/aliexpress/stores-store-id-products) | `GET /stores/{store_id}/products` | 10 |
+| [Get search suggestions](/api-reference/endpoint/aliexpress/autocomplete) | `GET /autocomplete` | 5 |
+| [Get category navigation](/api-reference/endpoint/aliexpress/categories) | `GET /categories` | 5 |
+| [Get store product categories](/api-reference/endpoint/aliexpress/stores-store-id-categories) | `GET /stores/{store_id}/categories` | 5 |
+
+Credits apply to successful requests. Failed requests and empty result sets are not charged.
+
+## Markets
+
+Supported market codes: `US`, `DE`.
+
+Use the same market and location parameters across search, product and availability requests. Store availability and prices reflect the requested context at collection time.
+
+## Pagination
+
+Follow each endpoint’s pagination fields and retain product IDs to deduplicate results. Search counts and stock can change between calls.
+
+## Get started
+
+[Open the playground](https://scrapebadger.com/dashboard/aliexpress-scraper) or use the [Python and Node.js SDKs](/sdks).
+
+## Search filters
+
+Keyword, price, sorting and pagination controls are available on Search. The Categories endpoints provide navigation data; category filtering is not offered on Search.

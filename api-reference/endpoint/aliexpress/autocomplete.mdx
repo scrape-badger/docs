@@ -1,0 +1,48 @@
+---
+title: "Get search suggestions"
+api: "GET https://scrapebadger.com/v1/aliexpress/autocomplete"
+description: "Get search suggestions."
+---
+
+Get search suggestions.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField query="query" type="string" required>
+Query. Minimum length: 1. Maximum length: 250.
+</ParamField>
+
+<ParamField query="country" type="string" default="US">
+Country.
+</ParamField>
+
+<ParamField query="language" type="string" default="en">
+Language.
+</ParamField>
+
+## Response
+
+```json
+{
+  "query": "wireless",
+  "suggestions": [
+    "wireless charger"
+  ]
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/aliexpress/autocomplete' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'query=wireless'
+```
+
+[Browse all AliExpress endpoints](/aliexpress/overview).

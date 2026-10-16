@@ -1,0 +1,59 @@
+---
+title: "Get search suggestions"
+api: "GET https://scrapebadger.com/v1/etsy/autocomplete"
+description: "Get search suggestions."
+---
+
+Get search suggestions.
+
+**Credits:** 20 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField query="query" type="string" required>
+Query. Minimum length: 1. Maximum length: 250.
+</ParamField>
+
+<ParamField query="country" type="string" default="US">
+Country.
+</ParamField>
+
+<ParamField query="currency" type="string" default="USD">
+Currency.
+</ParamField>
+
+<ParamField query="language" type="string" default="en-US">
+Language.
+</ParamField>
+
+## Response
+
+```json
+{
+  "query": "ceramic",
+  "suggestions": [
+    "ceramic wall art"
+  ],
+  "results": [
+    {
+      "query": "ceramic wall art",
+      "search_types": [],
+      "search_type_names": []
+    }
+  ]
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/etsy/autocomplete' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'query=ceramic'
+```
+
+[Browse all Etsy endpoints](/etsy/overview).

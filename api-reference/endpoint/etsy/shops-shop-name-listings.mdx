@@ -1,0 +1,116 @@
+---
+title: "Get shop listings"
+api: "GET https://scrapebadger.com/v1/etsy/shops/{shop_name}/listings"
+description: "Get shop listings."
+---
+
+Get shop listings.
+
+**Credits:** 10 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField path="shop_name" type="string" required>
+Shop name.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+Page. Minimum: 1. Maximum: 250.
+</ParamField>
+
+<ParamField query="country" type="string" default="US">
+Country.
+</ParamField>
+
+<ParamField query="currency" type="string" default="USD">
+Currency.
+</ParamField>
+
+<ParamField query="language" type="string" default="en-US">
+Language.
+</ParamField>
+
+## Response
+
+```json
+{
+  "items": [
+    {
+      "listing_id": "4597018849",
+      "title": "Spinosaurus fossil inspired Engraved Insulated Tumbler – 600ml Travel Mug",
+      "url": "https://www.etsy.com/listing/4597018849/spinosaurus-fossil-inspired-engraved",
+      "description": null,
+      "price": 25.08,
+      "original_price": null,
+      "currency": "USD",
+      "availability": "https://schema.org/InStock",
+      "quantity": null,
+      "category": null,
+      "images": [
+        "https://i.etsystatic.com/13626694/r/il/d7e5f4/8738680797/il_fullxfull.8738680797_4i18.jpg"
+      ],
+      "image_details": [],
+      "shop_name": "GlazyLittleThings",
+      "shop_id": "13626694",
+      "shop_url": "https://www.etsy.com/shop/GlazyLittleThings",
+      "rating": null,
+      "review_count": null,
+      "is_ad": false,
+      "shipping": null,
+      "variations": [],
+      "breadcrumbs": [],
+      "videos": []
+    }
+  ],
+  "total_results": 73,
+  "locale": {
+    "language": {
+      "code": "en-US",
+      "id": 0,
+      "name": "English (US)",
+      "translation": "English (US)",
+      "is_detected": false,
+      "is_default": true
+    },
+    "currency": {
+      "currency_id": 840,
+      "code": "USD",
+      "name": "United States Dollar",
+      "number_precision": 2,
+      "symbol": "$",
+      "listing_enabled": true,
+      "browsing_enabled": true,
+      "buyer_location_restricted": false,
+      "is_synthetic": true,
+      "is_detected": false,
+      "is_default": true,
+      "append_currency_symbol": false
+    },
+    "region": {
+      "code": "US",
+      "country_id": 209,
+      "name": "United States",
+      "translation": "United States",
+      "is_detected": false,
+      "is_default": true,
+      "is_EU_region": false
+    },
+    "subdir_code": ""
+  },
+  "next_page": null,
+  "page": 1
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/etsy/shops/GlazyLittleThings/listings' \
+  --header 'X-API-Key: YOUR_API_KEY'
+```
+
+[Browse all Etsy endpoints](/etsy/overview).

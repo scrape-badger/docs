@@ -1,6 +1,6 @@
 ---
 title: "MCP Server"
-description: "Connect AI agents to ScrapeBadger via Model Context Protocol. 344 tools for Twitter/X, Instagram, Google, YouTube, TikTok, Amazon, eBay, Reddit, real estate, and web scraping. Latest MCP spec (2026-07-28), one-click OAuth for Claude."
+description: "Connect AI agents to ScrapeBadger via Model Context Protocol. 510 tools for Twitter/X, Instagram, Google, YouTube, TikTok, Amazon, eBay, Reddit, real estate, and web scraping. Latest MCP spec (2026-07-28), one-click OAuth for Claude."
 ---
 
 # MCP Server
@@ -14,7 +14,7 @@ ScrapeBadger provides a hosted MCP (Model Context Protocol) server at `mcp.scrap
 ## Key Features
 
 <CardGroup cols={3}>
-  <Card title="344 Tools" icon="wrench">
+  <Card title="510 Tools" icon="wrench">
     Every ScrapeBadger API endpoint is available as a typed MCP tool with structured parameters, annotations, and output schemas.
   </Card>
   <Card title="Zero Setup" icon="bolt">
@@ -26,7 +26,7 @@ ScrapeBadger provides a hosted MCP (Model Context Protocol) server at `mcp.scrap
   <Card title="Same Pricing" icon="credit-card">
     No extra cost — MCP uses the same credit-based pricing as the REST API.
   </Card>
-  <Card title="31 Products" icon="layer-group">
+  <Card title="42 Products" icon="layer-group">
     Twitter/X, Instagram, Facebook, LinkedIn, Google, YouTube, TikTok, Reddit, Amazon, eBay, Walmart, Vinted, Depop, Wallapop, Gumtree, real estate, search engines, LLM answers, and general web scraping — all in one server.
   </Card>
   <Card title="Latest MCP Standard" icon="shield-check">
@@ -38,6 +38,11 @@ ScrapeBadger provides a hosted MCP (Model Context Protocol) server at `mcp.scrap
 
 | Product | Tools | Description |
 |----------|-------|-------------|
+| **Etsy** | 8 | Etsy public ecommerce search, product, seller and review data. |
+| **AliExpress** | 8 | AliExpress public ecommerce search, product, seller and review data. |
+| **Target** | 11 | Search Target US products, retrieve variants and prices, read reviews and questions, and monitor stores and stock. |
+| **ASOS** | 7 | Search ASOS fashion products, retrieve rich product detail, monitor stock and prices, and browse navigation and search facets across storefronts. |
+| **Best Buy** | 10 | Search Best Buy US products, compare deals and specifications, read reviews and questions, and check ZIP-specific fulfillment. |
 | **Twitter/X** | 49 | Profiles, tweets, advanced search, trends, communities, lists, spaces, real-time stream monitors, filter rules |
 | **Instagram** | 39 | Profiles, posts, reels, stories, highlights, comments, followers, hashtags, locations, audio, search |
 | **Google** | 33 | Web search (SERP), Images, Videos, Lens, Maps, News, Trends, Jobs, Hotels, Shopping, Patents, Scholar, Finance, Flights |
@@ -182,3 +187,5 @@ Health check: `https://mcp.scrapebadger.com/health`
 ## Vinted mobile reads
 
 Call `vinted_mobile_operations` to discover parameters and examples, then call `vinted_mobile_read` with `operation`, `market`, and a `parameters` object. See the [mobile API catalog](/vinted/mobile-api) for pricing, sold comparables, seller reviews, shipping, and reference data.
+
+

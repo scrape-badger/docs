@@ -1,0 +1,171 @@
+---
+title: "Get ASOS stock and price"
+api: "GET https://scrapebadger.com/v1/asos/stock-price"
+description: "Get ASOS stock and price."
+---
+
+Get ASOS stock and price.
+
+**Credits:** 10 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField query="product_ids" type="string" required>
+Product ids.
+</ParamField>
+
+<ParamField query="market" type="string" default="uk">
+Market.
+</ParamField>
+
+<ParamField query="store" type="string">
+Store.
+</ParamField>
+
+<ParamField query="country" type="string">
+Country.
+</ParamField>
+
+<ParamField query="currency" type="string">
+Currency.
+</ParamField>
+
+<ParamField query="language" type="string">
+Language.
+</ParamField>
+
+## Response
+
+```json
+{
+  "market": "uk",
+  "products": [
+    {
+      "productId": 209555590,
+      "productPrice": {
+        "current": {
+          "value": 20.0,
+          "text": "£20.00",
+          "versionId": "REGP0000020002000000000000000",
+          "conversionId": "0"
+        },
+        "previous": {
+          "value": 20.0,
+          "text": "£20.00",
+          "versionId": "REGP0000020002000000000000000",
+          "conversionId": "0"
+        },
+        "rrp": {
+          "value": null,
+          "text": null,
+          "versionId": "REGP0000020002000000000000000",
+          "conversionId": "0"
+        },
+        "currency": "GBP",
+        "isMarkedDown": false,
+        "isOutletPrice": false,
+        "discountPercentage": 0.0,
+        "xrp": {
+          "value": 20,
+          "text": "£20.00",
+          "versionId": "REGP0000020002000000000000000",
+          "conversionId": "0"
+        },
+        "startDateTime": "2026-10-09T02:52:36Z",
+        "previousEndDate": null,
+        "lowestPriceInLast30DaysValue": null,
+        "lowestPriceInLast30DaysText": null,
+        "lowestPriceInLast30DaysEndDate": null,
+        "lowestPriceInLast30DaysPercentage": null,
+        "context": null,
+        "additionalContexts": [],
+        "start_utc": 1791514356.0,
+        "start_at": "2026-10-09T02:52:36Z"
+      },
+      "isInStock": true,
+      "variants": [
+        {
+          "variantId": null,
+          "id": 209555592,
+          "size": null,
+          "brandSize": null,
+          "sizeId": null,
+          "colour": null,
+          "colourWayId": null,
+          "sku": null,
+          "isAvailable": null,
+          "isInStock": true,
+          "isLowInStock": false,
+          "isRestockingSoon": false,
+          "price": {
+            "current": {
+              "value": 20.0,
+              "text": "£20.00",
+              "versionId": "REGP0000020002000000000000000",
+              "conversionId": "0"
+            },
+            "previous": {
+              "value": 20.0,
+              "text": "£20.00",
+              "versionId": "REGP0000020002000000000000000",
+              "conversionId": "0"
+            },
+            "rrp": {
+              "value": null,
+              "text": null,
+              "versionId": "REGP0000020002000000000000000",
+              "conversionId": "0"
+            },
+            "currency": "GBP",
+            "isMarkedDown": false,
+            "isOutletPrice": false,
+            "discountPercentage": 0.0,
+            "xrp": {
+              "value": 20,
+              "text": "£20.00",
+              "versionId": "REGP0000020002000000000000000",
+              "conversionId": "0"
+            },
+            "startDateTime": "2026-10-09T02:58:00Z",
+            "previousEndDate": null,
+            "lowestPriceInLast30DaysValue": null,
+            "lowestPriceInLast30DaysText": null,
+            "lowestPriceInLast30DaysEndDate": null,
+            "lowestPriceInLast30DaysPercentage": null,
+            "context": null,
+            "additionalContexts": [],
+            "start_utc": 1791514680.0,
+            "start_at": "2026-10-09T02:58:00Z"
+          },
+          "stockLastUpdatedDate": "2026-10-12T09:04:39.861Z",
+          "warehouse": null,
+          "source": null,
+          "seller": null,
+          "showShippedByMessage": true,
+          "stockLastUpdated_utc": 1791795879.861,
+          "stockLastUpdated_at": "2026-10-12T09:04:39.861000Z"
+        }
+      ],
+      "hasMultipleColoursInStock": false,
+      "hasMultiplePricesInStock": false,
+      "isRestockingSoon": false,
+      "restockingLeadTime": 14
+    }
+  ],
+  "missing_product_ids": []
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/asos/stock-price' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'product_ids=209555590'
+```
+
+[Browse all ASOS endpoints](/asos/overview).

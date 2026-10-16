@@ -1,0 +1,38 @@
+---
+title: "Get category navigation"
+api: "GET https://scrapebadger.com/v1/aliexpress/categories"
+description: "Get category navigation."
+---
+
+Get category navigation.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Response
+
+```json
+{
+  "categories": [
+    {
+      "id": "10075",
+      "code": "automotive",
+      "name": "Automotive",
+      "url": "https://www.aliexpress.com/p/calp-plus/index.html?osf=category_navigate_newTab2&queryFrom=kingKong&categoryTab=automotive",
+      "image": "https://ae-pic-a1.aliexpress-media.com/kf/S641d13301ae042999bbc1dc1edd2bb80K/27x27.png"
+    }
+  ]
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/aliexpress/categories' \
+  --header 'X-API-Key: YOUR_API_KEY'
+```
+
+[Browse all AliExpress endpoints](/aliexpress/overview).

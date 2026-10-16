@@ -1,0 +1,149 @@
+---
+title: "Get category navigation"
+api: "GET https://scrapebadger.com/v1/asos/categories"
+description: "Get category navigation."
+---
+
+Get category navigation.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField query="gender" type="string" default="men">
+Gender. Allowed values: `men`, `women`.
+</ParamField>
+
+<ParamField query="market" type="string" default="uk">
+Market.
+</ParamField>
+
+<ParamField query="store" type="string">
+Store.
+</ParamField>
+
+<ParamField query="country" type="string">
+Country.
+</ParamField>
+
+<ParamField query="currency" type="string">
+Currency.
+</ParamField>
+
+<ParamField query="language" type="string">
+Language.
+</ParamField>
+
+## Response
+
+```json
+{
+  "market": "uk",
+  "gender": "men",
+  "categories": [
+    {
+      "id": "7276d7f9-b810-4743-8c11-eccb260bbecd",
+      "alias": "MW",
+      "type": "link",
+      "channelExclusions": [],
+      "webLargePriority": 0,
+      "content": {
+        "title": "Men",
+        "subTitle": null,
+        "webLargeImageUrl": null,
+        "mobileImageUrl": null
+      },
+      "display": null,
+      "style": {
+        "webLargeStyleType": "dark",
+        "mobileStyleType": "dark"
+      },
+      "link": {
+        "linkType": "internal",
+        "brandSectionAlias": null,
+        "categoryId": null,
+        "webUrl": "https://www.asos.com/men/",
+        "appUrl": null
+      },
+      "children": [
+        {
+          "id": "ae28af2b-e3ca-4f2f-a559-9a976a0812d4",
+          "alias": null,
+          "type": "container",
+          "channelExclusions": [],
+          "webLargePriority": 0,
+          "content": {
+            "title": "Home",
+            "subTitle": null,
+            "webLargeImageUrl": null,
+            "mobileImageUrl": null
+          },
+          "display": {
+            "webLargeTemplateId": 0,
+            "webLargeTemplateName": "",
+            "webLargeColumnSpan": 1,
+            "mobileTemplateId": 7,
+            "mobileTemplateName": "homepageLinks",
+            "mobileDisplayLayout": "list"
+          },
+          "style": {
+            "webLargeStyleType": "dark",
+            "mobileStyleType": "noTitle"
+          },
+          "link": null,
+          "children": [
+            {
+              "id": "47989db5-0597-43e6-9bee-1348c35590b0",
+              "alias": null,
+              "type": "link",
+              "channelExclusions": [],
+              "webLargePriority": 0,
+              "content": {},
+              "display": null,
+              "style": {},
+              "link": {},
+              "children": [],
+              "loyaltyBenefitType": null,
+              "targeting": {}
+            }
+          ],
+          "loyaltyBenefitType": null,
+          "targeting": {
+            "segmentsIncluded": [],
+            "segmentsExcluded": [],
+            "loyaltyTiersIncluded": [],
+            "loyaltyTiersExcluded": [],
+            "loyaltyConsent": null,
+            "premierStatus": null,
+            "authState": null
+          }
+        }
+      ],
+      "loyaltyBenefitType": null,
+      "targeting": {
+        "segmentsIncluded": [],
+        "segmentsExcluded": [],
+        "loyaltyTiersIncluded": [],
+        "loyaltyTiersExcluded": [],
+        "loyaltyConsent": null,
+        "premierStatus": null,
+        "authState": null
+      }
+    }
+  ]
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/asos/categories' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'gender=men'
+```
+
+[Browse all ASOS endpoints](/asos/overview).

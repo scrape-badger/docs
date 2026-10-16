@@ -1,0 +1,39 @@
+---
+title: "Best Buy API \u2014 Overview"
+description: "Search Best Buy US products, compare deals and specifications, read reviews and questions, and check ZIP-specific fulfillment."
+---
+
+Search Best Buy US products, compare deals and specifications, read reviews and questions, and check ZIP-specific fulfillment.
+
+Authenticate with `X-API-Key`. Requests use `https://scrapebadger.com/v1/bestbuy`.
+
+## Endpoints
+
+| Endpoint | Request | Credits |
+| --- | --- | ---: |
+| [List supported markets](/api-reference/endpoint/bestbuy/markets) | `GET /markets` | 0 |
+| [Search products](/api-reference/endpoint/bestbuy/search) | `GET /search` | 10 |
+| [Browse a category](/api-reference/endpoint/bestbuy/category) | `GET /category` | 10 |
+| [Get categories](/api-reference/endpoint/bestbuy/categories) | `GET /categories` | 5 |
+| [Get laptop and computer deals](/api-reference/endpoint/bestbuy/deals) | `GET /deals` | 10 |
+| [Get search suggestions](/api-reference/endpoint/bestbuy/autocomplete) | `GET /autocomplete` | 5 |
+| [Get product reviews](/api-reference/endpoint/bestbuy/products-sku-reviews) | `GET /products/{sku}/reviews` | 5 |
+| [Get product questions](/api-reference/endpoint/bestbuy/products-sku-questions) | `GET /products/{sku}/questions` | 5 |
+| [Get product availability](/api-reference/endpoint/bestbuy/products-sku-availability) | `GET /products/{sku}/availability` | 5 |
+| [Get product detail](/api-reference/endpoint/bestbuy/products-sku) | `GET /products/{sku}` | 10 |
+
+Credits apply to successful requests. Failed requests and empty result sets are not charged.
+
+## Markets
+
+Supported market codes: `us`.
+
+Use the same market and location parameters across search, product and availability requests. Store availability and prices reflect the requested context at collection time.
+
+## Pagination
+
+Follow each endpoint’s pagination fields and retain product IDs to deduplicate results. Search counts and stock can change between calls.
+
+## Get started
+
+[Open the playground](https://scrapebadger.com/dashboard/bestbuy-scraper) or use the [Python and Node.js SDKs](/sdks).

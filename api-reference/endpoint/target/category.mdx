@@ -1,0 +1,134 @@
+---
+title: "Browse a category"
+api: "GET https://scrapebadger.com/v1/target/category"
+description: "Browse a category."
+---
+
+Browse a category.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField query="category_id" type="string" required>
+Category id.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+Page. Minimum: 1. Maximum: 50.
+</ParamField>
+
+<ParamField query="page_size" type="integer" default="24">
+Page size. Minimum: 1. Maximum: 24.
+</ParamField>
+
+<ParamField query="store_id" type="string" default="1375">
+Store id.
+</ParamField>
+
+<ParamField query="zip_code" type="string" default="55403">
+Zip code.
+</ParamField>
+
+## Response
+
+```json
+{
+  "query": null,
+  "category": "5xtly",
+  "page": 1,
+  "page_size": 24,
+  "total_results": 24845,
+  "total_pages": 50,
+  "products": [
+    {
+      "tcin": "94818247",
+      "requested_tcin": null,
+      "title": "Bobbie Organic Whole Milk Formula - 14.1oz",
+      "url": "https://www.target.com/p/bobbie-organic-whole-milk-formula-14-1oz-infant-gas-38-immune-support-eye-development-easy-to-digest/-/A-94818247",
+      "brand": "Bobbie",
+      "description": null,
+      "price": {
+        "current_retail": 27.99,
+        "display_was_now": false,
+        "formatted_current_price": "$27.99",
+        "formatted_current_price_type": "reg",
+        "reg_retail": 27.99,
+        "location_id": 1375
+      },
+      "currency": "USD",
+      "images": [
+        "https://target.scene7.com/is/image/Target/GUEST_d587cb0f-9a06-4f3d-a21f-3cfc9e1b5977"
+      ],
+      "videos": [
+        {
+          "is_list_page_eligible": false,
+          "video_files": [
+            {
+              "mime_type": "video/mp4",
+              "video_url": "https://target.scene7.com/is/content/Target/GUEST_eefc6f18-6150-42c9-b37a-da691f90466c"
+            }
+          ]
+        }
+      ],
+      "specifications": [
+        "<B>Baby Formula Focus:</B> Immune System Support, Gas, Eye Development, Brain Development, Easy to Digest"
+      ],
+      "highlights": [
+        "Clinically crafted with organic, grass-fed whole milk + fewer added oils for easy digestionSupports brain development with MFGM*, DHA, and Choline"
+      ],
+      "fulfillment": {},
+      "promotions": [],
+      "ratings_and_reviews": {},
+      "category": {
+        "category_id": "5xtkh",
+        "parent_category_id": "5xtl0"
+      },
+      "variants": [],
+      "variation_hierarchy": [],
+      "seller": [],
+      "is_sponsored": true
+    }
+  ],
+  "facets": [
+    {
+      "facet_id": "d_channel",
+      "type": "checkbox",
+      "display_name": "Shipping & Pickup",
+      "expand": true,
+      "options": [
+        {
+          "display_name": "buy online & pick up",
+          "id": "5zl7w",
+          "url": "/c/baby/buy-online-pick-up/-/N-5xtlyZ5zl7w",
+          "value": "buy online & pick up"
+        }
+      ]
+    }
+  ],
+  "sort_options": [
+    {
+      "name": "Featured",
+      "value": "Featured"
+    }
+  ]
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/target/category' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'category_id=5xtly' \
+  --data-urlencode 'page=1' \
+  --data-urlencode 'page_size=24' \
+  --data-urlencode 'store_id=1375' \
+  --data-urlencode 'zip_code=55403'
+```
+
+[Browse all Target endpoints](/target/overview).

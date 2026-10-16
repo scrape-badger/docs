@@ -1,0 +1,38 @@
+---
+title: "List ASOS storefronts"
+api: "GET https://scrapebadger.com/v1/asos/markets"
+description: "List ASOS storefronts."
+---
+
+List ASOS storefronts.
+
+**Credits:** 0 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Response
+
+```json
+{
+  "markets": [
+    {
+      "id": "uk",
+      "store": "COM",
+      "country": "GB",
+      "currency": "GBP",
+      "language": "en-GB"
+    }
+  ]
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/asos/markets' \
+  --header 'X-API-Key: YOUR_API_KEY'
+```
+
+[Browse all ASOS endpoints](/asos/overview).
