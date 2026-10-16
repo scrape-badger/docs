@@ -1,0 +1,120 @@
+---
+title: "Get store detail"
+api: "GET https://scrapebadger.com/v1/target/stores/{store_id}"
+description: "Get store detail."
+---
+
+Get store detail.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField path="store_id" type="string" required>
+Store id.
+</ParamField>
+
+## Response
+
+```json
+{
+  "store": {
+    "store_id": "1375",
+    "location_name": "Mpls Nicollet Mall",
+    "status": "Open",
+    "is_test_location": false,
+    "geofence": {
+      "latitude": 44.975017,
+      "longitude": -93.274104,
+      "radius": 171
+    },
+    "mailing_address": {
+      "address_line1": "900 Nicollet Mall",
+      "city": "Minneapolis",
+      "country": "United States of America",
+      "country_code": "US",
+      "county": "Hennepin",
+      "state": "Minnesota",
+      "postal_code": "55403-2530",
+      "region": "MN"
+    },
+    "main_voice_phone_number": "612-338-0085",
+    "capabilities": [
+      {
+        "capability_code": "Drive Up",
+        "capability_name": "Drive Up",
+        "effective_date": "2021-07-14"
+      }
+    ],
+    "contact_information": [
+      {
+        "building_area": "Capability",
+        "capability": "Opt",
+        "telephone_type": "VOICE",
+        "is_international_phone_number": false,
+        "telephone_number": "612-338-7551"
+      }
+    ],
+    "physical_specifications": {
+      "total_building_area": 158193,
+      "merchandise_level": 2,
+      "format": "Pfresh"
+    },
+    "geographic_specifications": {
+      "latitude": 44.975017,
+      "longitude": -93.274104,
+      "time_zone_code": "CST",
+      "time_zone_description": "Central Std Time",
+      "time_zone_utc_offset_name": "UTC-06",
+      "time_zone_offset_hours": "06:00:00",
+      "is_daylight_savings_time_recognized": true,
+      "iso_time_zone_code": "America/Chicago"
+    },
+    "miscellaneous": {
+      "google_cid": "https://maps.google.com/maps?cid=17670872680649818414"
+    },
+    "rolling_operating_hours": {
+      "main_hours": {
+        "days": [
+          {
+            "sequence_number": "1",
+            "date": "2026-10-16",
+            "day_name": "Friday",
+            "is_open": true,
+            "hours": [
+              {}
+            ]
+          }
+        ]
+      },
+      "capability_hours": [
+        {
+          "capability_code": "Opt",
+          "days": [
+            {
+              "sequence_number": "1",
+              "date": "2026-10-16",
+              "day_name": "Friday",
+              "is_open": true,
+              "hours": []
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/target/stores/1375' \
+  --header 'X-API-Key: YOUR_API_KEY'
+```
+
+[Browse all Target endpoints](/target/overview).

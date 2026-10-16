@@ -1,0 +1,107 @@
+---
+title: "Get product availability"
+api: "GET https://scrapebadger.com/v1/target/products/{tcin}/availability"
+description: "Get product availability."
+---
+
+Get product availability.
+
+**Credits:** 10 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField path="tcin" type="string" required>
+Tcin.
+</ParamField>
+
+<ParamField query="zip_code" type="string" required>
+Zip code.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="10">
+Limit. Minimum: 1. Maximum: 20.
+</ParamField>
+
+## Response
+
+```json
+{
+  "product_id": "80179068",
+  "product": {
+    "__typename": "Product",
+    "tcin": "80179068",
+    "item": {
+      "dpci": "030-09-6480",
+      "relationship_type_code": "VC"
+    },
+    "parent": {
+      "__typename": "Product",
+      "tcin": "82286564",
+      "item": {
+        "relationship_type_code": "VAP"
+      }
+    }
+  },
+  "buy_unit_of_measure": "EACH",
+  "availability_unit_of_measure": "EACH",
+  "available_to_purchase_date_time": "1970-01-01T00:00:00.000Z",
+  "street_date": "1970-01-01T00:00:00.000Z",
+  "locations": [
+    {
+      "location_id": "1375",
+      "location_available_to_promise_quantity": 7.0,
+      "distance": 0.77,
+      "order_pickup": {
+        "pickup_date": "2026-10-16",
+        "guest_pick_sla": 120,
+        "location_locale": "America/Chicago",
+        "availability_status": "IN_STOCK",
+        "minimum_order_quantity": 1.0
+      },
+      "in_store_only": {
+        "availability_status": "IN_STOCK"
+      },
+      "curbside": {
+        "pickup_date": "2026-10-16",
+        "guest_pick_sla": 120,
+        "availability_status": "IN_STOCK",
+        "location_locale": "America/Chicago",
+        "minimum_order_quantity": 1.0
+      },
+      "store": {
+        "store_id": "1375",
+        "main_voice_phone_number": "612-338-0085",
+        "location_name": "Mpls Nicollet Mall",
+        "mailing_address": {
+          "address_line1": "900 Nicollet Mall",
+          "city": "Minneapolis",
+          "postal_code": "55403-2530",
+          "state": "Minnesota"
+        },
+        "rolling_operating_hours": {
+          "main_hours": {
+            "days": [
+              {}
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/target/products/80179068/availability' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'zip_code=55403' \
+  --data-urlencode 'limit=10'
+```
+
+[Browse all Target endpoints](/target/overview).

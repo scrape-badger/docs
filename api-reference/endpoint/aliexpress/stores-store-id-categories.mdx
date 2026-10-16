@@ -1,0 +1,49 @@
+---
+title: "Get store product categories"
+api: "GET https://scrapebadger.com/v1/aliexpress/stores/{store_id}/categories"
+description: "Get store product categories."
+---
+
+Get store product categories.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField path="store_id" type="string" required>
+Store id.
+</ParamField>
+
+<ParamField query="country" type="string" default="US">
+Country.
+</ParamField>
+
+## Response
+
+```json
+{
+  "store_id": "301635",
+  "categories": [
+    {
+      "groupId": 40000009285401,
+      "image": "https://img.alicdn.com/imgextra/i4/O1CN013Bz3gY22RdVKVqUY6_!!6000000007117-2-tps-316-316.png",
+      "name": "UGREEN x Honkai: Star Rail Series",
+      "region": "GLOBAL",
+      "type": "manual"
+    }
+  ]
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/aliexpress/stores/301635/categories' \
+  --header 'X-API-Key: YOUR_API_KEY'
+```
+
+[Browse all AliExpress endpoints](/aliexpress/overview).

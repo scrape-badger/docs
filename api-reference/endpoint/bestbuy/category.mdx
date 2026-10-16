@@ -1,0 +1,139 @@
+---
+title: "Browse a category"
+api: "GET https://scrapebadger.com/v1/bestbuy/category"
+description: "Browse a category."
+---
+
+Browse a category.
+
+**Credits:** 10 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField query="category_id" type="string" required>
+Category id.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+Page. Minimum: 1. Maximum: 100.
+</ParamField>
+
+## Response
+
+```json
+{
+  "query": null,
+  "page": 1,
+  "total_results": 7120,
+  "products": [
+    {
+      "sku": "6613865",
+      "bsin": "JJGQJRKGR5",
+      "title": "HP - OmniBook X Flip 2-in-1 - 16\" 2K Touchscreen Laptop - Intel Core Ultra 7 (2024) - 16GB Memory - 1TB SSD - Copilot+ PC - Eclipse Gray",
+      "url": "https://www.bestbuy.com/product/hp-omnibook-x-flip-2-in-1-16-2k-touchscreen-laptop-intel-core-ultra-7-2024-16gb-memory-1tb-ssd-copilot-pc-eclipse-gray/JJGQJRKGR5/sku/6613865",
+      "brand": "HP",
+      "upc": "198990145372",
+      "description": {
+        "long": "The future has arrived with HP OmniBook X Flip 16 Next Gen AI PC. Whether you want to be entertained or finish creative work, this AI-powered PC has the processor speed and performance to make it happen. Engineered with a dazzling 16\" display and the ability to view it flat, folded, or flipped, you can enjoy vibrant, high-contrast colors in any angle that suits your mood. Made from sleek, recycled metal and designed with a backlit keyboard with large keycaps, your future PC is bright."
+      },
+      "price": 699.99,
+      "regular_price": 1199.99,
+      "savings": 500.0,
+      "currency": "USD",
+      "rating": 4.7,
+      "review_count": 2330,
+      "images": [
+        {
+          "piscesHref": "https://pisces.bbystatic.com/image2/BestBuy_US/images/products/3909cb40-136f-4a58-b500-4f79b55a0f44.jpg",
+          "altText": "The text on the image reads: \"Intel Core Ultra 7\".",
+          "rel": "Front_Zoom"
+        }
+      ],
+      "specifications": [
+        {
+          "name": "Key Specs",
+          "specifications": [
+            {
+              "displayName": "Screen Type",
+              "value": "IPS"
+            }
+          ]
+        }
+      ],
+      "features": [],
+      "fulfillment": {},
+      "buying_options": {},
+      "seller": {
+        "classification": "1P",
+        "id": "bby"
+      },
+      "badges": [],
+      "questions": {}
+    }
+  ],
+  "facets": [
+    {
+      "parentFacetField": null,
+      "displayName": "GIF-Same Day Shipping",
+      "facetDisplay": "true",
+      "facetField": "samedayshippingallcondition_facet",
+      "maxValue": 10,
+      "values": [
+        {
+          "count": 107,
+          "value": "55423",
+          "categoryPath": null,
+          "nestedValues": null,
+          "__typename": "SearchFacetValue"
+        }
+      ],
+      "__typename": "SearchFacet"
+    }
+  ],
+  "sort_options": [
+    {
+      "value": "Best-Selling",
+      "displayName": "Best Selling",
+      "__typename": "SearchSortOption"
+    }
+  ],
+  "applied_filters": {
+    "appliedFacets": [
+      {
+        "values": [
+          "pcmcat138500050001"
+        ],
+        "id": "category_facet",
+        "autoFacet": "false",
+        "__typename": "SearchRequestInfoAppliedFacet"
+      }
+    ],
+    "categoryFacet": {
+      "categoryName": "All Laptops",
+      "categoryPath": "pcmcat138500050001",
+      "__typename": "SearchRequestInfoCategoryFacet"
+    },
+    "sort": {
+      "value": "Best-Selling",
+      "displayName": "Best Selling",
+      "__typename": "SearchRequestInfoSort"
+    },
+    "__typename": "SearchRequestInfo"
+  }
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/bestbuy/category' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'category_id=pcmcat138500050001' \
+  --data-urlencode 'page=1'
+```
+
+[Browse all Best Buy endpoints](/bestbuy/overview).

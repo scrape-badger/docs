@@ -1,0 +1,111 @@
+---
+title: "Get listing detail"
+api: "GET https://scrapebadger.com/v1/etsy/listings/{listing_id}"
+description: "Get listing detail."
+---
+
+Get listing detail.
+
+**Credits:** 10 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField path="listing_id" type="string" required>
+Listing id.
+</ParamField>
+
+<ParamField query="country" type="string" default="US">
+Country.
+</ParamField>
+
+<ParamField query="currency" type="string" default="USD">
+Currency.
+</ParamField>
+
+<ParamField query="language" type="string" default="en-US">
+Language.
+</ParamField>
+
+## Response
+
+```json
+{
+  "listing_id": "4589988962",
+  "title": "Handmade Acorn and Oak leaves mug ceramic",
+  "url": "https://www.etsy.com/listing/4589988962/handmade-acorn-and-oak-leaves-mug",
+  "description": "A lovely handmade acorn and oak leaves mug. Thrown on the wheel using speckled stoneware clay. Then hand decorated and hand glazed using underglaze and coloured glazes. Each one is unique. The mug you see is the one you will receive. \nAprox 10cm tall and 9cm wide at rim",
+  "price": 33.45,
+  "original_price": null,
+  "currency": "USD",
+  "availability": "https://schema.org/InStock",
+  "quantity": 1,
+  "category": "Home & Living < Kitchen & Dining < Drink & Barware < Drinkware < Mugs",
+  "images": [
+    "https://i.etsystatic.com/13626694/r/il/c07037/8682580345/il_fullxfull.8682580345_rdc6.jpg"
+  ],
+  "image_details": [
+    {
+      "@type": "ImageObject",
+      "@context": "https://schema.org",
+      "author": "GlazyLittleThings",
+      "contentURL": "https://i.etsystatic.com/13626694/r/il/c07037/8682580345/il_fullxfull.8682580345_rdc6.jpg",
+      "thumbnail": "https://i.etsystatic.com/13626694/r/il/c07037/8682580345/il_340x270.8682580345_rdc6.jpg",
+      "description": "May include: A ceramic mug with a speckled cream-colored glaze featuring a hand-painted pattern of brown acorns, black berries, and green oak leaves. The rim has a decorative drip of light green glaze, and the handle is curved and sturdy."
+    }
+  ],
+  "shop_name": "GlazyLittleThings",
+  "shop_id": "13626694",
+  "shop_url": "https://www.etsy.com/shop/GlazyLittleThings",
+  "rating": null,
+  "review_count": null,
+  "is_ad": null,
+  "shipping": {
+    "@type": "OfferShippingDetails",
+    "shippingRate": {
+      "@type": "MonetaryAmount",
+      "value": "0",
+      "currency": "USD"
+    },
+    "shippingOrigin": {
+      "@type": "DefinedRegion",
+      "addressCountry": "GB"
+    }
+  },
+  "variations": [],
+  "breadcrumbs": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home & Living",
+      "item": "https://www.etsy.com/c/home-and-living?explicit=1&ref=breadcrumb_listing"
+    }
+  ],
+  "videos": [
+    {
+      "@type": "VideoObject",
+      "@context": "https://schema.org",
+      "name": "Handmade Acorn and Oak leaves mug ceramic",
+      "description": "A lovely handmade acorn and oak leaves mug. Thrown on the wheel using speckled stoneware clay. Then hand decorated and hand glazed using underglaze and coloured glazes. Each one is unique. The mug you see is the one you will receive. \nAprox 10cm tall and 9cm wide at rim",
+      "thumbnailUrl": [
+        "https://v.etsystatic.com/e/videos/af35/72a378b0-9c16-4092-9cc0-6bf56e25e18a/listing_thumbnail_v1.jpg"
+      ],
+      "uploadDate": "2026-10-06T16:54:16-04:00",
+      "duration": "PT14S",
+      "contentURL": "https://v.etsystatic.com/e/videos/af35/72a378b0-9c16-4092-9cc0-6bf56e25e18a/vid_v1.mp4"
+    }
+  ]
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/etsy/listings/4589988962' \
+  --header 'X-API-Key: YOUR_API_KEY'
+```
+
+[Browse all Etsy endpoints](/etsy/overview).

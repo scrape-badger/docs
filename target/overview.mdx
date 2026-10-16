@@ -1,0 +1,40 @@
+---
+title: "Target API \u2014 Overview"
+description: "Search Target US products, retrieve variants and prices, read reviews and questions, and monitor stores and stock."
+---
+
+Search Target US products, retrieve variants and prices, read reviews and questions, and monitor stores and stock.
+
+Authenticate with `X-API-Key`. Requests use `https://scrapebadger.com/v1/target`.
+
+## Endpoints
+
+| Endpoint | Request | Credits |
+| --- | --- | ---: |
+| [List supported markets](/api-reference/endpoint/target/markets) | `GET /markets` | 0 |
+| [Search products](/api-reference/endpoint/target/search) | `GET /search` | 5 |
+| [Browse a category](/api-reference/endpoint/target/category) | `GET /category` | 5 |
+| [Get search suggestions](/api-reference/endpoint/target/autocomplete) | `GET /autocomplete` | 5 |
+| [Find nearby stores](/api-reference/endpoint/target/stores) | `GET /stores` | 5 |
+| [Get store detail](/api-reference/endpoint/target/stores-store-id) | `GET /stores/{store_id}` | 5 |
+| [Get categories](/api-reference/endpoint/target/categories) | `GET /categories` | 5 |
+| [Get product reviews](/api-reference/endpoint/target/products-tcin-reviews) | `GET /products/{tcin}/reviews` | 5 |
+| [Get product questions](/api-reference/endpoint/target/products-tcin-questions) | `GET /products/{tcin}/questions` | 5 |
+| [Get product availability](/api-reference/endpoint/target/products-tcin-availability) | `GET /products/{tcin}/availability` | 10 |
+| [Get product detail](/api-reference/endpoint/target/products-tcin) | `GET /products/{tcin}` | 10 |
+
+Credits apply to successful requests. Failed requests and empty result sets are not charged.
+
+## Markets
+
+Supported market codes: `us`.
+
+Use the same market and location parameters across search, product and availability requests. Store availability and prices reflect the requested context at collection time.
+
+## Pagination
+
+Follow each endpoint’s pagination fields and retain product IDs to deduplicate results. Search counts and stock can change between calls.
+
+## Get started
+
+[Open the playground](https://scrapebadger.com/dashboard/target-scraper) or use the [Python and Node.js SDKs](/sdks).

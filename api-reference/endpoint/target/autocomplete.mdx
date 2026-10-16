@@ -1,0 +1,48 @@
+---
+title: "Get search suggestions"
+api: "GET https://scrapebadger.com/v1/target/autocomplete"
+description: "Get search suggestions."
+---
+
+Get search suggestions.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField query="query" type="string" required>
+Query. Minimum length: 1.
+</ParamField>
+
+## Response
+
+```json
+{
+  "suggestions": [
+    {
+      "label": "laptop",
+      "location": "/s?searchTerm=laptop&category=0|All|matchallpartial|all%20categories"
+    }
+  ],
+  "meta_data": [
+    {
+      "name": "total_suggestions",
+      "value": "10"
+    }
+  ]
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/target/autocomplete' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'query=laptop'
+```
+
+[Browse all Target endpoints](/target/overview).

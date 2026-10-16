@@ -1,0 +1,101 @@
+---
+title: "Get product questions"
+api: "GET https://scrapebadger.com/v1/target/products/{tcin}/questions"
+description: "Get product questions."
+---
+
+Get product questions.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField path="tcin" type="string" required>
+Tcin.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+Page. Minimum: 1.
+</ParamField>
+
+<ParamField query="page_size" type="integer" default="10">
+Page size. Minimum: 1. Maximum: 50.
+</ParamField>
+
+## Response
+
+```json
+{
+  "page": 0,
+  "size": 24,
+  "total_results": 156,
+  "total_pages": 7,
+  "first_page": true,
+  "last_page": false,
+  "results": [
+    {
+      "id": "edb44f54-353d-4f60-a335-9a063d2d62cd",
+      "external_id": "ae6180b1-83e1-5923-bede-49e0d3cbdb80",
+      "is_syndicated": false,
+      "channel": "TARGET",
+      "author": {
+        "external_id": "10008344560",
+        "nickname": "Don"
+      },
+      "text": "Until what age we can use this car seat",
+      "feedback": {
+        "helpful": 0,
+        "unhelpful": 0
+      },
+      "status": "APPROVED",
+      "submitted_at": "2026-10-09T12:33:48.700Z",
+      "modified_at": "2026-10-12T03:32:32.330Z",
+      "tcins": [
+        "82136117"
+      ],
+      "answers": [
+        {
+          "id": "1b8f67d7-57bc-4afd-9db1-8843d5cbd709",
+          "question_id": "edb44f54-353d-4f60-a335-9a063d2d62cd",
+          "external_id": "8b8a999b-3f14-51d5-9cbe-935bbce32c3f",
+          "is_syndicated": false,
+          "author": {
+            "external_id": "BRAND_ANSWERS_graco",
+            "nickname": "Graco Consumer Care",
+            "badges": [
+              "BRAND_EXPERT"
+            ]
+          },
+          "text": "Thanks for your interest in our TriRide 3-in-1 Car Seat. The recommended use for this seat is Rear-Facing Harness: 5-40 lb., head must be at least 1\" below handle; Forward-Facing Harness: 26.5-65 lb., up to 49\"; Highback Booster: 40-100 lb., 43-57\", at least 4 years old. We hope this helps! -The Graco Team",
+          "feedback": {
+            "helpful": 0,
+            "unhelpful": 0
+          },
+          "status": "APPROVED",
+          "submitted_at": "2026-10-09T14:33:31Z",
+          "modified_at": "2026-10-12T04:10:40.397Z",
+          "submitted_utc": 1791556411.0,
+          "modified_utc": 1791778240.397
+        }
+      ],
+      "submitted_utc": 1791549228.7,
+      "modified_utc": 1791775952.33
+    }
+  ]
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/target/products/82286564/questions' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'page=1' \
+  --data-urlencode 'page_size=24'
+```
+
+[Browse all Target endpoints](/target/overview).

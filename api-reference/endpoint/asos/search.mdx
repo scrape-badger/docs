@@ -1,0 +1,188 @@
+---
+title: "Search ASOS products"
+api: "GET https://scrapebadger.com/v1/asos/search"
+description: "Search ASOS products."
+---
+
+Search ASOS products.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField query="query" type="string">
+Query. Minimum length: 1. Maximum length: 200.
+</ParamField>
+
+<ParamField query="category_id" type="integer">
+Category id.
+</ParamField>
+
+<ParamField query="offset" type="integer" default="0">
+Offset. Minimum: 0. Maximum: 10000.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="48">
+Limit. Minimum: 1. Maximum: 200.
+</ParamField>
+
+<ParamField query="sort" type="string" default="recommended">
+Sort. Allowed values: `recommended`, `freshness`, `priceasc`, `pricedesc`.
+</ParamField>
+
+<ParamField query="brand" type="string">
+Brand.
+</ParamField>
+
+<ParamField query="colour" type="string">
+Colour.
+</ParamField>
+
+<ParamField query="size" type="string">
+Size.
+</ParamField>
+
+<ParamField query="min_price" type="number">
+Min price. Minimum: 0.
+</ParamField>
+
+<ParamField query="max_price" type="number">
+Max price. Minimum: 0.
+</ParamField>
+
+<ParamField query="market" type="string" default="uk">
+Market.
+</ParamField>
+
+<ParamField query="store" type="string">
+Store.
+</ParamField>
+
+<ParamField query="country" type="string">
+Country.
+</ParamField>
+
+<ParamField query="currency" type="string">
+Currency.
+</ParamField>
+
+<ParamField query="language" type="string">
+Language.
+</ParamField>
+
+## Response
+
+```json
+{
+  "market": "uk",
+  "searchTerm": "",
+  "categoryName": "Shoes, Boots & Trainers",
+  "total_results": 3519,
+  "offset": 0,
+  "limit": 2,
+  "next_offset": 2,
+  "products": [
+    {
+      "id": 211277227,
+      "name": "Salomon XT-6 GTX trainers in bitter chocolate and vanilla ice",
+      "productCode": 158545475,
+      "brandName": "Salomon",
+      "brandId": null,
+      "colour": "BROWN",
+      "colourWayId": 211277231,
+      "price": {
+        "current": {
+          "value": 185.0,
+          "text": "£185.00"
+        },
+        "previous": {
+          "value": null,
+          "text": ""
+        },
+        "rrp": {
+          "value": null,
+          "text": ""
+        },
+        "currency": "GBP",
+        "isMarkedDown": false,
+        "isOutletPrice": false,
+        "discountPercentage": null,
+        "discounted": null,
+        "lowestPriceInLast30Days": {
+          "value": null,
+          "text": ""
+        },
+        "context": null,
+        "additionalContexts": []
+      },
+      "url": "https://www.asos.com/salomon/salomon-xt-6-gtx-trainers-in-bitter-chocolate-and-vanilla-ice/prd/211277227#colourWayId-211277231",
+      "imageUrl": "https://images.asos-media.com/products/salomon-xt-6-gtx-trainers-in-bitter-chocolate-and-vanilla-ice/211277227-1-brown",
+      "additionalImageUrls": [
+        "https://images.asos-media.com/products/salomon-xt-6-gtx-trainers-in-bitter-chocolate-and-vanilla-ice/211277227-2"
+      ],
+      "images": [],
+      "variants": [],
+      "isSellingFast": true,
+      "isRestockingSoon": false,
+      "isInStock": null,
+      "gender": null,
+      "description": null,
+      "ratings": null,
+      "breadcrumbs": [],
+      "hasVariantColours": false,
+      "hasMultiplePrices": false,
+      "groupId": null,
+      "productType": "Product",
+      "videoUrl": null,
+      "videoAssetId": null,
+      "showVideo": false,
+      "isPromotion": false,
+      "isNew": false,
+      "sponsoredCampaignId": null,
+      "facetGroupings": [],
+      "advertisement": null,
+      "earlyAccess": null
+    }
+  ],
+  "facets": [
+    {
+      "id": "freshness_band",
+      "name": "New in date",
+      "facetValues": [
+        {
+          "count": 72,
+          "id": "1",
+          "name": "Today",
+          "isSelected": false
+        }
+      ],
+      "displayStyle": "Single-Column",
+      "facetType": "TextMultiSelect",
+      "hasSelectedValues": false
+    }
+  ],
+  "searchPassMeta": {
+    "isPartial": false,
+    "isSpellcheck": false,
+    "searchPass": [],
+    "alternateSearchTerms": []
+  },
+  "redirectUrl": "",
+  "search_mode": "semantic"
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/asos/search' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'query=shoes' \
+  --data-urlencode 'limit=2'
+```
+
+[Browse all ASOS endpoints](/asos/overview).

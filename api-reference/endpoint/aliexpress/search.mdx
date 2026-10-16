@@ -1,0 +1,116 @@
+---
+title: "Search products"
+api: "GET https://scrapebadger.com/v1/aliexpress/search"
+description: "Search products."
+---
+
+Search products.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField query="query" type="string" required>
+Query. Minimum length: 1. Maximum length: 250.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+Page. Minimum: 1. Maximum: 60.
+</ParamField>
+
+<ParamField query="country" type="string" default="US">
+Country.
+</ParamField>
+
+<ParamField query="currency" type="string" default="USD">
+Currency.
+</ParamField>
+
+<ParamField query="language" type="string" default="en">
+Language.
+</ParamField>
+
+<ParamField query="sort" type="string" default="default">
+Sort. Allowed values: `default`, `price_asc`, `price_desc`, `total_tranpro_desc`.
+</ParamField>
+
+<ParamField query="min_price" type="number">
+Min price. Minimum: 0.
+</ParamField>
+
+<ParamField query="max_price" type="number">
+Max price. Minimum: 0.
+</ParamField>
+
+## Response
+
+```json
+{
+  "products": [
+    {
+      "product_id": "3256812854109939",
+      "title": "FocusOnPC 2.4GHz Wireless Gaming Mouse, 6 Programmable Buttons, Adjustable Up to 4000 Max DPI, Black Ergonomic PC Gaming Mice",
+      "url": "https://www.aliexpress.com/item/3256812854109939.html",
+      "sku_id": "12000060076849418",
+      "price": 5.38,
+      "original_price": 28.5,
+      "formatted_price": "US $5.38",
+      "currency": "USD",
+      "discount_percent": 81.0,
+      "images": [
+        "https://ae-pic-a1.aliexpress-media.com/kf/S6e1636e09a134ed88ef924f96b360eebq.png"
+      ],
+      "rating": 5.0,
+      "sold_count": 22,
+      "sold_text": "22 sold",
+      "store_name": "Shop1105233629 Store",
+      "ship_from": "US",
+      "category_ids": [
+        "7"
+      ],
+      "selling_points": [
+        {
+          "sellingPointTagId": "m0000552",
+          "position": 1,
+          "tagStyleType": "default",
+          "tagContent": {
+            "displayTagType": "image",
+            "tagImgUrl": "https://ae-pic-a1.aliexpress-media.com/kf/Sc5cfe13232bb46b5ac656c26f3ce8bbeb.png",
+            "tagImgWidth": 105,
+            "tagImgHeight": 32,
+            "tagStyle": {
+              "isPricePower": "false",
+              "position": "1"
+            }
+          },
+          "source": "localplus_flag",
+          "resourceCode": "searchItemCard"
+        }
+      ],
+      "sponsored": false,
+      "choice": false,
+      "delivery_min_days": 4,
+      "delivery_max_days": 10,
+      "first_listed_at": "2026-08-25T00:00:00Z",
+      "first_listed_utc": 1787616000.0
+    }
+  ],
+  "total_results": 6129,
+  "page": 1,
+  "query": "wireless mouse"
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/aliexpress/search' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'query=wireless mouse'
+```
+
+[Browse all AliExpress endpoints](/aliexpress/overview).

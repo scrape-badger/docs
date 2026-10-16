@@ -1559,6 +1559,130 @@
             ]
           }
         ]
+      },
+      {
+        "tab": "ASOS",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "asos/overview"
+            ]
+          },
+          {
+            "group": "ASOS endpoints",
+            "pages": [
+              "api-reference/endpoint/asos/search",
+              "api-reference/endpoint/asos/products-product-id",
+              "api-reference/endpoint/asos/stock-price",
+              "api-reference/endpoint/asos/categories",
+              "api-reference/endpoint/asos/autocomplete",
+              "api-reference/endpoint/asos/filters",
+              "api-reference/endpoint/asos/markets"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Target",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "target/overview"
+            ]
+          },
+          {
+            "group": "Target endpoints",
+            "pages": [
+              "api-reference/endpoint/target/markets",
+              "api-reference/endpoint/target/search",
+              "api-reference/endpoint/target/category",
+              "api-reference/endpoint/target/autocomplete",
+              "api-reference/endpoint/target/stores",
+              "api-reference/endpoint/target/stores-store-id",
+              "api-reference/endpoint/target/categories",
+              "api-reference/endpoint/target/products-tcin-reviews",
+              "api-reference/endpoint/target/products-tcin-questions",
+              "api-reference/endpoint/target/products-tcin-availability",
+              "api-reference/endpoint/target/products-tcin"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Etsy",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "etsy/overview"
+            ]
+          },
+          {
+            "group": "Etsy endpoints",
+            "pages": [
+              "api-reference/endpoint/etsy/search",
+              "api-reference/endpoint/etsy/listings-listing-id",
+              "api-reference/endpoint/etsy/shops-shop-name",
+              "api-reference/endpoint/etsy/shops-shop-name-listings",
+              "api-reference/endpoint/etsy/shops-shop-name-reviews",
+              "api-reference/endpoint/etsy/categories",
+              "api-reference/endpoint/etsy/listings-listing-id-reviews",
+              "api-reference/endpoint/etsy/autocomplete"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "AliExpress",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "aliexpress/overview"
+            ]
+          },
+          {
+            "group": "AliExpress endpoints",
+            "pages": [
+              "api-reference/endpoint/aliexpress/search",
+              "api-reference/endpoint/aliexpress/products-product-id",
+              "api-reference/endpoint/aliexpress/products-product-id-reviews",
+              "api-reference/endpoint/aliexpress/stores-store-id",
+              "api-reference/endpoint/aliexpress/stores-store-id-products",
+              "api-reference/endpoint/aliexpress/autocomplete",
+              "api-reference/endpoint/aliexpress/categories",
+              "api-reference/endpoint/aliexpress/stores-store-id-categories"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Best Buy",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "bestbuy/overview"
+            ]
+          },
+          {
+            "group": "Best Buy endpoints",
+            "pages": [
+              "api-reference/endpoint/bestbuy/markets",
+              "api-reference/endpoint/bestbuy/search",
+              "api-reference/endpoint/bestbuy/category",
+              "api-reference/endpoint/bestbuy/categories",
+              "api-reference/endpoint/bestbuy/deals",
+              "api-reference/endpoint/bestbuy/autocomplete",
+              "api-reference/endpoint/bestbuy/products-sku-reviews",
+              "api-reference/endpoint/bestbuy/products-sku-questions",
+              "api-reference/endpoint/bestbuy/products-sku-availability",
+              "api-reference/endpoint/bestbuy/products-sku"
+            ]
+          }
+        ]
       }
     ],
     "global": {

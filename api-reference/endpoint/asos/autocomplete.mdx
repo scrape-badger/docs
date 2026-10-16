@@ -1,0 +1,75 @@
+---
+title: "Autocomplete ASOS searches"
+api: "GET https://scrapebadger.com/v1/asos/autocomplete"
+description: "Autocomplete ASOS searches."
+---
+
+Autocomplete ASOS searches.
+
+**Credits:** 3 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField query="query" type="string" required>
+Query. Minimum length: 1. Maximum length: 200.
+</ParamField>
+
+<ParamField query="market" type="string" default="uk">
+Market.
+</ParamField>
+
+<ParamField query="store" type="string">
+Store.
+</ParamField>
+
+<ParamField query="country" type="string">
+Country.
+</ParamField>
+
+<ParamField query="currency" type="string">
+Currency.
+</ParamField>
+
+<ParamField query="language" type="string">
+Language.
+</ParamField>
+
+## Response
+
+```json
+{
+  "market": "uk",
+  "suggestionGroups": [
+    {
+      "indexName": "searchterms",
+      "indexTitle": "searchterms",
+      "suggestions": [
+        {
+          "searchTerm": "shorts",
+          "numberOfResults": 8925
+        }
+      ]
+    }
+  ],
+  "suggestions": [
+    {
+      "searchTerm": "shorts",
+      "numberOfResults": 8925
+    }
+  ]
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/asos/autocomplete' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'query=sho'
+```
+
+[Browse all ASOS endpoints](/asos/overview).

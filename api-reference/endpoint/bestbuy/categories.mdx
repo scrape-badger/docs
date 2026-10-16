@@ -1,0 +1,62 @@
+---
+title: "Get categories"
+api: "GET https://scrapebadger.com/v1/bestbuy/categories"
+description: "Get categories."
+---
+
+Get categories.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField query="query" type="string" default="laptop">
+Query. Minimum length: 1.
+</ParamField>
+
+## Response
+
+```json
+{
+  "query": "laptop",
+  "categories": [
+    {
+      "parentFacetField": null,
+      "displayName": "Category",
+      "facetDisplay": "Yes",
+      "facetField": "category_facet",
+      "maxValue": 6,
+      "values": [
+        {
+          "count": null,
+          "value": "All Laptops",
+          "categoryPath": "pcmcat138500050001",
+          "nestedValues": [
+            {
+              "categoryPath": "pcmcat247400050000",
+              "value": "Windows Laptops",
+              "__typename": "SearchNestedValue"
+            }
+          ],
+          "__typename": "SearchFacetValue"
+        }
+      ],
+      "__typename": "SearchFacet"
+    }
+  ]
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/bestbuy/categories' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'query=laptop'
+```
+
+[Browse all Best Buy endpoints](/bestbuy/overview).

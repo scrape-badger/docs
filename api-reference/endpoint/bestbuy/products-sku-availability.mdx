@@ -1,0 +1,170 @@
+---
+title: "Get product availability"
+api: "GET https://scrapebadger.com/v1/bestbuy/products/{sku}/availability"
+description: "Get product availability."
+---
+
+Get product availability.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField path="sku" type="string" required>
+Sku.
+</ParamField>
+
+<ParamField query="zip_code" type="string" required>
+Zip code.
+</ParamField>
+
+<ParamField query="store_id" type="string" default="7">
+Store id.
+</ParamField>
+
+## Response
+
+```json
+{
+  "sku": "6668412",
+  "zip_code": "55423",
+  "store_id": "7",
+  "fulfillment": {
+    "__typename": "FulfillmentOptionsList",
+    "buttonStates": [
+      {
+        "__typename": "ButtonState",
+        "buttonState": "ADD_TO_CART",
+        "condition": "NEW",
+        "displayText": "Add to Cart",
+        "fulfillmentOption": null,
+        "hyperlinkUrl": null,
+        "planButtonState": null,
+        "planDisplayText": null,
+        "secondaryButtonState": null,
+        "secondaryDisplayText": null,
+        "skuId": "6668412"
+      }
+    ],
+    "deliveryDetails": [
+      {
+        "__typename": "FulfillmentDeliveryDetail",
+        "deliveryAvailability": [
+          {
+            "__typename": "FulfillmentDeliveryAvailability",
+            "condition": "NEW",
+            "backordered": null,
+            "deliverable": null,
+            "deliveryEligible": null,
+            "deliveryServices": null,
+            "deliverySlots": null,
+            "forceSkipScheduling": null,
+            "forceSkipSchedulingReasonCode": null,
+            "homeDeliveryDisplayDateType": null,
+            "inStoreOnly": null,
+            "installationEligible": null,
+            "installationSlots": null,
+            "productAppointmentType": null,
+            "installationAppointmentType": null,
+            "dropoffAppointmentType": null,
+            "salLocationId": null,
+            "restrictions": null
+          }
+        ],
+        "destinationZipCode": null,
+        "sku": "6668412"
+      }
+    ],
+    "ispuDetails": [
+      {
+        "__typename": "InStorePickupDetail",
+        "installationEligible": null,
+        "ispuAvailability": [
+          {
+            "__typename": "InStorePickupAvailability",
+            "whenAvailableFlag": null,
+            "restrictions": null,
+            "quantity": "9999",
+            "promiseByStreetDate": null,
+            "preorderable": null,
+            "pickupEligible": true,
+            "minPickupInHours": "1",
+            "minDate": "2026-10-16",
+            "maxDate": "2026-10-16",
+            "instoreInventoryAvailable": true,
+            "inStoreServices": null,
+            "inStoreOnly": false,
+            "fulfillmentType": "PICKUP",
+            "fulfillDate": null,
+            "emailEligible": null,
+            "downloadEligible": null,
+            "displayDateType": "IN_HAND",
+            "condition": "NEW",
+            "backordered": null
+          }
+        ],
+        "maximumDistanceChecked": null,
+        "nearbyLocation": null,
+        "numberOfStoresChecked": null,
+        "sku": "6668412",
+        "nearbyLocations": null,
+        "store": {
+          "__typename": "FulfillmentPickUpStore",
+          "city": "Roseville",
+          "name": "Roseville",
+          "storeId": "7",
+          "zip": "55113"
+        }
+      }
+    ],
+    "shippingDetails": [
+      {
+        "__typename": "FulfillmentShippingDetail",
+        "destinationZipCode": "55423",
+        "sku": "6668412",
+        "abTestMetadata": null,
+        "shippingAvailability": [
+          {
+            "__typename": "FulfillmentShippingAvailability",
+            "backordered": null,
+            "condition": "NEW",
+            "customerLOSGroup": [
+              {}
+            ],
+            "defaultCustomerLosGroupId": 1,
+            "directToBoxEligible": false,
+            "downloadEligible": false,
+            "emailEligible": false,
+            "fulfillByVendor": false,
+            "inStoreOnly": false,
+            "installationEligible": false,
+            "levelOfServices": [
+              {}
+            ],
+            "preorderable": null,
+            "promiseByStreetDate": null,
+            "restrictions": null,
+            "shippingEligible": true,
+            "whenAvailableFlag": null
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/bestbuy/products/6668412/availability' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'zip_code=55423' \
+  --data-urlencode 'store_id=7'
+```
+
+[Browse all Best Buy endpoints](/bestbuy/overview).

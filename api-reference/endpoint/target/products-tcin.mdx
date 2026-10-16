@@ -1,0 +1,346 @@
+---
+title: "Get product detail"
+api: "GET https://scrapebadger.com/v1/target/products/{tcin}"
+description: "Get product detail."
+---
+
+Get product detail.
+
+**Credits:** 10 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField path="tcin" type="string" required>
+Tcin.
+</ParamField>
+
+<ParamField query="store_id" type="string" default="1375">
+Store id.
+</ParamField>
+
+<ParamField query="zip_code" type="string" default="55403">
+Zip code.
+</ParamField>
+
+## Response
+
+```json
+{
+  "tcin": "82286564",
+  "requested_tcin": "80179068",
+  "title": "Graco TriRide 3-in-1 Convertible Car Seat",
+  "url": "https://www.target.com/p/graco-triride-3-in-1-convertible-car-seat/-/A-82286564",
+  "brand": "Graco",
+  "description": "The Graco® TriRide™ 3-in-1 Car Seat helps to keep your little one safe from baby to big kid, through 3 modes of use: rear-facing harness (5-40 lb), forward-facing harness (22-65 lb), and highback booster (40-100 lb). The No-Rethread Simply Safe Adjust™ Harness System allows you to adjust the height of the headrest and harness in one motion, helping to save you time and ensure your child is properly secured. Choose the perfect headrest height from 10 positions and adjust the seat to 6 recline positions for a better installation. The easy-to-read level indicator helps eliminate installation guesswork and the car seat is LATCH-equipped for easy installation. The integrated harness storage compartment keeps the harness safely stored away, without removing, while in belt-positioning booster mode. Open-loop belt guides help properly position your vehicle’s seat belt across your child in highback booster mode. 2 easy-to-clean cup holders keep your child's drinks and snacks close at hand, and the seat pad is comfortable and machine washable for your convenience. Removable plush head and body inserts help to keep your infant feeling cradled and comfortable. Steel-reinforced frame provides strength and durability for years of use. This car seat is Graco® ProtectPlus Engineered™ to help protect in frontal, side, rear, and rollover crashes.<br />",
+  "price": {
+    "formatted_current_price": "$199.99",
+    "formatted_current_price_type": "reg",
+    "location_id": 3991,
+    "current_retail_min": 199.99,
+    "reg_retail_max": 199.99
+  },
+  "currency": "USD",
+  "images": [
+    "https://target.scene7.com/is/image/Target/GUEST_ee6af019-b943-40a0-b9cc-205d858057c2"
+  ],
+  "videos": [
+    {
+      "video_captions": [
+        {
+          "caption_url": "https://target.scene7.com/is/content/Target/GUEST_debe3f5c-4c9b-4422-b1ed-9e70460456d5",
+          "language": "EN"
+        }
+      ],
+      "video_files": [
+        {
+          "mime_type": "video/mp4",
+          "video_height_pixels": "720",
+          "video_url": "https://target.scene7.com/is/content/Target/GUEST_9ac77fcd-03b0-463b-9dca-b85a62f17725"
+        }
+      ],
+      "video_length_seconds": "36",
+      "video_poster_image": "https://target.scene7.com/is/image/Target/GUEST_9ac77fcd-03b0-463b-9dca-b85a62f17725",
+      "video_title": "Graco TriRide 3-in-1 Convertible Car Seat"
+    }
+  ],
+  "specifications": [
+    "<B>Dimensions (Overall):</B> 23.5 Inches (H) x 19.25 Inches (W) x 20.5 Inches (D)"
+  ],
+  "highlights": [
+    "Stages: Rear-facing harness (5-40 lb), forward-facing harness (22-65 lb), highback booster (40-100 lb)"
+  ],
+  "fulfillment": {},
+  "promotions": [],
+  "ratings_and_reviews": {
+    "has_verified": true,
+    "statistics": {
+      "not_recommended_count": 165,
+      "question_count": 157,
+      "rating": {
+        "average": 4.43,
+        "count": 2686,
+        "distribution": {
+          "rating1": 214,
+          "rating2": 59,
+          "rating3": 100,
+          "rating4": 304,
+          "rating5": 2009
+        },
+        "secondary_averages": [
+          {
+            "id": "quality",
+            "label": "quality",
+            "range": 5,
+            "type": "RATING",
+            "value": 3.94
+          }
+        ]
+      },
+      "recommended_count": 320,
+      "recommended_percentage": 65,
+      "review_count": 1350
+    },
+    "most_recent": [
+      {
+        "id": "8eff505d-dd00-406e-914a-2458f4adf737",
+        "text": "We love this car seat! It’s got sturdy material that is easy to remove for cleaning if need be. It has the should strap cushions which makes it easy to tighten the seat straps enough without them digging into the baby. The inserts for younger kids seem very cushiony and comfortable for long rides. The car seat is easy to install and easy instructions to follow for each stage of life. This is our third Graco convertible car seat we’ve purchased and we love it just as much as the other two seat models. Three different car sizes so three different models are needed for fit. That’s why we love graco.",
+        "author": {
+          "nickname": "Lindsey",
+          "external_id": "20025589297"
+        },
+        "title": "Easy to install",
+        "rating": {
+          "value": 5.0,
+          "submitted_at": "2026-10-11T15:18:42.781Z"
+        }
+      }
+    ],
+    "photos": [
+      "https://target.scene7.com/is/image/Target/GUEST_30d0a0ed-7e22-4b19-9aa5-57823d3ec68c"
+    ]
+  },
+  "category": {
+    "parent_category_id": "5xtlx",
+    "name": "Convertible Car Seats",
+    "breadcrumbs": [
+      {
+        "canonical_url": "/",
+        "category_id": "root",
+        "name": "target"
+      }
+    ]
+  },
+  "variants": [
+    {
+      "__typename": "Product",
+      "tcin": "80179068",
+      "item": {
+        "compliance": {},
+        "enrichment": {
+          "buy_url": "https://www.target.com/p/graco-triride-3-in-1-convertible-car-seat-kipling/-/A-80179068",
+          "image_info": {
+            "base_url": "//target.scene7.com/is/image/Target/",
+            "primary_image": {
+              "alt_text": "Black colored car seat with cup holders and adjustable headrest, featuring the text \"GRACO\" and \"TRIRIDE.\"",
+              "image_name": "GUEST_ee6af019-b943-40a0-b9cc-205d858057c2",
+              "url": "https://target.scene7.com/is/image/Target/GUEST_ee6af019-b943-40a0-b9cc-205d858057c2"
+            },
+            "content_labels": [
+              {}
+            ],
+            "alternate_images": [
+              {}
+            ],
+            "swatch_image": {
+              "url": "https://target.scene7.com/is/image/Target/GUEST_ee6af019-b943-40a0-b9cc-205d858057c2?cropN=0.68,0.37,0.05,0.05&sizeN=150,150",
+              "image_name": "GUEST_ee6af019-b943-40a0-b9cc-205d858057c2?cropN=0.68,0.37,0.05,0.05&sizeN=150,150"
+            }
+          },
+          "videos": [
+            {
+              "video_captions": [],
+              "video_files": [],
+              "video_length_seconds": "36",
+              "video_poster_image": "https://target.scene7.com/is/image/Target/GUEST_9ac77fcd-03b0-463b-9dca-b85a62f17725",
+              "video_title": "Graco TriRide 3-in-1 Convertible Car Seat"
+            }
+          ],
+          "return_policies": [
+            {
+              "user_type": "best_guest",
+              "day_count": 120
+            }
+          ]
+        },
+        "environmental_segmentation": {
+          "is_hazardous_material": false
+        },
+        "formatted_return_method": "This item can be returned to any Target store or Target.com.",
+        "fulfillment": {
+          "is_gift_wrap_eligible": false,
+          "purchase_limit": 4
+        },
+        "package_dimensions": {
+          "depth": 20.5,
+          "dimension_unit_of_measure": "INCH",
+          "weight": 17.2,
+          "weight_unit_of_measure": "POUND",
+          "height": 23.5,
+          "width": 19.25
+        },
+        "product_description": {
+          "bullet_descriptions": [
+            "<B>Dimensions (Overall):</B> 23.5 Inches (H) x 19.25 Inches (W) x 20.5 Inches (D)"
+          ],
+          "downstream_description": "The Graco® TriRide™ 3-in-1 Car Seat helps to keep your little one safe from baby to big kid, through 3 modes of use: rear-facing harness (5-40 lb), forward-facing harness (22-65 lb), and highback booster (40-100 lb). The No-Rethread Simply Safe Adjust™ Harness System allows you to adjust the height of the headrest and harness in one motion, helping to save you time and ensure your child is properly secured. Choose the perfect headrest height from 10 positions and adjust the seat to 6 recline positions for a better installation. The easy-to-read level indicator helps eliminate installation guesswork and the car seat is LATCH-equipped for easy installation. The integrated harness storage compartment keeps the harness safely stored away, without removing, while in belt-positioning booster mode. Open-loop belt guides help properly position your vehicle’s seat belt across your child in highback booster mode. 2 easy-to-clean cup holders keep your child's drinks and snacks close at hand, and the seat pad is comfortable and machine washable for your convenience. Removable plush head and body inserts help to keep your infant feeling cradled and comfortable. Steel-reinforced frame provides strength and durability for years of use. This car seat is Graco® ProtectPlus Engineered™ to help protect in frontal, side, rear, and rollover crashes.<br />",
+          "soft_bullets": {
+            "bullets": [
+              "Stages: Rear-facing harness (5-40 lb), forward-facing harness (22-65 lb), highback booster (40-100 lb)"
+            ],
+            "title": "highlights"
+          },
+          "title": "Graco TriRide 3-in-1 Convertible Car Seat - Kipling",
+          "soft_bullet_description": "&bull;Stages: Rear-facing harness (5-40 lb), forward-facing harness (22-65 lb), highback booster (40-100 lb)<br>&bull;Grows with Child: 6-position recline and 10-position adjustable headrest<br>&bull;Includes: 2 cup holders, removable infant head and body inserts, LATCH-equipped<br>&bull;Safety Features: Graco® ProtectPlus Engineered™ helps to protect your little one in frontal, side, rear, and rollover crashes<br>&bull;Easy to Clean: Seat pad is comfortable and machine-washable<br>&bull;Installation: Easy-to-read level indicator helps eliminate installation guesswork <br>&bull;Long-Lasting for 10 Years of Use: Steel-reinforced frame provides strength and durability"
+        },
+        "relationship_type_code": "VC",
+        "return_policies_guest_message": "This item must be returned within 90 days of the date it was purchased in store, delivered to the guest, delivered by a Shipt shopper, or picked up by the guest.",
+        "return_policy_url": "https://www.target.com/help/articles/returns-exchanges/returns",
+        "wellness_merchandise_attributes": [
+          {
+            "badge_url": "https://target.scene7.com/is/image/Target/GUEST_537c73cc-eb3d-498f-afb6-612e79085160",
+            "parent_id": "107703",
+            "value_id": "377935",
+            "value_name": "Washable",
+            "wellness_description": "Can be washed in a washing machine for easy care."
+          }
+        ],
+        "cart_add_on_threshold": 35.0,
+        "dpci": "030-09-6480",
+        "eligibility_rules": {
+          "hold": {
+            "is_active": true
+          },
+          "scheduled_delivery": {
+            "is_active": true
+          },
+          "ship_to_guest": {
+            "is_active": true
+          }
+        },
+        "handling": {
+          "import_designation_description": "Imported"
+        },
+        "is_limited_time_offer": false,
+        "merchandise_classification": {
+          "class_id": 9,
+          "department_id": 30,
+          "department_name": "BABY HOME/GEAR/PLAY"
+        },
+        "primary_barcode": "047406190867",
+        "primary_brand": {
+          "canonical_url": "/b/graco/-/N-5y6ua",
+          "linking_id": "5y6ua",
+          "name": "Graco"
+        },
+        "product_classification": {
+          "product_type": 537,
+          "product_type_name": "BABY",
+          "purchase_behavior": "Discretionary"
+        },
+        "return_method": "Mail In or Store",
+        "will_be_shipped_in_original_package": true
+      },
+      "esp": {
+        "tcin": "51513387",
+        "enrichment": {},
+        "price": {
+          "formatted_current_price": "$29.00",
+          "formatted_current_price_type": "reg"
+        },
+        "product_description": {
+          "title": "2 Year Baby Products Protection Plan ($175-$199.99) - Allstate",
+          "bullet_descriptions": [
+            "<B>Benefits:</B> Free 2-Way Shipping, 24/7 Support, No Deductible"
+          ]
+        }
+      },
+      "desirability_cues": [
+        {
+          "code": "bestseller",
+          "display": "Bestseller",
+          "long_description": "Based on sales and guest views of this item within the last 30 days."
+        }
+      ],
+      "ornaments": [
+        {
+          "ornament": "bestseller",
+          "display": "Bestseller",
+          "long_description": "Based on sales and guest views of this item within the last 30 days.",
+          "ornament_type": "guest",
+          "template_type": "dark_marker_with_trophy",
+          "metadata": "{\"experiments\":[{\"factor\":\"bestseller_halloween_ornament\",\"value\":\"control\",\"default\":false}]}"
+        }
+      ],
+      "free_shipping": {
+        "enabled": true
+      },
+      "price": {
+        "current_retail": 199.99,
+        "display_was_now": false,
+        "formatted_current_price": "$199.99",
+        "formatted_current_price_type": "reg",
+        "reg_retail": 199.99,
+        "location_id": 3991,
+        "external_system_id": "80179068-3991-199.99-2026090315-EPC"
+      },
+      "promotions": []
+    }
+  ],
+  "variation_hierarchy": [
+    {
+      "name": "Color",
+      "value": "Kipling",
+      "tcin": "80179068",
+      "buy_url": "https://www.target.com/p/graco-triride-3-in-1-convertible-car-seat-kipling/-/A-80179068",
+      "swatch_image_url": "https://target.scene7.com/is/image/Target/GUEST_ee6af019-b943-40a0-b9cc-205d858057c2?cropN=0.68,0.37,0.05,0.05&sizeN=150,150",
+      "primary_image_url": "https://target.scene7.com/is/image/Target/GUEST_ee6af019-b943-40a0-b9cc-205d858057c2",
+      "availability": {
+        "is_shipping_available": true,
+        "is_shipping_loyalty_available": true,
+        "is_scheduled_delivery_available": false,
+        "is_primary_store_available": true,
+        "is_backup_store_available": false,
+        "is_digital_options_available": false,
+        "is_sold_out": false
+      },
+      "fulfillment": {
+        "is_shipping_available": true,
+        "is_shipping_loyalty_available": true,
+        "is_scheduled_delivery_available": false,
+        "is_primary_store_available": true,
+        "is_backup_store_available": false,
+        "is_digital_options_available": false,
+        "is_sold_out": false,
+        "is_future_selling_intent_available": false
+      }
+    }
+  ],
+  "seller": [],
+  "is_sponsored": false
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/target/products/80179068' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'store_id=1375' \
+  --data-urlencode 'zip_code=55403'
+```
+
+[Browse all Target endpoints](/target/overview).

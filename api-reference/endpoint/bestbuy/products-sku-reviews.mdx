@@ -1,0 +1,145 @@
+---
+title: "Get product reviews"
+api: "GET https://scrapebadger.com/v1/bestbuy/products/{sku}/reviews"
+description: "Get product reviews."
+---
+
+Get product reviews.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField path="sku" type="string" required>
+Sku.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+Page. Minimum: 1. Maximum: 1000.
+</ParamField>
+
+<ParamField query="page_size" type="integer" default="10">
+Page size. Minimum: 1. Maximum: 20.
+</ParamField>
+
+<ParamField query="sort" type="string" default="MOST_RECENT">
+Sort. Allowed values: `MOST_RECENT`, `BEST_REVIEW`, `MOST_HELPFUL`, `OLDEST`, `HIGHEST_RATING`, `LOWEST_RATING`.
+</ParamField>
+
+## Response
+
+```json
+{
+  "reviews": [
+    {
+      "id": "65672b9b-37fb-3a6d-b026-3abb4fade5a3",
+      "title": "Great laptop",
+      "text": "Great laptop for a great price! It runs well and didn’t give me any issues. The only thing I would change about it is giving it a touch screen and allowing the screen to bend all the way back",
+      "rating": 5.0,
+      "author": "BENM",
+      "submitted_at": "2026-10-16T20:41:34Z",
+      "submitted_utc": 1792183294.0,
+      "recommended": true,
+      "verified_purchase": true,
+      "helpful_count": 0,
+      "unhelpful_count": 0,
+      "photos": [],
+      "badges": [
+        {
+          "badgeCode": "Incentivized",
+          "badgeDescription": "This reviewer received promo considerations or sweepstakes entry for writing a review.",
+          "badgeName": "Incentivized",
+          "badgeType": "Custom",
+          "fileName": null,
+          "iconText": null,
+          "iconPath": null,
+          "index": 90900
+        }
+      ]
+    }
+  ],
+  "total_results": 106,
+  "page": 1,
+  "total_pages": 11,
+  "statistics": {
+    "sku": "6668412",
+    "verifiedPurchaseCount": 105,
+    "distribution": [
+      {
+        "value": 5,
+        "count": 80,
+        "actualPercent": "75.47169811320755",
+        "roundedPercent": 75
+      }
+    ],
+    "prosDistribution": [
+      {
+        "value": "Overall Performance",
+        "count": 65,
+        "actualPercent": "63.10679611650485",
+        "roundedPercent": 63
+      }
+    ],
+    "consDistribution": [
+      {
+        "value": "Connectivity",
+        "count": 2,
+        "actualPercent": 20,
+        "roundedPercent": 20
+      }
+    ],
+    "overallStats": {
+      "averageOverallRating": 4.6,
+      "overallDistributions": [
+        {
+          "value": 5,
+          "count": 80,
+          "actualPercent": "75.47169811320755",
+          "roundedPercent": 75
+        }
+      ],
+      "overallProsDistributions": [
+        {
+          "value": "Overall Performance",
+          "count": 65,
+          "actualPercent": "63.10679611650485",
+          "roundedPercent": 63
+        }
+      ],
+      "overallConsDistributions": [
+        {
+          "value": "Connectivity",
+          "count": 2,
+          "actualPercent": 20,
+          "roundedPercent": 20
+        }
+      ],
+      "totalReviewCount": 106,
+      "recommendedPercent": 92,
+      "topRated": true
+    }
+  },
+  "sort_options": [
+    {
+      "displayName": "Most relevant",
+      "value": "BEST_REVIEW"
+    }
+  ]
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/bestbuy/products/6668412/reviews' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'page=1' \
+  --data-urlencode 'page_size=10' \
+  --data-urlencode 'sort=MOST_RECENT'
+```
+
+[Browse all Best Buy endpoints](/bestbuy/overview).

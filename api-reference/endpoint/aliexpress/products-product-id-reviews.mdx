@@ -1,0 +1,129 @@
+---
+title: "Get product reviews"
+api: "GET https://scrapebadger.com/v1/aliexpress/products/{product_id}/reviews"
+description: "Get product reviews."
+---
+
+Get product reviews.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField path="product_id" type="string" required>
+Product id.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+Page. Minimum: 1. Maximum: 10000.
+</ParamField>
+
+<ParamField query="page_size" type="integer" default="10">
+Page size. Minimum: 1. Maximum: 50.
+</ParamField>
+
+<ParamField query="sort" type="string" default="complex_default">
+Sort. Allowed values: `complex_default`, `latest_sort`.
+</ParamField>
+
+## Response
+
+```json
+{
+  "reviews": [
+    {
+      "review_id": "60096074220393787",
+      "text": "I own a logitech and redragon mouse, and this is better than both of them.    It's noticeably lighter and the sensor seems to work better with my cloth desk mat. The pads on the underside of the mouse have a blue sticker that you need to remove, after which it slides smoothly on the desk.    I'll probably end up buying another one later on, just to have a spare on hand.",
+      "author": "A***r",
+      "country": "US",
+      "rating": 5.0,
+      "created_at": "2026-03-17T00:00:00Z",
+      "created_utc": 1773705600.0,
+      "sku_id": "12000039021192608",
+      "sku_info": "Color:black Ships From:United States",
+      "helpful_count": 0,
+      "unhelpful_count": 0,
+      "images": [],
+      "additional_feedback": null,
+      "seller_response": null,
+      "original": {
+        "aigc": false,
+        "anonymous": false,
+        "buyerAddFbDays": 0,
+        "buyerCountry": "US",
+        "buyerEval": 100,
+        "buyerFbType": {
+          "crowdSourcingPersonName": "AliExpress Shopper",
+          "sourceLang": "en",
+          "typeTranslationAccepted": "crowdsourcing"
+        },
+        "buyerFeedback": "I own a logitech and redragon mouse, and this is better than both of them.    It's noticeably lighter and the sensor seems to work better with my cloth desk mat. The pads on the underside of the mouse have a blue sticker that you need to remove, after which it slides smoothly on the desk.    I'll probably end up buying another one later on, just to have a spare on hand.",
+        "buyerName": "A***r",
+        "buyerProductFeedBack": "",
+        "downVoteCount": 0,
+        "evalDate": "17 Mar 2026",
+        "evaluationId": 60096074220393787,
+        "evaluationIdStr": "60096074220393787",
+        "independentSite": false,
+        "logistics": "Seller Shpping",
+        "reviewType": "REVIEW",
+        "samePurchaseSuggestion": "Buy the same",
+        "selectedReview": false,
+        "skuId": 12000039021192608,
+        "skuInfo": "Color:black Ships From:United States",
+        "status": "1",
+        "thirdParty": false,
+        "trendyol": false,
+        "upVoteCount": 0
+      }
+    }
+  ],
+  "page": 1,
+  "page_size": 20,
+  "total_results": 203,
+  "total_pages": 11,
+  "statistics": {
+    "evarageStar": 4.8,
+    "evarageStarRage": 95.5,
+    "fiveStarNum": 174,
+    "fiveStarRate": 85.3,
+    "fourStarNum": 19,
+    "fourStarRate": 9.3,
+    "negativeNum": 6,
+    "negativeRate": 2.9,
+    "neutralNum": 5,
+    "neutralRate": 2.5,
+    "oneStarNum": 4,
+    "oneStarRate": 1.9,
+    "positiveNum": 193,
+    "positiveRate": 94.6,
+    "threeStarNum": 5,
+    "threeStarRate": 2.5,
+    "totalNum": 204,
+    "twoStarNum": 2,
+    "twoStarRate": 1.0
+  },
+  "filters": {
+    "currentFilter": "all",
+    "filterStatistic": [
+      {
+        "filterCode": "additional",
+        "filterCount": 2
+      }
+    ]
+  }
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/aliexpress/products/3256806816805325/reviews' \
+  --header 'X-API-Key: YOUR_API_KEY'
+```
+
+[Browse all AliExpress endpoints](/aliexpress/overview).

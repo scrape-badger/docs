@@ -1,0 +1,79 @@
+---
+title: "Get search facets"
+api: "GET https://scrapebadger.com/v1/asos/filters"
+description: "Get search facets."
+---
+
+Get search facets.
+
+**Credits:** 5 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField query="query" type="string">
+Query. Minimum length: 1.
+</ParamField>
+
+<ParamField query="category_id" type="integer">
+Category id.
+</ParamField>
+
+<ParamField query="market" type="string" default="uk">
+Market.
+</ParamField>
+
+<ParamField query="store" type="string">
+Store.
+</ParamField>
+
+<ParamField query="country" type="string">
+Country.
+</ParamField>
+
+<ParamField query="currency" type="string">
+Currency.
+</ParamField>
+
+<ParamField query="language" type="string">
+Language.
+</ParamField>
+
+## Response
+
+```json
+{
+  "market": "uk",
+  "total_results": 13710,
+  "facets": [
+    {
+      "id": "range",
+      "name": "Sale/New Season",
+      "facetValues": [
+        {
+          "count": 8426,
+          "id": "new_season",
+          "name": "New Season",
+          "isSelected": false
+        }
+      ],
+      "displayStyle": "Single-Column",
+      "facetType": "TextMultiSelect",
+      "hasSelectedValues": false
+    }
+  ]
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/asos/filters' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'query=shoes'
+```
+
+[Browse all ASOS endpoints](/asos/overview).

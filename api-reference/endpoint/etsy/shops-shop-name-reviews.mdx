@@ -1,0 +1,124 @@
+---
+title: "Get shop reviews"
+api: "GET https://scrapebadger.com/v1/etsy/shops/{shop_name}/reviews"
+description: "Get shop reviews."
+---
+
+Get shop reviews.
+
+**Credits:** 20 per successful request. Failed requests and empty result sets are not charged.
+
+## Authentication
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField path="shop_name" type="string" required>
+Shop name.
+</ParamField>
+
+<ParamField query="page" type="integer" default="1">
+Page. Minimum: 1. Maximum: 10000.
+</ParamField>
+
+<ParamField query="country" type="string" default="US">
+Country.
+</ParamField>
+
+<ParamField query="currency" type="string" default="USD">
+Currency.
+</ParamField>
+
+<ParamField query="language" type="string" default="en-US">
+Language.
+</ParamField>
+
+## Response
+
+```json
+{
+  "reviews": [
+    {
+      "review_id": "5230925311",
+      "rating": 5.0,
+      "text": "Beautiful mug! I got two and both came with a free bookmark! ❤️",
+      "author": "Chloe",
+      "author_url": "https://www.etsy.com/people/9mc1acsys9tc7ed7?ref=l_review",
+      "created_utc": 1791244800.0,
+      "created_at": "2026-10-06T00:00:00Z",
+      "listing_id": "4573559591",
+      "listing_title": "Handmade ghost gallery halloween mug",
+      "listing_url": "https://www.etsy.com/listing/4573559591/handmade-ghost-gallery-halloween-mug?ref=reviews",
+      "seller_response": null,
+      "images": [],
+      "author_avatar": "https://i.etsystatic.com/iusa/8a87cc/85566462/iusa_75x75.85566462_amws.jpg?version=0",
+      "translated_text": null,
+      "translation_context": {
+        "canTranslateReview": false,
+        "canTranslateResponse": false,
+        "targetLanguageCode": "en",
+        "targetLanguageName": "English"
+      },
+      "original": {
+        "transactionId": 5230925311,
+        "reviewInfo": {
+          "isRecommended": null,
+          "rating": 5,
+          "reviewDate": "Oct 6, 2026",
+          "shouldShowVariations": false,
+          "shouldShowTransactionData": true,
+          "transactionData": {
+            "listingTitle": "Handmade ghost gallery halloween mug",
+            "listingUrl": "/listing/4573559591/handmade-ghost-gallery-halloween-mug?ref=reviews"
+          }
+        },
+        "buyerInfo": {
+          "name": "Chloe",
+          "isAnonymous": false,
+          "isInactive": false,
+          "profileUrl": "https://www.etsy.com/people/9mc1acsys9tc7ed7?ref=l_review",
+          "avatarUrl": "https://i.etsystatic.com/iusa/8a87cc/85566462/iusa_75x75.85566462_amws.jpg?version=0"
+        },
+        "reviewContent": {
+          "appreciationPhotoUrl": null,
+          "reviewText": "Beautiful mug! I got two and both came with a free bookmark! ❤️",
+          "emphasizedText": [],
+          "reviewTextTranslated": null,
+          "translationAttributionMessage": null
+        },
+        "sellerResponse": null,
+        "translationContext": {
+          "canTranslateReview": false,
+          "canTranslateResponse": false,
+          "targetLanguageCode": "en",
+          "targetLanguageName": "English"
+        }
+      }
+    }
+  ],
+  "page": 2,
+  "total_results": 411,
+  "total_pages": 52,
+  "average_rating": 4.97,
+  "rating_counts": {
+    "5": 403,
+    "4": 6,
+    "3": 1,
+    "2": 1,
+    "1": 0,
+    "All": 411
+  },
+  "tag_filters": [],
+  "shop_name": "GlazyLittleThings"
+}
+```
+
+## Example
+
+```bash
+curl --get 'https://scrapebadger.com/v1/etsy/shops/GlazyLittleThings/reviews' \
+  --header 'X-API-Key: YOUR_API_KEY'
+```
+
+[Browse all Etsy endpoints](/etsy/overview).
