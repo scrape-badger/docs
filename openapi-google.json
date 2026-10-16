@@ -12,7 +12,7 @@
           "Google Search"
         ],
         "summary": "Google web search",
-        "description": "Search Google and get structured results.\n\nTwo response modes:\n\n- **full** (default, 2 credits): complete SERP with organic, ads,\n  knowledge graph, People Also Ask, AI Overview, local pack, news,\n  related searches, inline videos, etc. ~1.5-2s cold, ~1.5ms warm.\n- **fast** (1 credit, ~40% faster): lite endpoint (`gbv=1`) returning\n  only organic results + related searches. Rich blocks (KG, local,\n  AI Overview, news) are **not** returned — request ``mode=full`` for\n  those. Auto-upgrades to full if ``ai_overview=true`` is set.\n\nFirst request in either mode triggers a browser warmup (~15s) to\nsolve SearchGuard. Subsequent requests reuse the sticky session.",
+        "description": "Search Google and get structured results.\n\nTwo response modes:\n\n- **full** (default): complete SERP with organic, ads,\n  knowledge graph, People Also Ask, AI Overview, local pack, news,\n  related searches, inline videos, etc. ~1.5-2s cold, ~1.5ms warm.\n- **fast** (~40% faster): lite endpoint (`gbv=1`) returning\n  only organic results + related searches. Rich blocks (KG, local,\n  AI Overview, news) are **not** returned — request ``mode=full`` for\n  those. Auto-upgrades to full if ``ai_overview=true`` is set.\n\nFirst request in either mode triggers a browser warmup (~15s) to\nsolve SearchGuard. Subsequent requests reuse the sticky session.",
         "operationId": "google_search_api_v1_search_get",
         "parameters": [
           {
@@ -351,11 +351,11 @@
             "required": false,
             "schema": {
               "type": "boolean",
-              "description": "When true, chase Google's deferred AI Overview page_token with a follow-up fetch and merge the result into ai_overview. Adds ~1s and 1 credit when the SERP actually defers the overview.",
+              "description": "When true, chase Google's deferred AI Overview page_token with a follow-up fetch and merge the result into ai_overview. Adds ~1s when the SERP actually defers the overview.",
               "default": false,
               "title": "Ai Overview"
             },
-            "description": "When true, chase Google's deferred AI Overview page_token with a follow-up fetch and merge the result into ai_overview. Adds ~1s and 1 credit when the SERP actually defers the overview."
+            "description": "When true, chase Google's deferred AI Overview page_token with a follow-up fetch and merge the result into ai_overview. Adds ~1s when the SERP actually defers the overview."
           },
           {
             "name": "mode",

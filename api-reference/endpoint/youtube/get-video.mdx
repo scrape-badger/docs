@@ -153,10 +153,10 @@ description: "Full detail for a single YouTube video (metadata, engagement, chap
 | `GET /v1/youtube/videos/{video_id}/related` | Related / recommended videos (returns `results` + `continuation`). |
 | `GET /v1/youtube/videos/{video_id}/streams` | Streaming formats (muxed + adaptive); `client` selects `IOS` (default), `ANDROID`, or `WEB`. **15 credits.** |
 | `GET /v1/youtube/videos/{video_id}/live_chat` | Live chat / chat replay messages (`continuation` paginated). |
-| `POST /v1/youtube/videos/batch` | Up to 50 video ids in one request (body `{ "video_ids": [...] }`); billed **10 credits per video**. |
+| `POST /v1/youtube/videos/batch` | Up to 50 video ids in one request (body `{ "video_ids": [...] }`); billed **15 credits per video**. |
 
 <Note>
-  A video-detail request costs **10 credits**. The `/streams` sub-endpoint costs **15 credits**; `/related` and `/live_chat` cost **5 credits** each. Failed requests are not charged.
+  A video-detail request costs **15 credits**. The `/streams` sub-endpoint costs **23 credits**; `/related` and `/live_chat` cost **8 credits** each. Failed requests are not charged.
 </Note>
 
 <Warning>

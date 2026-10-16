@@ -78,9 +78,16 @@ standard tier is **5 credits**, with these exceptions:
 
 | Endpoint | Path | Credits |
 | -------- | ---- | ------- |
-| Autocomplete | `GET /v1/naver/autocomplete` | 1 |
+| Web search, News, Blog, Local | `GET /v1/naver/search`, `/news`, `/blog`, `/local` | 8 |
+| Place reviews | `GET /v1/naver/place/{place_id}/reviews` | 8 |
+| Shopping catalog search, price compare | `GET /v1/naver/shopping/search-catalog`, `/shopping/price-compare` | 8 |
+| Shopping bestsellers, insight, keywords | `GET /v1/naver/shopping/bestsellers`, `/shopping/insight`, `/shopping/keywords` | 8 |
+| Place detail | `GET /v1/naver/place/{place_id}` | 11 (browser-rendered) |
+| Shopping Live broadcast, channel and shortclip detail | `GET /v1/naver/shopping/live/broadcasts/{id}`, `/channels/{id}`, `/shortclips/{id}` | 3 |
+| Shopping Live keyword search | `GET /v1/naver/shopping/live/search/keywords` | 3 |
+| Review SSR queries, review video key | `GET /v1/naver/reviews/{id}/ssr-queries`, `/reviews/video-inkey` | 3 |
+| Autocomplete | `GET /v1/naver/autocomplete` | 2 |
 | Shopping categories | `GET /v1/naver/shopping/categories` | 0 (free reference) |
-| Place detail | `GET /v1/naver/place/{place_id}` | 8 (browser-rendered) |
 | Everything else | `GET /v1/naver/*` | 5 |
 
 <Note>
