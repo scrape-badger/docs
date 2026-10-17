@@ -10,8 +10,9 @@ If the service cannot obtain a complete AI Mode answer, it returns `503 Service
 Unavailable` instead of an empty answer or a misleading `404`. It does not
 substitute a regular search result or an AI Overview for an AI Mode answer.
 
-Wait at least the time specified by `Retry-After` before retrying (currently
-`5` seconds). Use bounded retries with backoff and reduce concurrency if failures
-continue. A retry is not guaranteed to succeed.
+Wait at least the time specified by the response’s `Retry-After` header before
+retrying. Do not assume a fixed delay: a recently failed identical prompt can
+require a `300`-second wait. Use bounded retries with backoff and reduce
+concurrency if failures continue. A retry is not guaranteed to succeed.
 
 Failed requests do not consume credits. See [credits and pricing](/credits-and-pricing).
