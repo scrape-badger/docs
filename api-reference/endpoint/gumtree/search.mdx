@@ -444,4 +444,5 @@ for private sellers, `priceType:NEGOTIABLE` for negotiable prices.
 | Status | Meaning |
 | ------ | ------- |
 | `400` | Malformed `filters` value; an unknown `category` or `location` id; a parameter the `market` does not support (see the table above); a `za` filter key gumtree.co.za does not know, or an old numeric `za` id; or `min_price` / `max_price` with `category=all` on `uk`. |
-| `422` | Invalid parameter (e.g. `page` above 50), or Gumtree temporarily refused the request. **Not billed** — retry the latter shortly. |
+| `422` | Invalid parameter (e.g. `page` above 50), or Gumtree blocked the request. **Not billed**. |
+| `503` | Gumtree's origin or transport is temporarily unavailable. **Not billed**. Wait for the `Retry-After` interval (currently 60 seconds) before retrying. |
