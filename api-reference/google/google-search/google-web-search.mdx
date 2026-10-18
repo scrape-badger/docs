@@ -8,8 +8,18 @@ openapi: "GET /v1/google/search"
   **The `num` parameter is deprecated.** Google no longer honours `num` to widen a page — a single request returns roughly **10 organic results per page**, regardless of the value you pass. To collect more results, paginate with the **`start`** offset (`start=0`, `10`, `20`, …) and merge the pages client-side.
 </Warning>
 
+## Search pricing
+
+Regular Search costs **20 credits** per successful uncached request.
+[Google Light Search](/api-reference/endpoint/google/light-search) has a dedicated
+`/v1/google/light/search` endpoint and costs **10 credits** for organic results
+and related searches. No `mode` parameter is required on the Light endpoint.
+
+Legacy `/search?mode=fast` requests remain compatible at the regular route's
+20-credit price. Move to `/light/search` for the 10-credit rate.
+
 ## Fast search timeout
 
 With `mode=fast`, search has an 8-second processing budget shared by fetching, retries, fallback and parsing. If no result is ready within that budget, the API returns `503` with `Retry-After: 60`. Wait at least 60 seconds before retrying. Network transit and gateway processing can add to the time you observe.
 
-This budget also applies to `/v1/google/light/search`. It does not apply to `mode=full`, or to a fast request upgraded to full mode by `ai_overview=true`.
+This budget also applies to `/v1/google/light/search`. The dedicated Light endpoint cannot enable rich SERP features through `mode=full` or `ai_overview=true`. The budget does not apply to regular full Search.

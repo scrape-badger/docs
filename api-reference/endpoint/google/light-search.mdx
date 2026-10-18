@@ -1,0 +1,36 @@
+---
+title: "Google Light Search"
+openapi: "GET /v1/google/light/search"
+description: "Organic results and related searches through a dedicated lightweight endpoint."
+---
+
+A successful uncached request costs **10 credits**. Failed requests and cache
+hits are free. Check `X-Credits-Used` for the actual charge and
+`/api/public/pricing` for current prices and promotions.
+
+```bash
+curl --get 'https://scrapebadger.com/v1/google/light/search' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'q=vinted api' \
+  --data-urlencode 'gl=us' \
+  --data-urlencode 'hl=en'
+```
+
+The JSON response contains `search_information`, `organic_results`,
+`related_searches` and `pagination`. Light skips ads, AI Overviews, Knowledge
+Graph, People Also Ask, local results, news, inline videos and shopping.
+No `mode` parameter is required. Passing `mode=full` or `ai_overview=true`
+cannot enable rich SERP features.
+
+Use `start=10`, `20`, and so on for later pages. Google may return fewer results
+than requested by `num`; a page commonly contains about ten organic results.
+Set `output=html` to receive the raw Google response instead of parsed JSON.
+
+Light has an eight-second processing budget, including fetching, fallback and
+parsing. If the budget expires, the response is `503` with `Retry-After`.
+
+The CLI command is `scrapebadger google light-search "vinted api"`. The MCP tool
+is `google_light_search`, with `start` for pagination.
+
+See the [Light overview](/google-light/overview) or
+[regular Search](/api-reference/google/google-search/google-web-search).
