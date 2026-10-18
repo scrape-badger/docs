@@ -7,6 +7,18 @@ description: "Structured JSON APIs for 16 Google product APIs — Search, Maps, 
 
 Programmatic access to **16 Google product APIs** with structured JSON responses. The ScrapeBadger Google Scraper handles SearchGuard, proxy rotation, cookie warmup, and IP rotation on 429 automatically — you just call the endpoint.
 
+## Choose full Search or Light Search
+
+| Product | Endpoint | Credits per successful uncached request |
+| --- | --- | --- |
+| Full Search | `GET /v1/google/search` | 20 |
+| Light Search | `GET /v1/google/light/search` | 10 |
+
+Use [Light Search](/google-light/overview) for organic results and related
+searches only. Use regular Search for the complete SERP and available rich
+results. Failed requests and cache hits are free. Check `X-Credits-Used` for
+actual charges and `/api/public/pricing` for current prices and promotions.
+
 ## Products
 
 <CardGroup cols={3}>

@@ -89,13 +89,15 @@
             "pages": [
               "google/overview",
               "google/shopping-click-enrichment",
-              "google/shopping-offers"
+              "google/shopping-offers",
+              "google-light/overview"
             ]
           },
           {
             "group": "Search",
             "pages": [
-              "api-reference/google/google-search/google-web-search"
+              "api-reference/google/google-search/google-web-search",
+              "api-reference/endpoint/google/light-search"
             ]
           },
           {

@@ -4915,6 +4915,413 @@
           }
         }
       }
+    },
+    "/v1/google/light/search": {
+      "get": {
+        "tags": [
+          "Google Light Search"
+        ],
+        "summary": "Google Light web search",
+        "description": "Google Light Search: organic results and related searches, 10 credits.\n\nThe dedicated route always uses the lightweight fetch path. It cannot be\nupgraded to full Search by passing mode=full or ai_overview=true.",
+        "operationId": "google_light_search_api_v1_light_search_get",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Search query (supports Google operators like site:, inurl:, intitle:)",
+              "title": "Q"
+            },
+            "description": "Search query (supports Google operators like site:, inurl:, intitle:)"
+          },
+          {
+            "name": "gl",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Country code (e.g. us, gb, de, fr). Defaults to the country implied by ``domain`` (e.g. ``google.co.uk`` → ``gb``), falling back to ``us`` when domain doesn't carry a country hint.",
+              "title": "Gl"
+            },
+            "description": "Country code (e.g. us, gb, de, fr). Defaults to the country implied by ``domain`` (e.g. ``google.co.uk`` → ``gb``), falling back to ``us`` when domain doesn't carry a country hint."
+          },
+          {
+            "name": "hl",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Language code (e.g. en, es, fr)",
+              "default": "en",
+              "title": "Hl"
+            },
+            "description": "Language code (e.g. en, es, fr)"
+          },
+          {
+            "name": "num",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Results per page",
+              "default": 10,
+              "title": "Num"
+            },
+            "description": "Results per page"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Pagination offset (0, 10, 20...)",
+              "default": 0,
+              "title": "Start"
+            },
+            "description": "Pagination offset (0, 10, 20...)"
+          },
+          {
+            "name": "domain",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Google domain (e.g. google.com, google.co.uk)",
+              "default": "google.com",
+              "title": "Domain"
+            },
+            "description": "Google domain (e.g. google.com, google.co.uk)"
+          },
+          {
+            "name": "device",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Device target — selects the Google SERP layout via a matching User-Agent. One of: desktop, mobile, iphone, android, tablet.",
+              "default": "desktop",
+              "title": "Device"
+            },
+            "description": "Device target — selects the Google SERP layout via a matching User-Agent. One of: desktop, mobile, iphone, android, tablet."
+          },
+          {
+            "name": "user_agent",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 512,
+                  "pattern": "^[^\\r\\n]*$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Custom User-Agent to send to Google. Overrides ``device``. Use to target a specific browser/OS fingerprint.",
+              "title": "User Agent"
+            },
+            "description": "Custom User-Agent to send to Google. Overrides ``device``. Use to target a specific browser/OS fingerprint."
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "City-level geo-targeting (e.g. 'New York, USA')",
+              "title": "Location"
+            },
+            "description": "City-level geo-targeting (e.g. 'New York, USA')"
+          },
+          {
+            "name": "lr",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Language restrict (e.g. lang_en)",
+              "title": "Lr"
+            },
+            "description": "Language restrict (e.g. lang_en)"
+          },
+          {
+            "name": "tbs",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Time-based search filter (e.g. qdr:d for past 24h)",
+              "title": "Tbs"
+            },
+            "description": "Time-based search filter (e.g. qdr:d for past 24h)"
+          },
+          {
+            "name": "safe",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Safe search (active/off)",
+              "default": "off",
+              "title": "Safe"
+            },
+            "description": "Safe search (active/off)"
+          },
+          {
+            "name": "uule",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Encoded location parameter (UULE)",
+              "title": "Uule"
+            },
+            "description": "Encoded location parameter (UULE)"
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "maximum": 1,
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Include omitted results (0=show all, 1=filter)",
+              "title": "Filter"
+            },
+            "description": "Include omitted results (0=show all, 1=filter)"
+          },
+          {
+            "name": "nfpr",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1,
+              "minimum": 0,
+              "description": "Disable auto-correction (1=exact match)",
+              "default": 0,
+              "title": "Nfpr"
+            },
+            "description": "Disable auto-correction (1=exact match)"
+          },
+          {
+            "name": "cr",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Country restrict (e.g. countryUS|countryGB)",
+              "title": "Cr"
+            },
+            "description": "Country restrict (e.g. countryUS|countryGB)"
+          },
+          {
+            "name": "ludocid",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Google My Business CID (place ID)",
+              "title": "Ludocid"
+            },
+            "description": "Google My Business CID (place ID)"
+          },
+          {
+            "name": "lsig",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Knowledge Graph map view ID",
+              "title": "Lsig"
+            },
+            "description": "Knowledge Graph map view ID"
+          },
+          {
+            "name": "kgmid",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Knowledge Graph entity ID",
+              "title": "Kgmid"
+            },
+            "description": "Knowledge Graph entity ID"
+          },
+          {
+            "name": "si",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Cached search parameters",
+              "title": "Si"
+            },
+            "description": "Cached search parameters"
+          },
+          {
+            "name": "ibp",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Layout control (e.g. gwp;0,7)",
+              "title": "Ibp"
+            },
+            "description": "Layout control (e.g. gwp;0,7)"
+          },
+          {
+            "name": "uds",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Google filter string",
+              "title": "Uds"
+            },
+            "description": "Google filter string"
+          },
+          {
+            "name": "output",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "json",
+                "html"
+              ],
+              "type": "string",
+              "description": "Response format. **json** (default): structured parsed SERP. **html**: the raw Google SERP HTML exactly as fetched, with ``Content-Type: text/html`` and no parsing. Use ``html`` when you run your own parser. Pagination/geo/device/UULE params all still apply; the ``ai_overview`` chase is skipped for html output.",
+              "default": "json",
+              "title": "Output"
+            },
+            "description": "Response format. **json** (default): structured parsed SERP. **html**: the raw Google SERP HTML exactly as fetched, with ``Content-Type: text/html`` and no parsing. Use ``html`` when you run your own parser. Pagination/geo/device/UULE params all still apply; the ``ai_overview`` chase is skipped for html output."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleLightSearchResponse"
+                }
+              },
+              "text/html": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -12688,6 +13095,37 @@
         ],
         "title": "PeopleAlsoSearchFor",
         "type": "object"
+      },
+      "GoogleLightSearchResponse": {
+        "properties": {
+          "search_information": {
+            "$ref": "#/components/schemas/SearchInformation"
+          },
+          "organic_results": {
+            "items": {
+              "$ref": "#/components/schemas/OrganicResult"
+            },
+            "type": "array",
+            "title": "Organic Results"
+          },
+          "related_searches": {
+            "items": {
+              "$ref": "#/components/schemas/RelatedSearch"
+            },
+            "type": "array",
+            "title": "Related Searches"
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          }
+        },
+        "type": "object",
+        "required": [
+          "search_information",
+          "pagination"
+        ],
+        "title": "GoogleLightSearchResponse",
+        "description": "Essential SERP data returned by GET /api/v1/light/search."
       }
     },
     "securitySchemes": {

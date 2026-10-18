@@ -1,0 +1,44 @@
+---
+title: "Google Light Search API"
+description: "Google organic results and related searches for 10 credits per successful uncached request."
+---
+
+Google Light Search has a dedicated endpoint:
+`GET https://scrapebadger.com/v1/google/light/search`.
+It returns `search_information`, `organic_results`, `related_searches` and
+`pagination`. It skips ads, AI Overviews, Knowledge Graph, People Also Ask,
+local results, news, videos and shopping blocks.
+
+| Endpoint | Data | Credits per successful uncached request |
+| --- | --- | --- |
+| `/v1/google/light/search` | Organic results and related searches | **10** |
+| `/v1/google/search` | Full SERP, including available rich results | **20** |
+
+Failed requests and cached responses are not charged. The response header
+`X-Credits-Used` reports the actual charge. Check
+`https://scrapebadger.com/api/public/pricing` for current prices and promotions.
+
+```bash
+curl --get 'https://scrapebadger.com/v1/google/light/search' \
+  --header 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'q=vinted api' \
+  --data-urlencode 'gl=us' \
+  --data-urlencode 'hl=en'
+```
+
+No `mode` parameter is required. Light always uses the lightweight path;
+`mode=full` and `ai_overview=true` cannot enable full Search features.
+Use `start=10` for the next page. `num` requests 1–100 results; Google may
+return fewer. Google page variants can have different rankings, even for the
+same query and locale.
+
+```bash
+scrapebadger google light-search "vinted api" --gl us --hl en
+```
+
+The MCP tool is `google_light_search`. Both the CLI and MCP call the dedicated
+Light endpoint. Existing `/search?mode=fast` clients still work, but that is
+the regular Search route and retains its 20-credit price. Migrate to
+`/light/search` for the 10-credit rate.
+
+See the [endpoint reference](/api-reference/endpoint/google/light-search).
