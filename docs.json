@@ -50,6 +50,7 @@
               "authentication",
               "teams",
               "credits-and-pricing",
+              "usage-logs",
               "rate-limits"
             ]
           },

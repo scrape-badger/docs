@@ -1,0 +1,38 @@
+---
+title: 'Download usage logs'
+description: 'Export your API request history as a CSV for reviewing usage and credit charges.'
+---
+
+Download your request history from [Usage & Logs](https://scrapebadger.com/dashboard/usage).
+
+1. Sign in and open **Usage & Logs**.
+2. Choose a date range. Use **Custom** for specific dates or **All** for all retained history.
+3. Optionally choose a scraper, such as Google or Reddit.
+4. Click **Download CSV**.
+
+The download includes every matching retained request, up to **100,000 rows per file**. It is not limited to the 50 requests shown under **Recent Activity**. If the selection exceeds the limit, choose a shorter date range or one scraper. Oversized exports return an error instead of a partial file.
+
+Custom dates include both selected calendar days in your browser's local time zone. CSV timestamps are always in **UTC**.
+
+## CSV columns
+
+| Column | Meaning |
+| --- | --- |
+| `timestamp_utc` | Request timestamp in UTC, for example `2026-10-18T12:00:00Z`. |
+| `scraper` | API used, such as `google`, `reddit`, or `web`. |
+| `endpoint` | Endpoint called. |
+| `credits_used` | Credits recorded for that request. |
+| `response_status` | HTTP response status. |
+| `response_time_ms` | Response time in milliseconds. |
+
+You can open the UTF-8 CSV in Excel, Google Sheets, or your own analysis tools. An empty selection produces a file with column headers and no request rows.
+
+## What is included
+
+The export contains your own retained usage records across your API keys. It includes successful and failed requests recorded in the usage log. It does not contain API secrets, scraped response data, or separate Twitter stream-monitor and filter-rule billing logs.
+
+Some requests served before usage logging, including some gateway-cache hits, do not create a usage record and will not appear in the export. This is a download of recorded request history, not a record of every network request your client sent.
+
+<Note>
+  To check one request's charge immediately, read its `X-Credits-Used` response header. To download invoices, open [Invoices](https://scrapebadger.com/dashboard/invoices).
+</Note>
