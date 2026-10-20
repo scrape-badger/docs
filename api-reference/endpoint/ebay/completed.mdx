@@ -9,10 +9,19 @@ actually paid, with the date each item sold. Every result has `sold` set to `tru
 on the response envelope. This is the data resellers, flippers and pricing tools
 rely on, since asking prices alone don't reflect what items actually sell for.
 
+Search by keywords, by seller, or both. With `seller` and no `query` you get
+everything that seller sold.
+
 ## Query Parameters
 
-<ParamField query="query" type="string" required>
-  Search keywords. Matches against listing titles.
+<ParamField query="query" type="string">
+  Search keywords. Matches against listing titles. Optional when `seller` is
+  set; send at least one of the two.
+</ParamField>
+
+<ParamField query="seller" type="string">
+  Only this seller's sold listings, by eBay username (e.g. `musicmagpie`). Works
+  on its own, with no keyword, and combines with `query` and every other filter.
 </ParamField>
 
 <ParamField query="domain" type="string" default="com">
@@ -33,7 +42,9 @@ rely on, since asking prices alone don't reflect what items actually sell for.
 </ParamField>
 
 <ParamField query="per_page" type="integer">
-  Results per page. Clamped to one of `60`, `120`, or `240`.
+  Results per page. Clamped to one of `60`, `120`, or `240`. eBay's sold index
+  fills about 5/6 of the larger sizes, so expect about 100 results at `120` and
+  about 200 at `240`; `pagination.returned` says how many this page holds.
 </ParamField>
 
 <ParamField query="sort_by" type="string" default="best_match">
@@ -150,6 +161,23 @@ Identical shape to [`/v1/ebay/search`](/api-reference/endpoint/ebay/search), exc
   "scraped_at": "2026-08-20T12:00:00Z"
 }
 ```
+
+## Sold listings for one seller
+
+Pass `seller` without a `query` to page through everything one seller sold:
+
+```bash
+curl --get 'https://scrapebadger.com/v1/ebay/completed' \
+  --data-urlencode 'seller=musicmagpie' \
+  --data-urlencode 'domain=co.uk' \
+  --data-urlencode 'per_page=240' \
+  --header 'x-api-key: YOUR_API_KEY'
+```
+
+Every result is one of that seller's sales, and `seller_name` says so. Add
+`query`, `category_id`, `condition` or a price range to narrow it down. eBay
+handles the request; no eBay account or cookies are needed on your side. How
+far back it reaches is eBay's own sold history for that marketplace.
 
 ## Fetching every sold listing
 

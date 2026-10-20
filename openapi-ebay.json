@@ -1085,7 +1085,7 @@
       "get": {
         "operationId": "searchEbayCompleted",
         "summary": "Completed / Sold Listings",
-        "description": "Search eBay completed (sold) listings — the closing prices buyers actually paid, with the date each item sold. `sold` is `true` on the envelope and each result's `price` is the final sold price. Served via an authenticated eBay session. Costs 8 credits; failed requests are free.",
+        "description": "Search eBay completed (sold) listings — the closing prices buyers actually paid, with the date each item sold. `sold` is `true` on the envelope and each result's `price` is the final sold price. Costs 8 credits; failed requests are free. Pass `query`, `seller` or both; `seller` alone returns everything that seller sold.",
         "tags": [
           "eBay Search"
         ],
@@ -1093,11 +1093,20 @@
           {
             "name": "query",
             "in": "query",
-            "required": true,
+            "required": false,
             "schema": {
               "type": "string"
             },
-            "description": "Search keywords."
+            "description": "Search keywords. Optional when `seller` is set; send at least one of the two."
+          },
+          {
+            "name": "seller",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Only this seller's sold listings (eBay username, e.g. `musicmagpie`). Works without `query`."
           },
           {
             "name": "domain",
