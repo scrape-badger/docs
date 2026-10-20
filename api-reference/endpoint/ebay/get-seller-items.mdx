@@ -4,6 +4,12 @@ openapi: "GET /v1/ebay/sellers/{username}/items"
 description: "List the active listings of a single eBay seller."
 ---
 
+<Tip>
+  This returns what the seller has for sale **now**. For what they have already
+  **sold**, use [`/v1/ebay/completed?seller=<username>`](/api-reference/endpoint/ebay/completed#sold-listings-for-one-seller).
+  No keyword is needed.
+</Tip>
+
 ## Path Parameters
 
 <ParamField path="username" type="string" required>
