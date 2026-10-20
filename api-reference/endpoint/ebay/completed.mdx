@@ -35,7 +35,7 @@ everything that seller sold.
 </ParamField>
 
 <ParamField query="page" type="integer" default={1}>
-  Page number for paginated results. Range: `1` - `1000`.
+  Page number for paginated results. Range: `1` - `100`.
 
   Use `pagination.has_more` to know when to stop — eBay re-serves its last
   page if you ask past the end, so this API returns an empty page there.
@@ -205,7 +205,7 @@ while True:
   client that ignores `has_more` and retries forever will keep spending credits.
 </Warning>
 
-A broad sold search runs roughly 130 pages deep at `per_page=240` (~26,000 listings).
+Pages stop at `100`, so one search returns at most about 20,000 listings at `per_page=240`; narrow a bigger result set with `sort_by`, `condition`, `category_id` or a price range.
 Use the largest `per_page` you can: each request costs 8 credits regardless of page
 size, so `per_page=240` is about 8x cheaper per listing than the default.
 
