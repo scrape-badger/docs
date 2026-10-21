@@ -96,6 +96,8 @@ description: "Search an eBay marketplace for active listings."
   price series picks up sales that never happened in that country, and a foreign
   listing's price is shown **converted** into the marketplace's currency rather
   than the amount it actually sold for. `location=domestic` removes both.
+
+  Any other value returns `400 invalid_location` — it is never silently ignored.
 </ParamField>
 
 ## Response
@@ -127,7 +129,7 @@ description: "Search an eBay marketplace for active listings."
     <ResponseField name="shipping" type="string">Raw shipping text.</ResponseField>
     <ResponseField name="shipping_cost" type="object">Parsed shipping cost (nullable).</ResponseField>
     <ResponseField name="free_shipping" type="boolean">Whether shipping is free (nullable).</ResponseField>
-    <ResponseField name="location" type="string">Item location text.</ResponseField>
+    <ResponseField name="location" type="string">Where a foreign item ships from, as eBay prints it on the card: `from United States` on co.uk and the other English-language sites, the country alone on ebay.com. `null` for an item in the marketplace's own country, and on localized sites (fr, de, …) where eBay translates the country. `location=domestic` removes foreign items on every marketplace either way.</ResponseField>
     <ResponseField name="returns" type="string">Returns text (nullable).</ResponseField>
     <ResponseField name="sold_count" type="integer">Number sold (nullable).</ResponseField>
     <ResponseField name="sold_date" type="string">Sale date text as rendered by eBay, e.g. `2 Jul 2026` (completed/sold cards only; localized on non-English marketplaces, nullable).</ResponseField>
