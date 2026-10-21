@@ -1,13 +1,13 @@
 ---
 title: "Vinted mobile data"
-description: "Read listings, seller reviews, sold comparables, prices, categories, shipping references and help data through 76 public operations."
+description: "Read listings, seller reviews, sold comparables, prices, categories, shipping references and help data through 77 public operations."
 ---
 
 The Vinted API now uses mobile JSON requests for search, item details, seller
 profiles, wardrobes, brands, colors and conditions. You do not need a Vinted account.
 The existing endpoints keep their response envelopes and pricing.
 
-For the wider data set, use **76 public read operations**. These include sold
+For the wider data set, use **77 public read operations**. These include sold
 comparables, suggested prices, reviews, followers, related listings, category trees,
 homepage feeds, ISBN metadata, package sizes, and help articles.
 
@@ -112,6 +112,40 @@ including identifiers used to select an item, seller or category.
 | `homepage` | `vertical`, `column_count`, `version` | `blocks`, `load_more_button`, `pagination` |
 | `promoted-closets` | None | `page_info`, `promoted_closets` |
 
+### Filter by category and build a brand list
+
+Filter `catalog-search`, `filters`, `filter-facets` and `filter-search` with
+`attribute_ids`. It takes the category ID as `catalog`, and brand, size, status
+(condition), color and material IDs the same way. A comma-separated string or a
+list selects several IDs.
+
+```json
+{
+  "market": "uk",
+  "parameters": {"attribute_ids": {"catalog": "2536", "brand": "2319"}}
+}
+```
+
+<Warning>
+  `catalog_from` records which catalog the app navigated from. It does not filter
+  results. Use `attribute_ids.catalog` to restrict a search to a category.
+</Warning>
+
+Vinted has no single endpoint that lists every brand. Use these operations together:
+
+| Need | Operation | Limit |
+|---|---|---|
+| Broad brand ID list | `popular-brands` with `letter` A–Z and `0` | About 240 of the most popular brands per letter, with item counts. 27 calls return about 6,000 brands. |
+| Brands in one category | `filter-facets` with `filter_code: "brand"` and `attribute_ids.catalog` | The top 50 brands in that category, with item counts. Vinted ignores paging. |
+| Any brand by name | `brands` with `keyword`, or `filter-search` with `filter_search_code: "brand"` | 10 matches per keyword |
+
+```bash
+curl 'https://scrapebadger.com/v1/vinted/mobile/popular-brands' \
+  -H 'X-API-Key: YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{"market":"uk","parameters":{"letter":"A"}}'
+```
+
 ### Listing age on catalog search
 
 Vinted sends no upload time on search results. `catalog-search` adds an estimate to every item, at the same 1 credit:
@@ -181,6 +215,7 @@ It is `null` if the reference table is briefly unavailable, in which case every 
 |---|---|---|
 | `brands` | `keyword` | `brands`, `pagination` |
 | `brand-suggestions` | None | `brands`, `pagination` |
+| `popular-brands` | None (`letter` A–Z or 0 is optional) | `brands` |
 | `size-groups` | `catalog_ids[]` | `size_groups` |
 | `catalog-filters` | None | `filters`, `selected_filters` |
 | `catalog-filter-facets` | `filter_code` | `filter_code`, `total_count`, `total_count_max` |
@@ -281,4 +316,23 @@ const result = await client.vinted.readVintedMobileData("sold-comparables", {
   parameters: { catalog_id: "1242", brand_id: "53", status_id: "2" },
 });
 console.log(result);
+```
+
+SDK 0.64.0 adds a typed helper for the brand directory:
+
+```python
+import string
+
+brand_ids = {}
+for letter in [*string.ascii_uppercase, "0"]:
+    result = await client.vinted.reference.popular_brands(letter, market="uk")
+    brand_ids.update({brand.title: brand.id for brand in result.brands})
+```
+
+```typescript
+const ids = new Map<string, number>();
+for (const letter of [..."ABCDEFGHIJKLMNOPQRSTUVWXYZ", "0"]) {
+  const { brands } = await client.vinted.reference.popularBrands({ letter, market: "uk" });
+  for (const brand of brands) ids.set(brand.title, brand.id);
+}
 ```
