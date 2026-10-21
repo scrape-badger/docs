@@ -1,27 +1,16 @@
 ---
 title: "Instagram Scraper by ScrapeBadger — Overview"
-description: "Pull public Instagram data — profiles, posts, media detail and comments — as clean JSON, with no Instagram login or API key required."
+description: "Pull public Instagram data — profiles, posts, reels, stories, followers, media, comments, hashtags, locations, audio and search — as clean JSON, with no Instagram login or API key required."
 ---
 
 ## Scraper API for Instagram
 
-The ScrapeBadger **Instagram API** turns `instagram.com`'s public surface into a
-clean JSON feed: user profiles and their `posts`, media detail by shortcode, and
-paginated `comments`.
-
-<Warning>
-  Every other Instagram endpoint needs the **authenticated (account-pool) tier**,
-  which is **temporarily unavailable** while we scale the pool: related
-  profiles, user about/videos/reels/tagged/pinned, followers/following,
-  stories/highlights, media `oembed`, media and comment likers, comment replies,
-  all hashtag endpoints (info, `top`, `recent`, `reels`), all locations, audio,
-  and all search variants (`hashtags`, `top`, users/places/reels/music/autocomplete).
-  They currently return `503 {"error": "temporarily_unavailable"}` with a
-  `Retry-After` header and are **not billed**. The
-  [hashtag](/api-reference/endpoint/instagram/get-hashtag) and
-  [search](/api-reference/endpoint/instagram/search) pages stay published,
-  flagged, so the request shape is known when they return.
-</Warning>
+The ScrapeBadger **Instagram API** turns `instagram.com` into a clean JSON feed:
+user profiles with their `about`, `related` accounts, `posts`, `videos`,
+`reels`, `tagged` and `pinned` media, followers/following, stories and
+highlights; media detail with `oembed`, likers, comments, comment replies and
+comment likers; hashtag, location and audio feeds; and search (users, hashtags,
+places, top, reels, music, autocomplete).
 
 <Info>
   All endpoints are `GET`, live under `https://scrapebadger.com/v1/instagram/*`,
@@ -35,16 +24,57 @@ paginated `comments`.
 ## Features
 
 - **Profiles** — full public profile by `username`: bio, links, counts,
-  verification, business/professional metadata, plus paginated `posts`.
-- **Media** — media detail by shortcode `code` and paginated `comments`.
-- **Hashtags & search** — temporarily unavailable (see above).
+  verification, business/professional metadata, plus `about` (country, join
+  date, former usernames), `related` accounts and paginated `posts`.
+- **User media** — `videos`, `reels`, `tagged` and `pinned` media, active
+  `stories` and `highlights`.
+- **Social graph** — paginated `followers` and `following`, and search within
+  a user's followers.
+- **Media** — media detail by shortcode `code`, oEmbed, `likers`, paginated
+  `comments`, comment `replies` and per-comment `likers`.
+- **Hashtags** — hashtag info by `tag`, plus `top`, `recent` and `reels` feeds.
+- **Locations** — search, location detail by `pk`, plus `top` and `recent` feeds.
+- **Audio** — trending audio, track info and the media using a track.
+- **Search** — `users`, `hashtags`, `places`, blended `top`, `reels`, `music`
+  and `autocomplete`.
+
+## Endpoints
+
+| Path | Returns |
+| ---- | ------- |
+| `/users/{username}` | Profile |
+| `/users/{username}/about` | "About this account": country, join date, former usernames |
+| `/users/{username}/related` | Similar accounts, in the standard list envelope |
+| `/users/{username}/posts` | Feed posts, paginated |
+| `/users/{username}/videos` | Video posts from the user's feed, paginated |
+| `/users/{username}/reels` · `/tagged` | Reels tab · posts the user is tagged in, paginated |
+| `/users/{username}/pinned` | Pinned posts |
+| `/users/{username}/followers` · `/following` | Social graph, paginated (`order` on followers) |
+| `/users/{username}/followers/search` | Followers matching `query` |
+| `/users/{username}/stories` · `/highlights` | Active stories · highlight trays |
+| `/stories/{story_pk}` · `/highlights/{highlight_pk}` | One story · one highlight |
+| `/media/{code}` · `/media/{code}/oembed` | Media detail · oEmbed payload |
+| `/media/{code}/likers` | Users who liked the media |
+| `/media/{code}/comments` | Top-level comments, paginated |
+| `/media/{code}/comments/{comment_id}/replies` · `/likers` | Replies to · likers of a comment |
+| `/hashtags/{tag}` · `/top` · `/recent` · `/reels` | Hashtag info · its feeds |
+| `/locations/search` | Locations by `query`, or by `lat`/`lng` |
+| `/locations/{location_pk}` · `/top` · `/recent` | Location detail · its feeds |
+| `/audio/trending` · `/audio/{audio_id}` · `/audio/{audio_id}/media` | Trending audio · track info · media using the track |
+| `/search/users` · `/hashtags` · `/places` · `/top` · `/reels` · `/music` · `/autocomplete` | Search by `query` |
+
+- **`/users/{username}/videos`** pages the user's main feed and keeps the video
+  posts, so a page can hold slightly more than `amount` items; pass
+  `next_cursor` back as `cursor` to continue the feed.
+- **`/search/places`** takes optional `lat` and `lng` to bias the ranking
+  toward a point; without them the ranking is global.
 
 ## Honesty caveat
 
 <Warning>
   These endpoints read Instagram's **public** surface only. Private accounts
   expose profile metadata but not their posts or media. Fields
-  reflect what Instagram serves to an unauthenticated client; some
+  reflect what Instagram serves; some
   professional/business fields are only present when the account has opted into
   them.
 </Warning>
@@ -71,10 +101,14 @@ paginated `comments`.
 | Stories / highlights | `GET /v1/instagram/users/{username}/stories` | 23 |
 
 <Info>
-  Standard read (8) covers profile and media detail. Paginated listings (12)
-  cover `posts`, `reels`, `tagged` and `comments`. The live per-endpoint price is
-  published at `GET /api/public/pricing`. A `503 temporarily_unavailable` from a
-  gated endpoint costs 0 credits.
+  Standard read (8) covers profile, `about`, `related`, media detail, hashtag and
+  location info, audio, and search `users`, `places`, `top`, `reels` and
+  `music`. Paginated listings (12) cover `posts`, `videos`, `reels`, `tagged`,
+  `pinned`, comments, replies, likers, and hashtag, location and audio feeds.
+  Search suggestions (3) cover search `hashtags`, `autocomplete` and media
+  `oembed`. Followers/following (15) include follower search; stories/highlights
+  (23) include single story and highlight lookups. The live per-endpoint price
+  is published at `GET /api/public/pricing`.
 </Info>
 
 ## Quickstart
