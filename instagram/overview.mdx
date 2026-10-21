@@ -85,7 +85,14 @@ places, top, reels, music, autocomplete).
   (opaque next-page token). Every list response is wrapped in
   `{ items, count, next_cursor, has_more }` —
   pass `next_cursor` back as `cursor` to walk forward until `has_more` is
-  `false`.
+  `false`. Pass it back **unchanged**: it identifies the session that served the
+  page, because Instagram's own cursors only continue on that session.
+- **Page sizes.** `amount` is a target. Hashtag feeds and `/videos` return
+  whole Instagram pages, so a page can hold a few more items than `amount`;
+  nothing is skipped between pages.
+- **Followers.** Instagram shows a viewer only about the first 50 followers of
+  another account, so `/followers` stops there with `has_more: false`.
+  `/following` pages through the full list.
 - **Datetimes.** Every datetime ships in **both** a Unix form (`*_utc`) and an
   ISO 8601 UTC string (`*_at`), e.g. `taken_at` + `taken_at_utc`.
 

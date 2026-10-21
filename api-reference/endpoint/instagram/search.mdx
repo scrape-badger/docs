@@ -52,7 +52,8 @@ Search Instagram by keyword. Every search endpoint takes `query`.
 <ResponseField name="items" type="object[]">
   `users`, `hashtags`, `places` and `music` return typed results wrapped in
   `{ items, count, next_cursor, has_more }`. `top`, `reels` and
-  `autocomplete` return Instagram's blended payload.
+  `autocomplete` return Instagram's blended payload. `top` and `reels` add a
+  `next_cursor` field; pass it back as `cursor` for the next page.
 </ResponseField>
 
 ## Example
