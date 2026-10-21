@@ -1,22 +1,12 @@
 ---
 title: "Search"
 api: "GET https://scrapebadger.com/v1/instagram/search/top"
-description: "Search Instagram across hashtags and blended top results. Temporarily unavailable."
-tag: "UNAVAILABLE"
+description: "Search Instagram users, hashtags, places, reels, music, blended top results and autocomplete."
 ---
 
-<Warning>
-  **Temporarily unavailable.** This endpoint needs the authenticated Instagram
-  tier, which is offline while we scale the account pool. Every call currently
-  returns `503 {"error": "temporarily_unavailable"}` with a `Retry-After`
-  header and is **not billed**. The public endpoints — [profile](/api-reference/endpoint/instagram/get-user),
-  [posts](/api-reference/endpoint/instagram/user-posts), [media detail](/api-reference/endpoint/instagram/get-media)
-  and [comments](/api-reference/endpoint/instagram/media-comments) — are live.
-</Warning>
+Search Instagram by keyword. Every search endpoint takes `query`.
 
-Search Instagram by keyword. Both typed endpoints share one query shape.
-
-**Credits:** 5 (`top`) · 2 (`hashtags`)
+**Credits:** 8 (`users`, `places`, `top`, `reels`, `music`) · 3 (`hashtags`, `autocomplete`)
 
 ## Authorization
 
@@ -30,16 +20,39 @@ Search Instagram by keyword. Both typed endpoints share one query shape.
   The search term.
 </ParamField>
 
+<ParamField query="amount" type="integer" default="20">
+  **`users` only** — how many accounts to return (1–100).
+</ParamField>
+
+<ParamField query="lat" type="number">
+  **`places` only, optional** — latitude to bias the ranking toward. Without
+  `lat`/`lng` the ranking is global.
+</ParamField>
+
+<ParamField query="lng" type="number">
+  **`places` only, optional** — longitude, paired with `lat`.
+</ParamField>
+
+<ParamField query="cursor" type="string">
+  **`top` and `reels` only** — opaque next-page token.
+</ParamField>
+
 ## Paths
 
+- `GET /v1/instagram/search/users` — matching accounts (`UserShort[]`). **8 credits.**
 - `GET /v1/instagram/search/hashtags` — matching hashtags (`Hashtag[]`). **3 credits.**
-- `GET /v1/instagram/search/top` — blended top results. **8 credits.**
+- `GET /v1/instagram/search/places` — matching places. **8 credits.**
+- `GET /v1/instagram/search/top` — blended top results (users, hashtags, places). **8 credits.**
+- `GET /v1/instagram/search/reels` — reels matching the keyword. **8 credits.**
+- `GET /v1/instagram/search/music` — matching audio tracks. **8 credits.**
+- `GET /v1/instagram/search/autocomplete` — keyword typeahead suggestions. **3 credits.**
 
 ## Response
 
 <ResponseField name="items" type="object[]">
-  Typed results per path — `Hashtag` (hashtags) or a blended list (top).
-  Wrapped in `{ items, count, next_cursor, has_more }`.
+  `users`, `hashtags`, `places` and `music` return typed results wrapped in
+  `{ items, count, next_cursor, has_more }`. `top`, `reels` and
+  `autocomplete` return Instagram's blended payload.
 </ResponseField>
 
 ## Example

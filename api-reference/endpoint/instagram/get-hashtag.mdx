@@ -1,22 +1,12 @@
 ---
 title: "Hashtag Info & Feeds"
 api: "GET https://scrapebadger.com/v1/instagram/hashtags/{tag}"
-description: "Hashtag metadata by name, plus a paginated recent feed for the tag. Temporarily unavailable."
-tag: "UNAVAILABLE"
+description: "Hashtag metadata by name, plus its top, recent and reels feeds."
 ---
 
-<Warning>
-  **Temporarily unavailable.** This endpoint needs the authenticated Instagram
-  tier, which is offline while we scale the account pool. Every call currently
-  returns `503 {"error": "temporarily_unavailable"}` with a `Retry-After`
-  header and is **not billed**. The public endpoints — [profile](/api-reference/endpoint/instagram/get-user),
-  [posts](/api-reference/endpoint/instagram/user-posts), [media detail](/api-reference/endpoint/instagram/get-media)
-  and [comments](/api-reference/endpoint/instagram/media-comments) — are live.
-</Warning>
+Fetch a hashtag's metadata by `tag` (no `#`), then page its `top`, `recent` or `reels` media feed.
 
-Fetch a hashtag's metadata by `tag` (no `#`), then page its `recent` media feed.
-
-**Credits:** 5 (hashtag info) · 8 (`recent` feed)
+**Credits:** 8 (hashtag info) · 12 (feeds)
 
 ## Authorization
 
@@ -38,7 +28,9 @@ Fetch a hashtag's metadata by `tag` (no `#`), then page its `recent` media feed.
 ## Paths
 
 - `GET /v1/instagram/hashtags/{tag}` — hashtag info. **8 credits.**
+- `GET /v1/instagram/hashtags/{tag}/top` — top media. **12 credits.**
 - `GET /v1/instagram/hashtags/{tag}/recent` — most recent media. **12 credits.**
+- `GET /v1/instagram/hashtags/{tag}/reels` — reels for the tag. **12 credits.**
 
 ## Response
 

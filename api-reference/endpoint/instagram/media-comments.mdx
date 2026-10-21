@@ -1,12 +1,12 @@
 ---
-title: "Comments"
+title: "Comments, Replies & Likers"
 api: "GET https://scrapebadger.com/v1/instagram/media/{code}/comments"
-description: "Paginated top-level comments on a media."
+description: "Paginated comments on a media, plus the replies to and likers of a comment."
 ---
 
-Page through a media's top-level `comments`.
+Page through a media's `comments`, or list the `replies` to or `likers` of a comment.
 
-**Credits:** 8
+**Credits:** 12 (`comments`, `comments/{comment_id}/replies`, `comments/{comment_id}/likers`)
 
 ## Authorization
 
@@ -20,6 +20,10 @@ Page through a media's top-level `comments`.
   Media shortcode.
 </ParamField>
 
+<ParamField path="comment_id" type="string">
+  **Reply and comment-liker paths only** — the parent comment's `pk`.
+</ParamField>
+
 ## Query Parameters
 
 <ParamField query="amount" type="integer" default="20">Page size.</ParamField>
@@ -28,15 +32,15 @@ Page through a media's top-level `comments`.
 ## Paths
 
 - `GET /v1/instagram/media/{code}/comments` — top-level comments.
+- `GET /v1/instagram/media/{code}/comments/{comment_id}/replies` — replies to a comment.
 - `GET /v1/instagram/media/{code}/comments/{comment_id}/likers` — likers of a comment.
-  **Temporarily unavailable** — needs the authenticated tier, currently returns
-  `503 temporarily_unavailable` (not billed). See the [overview](/instagram/overview).
 
 ## Response
 
-<ResponseField name="items" type="Comment[]">
-  A `Comment`: `pk`, `text`, `user`, `created_at`, `created_at_utc`,
-  `like_count`, `has_liked`.
+<ResponseField name="items" type="Comment[] | UserShort[]">
+  For the comment and reply paths a `Comment`: `pk`, `text`, `user`,
+  `created_at`, `created_at_utc`, `like_count`, `has_liked`. For the
+  comment-liker path a `UserShort`.
 </ResponseField>
 <ResponseField name="count" type="integer" />
 <ResponseField name="next_cursor" type="string">Null when exhausted.</ResponseField>
