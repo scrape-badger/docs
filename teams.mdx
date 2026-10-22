@@ -1,6 +1,6 @@
 ---
 title: Teams
-description: Share one ScrapeBadger account with colleagues — invite members, grant them permissions, and manage member and service API keys.
+description: Share one ScrapeBadger account with colleagues — invite members, grant them permissions, sign in with your company's SSO, and manage member and service API keys.
 ---
 
 Teams let a company use one ScrapeBadger balance from several user accounts. Each member signs in with their own account, and the team's API keys draw credits from the **team owner's** balance and use the owner's rate limit.
@@ -50,6 +50,41 @@ Admins invite by email from the team's **Members** tab, choosing the role and, f
 
 Invitees can also accept from the [Teams](https://scrapebadger.com/dashboard/teams) page once they're signed in. Inviting the same email again replaces the earlier invitation.
 
+## Single sign-on (SSO)
+
+Connect your company's identity provider to a team, and anyone with an email on your company domain can sign in with it and join the team automatically. Any OpenID Connect (OIDC) provider works, including Okta, Microsoft Entra ID, Google Workspace and Auth0. SSO covers signing in to the dashboard only. API calls still authenticate with [API keys](/authentication).
+
+Owners and admins set it up on the team's **Single sign-on** tab:
+
+<Steps>
+  <Step title="Create an app in your identity provider">
+    Create an **OIDC web application** that uses the authorization code grant. You can create it with any redirect URI and update it in step 3. ScrapeBadger requests the `openid`, `email` and `profile` scopes.
+  </Step>
+  <Step title="Enter the app's details">
+    Enter your email domain (for example `example.com`), the **issuer URL** (in Okta, `https://<your-org>.okta.com`, or your custom authorization server's issuer), the **client ID** and the **client secret**. ScrapeBadger reads the issuer's discovery document to find its endpoints.
+  </Step>
+  <Step title="Add the redirect URI to the app">
+    Copy the **Redirect URI** shown on the tab into the app's sign-in redirect URIs. It looks like `https://scrapebadger.com/api/auth/sso/callback/sso-example-com`.
+  </Step>
+  <Step title="Verify the domain">
+    Add the DNS TXT record shown on the tab at your DNS provider, then click **Verify domain**:
+
+    | Type | Name | Value |
+    |------|------|-------|
+    | TXT | `_scrapebadger-sso.example.com` | `scrapebadger-sso-verification=…` |
+
+    Nobody can sign in through the provider until the domain is verified. This stops anyone outside your company from putting an identity provider in front of your addresses.
+  </Step>
+</Steps>
+
+From then on, people choose **Sign in with SSO** on the [sign-in page](https://scrapebadger.com/auth/signin) and enter their work email:
+
+- **New people** get an account the first time they sign in, and join the team as members. Grant them permissions from the **Members** tab as usual.
+- **Existing accounts** on your domain are linked the first time their owner signs in through SSO. They can keep using their password or Google sign-in too.
+- Only addresses on the verified domain and its subdomains can sign in through it. If the identity provider returns any other address, the sign-in is refused.
+
+A team can have one identity provider, for one domain, and a domain can belong to only one team. Webmail domains such as `gmail.com` can't be used. To rotate the client secret, enter the new one on the tab. **Turn off** removes the connection. Members stay in the team, but anyone who only ever signed in through SSO has no password, so they'll need **Continue with Google** on the same email (or support) to get back in.
+
 ## Audit log
 
 Owners and admins see an **Audit log** tab on the team page: a permanent, read-only record of who did what and when.
@@ -58,7 +93,8 @@ Owners and admins see an **Audit log** tab on the team page: a permanent, read-o
 |----------|-----------------|
 | Team | team created, renamed |
 | Invitations | sent (with role and permissions), revoked, accepted, declined |
-| Members | role or permission changes (before → after), removed, left |
+| Members | role or permission changes (before → after), removed, left, joined through single sign-on |
+| Single sign-on | set up, settings changed (incl. secret rotation), domain verified, turned off |
 | API keys | created, edited (each changed field, before → after, including API permissions), enabled, disabled, deleted — also when a member's keys are deleted because they left — and **every time a key's secret was viewed** |
 
 Each entry shows the person who acted, the time, and the IP address it came from. Filter by category, and expand an entry to see the exact changes. Entries cannot be edited or deleted; they are removed only if the team itself is deleted.
