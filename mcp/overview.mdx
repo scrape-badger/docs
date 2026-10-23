@@ -183,6 +183,17 @@ https://mcp.scrapebadger.com/mcp
 
 Health check: `https://mcp.scrapebadger.com/health`
 
+### Lean endpoint for agents
+
+`https://mcp.scrapebadger.com/mcp/lean` serves only the helper tools, for clients that load every tool definition into context:
+- `search_endpoints` and `describe_endpoint`
+- `quote_call` and `call_endpoint`
+- `read_result` and `get_request`
+- `report_bug` and `send_feedback`
+- `get_account_info`
+
+It reaches every endpoint through `call_endpoint`. Both endpoints return oversized results as an outline plus a `result_id`, and long calls as a `request_id`. See [AI Agents](/ai-agents).
+
 
 ## Vinted mobile reads
 

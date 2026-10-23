@@ -204,3 +204,19 @@ scrapebadger vinted search-by-image --image-url https://example.com/photo.webp -
 Supply exactly one of `--image`, `--image-url` or `--image-base64`. JPEG, PNG and
 WebP up to 5 MiB are supported. A successful search costs 10 credits.
 See [Vinted image search](/vinted/image-search) for all filters and pagination.
+
+## Agent commands
+
+| Command | What it does |
+|---|---|
+| `scrapebadger init [--yes]` | Install the ScrapeBadger skill into Claude Code and Codex, register the MCP server, and offer `login` or `trial` |
+| `scrapebadger login` | Device sign-in: approve the code at scrapebadger.com/device and the CLI saves a new key |
+| `scrapebadger trial` | Mint a free no-account trial key (see [AI Agents](/ai-agents)) |
+| `scrapebadger connect` | Print the claim link for a trial key |
+| `scrapebadger quote /v1/<api>/<path> -p k=v` | Credits, USD, parameter validation and latency for a call, free |
+| `scrapebadger view --last [API] [--jq E] [--fields a,b] [--max-items N] [--summary]` | Re-slice a saved result locally, free |
+| `scrapebadger results get <result_id> [--jq E]` | Re-read a billed result from the server, free for ~15 minutes |
+| `scrapebadger report-bug "<summary>" --request-id <id>` | Report a wrong result or error |
+| `scrapebadger feedback "<summary>"` | Ask for a missing API or field |
+
+Every API command saves its full JSON response under `~/.cache/scrapebadger/results/` and prints the path, credits and `result_id` to stderr. stdout is unchanged. Use `scrapebadger --no-save <command>` or `SCRAPEBADGER_SAVE=0` to turn this off.
