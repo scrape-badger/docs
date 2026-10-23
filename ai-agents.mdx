@@ -1,0 +1,157 @@
+---
+title: AI Agents
+description: Set up an AI agent with one prompt, quote calls before running them, trim large results, re-read results for free, run long calls asynchronously, and report problems.
+---
+
+ScrapeBadger is built to be called by AI agents (Claude Code, Codex, Cursor and others) as well as by code. Everything on this page also works from plain HTTP.
+
+## Set up an agent with one prompt
+
+Give your agent this prompt:
+
+```text
+Read https://scrapebadger.com/SKILL.md and set up ScrapeBadger for me
+```
+
+[`SKILL.md`](https://scrapebadger.com/SKILL.md) tells the agent everything it needs:
+- how to get a key and connect MCP or the CLI;
+- which endpoint fits a task;
+- how to keep results small and what things cost.
+
+The full endpoint catalog, with the MCP tool name for every endpoint, is at [`/SKILL/endpoints.md`](https://scrapebadger.com/SKILL/endpoints.md).
+
+With the CLI, one command installs the skill into Claude Code and Codex and registers the MCP server:
+
+```bash
+uv tool install scrapebadger-cli
+scrapebadger init
+```
+
+## Get a key without copying one
+
+There are two ways an agent can get a key without anyone pasting it.
+
+### Device sign-in
+
+`scrapebadger login` prints a short code and opens `https://scrapebadger.com/device`. You sign in, check the request and approve it. That creates a new API key on your account, which the CLI receives directly, so no key passes through the conversation.
+
+Under the hood:
+1. `POST /v1/public/agent/device/code` returns a `device_code`, a `user_code` and a `verification_uri`.
+2. The client polls `POST /v1/public/agent/device/token` until it gets the key or one of `authorization_pending`, `slow_down`, `access_denied` or `expired_token`.
+
+### Trial keys (no account)
+
+An agent with a shell can mint a free trial key before you sign up:
+
+```bash
+scrapebadger trial
+```
+
+A trial key comes with these limits:
+
+| Limit | Value |
+|---|---|
+| Credits | 50 |
+| Expires | 7 days |
+| Rate | 10 requests/min, one call at a time |
+| APIs | Read APIs only: no Web Scraping API, ChatGPT, Perplexity, Gemini or stream monitors |
+| Network | Works only from the IP that minted it; not through the hosted MCP server |
+| Availability | One per IP per day; not available from proxy, VPN or Tor networks |
+
+To keep using the key, open its `claim_url` (`scrapebadger connect` prints it). Signing in there attaches the key to your account as a normal key. Unused trial credits are not transferred.
+
+Over HTTP:
+1. `POST /v1/public/agent/trial/challenge` returns a `challenge` and a `difficulty`.
+2. Find a decimal `nonce` such that `sha256(f"{challenge}:{nonce}")` has at least `difficulty` leading zero bits.
+3. `POST /v1/public/agent/trial` with `{"challenge", "nonce", "label"}` returns the key, its `claim_url` and a `notice` to show to the user.
+
+## Quote a call before running it
+
+`POST /v1/quote` is free. It runs nothing and charges nothing.
+
+```bash
+curl -s https://scrapebadger.com/v1/quote -H "X-API-Key: $SCRAPEBADGER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"method": "GET", "path": "/v1/google/search", "params": {"q": "web scraping api"}}'
+```
+
+The response contains:
+- `credits`: the min, max, base and per-item cost;
+- `usd`: USD per 1,000 calls at the list rate and the best plan rate;
+- `valid` and `errors`: your parameters, checked against the endpoint, with each bad field named;
+- `latency`: the endpoint's p50, p95 and p99 over the last 30 days.
+
+## Keep large results small
+
+These query parameters work on any read endpoint. They change what is sent back, never what is billed or cached.
+
+| Parameter | Effect |
+|---|---|
+| `_fields=a,b.c` | Keep only these fields on each item of the main result list |
+| `_max_items=N` | Cap the main list; adds a `_truncated` note |
+| `_summary=true` | Return only the structure, with byte sizes per field |
+| `_jq=<expression>` | Run a [jq](https://jqlang.org) expression on the result |
+
+```bash
+curl -s "https://scrapebadger.com/v1/google/search?q=crm&_jq=.organic_results[:5]|map({title,link})" \
+  -H "X-API-Key: $SCRAPEBADGER_API_KEY"
+```
+
+If a jq expression fails, the response is `{"_view_error", "result_id", "data": <full result>}`, so the paid call is never wasted.
+
+## Re-read a result for free
+
+Every billed result carries an `X-Result-ID` header. For about 15 minutes, `GET /v1/results/{result_id}` returns that result again at no charge.
+
+It accepts the same views without the underscore (`jq`, `fields`, `max_items`, `summary`), so you can read a long result in slices:
+
+```bash
+curl -s "https://scrapebadger.com/v1/results/$RESULT_ID?jq=.content[3500:7000]" \
+  -H "X-API-Key: $SCRAPEBADGER_API_KEY"
+```
+
+## Run long calls asynchronously
+
+Send `Prefer: respond-async, wait=25` on any read request.
+- **If the call finishes within `wait` seconds** (1–120), you get the normal response.
+- **Otherwise** you get `202` with a `request_id` and `next_action`:
+
+  ```json
+  {"request_id": "…", "status": "running", "retry_after_seconds": 5,
+   "next_action": {"method": "GET", "url": "/v1/requests/…"}}
+  ```
+
+Poll `GET /v1/requests/{request_id}`. It is free. It returns `202` while the call runs, then the original status, headers and body.
+
+The call is billed once, when it completes. A call that never completes is never billed. Don't re-send the original request: that runs, and bills, a second call.
+
+## Report a problem
+
+`POST /v1/feedback` is free.
+- Use `"type": "bug"` for an empty or malformed result on valid input, a misleading error, or a charge that doesn't match the quote.
+- Use `"type": "feedback"` for an API or field you needed and couldn't find.
+
+Include the failing call's `X-Request-ID` so we can find it.
+
+```bash
+curl -s https://scrapebadger.com/v1/feedback -H "X-API-Key: $SCRAPEBADGER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"type": "bug", "summary": "Empty results for a valid query", "request_id": "…", "endpoint": "/v1/google/search"}'
+```
+
+## MCP for agents
+
+The hosted MCP server has two endpoints:
+- **`https://mcp.scrapebadger.com/mcp`** has all endpoint tools plus the helpers below.
+- **`https://mcp.scrapebadger.com/mcp/lean`** has only the helpers, for clients that load every tool definition into context:
+  - `search_endpoints` and `describe_endpoint`
+  - `quote_call` and `call_endpoint` (which accepts `jq`, `fields`, `max_items` and `summary`)
+  - `read_result` and `get_request`
+  - `report_bug` and `send_feedback`
+  - `get_account_info`
+
+A result too large for the context window comes back as an outline plus a `result_id`; use `read_result` to fetch the part you need. A call still running after about 45 seconds returns a `request_id`; use `get_request` to fetch the result. See [MCP](/mcp/overview).
+
+## Out of credits
+
+A `402` response body includes `upgrade_url`, `free_credits_url` and `pricing_url`. For a trial key, it includes `claim_url` instead.
