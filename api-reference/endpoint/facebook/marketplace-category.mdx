@@ -12,7 +12,7 @@ sort filters. Returns the same `MarketplaceListing` shape as
 This page also documents the two free reference endpoints that list the valid
 `location` and `category` slugs.
 
-**Credits:** 5 (category browse) · 0 (`/marketplace/locations`, `/marketplace/categories`)
+**Credits:** 10 (category browse) · 0 (`/marketplace/locations`, `/marketplace/categories`)
 
 ## Authorization
 
@@ -36,7 +36,13 @@ This page also documents the two free reference endpoints that list the valid
   Facebook place id. Human-readable names such as `Durham, UK` return a `400
   invalid_location` rather than silently browsing a different place — see
   [Location targeting](/api-reference/endpoint/facebook/marketplace-search#location-targeting).
-  Facebook honours `radius` on search only, so there is no `radius` here.
+</ParamField>
+
+<ParamField query="radius" type="integer">
+  Radius around the location, `1`–`500`. Facebook's own unit: kilometres in
+  metric locales, miles in the US. Defaults to Facebook's 65 km / 40 mi, which
+  can reach the next city over — pass a smaller radius to keep the feed local.
+  `resolved_location.radius` echoes the radius that was applied.
 </ParamField>
 
 <ParamField query="min_price" type="integer">Minimum price.</ParamField>
@@ -68,7 +74,8 @@ This page also documents the two free reference endpoints that list the valid
 <ResponseField name="location" type="string">The location value you sent.</ResponseField>
 <ResponseField name="resolved_location" type="ResolvedLocation">
   The location Facebook actually browsed: `slug`, `latitude`, `longitude` and
-  `radius`. Verify it against your target geography before ingesting.
+  the `radius` the feed was filtered by. Verify it against your target
+  geography before ingesting.
 </ResponseField>
 
 <Note>
