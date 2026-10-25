@@ -1,0 +1,56 @@
+---
+title: Delete your account
+description: Permanently delete your ScrapeBadger account and its data, and unsubscribe from all marketing. You can cancel within 24 hours.
+---
+
+You can delete your ScrapeBadger account yourself from the dashboard. Deleting also unsubscribes you from all marketing emails. You have **24 hours to change your mind**.
+
+## How to delete your account
+
+1. Sign in and open [**Settings**](https://scrapebadger.com/dashboard/settings).
+2. Scroll to the **Danger zone** at the bottom and click **Delete account**.
+3. Read what will be deleted, tick the box, and click **Continue**.
+4. Type your account email to confirm, then click **Delete my account**.
+
+We email you to confirm the request. The email also has a link back to settings in case you want to undo it.
+
+## What happens during the 24 hours
+
+As soon as you confirm, your account is **locked**, so nothing is used or billed while it waits:
+
+- Your API keys stop working. Calls return `403` with a message saying the account is scheduled for deletion.
+- Running stream monitors and filter rules are paused.
+- You are unsubscribed from all marketing emails.
+- The dashboard shows only a countdown and a **Cancel deletion** button. You can still sign in.
+
+## How to cancel the deletion
+
+Sign in before the countdown ends and click **Cancel deletion and keep my account**. Everything works again straight away:
+
+- Your API keys work again.
+- The stream monitors and filter rules that were running are resumed. Any you had paused yourself stay paused.
+- Your marketing preferences go back to how they were.
+
+## What gets deleted
+
+When the 24 hours are up, we permanently delete:
+
+- your profile and API keys, and any remaining credits;
+- your usage history and request logs;
+- stream monitors, filter rules, support tickets and messages;
+- any [teams](/teams) you own. Every member's team API keys go with them, so transfer or close those teams first if others depend on them;
+- your contact record in our marketing system.
+
+Any active subscription is **cancelled immediately, without a refund** for the rest of the period.
+
+## What we keep
+
+- **Invoices.** Tax law requires us to keep issued invoices for 10 years. They are kept without a link to your deleted account.
+- **A one-way hash of your email address.** It stops the same inbox from getting a second free trial. Nothing else about your account is kept, and the hash can't be turned back into your address.
+- **Backups.** Deleted data can remain in database backups until those are overwritten, within 90 days.
+
+You can sign up again with the same email at any time. It will be a new, empty account without free trial credits.
+
+## Need help?
+
+If you can't sign in, or you want your data deleted without using the dashboard, email [support@scrapebadger.com](mailto:support@scrapebadger.com) from your account email address.
