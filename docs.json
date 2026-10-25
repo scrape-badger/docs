@@ -58,7 +58,8 @@
           {
             "group": "Account",
             "pages": [
-              "api-reference/endpoint/account/get-account-info"
+              "api-reference/endpoint/account/get-account-info",
+              "delete-account"
             ]
           }
         ]
