@@ -41,9 +41,9 @@ const client = new ScrapeBadger({ apiKey: 'YOUR_API_KEY' });
 
 // Search posts
 const results = await client.reddit.search.posts({
-  q: 'artificial intelligence',
+  query: 'artificial intelligence',
   sort: 'top',
-  t: 'week',
+  time: 'week',
   limit: 10,
 });
 
@@ -51,19 +51,20 @@ console.log(results.posts);
 ```
 
 ```python Python
+import asyncio
 from scrapebadger import ScrapeBadger
 
-client = ScrapeBadger(api_key="YOUR_API_KEY")
+async def main():
+    async with ScrapeBadger(api_key="YOUR_API_KEY") as client:
+        results = await client.reddit.search.posts(
+            "artificial intelligence",
+            sort="top",
+            time_filter="week",
+            limit=10,
+        )
+        print(results.posts)
 
-# Search posts
-results = client.reddit.search.posts(
-    q="artificial intelligence",
-    sort="top",
-    t="week",
-    limit=10,
-)
-
-print(results.posts)
+asyncio.run(main())
 ```
 
 ```bash cURL
@@ -142,6 +143,10 @@ Search cursors start with `rs1.`. Treat them as opaque: pass `pagination.after` 
 `limit` is the maximum number of results to return. Reddit's native page may contain fewer rows. Keep paginating while `pagination.after` is present, even when `count` is smaller than `limit`. Search pagination moves forward only; `pagination.before` is `null`.
 
 Community search includes `weekly_visitors` and `weekly_contributions` when Reddit supplies them. These activity counters are separate from `subscribers`. Post search can include `search_snippet`, the excerpt shown in search results; `selftext` remains the full post body when available.
+
+### Search time filters
+
+Search follows Reddit's UI behavior. Reddit ignores the time filter when sorting by `new`; results can be older than the requested window. Use `top`, `hot`, or `comments` when you need a time window.
 
 ## Search Syntax
 
