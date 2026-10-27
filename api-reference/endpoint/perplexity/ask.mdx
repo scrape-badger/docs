@@ -1,0 +1,180 @@
+---
+title: "Ask Perplexity"
+api: "GET https://scrapebadger.com/v1/perplexity/ask"
+description: "Send a prompt to the real perplexity.ai and get the grounded answer as structured JSON, with its cited sources, search queries and related questions."
+---
+
+Ask **the real `perplexity.ai`** a question anonymously and get the answer back
+as JSON, plus every source Perplexity retrieved, which of those it cited, and
+the sub-queries it searched for.
+
+Accepts `GET` (query params) or `POST` (JSON body) with identical fields.
+
+**Credits:** 20
+
+<Warning>
+  This is a live answer, not a cache. A call can take up to about 75 s while
+  exits are tried, so set your client timeout to at least 90 s.
+</Warning>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="prompt" type="string" required>
+  The question to ask. Maximum **4,096 characters**. Each request is standalone,
+  so include all the context you need here.
+</ParamField>
+
+<ParamField query="country" type="string">
+  ISO-3166 alpha-2 market, e.g. `US`, `DE`, `JP`. Sets the ask's language and
+  timezone (e.g. `DE`: `de-DE`, `Europe/Berlin`). Omit it and the market whose
+  exits answer best right now is used.
+
+  The egress is **best-effort**: when that market has no exit left, another one
+  carries the ask and the response `country` says which. Set `strict_country`
+  to forbid that.
+</ParamField>
+
+<ParamField query="strict_country" type="boolean" default="false">
+  Answer only from an exit in `country`, never another one. When no exit there
+  answers in time the call fails with **`503`** and
+  `detail.code = "country_unavailable"`. It is **not billed** (only `2xx`
+  responses are). Requires `country` — `400` otherwise. A JSON `boolean` on
+  `POST`.
+</ParamField>
+
+<ParamField query="focus" type="string" default="web">
+  Retrieval focus: `web`, `scholar` (academic sources) or `social`
+  (discussions and forums).
+</ParamField>
+
+## Response
+
+<ResponseField name="prompt" type="string">Echo of the prompt you sent.</ResponseField>
+<ResponseField name="answer" type="string">The answer text. Citation offsets index into this string.</ResponseField>
+<ResponseField name="answer_markdown" type="string | null">The answer with its Markdown formatting.</ResponseField>
+
+<ResponseField name="citations" type="Citation[]">
+  The sources the answer actually references.
+
+  <Expandable title="Citation">
+    <ResponseField name="url" type="string">Source URL.</ResponseField>
+    <ResponseField name="title" type="string | null">Page title.</ResponseField>
+    <ResponseField name="snippet" type="string | null">Snippet Perplexity retrieved from the page.</ResponseField>
+    <ResponseField name="domain" type="string | null">Hostname, e.g. `techcrunch.com`.</ResponseField>
+    <ResponseField name="source_type" type="string | null">Perplexity's source kind, e.g. `web`, `scholar`, `social`.</ResponseField>
+    <ResponseField name="pub_date_utc" type="number | null">Publication date as a Unix timestamp.</ResponseField>
+    <ResponseField name="published_at" type="string | null">Publication date as an ISO-8601 UTC string.</ResponseField>
+    <ResponseField name="last_updated" type="string | null">Last-updated date as reported by Perplexity.</ResponseField>
+    <ResponseField name="ref_index" type="integer | null">The inline `[n]` marker number.</ResponseField>
+    <ResponseField name="start_index" type="integer | null">Character offset in `answer` where the cited span begins.</ResponseField>
+    <ResponseField name="end_index" type="integer | null">Character offset in `answer` where the cited span ends.</ResponseField>
+    <ResponseField name="matched_text" type="string | null">The substring of `answer` this source supports.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="search_results" type="SearchResult[]">
+  The **full** set Perplexity retrieved, cited or not. Same fields as
+  `Citation` without the answer offsets, plus `cited` (`boolean`).
+</ResponseField>
+
+<ResponseField name="source_domains" type="string[]">Distinct hostnames across the sources.</ResponseField>
+<ResponseField name="related_questions" type="string[]">Perplexity's suggested follow-up questions.</ResponseField>
+<ResponseField name="images" type="MediaItem[]">Images attached to the answer (`url`, `title`, `source_url`, `thumbnail`).</ResponseField>
+<ResponseField name="videos" type="MediaItem[]">Videos attached to the answer, same shape.</ResponseField>
+<ResponseField name="web_search_triggered" type="boolean">Whether Perplexity searched the web for this answer.</ResponseField>
+<ResponseField name="truncated" type="boolean">`true` when the stream budget expired mid-answer, so `answer` is partial.</ResponseField>
+<ResponseField name="search_queries" type="string[]">The sub-queries Perplexity sent to its search backend (its retrieval fan-out).</ResponseField>
+<ResponseField name="focus" type="string">The retrieval focus used.</ResponseField>
+<ResponseField name="model" type="string | null">Which model answered. Reported, not requestable.</ResponseField>
+<ResponseField name="backend_uuid" type="string | null">Perplexity's id for this answer.</ResponseField>
+<ResponseField name="country" type="string">The market that actually answered. Without `strict_country` it can differ from the `country` you asked for.</ResponseField>
+<ResponseField name="answer_length" type="integer">Length of `answer` in characters.</ResponseField>
+<ResponseField name="citation_count" type="integer">Number of entries in `citations`.</ResponseField>
+<ResponseField name="latency_ms" type="integer">End-to-end time in milliseconds.</ResponseField>
+<ResponseField name="created_utc" type="number | null">Answer creation time as a Unix timestamp.</ResponseField>
+<ResponseField name="created_at" type="string | null">Answer creation time as an ISO-8601 UTC string.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl -G "https://scrapebadger.com/v1/perplexity/ask" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  --data-urlencode "prompt=Which companies lead the web scraping API market?" \
+  --data-urlencode "country=US" \
+  --max-time 120
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/perplexity/ask", {
+  method: "POST",
+  headers: {
+    "X-API-Key": process.env.SCRAPEBADGER_API_KEY,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    prompt: "Which companies lead the web scraping API market?",
+    country: "US",
+  }),
+  signal: AbortSignal.timeout(120_000),
+});
+const data = await res.json();
+console.log(data.country, data.answer);
+```
+
+```python Python
+import requests
+
+res = requests.post(
+    "https://scrapebadger.com/v1/perplexity/ask",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    json={"prompt": "Which companies lead the web scraping API market?", "country": "US"},
+    timeout=120,
+)
+data = res.json()
+for c in data["citations"]:
+    print(c["domain"], "->", c["matched_text"])
+```
+
+</CodeGroup>
+
+## Strict country
+
+By default `country` is best-effort, so a market that is short of exits still
+gets an answer, from another market. Check the response `country` to see which
+one answered. When the market matters more than the answer (local rankings,
+per-country visibility tracking), set `strict_country=true`:
+
+```bash
+curl -G "https://scrapebadger.com/v1/perplexity/ask" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  --data-urlencode "prompt=best electricity provider" \
+  --data-urlencode "country=DE" \
+  --data-urlencode "strict_country=true" \
+  --max-time 120
+```
+
+If no exit in that market answers in time you get a `503`, which is not billed.
+Retry later rather than dropping `strict_country`:
+
+```json 503 Response
+{
+  "detail": {
+    "code": "country_unavailable",
+    "message": "no DE exit answered in 16 attempts {...}; strict_country never falls back to another country"
+  }
+}
+```
+
+<Warning>
+  Perplexity is non-deterministic. The same prompt can return different wording
+  and different sources on each call. For tracking, sample on a schedule and
+  aggregate.
+</Warning>

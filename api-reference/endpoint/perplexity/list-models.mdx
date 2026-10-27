@@ -1,0 +1,43 @@
+---
+title: "List Models"
+api: "GET https://scrapebadger.com/v1/perplexity/models"
+description: "The models Perplexity offers, flagged by whether they need a signed-in account."
+---
+
+A static reference of the models Perplexity offers. Only `turbo` (Perplexity's
+default) is reachable by the anonymous [`/ask`](/api-reference/endpoint/perplexity/ask);
+the rest are listed with `requires_account: true`. You cannot pick a model on
+`/ask`; its `model` field reports which one answered.
+
+**Credits:** 1
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="anonymous_only" type="boolean" default="false">
+  Return only models the anonymous `/ask` path can reach.
+</ParamField>
+
+## Response
+
+<ResponseField name="models" type="Model[]">
+  <Expandable title="Model">
+    <ResponseField name="slug" type="string">Model identifier, e.g. `turbo`.</ResponseField>
+    <ResponseField name="title" type="string | null">Display name.</ResponseField>
+    <ResponseField name="description" type="string | null">What the model is.</ResponseField>
+    <ResponseField name="requires_account" type="boolean">`true` when only signed-in or Pro users can use it.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="count" type="integer">Number of entries in `models`.</ResponseField>
+
+## Example
+
+```bash cURL
+curl "https://scrapebadger.com/v1/perplexity/models?anonymous_only=true" \
+  -H "X-API-Key: YOUR_API_KEY"
+```

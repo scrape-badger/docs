@@ -1527,6 +1527,29 @@
         ]
       },
       {
+        "tab": "Perplexity",
+        "groups": [
+          {
+            "group": "Ask",
+            "pages": [
+              "api-reference/endpoint/perplexity/ask"
+            ]
+          },
+          {
+            "group": "Brand Visibility",
+            "pages": [
+              "api-reference/endpoint/perplexity/brand-visibility"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api-reference/endpoint/perplexity/list-models"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "MCP Server",
         "groups": [
           {

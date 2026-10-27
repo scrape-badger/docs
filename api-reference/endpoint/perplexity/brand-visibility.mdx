@@ -1,0 +1,169 @@
+---
+title: "Brand Visibility"
+api: "GET https://scrapebadger.com/v1/perplexity/brand-visibility"
+description: "Ask Perplexity a question and get an AEO/GEO analysis of how your brand appears in the answer: mentions, position, share of voice against competitors, and whether your domain was cited."
+---
+
+Ask **the real `perplexity.ai`** a buyer-intent question and get back both the
+answer **and** how your brand fares in it: whether it was mentioned, how early,
+how often, how it compares to named competitors, and whether your domain was
+cited as a source.
+
+Accepts `GET` (query params) or `POST` (JSON body).
+
+**Credits:** 25
+
+<Warning>
+  This is a live answer, not a cache. A call can take up to about 75 s while
+  exits are tried, so set your client timeout to at least 90 s.
+</Warning>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="prompt" type="string" required>
+  The question to ask, typically a buyer-intent prompt like
+  `best web scraping API for e-commerce`. Maximum 4,096 characters.
+</ParamField>
+
+<ParamField query="brand" type="string" required>
+  The brand name to look for in the answer, e.g. `ScrapeBadger`.
+</ParamField>
+
+<ParamField query="domain" type="string">
+  Your domain, e.g. `scrapebadger.com`. Used for `cited`, `cited_urls` and
+  `citation_rank`.
+</ParamField>
+
+<ParamField query="aliases" type="string">
+  Alternate spellings that also count as a mention of `brand`.
+  **Comma-separated on `GET`; a `string[]` on `POST`.**
+</ParamField>
+
+<ParamField query="competitors" type="string">
+  Competitor names to measure against, e.g. `Bright Data,Oxylabs,Zyte`.
+  **Comma-separated on `GET`; a `string[]` on `POST`.**
+</ParamField>
+
+<ParamField query="country" type="string">
+  ISO-3166 alpha-2 market, e.g. `US`, `DE`, `JP`. Sets the ask's language and
+  timezone (e.g. `DE`: `de-DE`, `Europe/Berlin`). Omit it and the market whose
+  exits answer best right now is used.
+
+  The egress is **best-effort**: when that market has no exit left, another one
+  carries the ask and the response `country` says which. Set `strict_country`
+  to forbid that.
+</ParamField>
+
+<ParamField query="strict_country" type="boolean" default="false">
+  Answer only from an exit in `country`, never another one. When no exit there
+  answers in time the call fails with **`503`** and
+  `detail.code = "country_unavailable"`. It is **not billed** (only `2xx`
+  responses are). Requires `country` — `400` otherwise. A JSON `boolean` on
+  `POST`.
+</ParamField>
+
+<ParamField query="focus" type="string" default="web">
+  Retrieval focus: `web`, `scholar` (academic sources) or `social`
+  (discussions and forums).
+</ParamField>
+
+## Response
+
+<ResponseField name="prompt" type="string">Echo of the prompt you sent.</ResponseField>
+<ResponseField name="brand" type="string">Echo of the brand you tracked.</ResponseField>
+<ResponseField name="domain" type="string | null">Echo of the domain you supplied.</ResponseField>
+<ResponseField name="mentioned" type="boolean">Whether the brand (or any alias) appears in the answer.</ResponseField>
+<ResponseField name="mention_count" type="integer">How many times the brand or its aliases appear.</ResponseField>
+<ResponseField name="first_position" type="integer | null">Character offset of the first mention in `answer`. `null` when absent.</ResponseField>
+<ResponseField name="position_score" type="number">`1.0` = named at the very start of the answer, `0.0` = absent.</ResponseField>
+<ResponseField name="share_of_voice_pct" type="number">Brand mentions as a percentage of brand + competitor mentions.</ResponseField>
+<ResponseField name="cited" type="boolean">Whether the brand's `domain` is among the cited sources.</ResponseField>
+<ResponseField name="cited_urls" type="string[]">The cited URLs on the brand's domain.</ResponseField>
+<ResponseField name="citation_rank" type="integer | null">1-based rank of the brand's first cited URL among all citations.</ResponseField>
+
+<ResponseField name="competitors" type="CompetitorMention[]">
+  One entry per competitor you named: `name`, `mentioned`, `mention_count`,
+  `first_position`, `cited`, `cited_urls`.
+</ResponseField>
+
+<ResponseField name="excerpt" type="string | null">Answer text around the first brand mention.</ResponseField>
+<ResponseField name="answer" type="string">The full answer text.</ResponseField>
+<ResponseField name="citations" type="Citation[]">The sources the answer references, same shape as [`/ask`](/api-reference/endpoint/perplexity/ask).</ResponseField>
+<ResponseField name="web_search_triggered" type="boolean">Whether Perplexity searched the web.</ResponseField>
+<ResponseField name="model" type="string | null">Which model answered.</ResponseField>
+<ResponseField name="country" type="string">The market that actually answered. Without `strict_country` it can differ from the `country` you asked for.</ResponseField>
+<ResponseField name="latency_ms" type="integer">End-to-end time in milliseconds.</ResponseField>
+<ResponseField name="created_utc" type="number | null">Answer creation time as a Unix timestamp.</ResponseField>
+<ResponseField name="created_at" type="string | null">Answer creation time as an ISO-8601 UTC string.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl -G "https://scrapebadger.com/v1/perplexity/brand-visibility" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  --data-urlencode "prompt=What is the best web scraping API for e-commerce data?" \
+  --data-urlencode "brand=ScrapeBadger" \
+  --data-urlencode "domain=scrapebadger.com" \
+  --data-urlencode "competitors=Bright Data,Oxylabs,Zyte" \
+  --data-urlencode "country=US" \
+  --max-time 120
+```
+
+```python Python
+import requests
+
+res = requests.post(
+    "https://scrapebadger.com/v1/perplexity/brand-visibility",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    json={
+        "prompt": "What is the best web scraping API for e-commerce data?",
+        "brand": "ScrapeBadger",
+        "domain": "scrapebadger.com",
+        "competitors": ["Bright Data", "Oxylabs", "Zyte"],
+        "country": "DE",
+        "strict_country": True,
+    },
+    timeout=120,
+)
+data = res.json()
+print(data["country"], data["mentioned"], data["share_of_voice_pct"])
+```
+
+</CodeGroup>
+
+## Strict country
+
+By default `country` is best-effort, so a market that is short of exits still
+gets an answer, from another market. Check the response `country` to see which
+one answered. When the market matters more than the answer (local rankings,
+per-country visibility tracking), set `strict_country=true`:
+
+```bash
+curl -G "https://scrapebadger.com/v1/perplexity/brand-visibility" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  --data-urlencode "prompt=best electricity provider" \
+  --data-urlencode "brand=Octopus Energy" \
+  --data-urlencode "country=DE" \
+  --data-urlencode "strict_country=true" \
+  --max-time 120
+```
+
+If no exit in that market answers in time you get a `503`, which is not billed.
+Retry later rather than dropping `strict_country`:
+
+```json 503 Response
+{
+  "detail": {
+    "code": "country_unavailable",
+    "message": "no DE exit answered in 16 attempts {...}; strict_country never falls back to another country"
+  }
+}
+```
