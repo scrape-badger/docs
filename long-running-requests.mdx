@@ -95,10 +95,11 @@ Add `X-Callback-URL: https://your-server.example/hook` to an async call (it need
 - Answer with any `2xx`. On a timeout, a connection error, `408`, `429` or `5xx`, the delivery is retried after 10 s, 60 s and 5 min (4 attempts in total). Other statuses are final. Deliveries can repeat, so deduplicate on `request_id`.
 - `GET /v1/requests/{request_id}` reports the delivery: as a `callback` object (`status`: `pending` / `delivered` / `failed`, `attempts`, `last_error`) while the call runs, and as `X-Callback-Status` and `X-Callback-Attempts` headers on the final response.
 - Calls refused before they run (invalid key, no credits, rate limit) answer synchronously and send no webhook.
+- Deliveries in progress don't survive a restart of our gateway. If a restart interrupts retries, the poll reports the delivery as `failed` with `last_error: "interrupted (gateway restart)"`. Fetch the result from `result_url` while it is still kept.
 
 ### Verify the signature
 
-Every delivery is signed with your account's webhook secret. Get the secret from `GET /v1/account/webhook-secret`, and rotate it with `POST /v1/account/webhook-secret/rotate`. `X-ScrapeBadger-Signature` is `sha256=` followed by the hex HMAC-SHA256 of the **raw** request body. Check it before you parse the body, and reject stale `sent_at` values to stop replays. This is the same scheme stream monitors use.
+Every delivery is signed with your account's webhook secret. Get the secret from `GET /v1/account/webhook-secret`, and rotate it with `POST /v1/account/webhook-secret/rotate`. Both need a full-access API key: a key restricted to some APIs gets `403 full_access_required`. `X-ScrapeBadger-Signature` is `sha256=` followed by the hex HMAC-SHA256 of the **raw** request body. Check it before you parse the body, and reject stale `sent_at` values to stop replays. This is the same scheme stream monitors use.
 
 <CodeGroup>
 
@@ -146,10 +147,13 @@ curl -s https://scrapebadger.com/v1/batch \
 ```
 
 - Each item is an ordinary async request under your key. It has the same authentication, permissions, credit check, [rate limit](/rate-limits) and price as if you had sent it alone. Submitting the batch is free.
-- An item that can't start (for example `429` over your rate limit, `402` out of credits, or `404` unknown endpoint) comes back with `"accepted": false`, its `status` and `error`. It is not billed, and you can resubmit just that item later.
+- Items are checked against your balance before any of them start, at each endpoint's base price (what `POST /v1/quote` reports). Items whose price no longer fits, after the items before them and your other batch items still running, come back as `402 insufficient_credits` and are not started.
+- An item that can't start (for example `402` as above, `429` over your rate limit, or `404` unknown endpoint) comes back with `"accepted": false`, its `status` and `error`. It is not billed, and you can resubmit just that item later.
 - Poll each `poll_url`, or pass `callback_url` to get one webhook per item, each with `batch_id` set.
 - At most 10 items of one batch run at a time. The others wait their turn and show as `running` when polled.
 - A batch over 100 items gets `413 batch_too_large`.
+- Items still waiting for a slot when our gateway restarts are dropped. They are not billed, and polling them returns `404 request_not_found` within about 5 minutes. Resubmit those.
+- Unclaimed trial keys can't batch (`403 trial_not_allowed`) or use webhooks. They also ignore `Prefer: respond-async` and answer synchronously.
 
 ## Concurrency
 
