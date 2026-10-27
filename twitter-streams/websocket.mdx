@@ -24,15 +24,29 @@ wscat -c "wss://scrapebadger.com/v1/twitter/stream?api_key=YOUR_API_KEY"
 
 ```python
 import asyncio
-import websockets
 import json
 
+import websockets
+
+URI = "wss://scrapebadger.com/v1/twitter/stream?api_key=YOUR_API_KEY"
+
 async def listen():
-    uri = "wss://scrapebadger.com/v1/twitter/stream?api_key=YOUR_API_KEY"
-    async with websockets.connect(uri) as ws:
-        async for message in ws:
-            event = json.loads(message)
-            print(f"New tweet from @{event['author_username']}: {event['tweet_url']}")
+    backoff = 1
+    while True:
+        try:
+            async with websockets.connect(URI) as ws:
+                backoff = 1
+                async for message in ws:
+                    event = json.loads(message)
+                    if event["type"] == "ping":
+                        await ws.send(json.dumps({"type": "pong"}))
+                    elif event["type"] == "connected":
+                        pass  # backfill anything missed while disconnected (see below)
+                    elif event["type"] == "tweet":
+                        print(f"@{event['author_username']}: {event['tweet_id']}")
+        except (websockets.ConnectionClosed, OSError):
+            await asyncio.sleep(backoff)
+            backoff = min(backoff * 2, 30)
 
 asyncio.run(listen())
 ```
@@ -42,47 +56,103 @@ asyncio.run(listen())
 ```javascript
 const WebSocket = require('ws');
 
-const ws = new WebSocket(
-  'wss://scrapebadger.com/v1/twitter/stream?api_key=YOUR_API_KEY'
-);
+function connect(backoff = 1000) {
+  const ws = new WebSocket(
+    'wss://scrapebadger.com/v1/twitter/stream?api_key=YOUR_API_KEY'
+  );
 
-ws.on('message', (data) => {
-  const event = JSON.parse(data);
-  console.log(`New tweet from @${event.author_username}: ${event.tweet_url}`);
-});
+  ws.on('open', () => { backoff = 1000; });
 
-ws.on('error', console.error);
+  ws.on('message', (data) => {
+    const event = JSON.parse(data);
+    if (event.type === 'ping') {
+      ws.send(JSON.stringify({ type: 'pong' }));
+    } else if (event.type === 'tweet') {
+      console.log(`@${event.author_username}: ${event.tweet_id}`);
+    }
+  });
+
+  ws.on('close', () => {
+    setTimeout(() => connect(Math.min(backoff * 2, 30000)), backoff);
+  });
+  ws.on('error', console.error);
+}
+
+connect();
 ```
 
-## Event format
+## Messages
 
-Each WebSocket message is a JSON object:
+Every message is a JSON object with a `type` field.
+
+| `type` | When |
+|--------|------|
+| `connected` | Right after the connection is accepted. Includes `connection_id`. |
+| `ping` | Every 40 seconds. Reply with `{"type": "pong"}`. |
+| `tweet` | A monitor or filter rule detected a tweet. |
+| `monitor_paused` / `filter_rule_paused` | A monitor or rule was paused (for example, out of credits). Includes `reason`. |
+| `error` | Sent just before the server refuses a connection. Includes `code` and `message`. |
+
+### Tweet event
 
 ```json
 {
-  "event": "tweet.detected",
+  "type": "tweet",
   "monitor_id": "abc-123",
-  "monitor_name": "Tech Leaders",
   "tweet_id": "1234567890",
   "author_username": "elonmusk",
-  "tweet_text": "Just announced...",
-  "tweet_url": "https://x.com/elonmusk/status/1234567890",
-  "tweet_published_at": "2026-03-13T12:00:00Z",
-  "detected_at": "2026-03-13T12:00:00.150Z",
-  "latency_ms": 150
+  "tweet_type": "original",
+  "tweet_published_at": "2026-03-13T12:00:00+00:00",
+  "detected_at": "2026-03-13T12:00:00.150000+00:00",
+  "latency_ms": 150,
+  "tweet": { "...": "full tweet object" }
 }
 ```
+
+Tweets from a filter rule also carry `"source": "filter_rule"`, `rule_id` and `tag` instead of `monitor_id`.
 
 ## Connection behavior
 
 - **Authentication** is done via the `api_key` query parameter
-- **Heartbeat pings** are sent every 30 seconds to keep the connection alive
-- **Auto-reconnect** is recommended in your client code -- the server may close idle connections
-- **All monitors and filter rules** for the API key deliver to the same WebSocket connection
-- **Multiple connections** are supported per API key
+- **Keepalive:** the server sends `{"type": "ping"}` every 40 seconds. If your client doesn't reply with `{"type": "pong"}` within 30 seconds, the connection is closed with code `1001`
+- **Restarts:** the server closes all connections with code `1001` when it restarts. Reconnect right away
+- **All monitors and filter rules** for the API key deliver to the same connection
+- **Up to 5 connections** per API key. Every open connection gets every event
+
+### Close codes
+
+| Code | Meaning |
+|------|---------|
+| `1001` | Pong timeout or server restart. Reconnect. |
+| `4001` | Invalid or missing API key |
+| `4003` | More than 5 connections for this API key |
+| `4403` | Request IP isn't on the key's allowlist, or the key lacks the Twitter permission |
+
+## Delivery status and missed tweets
+
+WebSocket delivery is live only: tweets aren't queued or replayed. A tweet detected while none of your connections is open isn't sent again.
+
+Each tweet a monitor detects is recorded in the delivery log (`GET /v1/twitter/stream/logs`) with a `delivery_status`:
+
+| Status | Meaning |
+|--------|---------|
+| `websocket_delivered` | Sent to at least one open WebSocket connection |
+| `pending` | No WebSocket connection was open for the API key when the tweet was detected |
+| `webhook_delivered` / `webhook_failed` | Result of webhook delivery, for monitors with a `webhook_url` |
+
+To make sure you receive everything, backfill after every reconnect:
+
+```bash
+curl "https://scrapebadger.com/v1/twitter/stream/logs?delivery_status=pending&page_size=100" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+Skip any `tweet_id` you've already processed, and fetch the rest with [Get tweets by IDs](/api-reference/endpoint/tweets/get-tweets-by-ids) if you need the full object. The log keeps the most recent 100 entries per monitor, so backfill promptly.
 
 ## Best practices
 
-1. **Always implement reconnection logic** with exponential backoff
-2. **Process messages asynchronously** to avoid blocking the WebSocket receive loop
-3. **Use webhooks as a backup** -- WebSocket connections can drop, but webhooks retry delivery
+1. **Reply to every ping**, or the connection is dropped after 70 seconds
+2. **Reconnect on every close** with exponential backoff, then backfill `pending` tweets from the delivery log
+3. **Process messages asynchronously** so a slow handler doesn't delay your pong
+4. **Deduplicate by `tweet_id`.** With several connections open, each one receives every event
+5. **Use [webhooks](/twitter-streams/webhooks)** when you need guaranteed delivery. Webhooks are retried, WebSocket is not
