@@ -153,7 +153,7 @@ curl -s https://scrapebadger.com/v1/batch \
 - At most 10 items of one batch run at a time. The others wait their turn and show as `running` when polled.
 - A batch over 100 items gets `413 batch_too_large`.
 - Items still waiting for a slot when our gateway restarts are dropped. They are not billed, and polling them returns `404 request_not_found` within about 5 minutes. Resubmit those.
-- Unclaimed trial keys can't batch (`403 trial_not_allowed`) or use webhooks. They also ignore `Prefer: respond-async` and answer synchronously.
+- Unclaimed trial keys can't batch (`403 trial_not_allowed`) or use webhooks. They can still use `Prefer: respond-async`, one call at a time: a second call while the first is still running gets `429 trial_concurrency`.
 
 ## Concurrency
 
