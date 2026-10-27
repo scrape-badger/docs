@@ -133,6 +133,16 @@ All listing endpoints use cursor-based pagination with `after` and `before` para
 
 Pass the `after` value as a query parameter to get the next page of results. The maximum `limit` per request is 100.
 
+### Search pagination
+
+Post, community, and user search return Reddit's current web search results in the order Reddit provides them. Community and user search support pagination beyond the first matches.
+
+Search cursors start with `rs1.`. Treat them as opaque: pass `pagination.after` unchanged with the same query, subreddit scope, sort, and time filter. They expire after 30 minutes. An invalid, expired, or mismatched cursor returns `422`; restart the search without `after`.
+
+`limit` is the maximum number of results to return. Reddit's native page may contain fewer rows. Keep paginating while `pagination.after` is present, even when `count` is smaller than `limit`. Search pagination moves forward only; `pagination.before` is `null`.
+
+Community search includes `weekly_visitors` and `weekly_contributions` when Reddit supplies them. These activity counters are separate from `subscribers`. Post search can include `search_snippet`, the excerpt shown in search results; `selftext` remains the full post body when available.
+
 ## Search Syntax
 
 The search endpoints support Reddit's full query syntax:
@@ -168,6 +178,7 @@ The search endpoints support Reddit's full query syntax:
 | `author_fullname` | string \| null | Author fullname (`t2_...`) |
 | `selftext` | string | Plain-text body (empty for link posts) |
 | `selftext_html` | string \| null | HTML-rendered body |
+| `search_snippet` | string \| null | Preview excerpt shown in Reddit search; separate from the full body |
 | `url` | string | Link target, or the gallery/self-post URL |
 | `permalink` | string | Reddit permalink path (e.g. `/r/python/comments/...`) |
 | `domain` | string | Link domain (e.g. `github.com`, `self.python`) |
@@ -304,6 +315,8 @@ The search endpoints support Reddit's full query syntax:
 | `public_description_html` | string \| null | Short public description (HTML) |
 | `url` | string | Subreddit path (e.g. `/r/python/`) |
 | `subscribers` | number | Member count |
+| `weekly_visitors` | number \| null | Weekly visitors shown by Reddit search |
+| `weekly_contributions` | number \| null | Weekly contributions shown by Reddit search |
 | `created_utc` | number | Creation Unix timestamp |
 | `created_at` | string \| null | ISO 8601 UTC timestamp |
 | `subreddit_type` | string \| null | `public`, `private`, `restricted`, `archived` |
