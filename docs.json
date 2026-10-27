@@ -52,6 +52,7 @@
               "credits-and-pricing",
               "usage-logs",
               "rate-limits",
+              "long-running-requests",
               "ai-agents"
             ]
           },

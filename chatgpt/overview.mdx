@@ -23,8 +23,9 @@ sees.
 <Warning>
   **Answers take 20-25s ungrounded, 30-70s with web search.** This is a live browse of chatgpt.com, not a
   cached lookup — the clock includes ChatGPT composing the answer and, when it
-  browses, running its own web search. Set your HTTP client timeout to **60 s
-  or more**; the default 5–10 s timeout in most SDKs will abort the call.
+  browses, running its own web search. Set your HTTP client timeout to **100 s**;
+  the default 5–10 s timeout in most SDKs will abort the call. At volume, run asks
+  [asynchronously](/long-running-requests).
 </Warning>
 
 ## Features
@@ -188,8 +189,8 @@ Five things that are genuinely ours:
   </Accordion>
   <Accordion title="Why does a call take 20-25s ungrounded, 30-70s with web search?">
     Because a real answer is being generated, and when ChatGPT browses it runs
-    its own web search first. Budget a 60 s client timeout and run calls
-    concurrently rather than in a tight sequence.
+    its own web search first. Budget a 100 s client timeout, or run calls
+    [asynchronously](/long-running-requests) and poll for the result.
   </Accordion>
   <Accordion title="Can I continue a conversation or ask a follow-up?">
     No. Every request is a fresh, standalone question with no memory of previous
