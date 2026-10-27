@@ -23,7 +23,7 @@ sees, answered by the anonymous surface's **Gemini Flash-Lite** model.
 <Warning>
   **Answers are a live render of gemini.google.com, not a cached lookup** — the
   clock includes Gemini composing the answer and, when it grounds, running its
-  own web search. Set your HTTP client timeout to **100 s**;
+  own web search. Set your HTTP client timeout to **130 s**;
   the default 5–10 s timeout in most SDKs will abort the call. At volume, run asks
   [asynchronously](/long-running-requests).
 </Warning>
@@ -167,7 +167,7 @@ print(data["source_domains"])
   </Accordion>
   <Accordion title="Why can a call take tens of seconds?">
     Because a real answer is being generated, and when Gemini grounds it runs
-    its own web search first. Budget a 100 s client timeout, or run calls
+    its own web search first. Budget a 130 s client timeout, or run calls
     [asynchronously](/long-running-requests) and poll for the result.
   </Accordion>
   <Accordion title="Can I continue a conversation or ask a follow-up?">

@@ -5,16 +5,16 @@ description: How long a synchronous call can run, what happens when it is cut of
 
 Most calls answer in a few seconds. Some render a live page or wait for an AI answer: ChatGPT, Gemini and Perplexity asks usually take 15–40 s and sometimes over a minute. At volume, run these asynchronously.
 
-## Synchronous calls have about 95 seconds
+## Synchronous calls have about two minutes
 
-A normal (synchronous) call has about **95 s** to return. Long-running endpoints such as the AI asks fit their retries into that window: if they can't finish, you get an error response instead of a dropped connection. Failed calls are not billed.
+A normal (synchronous) call has about **115 s** to return. Long-running endpoints such as the AI asks fit their retries into that window: if they can't finish, you get an error response instead of a dropped connection. Failed calls are not billed.
 
-- Set your HTTP client timeout to **100 s** for AI endpoints. A shorter timeout aborts answers that would have arrived.
+- Set your HTTP client timeout to **130 s** for AI endpoints. A shorter timeout aborts answers that would have arrived.
 - If your connection drops before the response arrives, the call is **not billed**.
 
 ## Run slow calls asynchronously
 
-Add `Prefer: respond-async, wait=25` to any read request. Async calls are not bound by the 95 s window.
+Add `Prefer: respond-async, wait=25` to any read request. Async calls are not bound by that window.
 
 - **If the call finishes within `wait` seconds** (1–120), you get the normal response.
 - **Otherwise** you get `202 Accepted` with a `request_id`:
