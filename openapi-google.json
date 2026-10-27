@@ -6700,6 +6700,23 @@
               }
             ]
           },
+          "ai_overview_status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "present",
+                  "absent",
+                  "unavailable"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Overview Status",
+            "description": "Set when ai_overview=true. present: an overview was returned. absent: Google showed no AI Overview for this query (a definitive answer, not a fetch miss). unavailable: Google offered one but it could not be fetched this time (deferred overview lost, or a thin SERP); retrying may return it."
+          },
           "organic_results": {
             "items": {
               "$ref": "#/components/schemas/OrganicResult"

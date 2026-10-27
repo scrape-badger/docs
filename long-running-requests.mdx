@@ -1,0 +1,77 @@
+---
+title: Long-running and async requests
+description: How long a synchronous call can run, what happens when it is cut off, and how to run slow calls such as ChatGPT, Gemini and AI Overviews asynchronously at production volume.
+---
+
+Most calls answer in a few seconds. Some render a live page or wait for an AI answer: ChatGPT, Gemini and Perplexity asks usually take 15–40 s and sometimes over a minute. At volume, run these asynchronously.
+
+## Synchronous calls have about two minutes
+
+A normal (synchronous) call has about **115 s** to return. Long-running endpoints such as the AI asks fit their retries into that window: if they can't finish, you get an error response instead of a dropped connection. Failed calls are not billed.
+
+- Set your HTTP client timeout to **130 s** for AI endpoints. A shorter timeout aborts answers that would have arrived.
+- If your connection drops before the response arrives, the call is **not billed**.
+
+## Run slow calls asynchronously
+
+Add `Prefer: respond-async, wait=25` to any read request. Async calls are not bound by that window.
+
+- **If the call finishes within `wait` seconds** (1–120), you get the normal response.
+- **Otherwise** you get `202 Accepted` with a `request_id`:
+
+  ```json
+  {"request_id": "…", "status": "running", "retry_after_seconds": 5,
+   "next_action": {"method": "GET", "url": "/v1/requests/…"}}
+  ```
+
+Poll `GET /v1/requests/{request_id}`. Polling is free. It returns `202` while the call runs, then the original status, headers and body. Results stay available for about 15 minutes.
+
+The call is billed once, when it completes. A call that never completes is not billed. Don't re-send the original request while it runs: that starts, and bills, a second call.
+
+<CodeGroup>
+
+```bash cURL
+curl -s -i "https://scrapebadger.com/v1/gemini/ask?prompt=best+crm+for+startups" \
+  -H "X-API-Key: $SCRAPEBADGER_API_KEY" \
+  -H "Prefer: respond-async, wait=25"
+# 202 → poll the Location header:
+curl -s "https://scrapebadger.com/v1/requests/$REQUEST_ID" -H "X-API-Key: $SCRAPEBADGER_API_KEY"
+```
+
+```python Python
+import time, httpx
+
+def ask_async(client: httpx.Client, path: str, params: dict) -> httpx.Response:
+    r = client.get(path, params=params, headers={"Prefer": "respond-async, wait=25"})
+    while r.status_code == 202:
+        time.sleep(int(r.headers.get("Retry-After", "5")))
+        r = client.get(r.json()["next_action"]["url"])
+    return r
+
+with httpx.Client(base_url="https://scrapebadger.com",
+                  headers={"X-API-Key": "YOUR_API_KEY"}, timeout=130) as client:
+    print(ask_async(client, "/v1/chatgpt/ask", {"prompt": "best crm for startups"}).json())
+```
+
+```javascript JavaScript
+async function askAsync(path, params) {
+  const headers = { 'X-API-Key': process.env.SCRAPEBADGER_API_KEY };
+  let r = await fetch(`https://scrapebadger.com${path}?${new URLSearchParams(params)}`, {
+    headers: { ...headers, Prefer: 'respond-async, wait=25' },
+  });
+  while (r.status === 202) {
+    const { next_action, retry_after_seconds } = await r.json();
+    await new Promise((ok) => setTimeout(ok, retry_after_seconds * 1000));
+    r = await fetch(`https://scrapebadger.com${next_action.url}`, { headers });
+  }
+  return r.json();
+}
+```
+
+</CodeGroup>
+
+There is no webhook or batch endpoint. To run a batch, send each call with `Prefer: respond-async` and poll the `request_id`s.
+
+## Concurrency
+
+There is no per-key concurrency limit beyond your plan's [rate limit](/rate-limits). AI asks render a live answer, so latency rises when many run at once. Start around 10 in parallel per engine and scale up while you watch the error rate. A `502` on an AI ask means the engine produced no usable answer on that attempt. It is not billed, and retrying it is safe.
