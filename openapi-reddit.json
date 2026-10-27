@@ -20,7 +20,7 @@
     "/v1/reddit/search/posts": {
       "get": {
         "summary": "Search Reddit posts",
-        "description": "Search Reddit posts globally or within a subreddit.",
+        "description": "Search Reddit's current web UI globally or within a subreddit.\n\nPass pagination.after unchanged with the same query, scope, sort and time\nfilter. Search cursors expire after 30 minutes. Reddit's native page may\ncontain fewer rows than limit; continue while after is present.",
         "operationId": "search_posts_v1_reddit_search_posts_get",
         "parameters": [
           {
@@ -132,7 +132,7 @@
     "/v1/reddit/search/subreddits": {
       "get": {
         "summary": "Search subreddits",
-        "description": "Search for subreddits by keyword.",
+        "description": "Search communities using Reddit's current web UI ranking and pagination.\n\nPass pagination.after unchanged with the same query. Search cursors expire\nafter 30 minutes. weekly_visitors and weekly_contributions are activity\ncounters, separate from the subscriber count.",
         "operationId": "search_subreddits_v1_reddit_search_subreddits_get",
         "parameters": [
           {
@@ -202,7 +202,7 @@
     "/v1/reddit/search/users": {
       "get": {
         "summary": "Search users",
-        "description": "Search for Reddit users.",
+        "description": "Search profiles using Reddit's current web UI ranking and pagination.\n\nPass pagination.after unchanged with the same query. Search cursors expire\nafter 30 minutes. The native page may contain fewer rows than limit.",
         "operationId": "search_users_v1_reddit_search_users_get",
         "parameters": [
           {
