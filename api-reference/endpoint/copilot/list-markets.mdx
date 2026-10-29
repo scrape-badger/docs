@@ -1,0 +1,48 @@
+---
+title: "List Markets"
+api: "GET https://scrapebadger.com/v1/copilot/markets"
+description: "The curated Bing markets you can pass as market to Copilot ask and brand-visibility."
+---
+
+The curated list of Bing markets for the `market` parameter of
+[`/ask`](/api-reference/endpoint/copilot/ask) and
+[`/brand-visibility`](/api-reference/endpoint/copilot/brand-visibility). The
+list is a reference, not a limit: any well-formed `language-COUNTRY` code is
+also accepted.
+
+**Credits:** 1
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Response
+
+<ResponseField name="markets" type="Market[]">
+  <Expandable title="Market">
+    <ResponseField name="code" type="string">Bing market code, e.g. `ja-JP`.</ResponseField>
+    <ResponseField name="name" type="string">Display name of the market.</ResponseField>
+    <ResponseField name="country" type="string">The country the market belongs to.</ResponseField>
+  </Expandable>
+</ResponseField>
+<ResponseField name="count" type="integer">Number of entries in `markets` (30).</ResponseField>
+
+## Curated markets
+
+| Region | Codes |
+| ------ | ----- |
+| North America | `en-US`, `en-CA`, `fr-CA`, `es-MX` |
+| English-speaking, rest of world | `en-GB`, `en-AU`, `en-IN`, `en-IE`, `en-NZ`, `en-ZA` |
+| Europe | `de-DE`, `fr-FR`, `es-ES`, `it-IT`, `nl-NL`, `pt-PT`, `pl-PL`, `sv-SE`, `da-DK`, `fi-FI`, `nb-NO`, `ru-RU`, `tr-TR` |
+| South America | `pt-BR` |
+| Asia | `ja-JP`, `ko-KR`, `zh-CN`, `zh-TW`, `zh-HK` |
+| Middle East | `ar-SA` |
+
+## Example
+
+```bash cURL
+curl "https://scrapebadger.com/v1/copilot/markets" \
+  -H "X-API-Key: YOUR_API_KEY"
+```

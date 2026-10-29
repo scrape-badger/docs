@@ -1551,6 +1551,35 @@
         ]
       },
       {
+        "tab": "Copilot",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "copilot/overview"
+            ]
+          },
+          {
+            "group": "Ask",
+            "pages": [
+              "api-reference/endpoint/copilot/ask"
+            ]
+          },
+          {
+            "group": "Brand Visibility",
+            "pages": [
+              "api-reference/endpoint/copilot/brand-visibility"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api-reference/endpoint/copilot/list-markets"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "MCP Server",
         "groups": [
           {

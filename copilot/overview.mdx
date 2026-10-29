@@ -1,0 +1,180 @@
+---
+title: "Copilot API Overview"
+description: "Ask Microsoft Copilot (Copilot Search in Bing) a question and get the grounded answer back as structured JSON, with claim-level citations to the web sources it used. No Microsoft account required."
+---
+
+## Overview
+
+The ScrapeBadger **Copilot API** sends a prompt to **Microsoft Copilot (Copilot
+Search in Bing)**, Microsoft's public Copilot answer engine at
+`bing.com/copilotsearch`, and returns the grounded answer as structured JSON,
+including the web sources Copilot retrieved and cited.
+
+Requests are **anonymous**: no Microsoft account and no billing relationship
+with Microsoft. You see what a logged-out user in your chosen country and Bing
+market sees.
+
+<Info>
+  All endpoints live under `https://scrapebadger.com/v1/copilot/*` and
+  authenticate with the `X-API-Key` header. `/ask` and `/brand-visibility`
+  accept both `GET` (query params) and `POST` (JSON body). Credits are charged
+  per request and reported on the `X-Credits-Used` response header.
+</Info>
+
+<Warning>
+  **Fresh answers take about 15–25 s.** When Copilot serves its own recent
+  cached answer for the same prompt, the call returns in under 1 s with
+  `cached: true`. Raise your HTTP client timeout well above the 5–10 s default
+  of most SDKs, and at volume run asks
+  [asynchronously](/long-running-requests).
+</Warning>
+
+## Features
+
+- **Grounded Copilot answers** — the full answer text, plus a Markdown variant.
+- **Claim-level citations** — each citation anchors a span of `answer`
+  (`start_index` / `end_index`, `matched_text`) to a source by `ref_index`,
+  Copilot's own citation number.
+- **The full search trail** — `search_results` is everything Copilot
+  retrieved, each flagged `cited: true/false`, and `search_queries` shows the
+  searches it ran.
+- **Brand visibility (AEO/GEO) built in** — one call returns mention counts,
+  position score, share of voice against named competitors, and whether and
+  how highly your domain was cited.
+- **Country and market control** — `country` picks the egress country and,
+  by default, its Bing market (`JP`: `ja-JP`); `market` overrides it. Set
+  `strict_country` to fail with an unbilled `503` instead of falling back.
+
+## Honesty caveat
+
+<Warning>
+  This is **Copilot Search in Bing**, not the copilot.microsoft.com chat app.
+  Each request is a **single, fresh, anonymous question**: there is no
+  conversation memory and no follow-up. `conversation_id` identifies the
+  one-shot exchange; it is not a handle you can continue from.
+
+  When `cached` is `true`, Copilot reused its own recent answer for the same
+  prompt, and `search_results` then lists only the cited sources.
+
+  Copilot is non-deterministic: the same prompt asked twice can produce
+  different wording and different sources. For monitoring, sample repeatedly
+  and aggregate rather than trusting a single call.
+</Warning>
+
+## Credits
+
+| Endpoint | Path | Credits |
+| -------- | ---- | ------- |
+| Ask | `GET`/`POST` `/v1/copilot/ask` | 20 |
+| Brand visibility | `GET`/`POST` `/v1/copilot/brand-visibility` | 25 |
+| List markets | `GET` `/v1/copilot/markets` | 1 |
+
+<Note>
+  Only `2xx` responses are billed. A `400`, a `422 content_refused`, a `502`
+  upstream failure or a `503 country_unavailable` costs nothing.
+</Note>
+
+## Quickstart
+
+<CodeGroup>
+
+```bash cURL
+curl -G "https://scrapebadger.com/v1/copilot/ask" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  --data-urlencode "prompt=法人向けクラウド会計ソフトの日本市場シェアランキングを教えてください" \
+  --data-urlencode "country=JP" \
+  --data-urlencode "strict_country=true" \
+  --max-time 120
+```
+
+```python Python
+import requests
+
+res = requests.post(
+    "https://scrapebadger.com/v1/copilot/ask",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    json={
+        "prompt": "法人向けクラウド会計ソフトの日本市場シェアランキングを教えてください",
+        "country": "JP",
+        "strict_country": True,
+    },
+    timeout=120,
+)
+data = res.json()
+print(data["market"], data["cached"])
+print(data["answer"])
+print(data["source_domains"])
+```
+
+</CodeGroup>
+
+The answer comes back in Japanese from the `ja-JP` market, ranks products such
+as freee会計, マネーフォワード クラウド会計 and 弥生会計 Next, and cites sources
+such as `it-trend.jp`.
+
+## What you can build
+
+<CardGroup cols={2}>
+  <Card title="AEO / GEO monitoring" icon="chart-line">
+    Track whether Copilot names your brand for the prompts your buyers ask, how
+    early it names you, and how you rank against competitors, with
+    [`/brand-visibility`](/api-reference/endpoint/copilot/brand-visibility).
+  </Card>
+  <Card title="Citation-source auditing" icon="link">
+    Find which domains Copilot trusts for a topic. `search_results` shows
+    everything it retrieved; `cited` shows what made it into the answer.
+  </Card>
+  <Card title="Per-market research" icon="globe">
+    Compare the answer in `ja-JP` against `en-US` or `de-DE`. Use
+    `strict_country` when the egress country must be exact.
+  </Card>
+  <Card title="Cross-engine comparison" icon="quote-left">
+    Ask the same prompt on the [ChatGPT](/chatgpt/overview),
+    [Gemini](/gemini/overview) and
+    [Perplexity](/api-reference/endpoint/perplexity/ask) APIs to compare who
+    each engine names and cites.
+  </Card>
+</CardGroup>
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is this copilot.microsoft.com?">
+    No. It asks **Copilot Search in Bing** (`bing.com/copilotsearch`),
+    Microsoft's public Copilot answer engine, as an anonymous visitor. You do
+    not need a Microsoft account.
+  </Accordion>
+  <Accordion title="Why did a call return in under a second?">
+    Copilot served its own recent cached answer for the same prompt. The
+    response has `cached: true`, and `search_results` lists only the cited
+    sources.
+  </Accordion>
+  <Accordion title="How do country and market interact?">
+    `country` sets where the ask egresses from and, unless you pass `market`,
+    which Bing market answers (`JP`: `ja-JP`). With neither, the market is
+    `en-US`. See [List Markets](/api-reference/endpoint/copilot/list-markets).
+  </Accordion>
+  <Accordion title="Why does the response country differ from the one I sent?">
+    `country` is best-effort: when no exit there answers, the last retry may
+    egress from the `US`, and the response `country` says so. Set
+    `strict_country=true` to get an unbilled `503 country_unavailable` instead.
+  </Accordion>
+  <Accordion title="Can I continue a conversation?">
+    No. Every request is a fresh, standalone question. Put all necessary
+    context in the single `prompt` (up to 2,000 characters).
+  </Accordion>
+  <Accordion title="What happens if a request fails?">
+    You get `{"detail": {"code": ..., "message": ...}}`: `400` for bad input,
+    `422 content_refused` when Copilot declines the prompt, `502`
+    (`empty_answer`, `blocked`, `throttled`) for upstream failures, and
+    `503 country_unavailable` under `strict_country`. **Non-2xx responses are
+    never billed.**
+  </Accordion>
+</AccordionGroup>
+
+<Tip>
+  Start with [`/ask`](/api-reference/endpoint/copilot/ask) to see the shape of a
+  real answer, then move to
+  [`/brand-visibility`](/api-reference/endpoint/copilot/brand-visibility) once
+  you know which prompts matter for your market.
+</Tip>

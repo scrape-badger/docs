@@ -1,0 +1,215 @@
+---
+title: "Ask Copilot"
+api: "GET https://scrapebadger.com/v1/copilot/ask"
+description: "Send a prompt to Microsoft Copilot (Copilot Search in Bing) and get the grounded answer as structured JSON, with its claim-level citations and every web source it retrieved."
+---
+
+Ask **Microsoft Copilot (Copilot Search in Bing)**, Microsoft's public Copilot
+answer engine at `bing.com/copilotsearch`, a question anonymously and get the
+answer back as JSON, plus every source Copilot retrieved, which of those it
+cited, and the searches it ran.
+
+Accepts `GET` (query params) or `POST` (JSON body) with identical fields.
+
+**Credits:** 20
+
+<Warning>
+  A fresh answer usually takes **15–25 s**, and retries across exits can add
+  more, so raise your client timeout well above the 5–10 s default (the
+  examples use 120 s). When Copilot serves its own recent cached answer for the
+  same prompt, the call returns in under 1 s with `cached: true`.
+</Warning>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="prompt" type="string" required>
+  The question to ask. Maximum **2,000 characters**. Each request is standalone,
+  so include all the context you need here.
+</ParamField>
+
+<ParamField query="country" type="string">
+  ISO-3166 alpha-2 country, e.g. `US`, `DE`, `JP`. The ask egresses from that
+  country and, unless you set `market`, is answered in that country's Bing
+  market (e.g. `JP`: `ja-JP`).
+
+  The egress is **best-effort**: when no exit in that country answers, the last
+  retry may egress from the `US` and the response `country` says so. Set
+  `strict_country` to forbid that.
+</ParamField>
+
+<ParamField query="market" type="string">
+  Bing market code in `language-COUNTRY` form, e.g. `ja-JP`, `en-GB`. Defaults
+  to the market of `country`, otherwise `en-US`. See
+  [List Markets](/api-reference/endpoint/copilot/list-markets) for the curated
+  list; any well-formed `language-COUNTRY` code is also accepted.
+</ParamField>
+
+<ParamField query="strict_country" type="boolean" default="false">
+  Answer only from an exit in `country`, never another one. When no exit there
+  answers the call fails with **`503`** and
+  `detail.code = "country_unavailable"`. It is **not billed** (only `2xx`
+  responses are). Requires `country` — `400` otherwise. A JSON `boolean` on
+  `POST`.
+</ParamField>
+
+## Response
+
+<ResponseField name="prompt" type="string">Echo of the prompt you sent.</ResponseField>
+<ResponseField name="answer" type="string">The answer text. Citation offsets index into this string.</ResponseField>
+<ResponseField name="answer_markdown" type="string | null">The answer with its Markdown formatting.</ResponseField>
+
+<ResponseField name="citations" type="Citation[]">
+  Claim-level citations. Each one anchors a span of `answer` (by character
+  offsets) to the source that supports it, identified by `ref_index`.
+
+  <Expandable title="Citation">
+    <ResponseField name="url" type="string">Source URL.</ResponseField>
+    <ResponseField name="title" type="string | null">Page title.</ResponseField>
+    <ResponseField name="snippet" type="string | null">Snippet Copilot retrieved from the page.</ResponseField>
+    <ResponseField name="domain" type="string | null">Hostname, e.g. `it-trend.jp`.</ResponseField>
+    <ResponseField name="site_name" type="string | null">The site's display name.</ResponseField>
+    <ResponseField name="ref_index" type="integer | null">Copilot's own citation number for this source.</ResponseField>
+    <ResponseField name="start_index" type="integer | null">Character offset in `answer` where the cited span begins.</ResponseField>
+    <ResponseField name="end_index" type="integer | null">Character offset in `answer` where the cited span ends.</ResponseField>
+    <ResponseField name="matched_text" type="string | null">The substring of `answer` this source supports.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="search_results" type="SearchResult[]">
+  Everything Copilot retrieved: `url`, `title`, `snippet`, `domain`,
+  `site_name`, `ref_index`, plus `cited` (`boolean`, `true` when the answer
+  cites it). When `cached` is `true`, this lists only the cited sources.
+</ResponseField>
+
+<ResponseField name="source_domains" type="string[]">Distinct hostnames across the sources.</ResponseField>
+<ResponseField name="search_queries" type="string[]">The searches Copilot ran to ground the answer.</ResponseField>
+<ResponseField name="web_search_triggered" type="boolean">Whether Copilot searched the web for this answer.</ResponseField>
+<ResponseField name="truncated" type="boolean">Always `false`.</ResponseField>
+<ResponseField name="cached" type="boolean">`true` when Copilot served its own recent cached answer for the same prompt.</ResponseField>
+<ResponseField name="conversation_id" type="string | null">Copilot's id for this one-shot exchange.</ResponseField>
+<ResponseField name="market" type="string">The Bing market that answered, e.g. `ja-JP`.</ResponseField>
+<ResponseField name="country" type="string">The country the ask egressed from. Without `strict_country` it can differ from the `country` you asked for.</ResponseField>
+<ResponseField name="answer_length" type="integer">Length of `answer` in characters.</ResponseField>
+<ResponseField name="citation_count" type="integer">Number of entries in `citations`.</ResponseField>
+<ResponseField name="latency_ms" type="integer">End-to-end time in milliseconds.</ResponseField>
+<ResponseField name="created_utc" type="number | null">Answer creation time as a Unix timestamp.</ResponseField>
+<ResponseField name="created_at" type="string | null">Answer creation time as an ISO-8601 UTC string.</ResponseField>
+
+## Errors
+
+| Status | `detail.code` | When | Billed |
+| ------ | ------------- | ---- | ------ |
+| `400` | — | Empty `prompt`, `prompt` over 2,000 characters, `strict_country` without `country`, or a malformed `country`/`market` | No |
+| `422` | `content_refused` | Copilot declined to answer the prompt | No |
+| `502` | `empty_answer`, `blocked`, `throttled` | Upstream failure at Copilot | No |
+| `503` | `country_unavailable` | `strict_country` set and no exit in `country` answered | No |
+
+Only `2xx` responses are billed.
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl -G "https://scrapebadger.com/v1/copilot/ask" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  --data-urlencode "prompt=法人向けクラウド会計ソフトの日本市場シェアランキングを教えてください" \
+  --data-urlencode "country=JP" \
+  --data-urlencode "strict_country=true" \
+  --max-time 120
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/copilot/ask", {
+  method: "POST",
+  headers: {
+    "X-API-Key": process.env.SCRAPEBADGER_API_KEY,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    prompt: "法人向けクラウド会計ソフトの日本市場シェアランキングを教えてください",
+    country: "JP",
+    strict_country: true,
+  }),
+  signal: AbortSignal.timeout(120_000),
+});
+const data = await res.json();
+console.log(data.market, data.cached, data.answer);
+```
+
+```python Python
+import requests
+
+res = requests.post(
+    "https://scrapebadger.com/v1/copilot/ask",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    json={
+        "prompt": "法人向けクラウド会計ソフトの日本市場シェアランキングを教えてください",
+        "country": "JP",
+        "strict_country": True,
+    },
+    timeout=120,
+)
+data = res.json()
+for c in data["citations"]:
+    print(c["ref_index"], c["domain"], "->", c["matched_text"])
+```
+
+</CodeGroup>
+
+The answer comes back in Japanese from the `ja-JP` market, names products such
+as freee会計, マネーフォワード クラウド会計 and 弥生会計 Next, and cites sources
+such as `it-trend.jp`. An abridged response:
+
+```json 200 Response (abridged)
+{
+  "prompt": "法人向けクラウド会計ソフトの日本市場シェアランキングを教えてください",
+  "answer": "… freee会計 … マネーフォワード クラウド会計 … 弥生会計 Next …",
+  "citations": [
+    {
+      "url": "https://it-trend.jp/…",
+      "domain": "it-trend.jp",
+      "ref_index": 1,
+      "start_index": 0,
+      "end_index": 42,
+      "matched_text": "…"
+    }
+  ],
+  "web_search_triggered": true,
+  "truncated": false,
+  "cached": false,
+  "market": "ja-JP",
+  "country": "JP"
+}
+```
+
+## Strict country
+
+By default `country` is best-effort, so a country that is short of exits still
+gets an answer, possibly from a `US` exit on the last retry. Check the response
+`country` to see where the ask egressed. When the country matters more than the
+answer (local rankings, per-country visibility tracking), set
+`strict_country=true`. If no exit there answers you get a `503`, which is not
+billed. Retry later rather than dropping `strict_country`:
+
+```json 503 Response
+{
+  "detail": {
+    "code": "country_unavailable",
+    "message": "…"
+  }
+}
+```
+
+<Warning>
+  Copilot is non-deterministic. The same prompt can return different wording
+  and different sources on each call, and a `cached: true` answer reflects
+  whatever Copilot cached recently. For tracking, sample on a schedule and
+  aggregate.
+</Warning>
