@@ -1,0 +1,158 @@
+---
+title: "Brand Visibility"
+api: "GET https://scrapebadger.com/v1/copilot/brand-visibility"
+description: "Ask Microsoft Copilot (Copilot Search in Bing) a question and get an AEO/GEO analysis of how your brand appears in the answer: mentions, position, share of voice against competitors, and whether your domain was cited."
+---
+
+Ask **Microsoft Copilot (Copilot Search in Bing)** a buyer-intent question and
+get back both the answer **and** how your brand fares in it: whether it was
+mentioned, how early, how often, how it compares to named competitors, and
+whether your domain was cited as a source.
+
+Accepts `GET` (query params) or `POST` (JSON body).
+
+**Credits:** 25
+
+<Warning>
+  A fresh answer usually takes **15–25 s**, and retries across exits can add
+  more, so raise your client timeout well above the 5–10 s default (the
+  examples use 120 s). A cached Copilot answer returns in under 1 s.
+</Warning>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="prompt" type="string" required>
+  The question to ask, typically a buyer-intent prompt like
+  `best web scraping API for e-commerce`. Maximum 2,000 characters.
+</ParamField>
+
+<ParamField query="brand" type="string" required>
+  The brand name to look for in the answer, e.g. `ScrapeBadger`.
+</ParamField>
+
+<ParamField query="domain" type="string">
+  Your domain, e.g. `scrapebadger.com`. Used for `cited`, `cited_urls` and
+  `citation_rank`.
+</ParamField>
+
+<ParamField query="aliases" type="string">
+  Alternate spellings that also count as a mention of `brand`.
+  **Comma-separated on `GET`; a `string[]` on `POST`.**
+</ParamField>
+
+<ParamField query="competitors" type="string">
+  Competitor names to measure against, e.g. `Bright Data,Oxylabs,Zyte`.
+  **Comma-separated on `GET`; a `string[]` on `POST`.**
+</ParamField>
+
+<ParamField query="country" type="string">
+  ISO-3166 alpha-2 country, e.g. `US`, `DE`, `JP`. The ask egresses from that
+  country and, unless you set `market`, is answered in that country's Bing
+  market (e.g. `JP`: `ja-JP`).
+
+  The egress is **best-effort**: when no exit in that country answers, the last
+  retry may egress from the `US` and the response `country` says so. Set
+  `strict_country` to forbid that.
+</ParamField>
+
+<ParamField query="market" type="string">
+  Bing market code in `language-COUNTRY` form, e.g. `ja-JP`, `en-GB`. Defaults
+  to the market of `country`, otherwise `en-US`. See
+  [List Markets](/api-reference/endpoint/copilot/list-markets).
+</ParamField>
+
+<ParamField query="strict_country" type="boolean" default="false">
+  Answer only from an exit in `country`, never another one. When no exit there
+  answers the call fails with **`503`** and
+  `detail.code = "country_unavailable"`. It is **not billed** (only `2xx`
+  responses are). Requires `country` — `400` otherwise. A JSON `boolean` on
+  `POST`.
+</ParamField>
+
+## Response
+
+<ResponseField name="prompt" type="string">Echo of the prompt you sent.</ResponseField>
+<ResponseField name="brand" type="string">Echo of the brand you tracked.</ResponseField>
+<ResponseField name="domain" type="string | null">Echo of the domain you supplied.</ResponseField>
+<ResponseField name="mentioned" type="boolean">Whether the brand (or any alias) appears in the answer.</ResponseField>
+<ResponseField name="mention_count" type="integer">How many times the brand or its aliases appear.</ResponseField>
+<ResponseField name="first_position" type="integer | null">Character offset of the first mention in `answer`. `null` when absent.</ResponseField>
+<ResponseField name="position_score" type="number">`1.0` = named at the very start of the answer, `0.0` = absent.</ResponseField>
+<ResponseField name="share_of_voice_pct" type="number">Brand mentions as a percentage of brand + competitor mentions.</ResponseField>
+<ResponseField name="cited" type="boolean">Whether the brand's `domain` is among the cited sources.</ResponseField>
+<ResponseField name="cited_urls" type="string[]">The cited URLs on the brand's domain.</ResponseField>
+<ResponseField name="citation_rank" type="integer | null">1-based rank of the brand's domain among the distinct cited sources, ordered by Copilot's own citation numbering.</ResponseField>
+
+<ResponseField name="competitors" type="CompetitorMention[]">
+  One entry per competitor you named: `name`, `mentioned`, `mention_count`,
+  `first_position`, `cited`, `cited_urls`.
+</ResponseField>
+
+<ResponseField name="excerpt" type="string | null">Answer text around the first brand mention.</ResponseField>
+<ResponseField name="answer" type="string">The full answer text.</ResponseField>
+<ResponseField name="citations" type="Citation[]">The claim-level citations, same shape as [`/ask`](/api-reference/endpoint/copilot/ask).</ResponseField>
+<ResponseField name="web_search_triggered" type="boolean">Whether Copilot searched the web.</ResponseField>
+<ResponseField name="market" type="string">The Bing market that answered.</ResponseField>
+<ResponseField name="country" type="string">The country the ask egressed from. Without `strict_country` it can differ from the `country` you asked for.</ResponseField>
+<ResponseField name="latency_ms" type="integer">End-to-end time in milliseconds.</ResponseField>
+<ResponseField name="created_utc" type="number | null">Answer creation time as a Unix timestamp.</ResponseField>
+<ResponseField name="created_at" type="string | null">Answer creation time as an ISO-8601 UTC string.</ResponseField>
+
+## Errors
+
+The same as [`/ask`](/api-reference/endpoint/copilot/ask#errors): `400` for bad
+input (including a missing `brand`), `422 content_refused`, `502`
+`empty_answer`/`blocked`/`throttled` and `503 country_unavailable`. Only `2xx`
+responses are billed.
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl -G "https://scrapebadger.com/v1/copilot/brand-visibility" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  --data-urlencode "prompt=法人向けクラウド会計ソフトの日本市場シェアランキングを教えてください" \
+  --data-urlencode "brand=freee会計" \
+  --data-urlencode "aliases=freee" \
+  --data-urlencode "competitors=マネーフォワード クラウド会計,弥生会計 Next" \
+  --data-urlencode "country=JP" \
+  --data-urlencode "strict_country=true" \
+  --max-time 120
+```
+
+```python Python
+import requests
+
+res = requests.post(
+    "https://scrapebadger.com/v1/copilot/brand-visibility",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    json={
+        "prompt": "What is the best web scraping API for e-commerce data?",
+        "brand": "ScrapeBadger",
+        "domain": "scrapebadger.com",
+        "competitors": ["Bright Data", "Oxylabs", "Zyte"],
+        "country": "GB",
+        "strict_country": True,
+    },
+    timeout=120,
+)
+data = res.json()
+print(data["market"], data["mentioned"], data["share_of_voice_pct"], data["citation_rank"])
+```
+
+</CodeGroup>
+
+## Strict country
+
+By default `country` is best-effort, so the last retry may egress from the `US`.
+Check the response `country`. For per-country visibility tracking, set
+`strict_country=true`; if no exit in that country answers you get a `503`
+`country_unavailable`, which is not billed. Retry later rather than dropping
+`strict_country`.
