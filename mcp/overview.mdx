@@ -173,7 +173,7 @@ Clients that support MCP OAuth can connect without any key handling: add the ser
 The server tracks the latest MCP specification (revision **2026-07-28**):
 
 - **Protocol versions** — speaks the stateless 2026-07-28 revision (per-request versioning, `server/discover`) and serves every earlier revision (2025-11-25, 2025-06-18, …) from the same endpoint, so older clients keep working. Streamable HTTP transport only; the deprecated HTTP+SSE transport is not offered.
-- **Tool metadata** — all 344 tools carry a human-readable `title`, `readOnlyHint`/`destructiveHint`/`openWorldHint` annotations, and an output schema. Tool results are size-capped to stay within client limits, and the tool list is served with cache hints (`ttlMs`/`cacheScope`) for faster clients.
+- **Tool metadata** — every tool carries a human-readable `title`, `readOnlyHint`/`destructiveHint`/`openWorldHint` annotations, and an output schema. Tool results are size-capped to stay within client limits, and the tool list is served with cache hints (`ttlMs`/`cacheScope`) for faster clients.
 - **OAuth 2.1** — authorization code + PKCE (S256), refresh-token rotation, RFC 8414 authorization-server metadata, RFC 9728 protected-resource metadata, RFC 8707 resource indicators, RFC 9207 `iss` authorization responses, and Client ID Metadata Documents (HTTPS-URL client ids, the 2026-07-28 successor to Dynamic Client Registration — which remains supported for older clients). Loopback redirect URIs match on any port (RFC 8252 §7.3), so native clients that pick a port at sign-in time work, and DCR clients that ask for `client_secret_basic` / `client_secret_post` receive a client secret.
 
 ## MCP Endpoint
@@ -183,6 +183,26 @@ https://mcp.scrapebadger.com/mcp
 ```
 
 Health check: `https://mcp.scrapebadger.com/health`
+
+## Tool discovery and toolsets
+
+Listing every tool up front would put ~115k tokens of tool schemas into your agent's context before it reads your message. Some clients also cap the number of tools they pass on (Cursor reportedly at 40). So by default the endpoint lists only nine small helper tools. Your agent reaches every endpoint through them:
+
+1. `search_endpoints("google maps reviews")` finds the tool.
+2. `describe_endpoint("google_maps_reviews")` returns its parameters, credit cost and latency.
+3. `call_endpoint("google_maps_reviews", {...})` runs it. Use `jq`, `fields` or `max_items` to trim the response.
+
+The other helpers are `quote_call`, `read_result`, `get_request`, `get_account_info`, `report_bug` and `send_feedback`. All are free.
+
+To have specific APIs' tools listed directly, add `apis` to the URL:
+
+| URL | Tools listed | Approx. context |
+|-----|--------------|-----------------|
+| `https://mcp.scrapebadger.com/mcp` | 9 helpers (default) | ~2k tokens |
+| `https://mcp.scrapebadger.com/mcp?apis=google,amazon` | helpers + Google and Amazon tools | ~17k tokens |
+| `https://mcp.scrapebadger.com/mcp?apis=all` | every tool | ~115k tokens |
+
+Use the API names `search_endpoints` returns (`google`, `google-play`, `amazon`, `twitter`, …). Every tool can be called by name on any URL, even when it isn't listed. Older clients and saved prompts that call `amazon_search` directly keep working.
 
 ### Lean endpoint for agents
 
