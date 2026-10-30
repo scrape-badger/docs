@@ -26,21 +26,45 @@ Browse a Walmart category by its browse path. Returns the same
 ## Query Parameters
 
 <ParamField query="path" type="string" required>
-  Walmart browse path, e.g. `electronics/3944` (taken from a
-  `walmart.com/browse/...` URL), or a `/cp/...` department path.
+  Walmart browse path **ending in its category id**, taken from a
+  `walmart.com/browse/...` URL. All of `electronics/3944`, `browse/electronics/3944`
+  and `cp/3944` work. A sub-category id is the **full underscore-joined path**
+  of ids: Toys › Action Figures is `toys/action-figures/4171_4172`, not
+  `action-figures/4172`.
 </ParamField>
 
 <ParamField query="page" type="integer" default="1">
   Result page, `1`–`11`. Browse dries up after page 11.
 </ParamField>
 
-<ParamField query="min_price" type="number">Minimum price in USD.</ParamField>
-<ParamField query="max_price" type="number">Maximum price in USD.</ParamField>
+<ParamField query="min_price" type="number">
+  Minimum price in USD. Walmart filters on whole dollars only, so the value is
+  rounded down (`99.50` is sent as `99`).
+</ParamField>
+<ParamField query="max_price" type="number">
+  Maximum price in USD, rounded up to a whole dollar (`199.99` is sent as `200`).
+</ParamField>
 
 <ParamField query="facet" type="string">
   Walmart facet filter, e.g. `brand:HP`. Facets can be applied but not
   enumerated.
 </ParamField>
+
+### Hub departments
+
+Some top-level departments, such as **Toys (`toys/4171`)**, render on
+walmart.com as a curated hub page rather than a product grid. For those,
+`/category` returns the department's full product grid from Walmart's
+category-scoped search instead. The result shape is the same, `title` is the
+department name and `url` is the page actually scraped. `page`, `min_price`,
+`max_price` and `facet` all apply.
+
+### Errors
+
+| Status | When | Credits |
+| --- | --- | --- |
+| `400` | `path` does not end in a category id, e.g. `toys` (Walmart would otherwise return an unrelated, cross-department result set) | 0 |
+| `404` | Walmart does not recognise the id, e.g. `action-figures/4172` | 0 |
 
 ## Response
 
