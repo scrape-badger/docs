@@ -802,6 +802,94 @@
         }
       }
     },
+    "/v1/twitter/users/{username}/latest_followers": {
+      "get": {
+        "operationId": "getUserLatestFollowers",
+        "summary": "Get latest followers",
+        "description": "Get the accounts that most recently followed a user, most recent first (Twitter's order, which it may change). Pass the username (screen name), not a numeric user ID. Returns full user profile data for each follower, up to 200 per page; pass `next_cursor` back as `cursor` for the next page. Use this to track new followers; use Get user followers to walk the full list.",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "description": "The username (screen name) of the user.",
+            "schema": {
+              "type": "string",
+              "example": "elonmusk"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Pagination cursor for fetching the next page of results.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved latest followers.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsersResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
+    "/v1/twitter/users/{username}/latest_following": {
+      "get": {
+        "operationId": "getUserLatestFollowing",
+        "summary": "Get latest following",
+        "description": "Get the accounts a user most recently started following, most recent first (Twitter's order, which it may change). Pass the username (screen name), not a numeric user ID. Returns full user profile data for each account, up to 200 per page; pass `next_cursor` back as `cursor` for the next page. Use this to track new follows; use Get user following to walk the full list.",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "description": "The username (screen name) of the user.",
+            "schema": {
+              "type": "string",
+              "example": "elonmusk"
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "description": "Pagination cursor for fetching the next page of results.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully retrieved latest following.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsersResponse"
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "402": { "$ref": "#/components/responses/PaymentRequired" },
+          "429": { "$ref": "#/components/responses/RateLimitExceeded" }
+        }
+      }
+    },
     "/v1/twitter/users/{user_id}/subscriptions": {
       "get": {
         "operationId": "getUserSubscriptions",
