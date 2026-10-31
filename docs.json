@@ -1391,6 +1391,8 @@
               "api-reference/endpoint/users/get-user-tweets",
               "api-reference/endpoint/users/get-user-followers",
               "api-reference/endpoint/users/get-user-following",
+              "api-reference/endpoint/users/get-user-latest-followers",
+              "api-reference/endpoint/users/get-user-latest-following",
               "api-reference/endpoint/users/get-user-subscriptions",
               "api-reference/endpoint/users/search-users",
               "api-reference/endpoint/users/get-user-mentions",
