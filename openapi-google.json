@@ -6791,6 +6791,34 @@
             "type": "array",
             "title": "Shopping Results"
           },
+          "perspectives": {
+            "items": {
+              "$ref": "#/components/schemas/Perspective"
+            },
+            "title": "Perspectives",
+            "type": "array"
+          },
+          "discussions_and_forums": {
+            "items": {
+              "$ref": "#/components/schemas/DiscussionResult"
+            },
+            "title": "Discussions And Forums",
+            "type": "array"
+          },
+          "short_videos": {
+            "items": {
+              "$ref": "#/components/schemas/ShortVideo"
+            },
+            "title": "Short Videos",
+            "type": "array"
+          },
+          "things_to_know": {
+            "items": {
+              "$ref": "#/components/schemas/ThingToKnow"
+            },
+            "title": "Things To Know",
+            "type": "array"
+          },
           "pagination": {
             "$ref": "#/components/schemas/Pagination"
           }
@@ -9708,6 +9736,17 @@
               }
             ],
             "title": "Date"
+          },
+          "rich_snippet": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RichSnippet"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
           },
           "rank": {
             "anyOf": [
@@ -13283,6 +13322,377 @@
         ],
         "title": "GoogleLightSearchResponse",
         "description": "Essential SERP data returned by GET /api/v1/light/search."
+      },
+      "Perspective": {
+        "description": "A card in the \"What people are saying\" block: an article, video or post.",
+        "properties": {
+          "position": {
+            "title": "Position",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "link": {
+            "title": "Link",
+            "type": "string"
+          },
+          "author": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Author"
+          },
+          "author_description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "How Google describes the author (\"CNET executive editor\").",
+            "title": "Author Description"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The site or platform (\"YouTube\").",
+            "title": "Source"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Date"
+          },
+          "duration": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Video length, for a video card.",
+            "title": "Duration"
+          },
+          "extensions": {
+            "description": "Engagement counts (\"47K+ views\", \"6.8K+ likes\").",
+            "items": {
+              "type": "string"
+            },
+            "title": "Extensions",
+            "type": "array"
+          },
+          "thumbnail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Thumbnail"
+          }
+        },
+        "required": [
+          "position",
+          "title",
+          "link"
+        ],
+        "title": "Perspective",
+        "type": "object"
+      },
+      "DiscussionAnswer": {
+        "description": "An answer Google shows under a forum thread.",
+        "properties": {
+          "snippet": {
+            "title": "Snippet",
+            "type": "string"
+          },
+          "link": {
+            "title": "Link",
+            "type": "string"
+          },
+          "extensions": {
+            "description": "The answer's line (\"14 votes\", \"10 months ago\").",
+            "items": {
+              "type": "string"
+            },
+            "title": "Extensions",
+            "type": "array"
+          },
+          "top_answer": {
+            "default": false,
+            "title": "Top Answer",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "snippet",
+          "link"
+        ],
+        "title": "DiscussionAnswer",
+        "type": "object"
+      },
+      "DiscussionResult": {
+        "description": "A thread in the \"Discussions and forums\" block.",
+        "properties": {
+          "position": {
+            "title": "Position",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "link": {
+            "title": "Link",
+            "type": "string"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The site (\"Reddit\", \"Quora\").",
+            "title": "Source"
+          },
+          "forum": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The forum or board (\"r/Workspaces\").",
+            "title": "Forum"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Date"
+          },
+          "extensions": {
+            "description": "E.g. \"70+ comments\".",
+            "items": {
+              "type": "string"
+            },
+            "title": "Extensions",
+            "type": "array"
+          },
+          "answers": {
+            "items": {
+              "$ref": "#/components/schemas/DiscussionAnswer"
+            },
+            "title": "Answers",
+            "type": "array"
+          }
+        },
+        "required": [
+          "position",
+          "title",
+          "link"
+        ],
+        "title": "DiscussionResult",
+        "type": "object"
+      },
+      "ShortVideo": {
+        "description": "A clip in the \"Short videos\" carousel.",
+        "properties": {
+          "position": {
+            "title": "Position",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "link": {
+            "title": "Link",
+            "type": "string"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The platform (\"YouTube\", \"TikTok\").",
+            "title": "Source"
+          },
+          "channel": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Channel"
+          },
+          "duration": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Duration"
+          },
+          "thumbnail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Thumbnail"
+          }
+        },
+        "required": [
+          "position",
+          "title",
+          "link"
+        ],
+        "title": "ShortVideo",
+        "type": "object"
+      },
+      "ThingToKnow": {
+        "description": "A topic in the \"Things to know\" block. Google loads its answer only on a click.",
+        "properties": {
+          "position": {
+            "title": "Position",
+            "type": "integer"
+          },
+          "title": {
+            "description": "The topic's label (\"How it Works\").",
+            "title": "Title",
+            "type": "string"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "link": {
+            "description": "A Google search for the question.",
+            "title": "Link",
+            "type": "string"
+          }
+        },
+        "required": [
+          "position",
+          "title",
+          "question",
+          "link"
+        ],
+        "title": "ThingToKnow",
+        "type": "object"
+      },
+      "RichSnippet": {
+        "description": "Rich-snippet lines on a result. ``top`` sits between the URL and the snippet.",
+        "properties": {
+          "top": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RichSnippetBlock"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "title": "RichSnippet",
+        "type": "object"
+      },
+      "RichSnippetBlock": {
+        "description": "The extension line Google prints on a result, e.g. a store's rating line.",
+        "properties": {
+          "extensions": {
+            "description": "The line's parts in order (\"4.6\", \"store rating (3.6K)\", \"$59 to $379\").",
+            "items": {
+              "type": "string"
+            },
+            "title": "Extensions",
+            "type": "array"
+          },
+          "detected_extensions": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Values read out of the line: rating, reviews, price_from, price_to, currency, day_returns, free_day_returns, items_up_to_off.",
+            "title": "Detected Extensions",
+            "type": "object"
+          }
+        },
+        "title": "RichSnippetBlock",
+        "type": "object"
       }
     },
     "securitySchemes": {
