@@ -459,6 +459,36 @@
             "in": "query",
             "schema": { "type": "boolean", "default": false },
             "description": "Only return reviews that include images or video."
+          },
+          {
+            "name": "mode",
+            "in": "query",
+            "schema": { "type": "string", "default": "public", "enum": ["public", "full"] },
+            "description": "public returns the anonymous featured block; full uses an authenticated account to paginate all accessible written reviews."
+          },
+          {
+            "name": "max_pages",
+            "in": "query",
+            "schema": { "type": "integer", "default": 10, "minimum": 1, "maximum": 50 },
+            "description": "Full mode only: maximum Amazon review pages to fetch per star sweep."
+          },
+          {
+            "name": "per_star",
+            "in": "query",
+            "schema": { "type": "boolean", "default": false },
+            "description": "Full mode only: sweep every star filter and merge and deduplicate the results."
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 1000 },
+            "description": "Full mode only: stop after collecting this many distinct reviews."
+          },
+          {
+            "name": "woot_offer",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Full mode on com only: optional current Woot offer URL or slug. Otherwise the service attempts automatic offer resolution."
           }
         ],
         "responses": {

@@ -19,9 +19,9 @@ description: "Customer reviews for an ASIN (featured + paginated, with filters).
 </ParamField>
 
 <ParamField query="page" type="integer" default={1}>
-  Page number for paginated reviews. Starts at `1` and is capped at `20`.
+  Page number for the reviews returned by the API. Each API page contains up to 10 reviews.
 
-  Amazon exposes roughly 10 reviews per page, so this endpoint returns at most **~200 reviews per product** (20 pages). Requesting a `page` beyond `20` returns no additional reviews.
+  In `full` mode, the service first collects all accessible reviews up to `max_pages` and `limit`, then slices them into API pages. An API page beyond the collected set returns an empty list.
 </ParamField>
 
 <ParamField query="sort_by" type="string" default="helpful">
@@ -49,6 +49,33 @@ description: "Customer reviews for an ASIN (featured + paginated, with filters).
 
 <ParamField query="media_only" type="boolean" default={false}>
   Only return reviews that include images or video.
+</ParamField>
+
+<ParamField query="mode" type="string" default="public">
+  Review collection mode.
+
+  | Value | Description |
+  |-------|-------------|
+  | `public` | Return only the anonymous featured-review block |
+  | `full` | Use an authenticated account to paginate all accessible written reviews |
+
+  Full mode is available for `com`, `de`, `fr`, `co.uk`, `it`, and `es`.
+</ParamField>
+
+<ParamField query="max_pages" type="integer" default={10}>
+  Full mode only: maximum Amazon review pages to fetch per star sweep. Maximum 50.
+</ParamField>
+
+<ParamField query="per_star" type="boolean" default={false}>
+  Full mode only: also sweep each star filter and merge and deduplicate the results.
+</ParamField>
+
+<ParamField query="limit" type="integer">
+  Full mode only: stop after collecting this many distinct reviews. Optional; maximum 1000.
+</ParamField>
+
+<ParamField query="woot_offer" type="string">
+  Full mode on `com` only: optional URL or slug of a current Woot offer. Without it, the service attempts to resolve a matching offer automatically from Woot's public catalog.
 </ParamField>
 
 ## Response
@@ -112,5 +139,5 @@ description: "Customer reviews for an ASIN (featured + paginated, with filters).
 ```
 
 <Note>
-  Each reviews request costs **13 credits**. Amazon exposes a public *featured* subset of reviews; full review history is login-gated. The `page` parameter is capped at **20** (~200 reviews per product) — there is no way to page deeper. Failed requests are not charged.
+  `public` mode returns only Amazon's featured subset. Use `mode=full` to collect the complete written-review set exposed by Amazon's cursor pagination. `ratings_total` includes ratings without written text and can be higher than `pagination.total_results`. Full-mode credit usage depends on the number of upstream pages fetched and appears in the `X-Credits-Used` response header.
 </Note>
