@@ -23,6 +23,7 @@ ScrapeBadger rate limits requests per minute to ensure fair usage and reliable p
 
 | Plan | Tier | Requests/Minute |
 |------|------|-----------------|
+| Free (sign-up credits, nothing bought yet) | Free | 5 |
 | Pay-as-you-go | Basic | 60 |
 | Starter, Growth | Pro | 300 |
 | Pro, Scale | Enterprise | 1,000 |
@@ -150,6 +151,9 @@ def fetch_with_rate_limit(url: str, api_key: str):
   </Accordion>
   <Accordion title="What happens when I hit the rate limit?">
     The API returns a 429 Too Many Requests response with details about when you can retry. Use the `Retry-After` header to know when to try again.
+  </Accordion>
+  <Accordion title="Which calls count against my rate limit?">
+    Every `/v1` call, including the free ones: `/v1/quote` (an agent's `quote_call`) and `/v1/account/me` (`get_account_info`) count like a scrape. On the Free tier's 5 requests per minute, quoting before each call halves how many calls you can make. Re-reading a result (`/v1/results/{result_id}`) and polling an async request (`/v1/requests/{request_id}`) do not count.
   </Accordion>
   <Accordion title="Do failed requests count against my rate limit?">
     Yes, all requests (successful or not) count against your rate limit. However, rate limits are generous and designed to accommodate normal usage patterns.
