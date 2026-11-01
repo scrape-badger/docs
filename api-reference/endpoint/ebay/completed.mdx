@@ -42,19 +42,19 @@ everything that seller sold.
 </ParamField>
 
 <ParamField query="per_page" type="integer">
-  Results per page. Clamped to one of `60`, `120`, or `240`. eBay's sold index
-  fills about 5/6 of the larger sizes, so expect about 100 results at `120` and
-  about 200 at `240`; `pagination.returned` says how many this page holds.
+  Results per page. Clamped to one of `60`, `120`, or `240`. eBay puts at most
+  200 sold listings on a page, so `240` returns 200 and `pagination.per_page`
+  says `200`; `pagination.returned` says how many this page holds.
 </ParamField>
 
 <ParamField query="sort_by" type="string" default="best_match">
-  Sort order for results.
+  Sort order for results. On sold listings eBay applies only the price sorts.
 
   | Value | Description |
   |-------|-------------|
-  | `best_match` | Best match (default) |
-  | `ending_soonest` | Ended soonest first |
-  | `newly_listed` | Most recently ended |
+  | `best_match` | Newest `ended_at` first (default) |
+  | `ending_soonest` | Same order as `best_match`: eBay ignores it on sold listings |
+  | `newly_listed` | Same order as `best_match`: eBay ignores it on sold listings |
   | `price_low_to_high` | Lowest sold price first |
   | `price_high_to_low` | Highest sold price first |
 </ParamField>
@@ -117,7 +117,8 @@ Identical shape to [`/v1/ebay/search`](/api-reference/endpoint/ebay/search), exc
     <ResponseField name="shipping" type="string">Shipping text.</ResponseField>
     <ResponseField name="location" type="string">Item location text.</ResponseField>
     <ResponseField name="sold_date" type="string">Sale date text as rendered by eBay, e.g. `Aug 19, 2026`. Localized on non-English marketplaces (e.g. `Verkauft 5. Okt. 2024`), nullable.</ResponseField>
-    <ResponseField name="sold_date_at" type="string">Best-effort ISO date parsed from `sold_date`, e.g. `2026-08-19`. Null when the marketplace's date format is not English.</ResponseField>
+    <ResponseField name="sold_date_at" type="string">ISO date of eBay's "Sold" label, e.g. `2026-08-19`: a day the item sold, on the marketplace's calendar. On a multi-quantity listing eBay labels an earlier sale, months before `ended_at` at times. On non-English marketplaces it is the day `ended_at` falls on in Europe/Berlin.</ResponseField>
+    <ResponseField name="ended_at" type="string">When eBay last closed this listing out, in UTC to the minute, e.g. `2026-08-19T14:31:00Z`: the listing's end, or the latest sale on a multi-quantity listing that is still live. Results are ordered by it, newest first.</ResponseField>
     <ResponseField name="seller_name" type="string">Seller username (nullable).</ResponseField>
     <ResponseField name="is_sponsored" type="boolean">Always `null`. eBay renders its "Sponsored" badge into every card as anti-scraping bait, so promoted placements cannot be distinguished from organic results.</ResponseField>
   </Expandable>
@@ -154,6 +155,7 @@ Identical shape to [`/v1/ebay/search`](/api-reference/endpoint/ebay/search), exc
       "location": "United States",
       "sold_date": "Aug 19, 2026",
       "sold_date_at": "2026-08-19",
+      "ended_at": "2026-08-19T14:31:00Z",
       "seller_name": "gamerdeals99",
       "is_sponsored": null
     }
@@ -172,7 +174,7 @@ Pass `seller` without a `query` to page through everything one seller sold:
 curl --get 'https://scrapebadger.com/v1/ebay/completed' \
   --data-urlencode 'seller=musicmagpie' \
   --data-urlencode 'domain=co.uk' \
-  --data-urlencode 'per_page=240' \
+  --data-urlencode 'per_page=200' \
   --header 'x-api-key: YOUR_API_KEY'
 ```
 
@@ -190,7 +192,7 @@ page, all_sold = 1, []
 while True:
     r = requests.get(
         "https://scrapebadger.com/v1/ebay/completed",
-        params={"query": "iphone 13", "per_page": 240, "page": page},
+        params={"query": "iphone 13", "per_page": 200, "page": page},
         headers={"X-API-Key": API_KEY},
     ).json()
 
@@ -207,9 +209,37 @@ while True:
   client that ignores `has_more` and retries forever will keep spending credits.
 </Warning>
 
-Pages stop at `100`, so one search returns at most about 20,000 listings at `per_page=240`; narrow a bigger result set with `sort_by`, `condition`, `category_id` or a price range.
+Pages stop at `100`, so one search returns at most 20,000 listings at `per_page=200`; narrow a bigger result set with `condition`, `category_id` or a price range (`min_price` / `max_price`).
 Use the largest `per_page` you can: each request costs 8 credits regardless of page
-size, so `per_page=240` is about 8x cheaper per listing than the default.
+size, so `per_page=200` is about 3x cheaper per listing than the default.
+
+## Collecting one day's sales
+
+Results come newest `ended_at` first, so one day of a seller's sales is a run of
+consecutive pages. To collect a calendar day in your timezone:
+
+1. Convert the day's start and end to UTC (for `Europe/London` on 1 November,
+   `2026-11-01T00:00:00Z` to `2026-11-02T00:00:00Z`).
+2. Walk `seller=<username>&per_page=200&page=1,2,…`, keeping results whose
+   `ended_at` falls inside that window.
+3. Stop at the first page whose **last** result has `ended_at` before the
+   window's start.
+4. De-duplicate on `item_id`.
+
+Things to know before you rely on the count:
+
+- **One result per listing, not per sale.** A multi-quantity listing that sold
+  several units appears once, at its latest sale. If it sells again after your
+  day, it moves to that later time, so walk soon after the day ends.
+- **eBay's sold index is not perfectly consistent.** The same page can come back
+  slightly different from one call to the next (one seller's page 1 came back in
+  three versions, 217 listings between them, 200 each). A second walk later can
+  return a few listings the first missed. Merge walks on `item_id`.
+- **The sold history is eBay's.** It covers roughly the last 90 days.
+
+A walk of N pages costs 8 × N credits. Your API key's per-minute limit counts
+every `/v1` call, so space a long walk out; a `429` carries a `Retry-After`
+header with the seconds to wait.
 
 <Note>
   Each completed/sold request costs **8 credits**. Failed requests are not charged.

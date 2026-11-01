@@ -1085,7 +1085,7 @@
       "get": {
         "operationId": "searchEbayCompleted",
         "summary": "Completed / Sold Listings",
-        "description": "Search eBay completed (sold) listings — the closing prices buyers actually paid, with the date each item sold. `sold` is `true` on the envelope and each result's `price` is the final sold price. Costs 8 credits; failed requests are free. Pass `query`, `seller` or both; `seller` alone returns everything that seller sold.",
+        "description": "Search eBay completed (sold) listings — the closing prices buyers actually paid, with the date each item sold. `sold` is `true` on the envelope and each result's `price` is the final sold price. Costs 8 credits; failed requests are free. Pass `query`, `seller` or both; `seller` alone returns everything that seller sold. Results are ordered by `ended_at`, newest first: eBay applies no other time order to sold listings, so `best_match`, `ending_soonest` and `newly_listed` all return it, and only the price sorts reorder.",
         "tags": [
           "eBay Search"
         ],
@@ -1144,7 +1144,7 @@
               "minimum": 1,
               "maximum": 240
             },
-            "description": "Results per page. Clamped to 60, 120 or 240."
+            "description": "Results per page. Clamped to 60, 120 or 240; eBay puts at most 200 on a page, so 240 returns 200 and `pagination.per_page` says 200."
           },
           {
             "name": "sort_by",
@@ -1160,7 +1160,7 @@
                 "price_high_to_low"
               ]
             },
-            "description": "Sort order for results."
+            "description": "Sort order. On sold listings eBay applies only the price sorts; `best_match`, `ending_soonest` and `newly_listed` all return the default order, newest `ended_at` first."
           },
           {
             "name": "condition",
@@ -1485,9 +1485,20 @@
                               "string",
                               "null"
                             ],
-                            "description": "Best-effort ISO 8601 date parsed from sold_date, e.g. \"2026-07-02\". Null when the marketplace's date format is not English.",
+                            "description": "ISO 8601 date of eBay's \"Sold\" label, e.g. \"2026-07-02\": a day the item sold, on the marketplace's calendar. On a multi-quantity listing eBay labels an earlier sale, months before `ended_at` at times. On non-English marketplaces, the day `ended_at` falls on in Europe/Berlin.",
                             "examples": [
                               "2026-07-02"
+                            ]
+                          },
+                          "ended_at": {
+                            "type": [
+                              "string",
+                              "null"
+                            ],
+                            "format": "date-time",
+                            "description": "When eBay last closed this listing out, in UTC to the minute: the listing's end, or the latest sale on a multi-quantity listing that is still live. Results are ordered by it, newest first. Bucket sales by day on this field, converted to your timezone.",
+                            "examples": [
+                              "2026-07-02T14:31:00Z"
                             ]
                           },
                           "watchers": {
