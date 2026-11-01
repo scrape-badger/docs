@@ -11887,10 +11887,11 @@
         "description": "A single product from search results."
       },
       "ShoppingResult": {
+        "description": "A product from the SERP's shopping carousels (\"Popular products\", \"More products\").",
         "properties": {
           "title": {
-            "type": "string",
-            "title": "Title"
+            "title": "Title",
+            "type": "string"
           },
           "price": {
             "anyOf": [
@@ -11901,6 +11902,7 @@
                 "type": "null"
               }
             ],
+            "default": null,
             "title": "Price"
           },
           "source": {
@@ -11912,6 +11914,8 @@
                 "type": "null"
               }
             ],
+            "default": null,
+            "description": "The store selling it, as Google shows it.",
             "title": "Source"
           },
           "link": {
@@ -11923,6 +11927,7 @@
                 "type": "null"
               }
             ],
+            "default": null,
             "title": "Link"
           },
           "thumbnail": {
@@ -11934,6 +11939,7 @@
                 "type": "null"
               }
             ],
+            "default": null,
             "title": "Thumbnail"
           },
           "rating": {
@@ -11945,6 +11951,7 @@
                 "type": "null"
               }
             ],
+            "default": null,
             "title": "Rating"
           },
           "reviews": {
@@ -11956,15 +11963,148 @@
                 "type": "null"
               }
             ],
+            "default": null,
             "title": "Reviews"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Position"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The carousel's heading, as Google shows it (\"Popular products\").",
+            "title": "Category"
+          },
+          "extracted_price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Extracted Price"
+          },
+          "original_price": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The crossed-out price (\"Was $359\", \"Usually $40\").",
+            "title": "Original Price"
+          },
+          "extracted_original_price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Extracted Original Price"
+          },
+          "delivery": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Delivery"
+          },
+          "extensions": {
+            "description": "Badges on the card (\"52% OFF\", \"LOW PRICE\").",
+            "items": {
+              "type": "string"
+            },
+            "title": "Extensions",
+            "type": "array"
+          },
+          "product_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Google Shopping product id (gpcid), when the page names it.",
+            "title": "Product Id"
+          },
+          "catalog_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Catalog Id"
+          },
+          "product_link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Google's Shopping page for this product.",
+            "title": "Product Link"
+          },
+          "scrapebadger_product_detail_link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Our /v1/google/products/detail call for this product's offers and specs.",
+            "title": "Scrapebadger Product Detail Link"
           }
         },
-        "type": "object",
         "required": [
           "title"
         ],
         "title": "ShoppingResult",
-        "description": "Inline shopping result."
+        "type": "object"
       },
       "ShoppingSearchResponse": {
         "properties": {
