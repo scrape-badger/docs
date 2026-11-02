@@ -5569,6 +5569,14 @@
             },
             "type": "array",
             "title": "Snippet Links"
+          },
+          "reference_indexes": {
+            "description": "0-based positions in `ai_overview.references` of the sources cited here.",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Reference Indexes",
+            "type": "array"
           }
         },
         "type": "object",
@@ -5686,6 +5694,14 @@
             },
             "type": "array",
             "title": "Video Links"
+          },
+          "reference_indexes": {
+            "description": "0-based positions in `ai_overview.references` of the sources cited here.",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Reference Indexes",
+            "type": "array"
           }
         },
         "type": "object",
@@ -9747,6 +9763,19 @@
               }
             ],
             "default": null
+          },
+          "read_more_link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The snippet's \"Read more\" link: the page, usually with a `#:~:text=` fragment that scrolls to the quoted passage.",
+            "title": "Read More Link"
           },
           "rank": {
             "anyOf": [
