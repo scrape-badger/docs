@@ -174,6 +174,16 @@ Each block below is returned when Google shows it for your query.
 
 For the United Kingdom, pass `gl=gb` (not `uk`), for example `q=lutron+london&gl=gb&hl=en&domain=google.co.uk`.
 
+### Queries with `site:`
+
+A full Search query that contains a `site:` operator, such as `"Jane Doe" "Acme" site:linkedin.com/company`, is answered from Google's Web tab. That tab lists only web pages and keeps the `site:` operator.
+
+- The response carries `organic_results`, `related_searches` and `pagination`. Rich blocks such as `ai_overview`, `related_questions` and `knowledge_graph` are empty.
+- The credit cost is the same as any other full Search.
+- To get the full results page and its AI Overview for a `site:` query, pass `ai_overview=true`.
+- When Google finds nothing that matches, `organic_results` is an empty list and `search_information.organic_results_state` is `no_results`. That is Google's answer, not a failed request, so a retry returns the same thing.
+- When Google drops the quotes to find results, `search_information.organic_results_state` is `Results for relaxed query`.
+
 ## Endpoint Index
 
 <Tabs>
