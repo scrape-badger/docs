@@ -413,10 +413,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "Search query (e.g. 'pizza in New York')",
+              "description": "Search query (e.g. 'pizza in New York'). A business phone number works too: international format (+966501234567), or national format with that country's gl (0501234567 with gl=sa).",
               "title": "Q"
             },
-            "description": "Search query (e.g. 'pizza in New York')"
+            "description": "Search query (e.g. 'pizza in New York'). A business phone number works too: international format (+966501234567), or national format with that country's gl (0501234567 with gl=sa)."
           },
           {
             "name": "ll",
