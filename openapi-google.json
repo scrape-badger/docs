@@ -10583,6 +10583,19 @@
             "type": "string",
             "title": "Question"
           },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "How Google answers the question when it is opened: 'ai_overview' when it generates the answer with AI. null when the page does not say.",
+            "title": "Type"
+          },
           "rank": {
             "anyOf": [
               {
