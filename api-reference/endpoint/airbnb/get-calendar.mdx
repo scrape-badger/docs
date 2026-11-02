@@ -21,8 +21,8 @@ Request up to twelve months from a starting `month` / `year`.
   Starting month, `1`–`12`.
 </ParamField>
 
-<ParamField query="year" type="integer" default="2026">
-  Starting year.
+<ParamField query="year" type="integer" default="current year (UTC)">
+  Starting year, `2020`–`2100`. Defaults to the current UTC year when omitted; an explicit value always wins.
 </ParamField>
 
 <ParamField query="months" type="integer" default="12">
