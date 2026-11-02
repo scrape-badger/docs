@@ -80,41 +80,41 @@ curl -X GET "https://scrapebadger.com/v1/reddit/search/posts?q=artificial+intell
 
 | Endpoint | Credits | Description |
 |----------|---------|-------------|
-| `GET /v1/reddit/search/posts` | 2 | Search posts globally or within a subreddit |
-| `GET /v1/reddit/search/subreddits` | 2 | Search for subreddits by keyword |
-| `GET /v1/reddit/search/users` | 2 | Search for Reddit users |
-| `GET /v1/reddit/domains/{domain}/posts` | 2 | Get posts linking to a specific domain |
+| `GET /v1/reddit/search/posts` | 8 | Search posts globally or within one or more subreddits |
+| `GET /v1/reddit/search/subreddits` | 8 | Search for subreddits by keyword |
+| `GET /v1/reddit/search/users` | 8 | Search for Reddit users |
+| `GET /v1/reddit/domains/{domain}/posts` | 8 | Get posts linking to a specific domain |
 
 ### Posts
 
 | Endpoint | Credits | Description |
 |----------|---------|-------------|
-| `GET /v1/reddit/posts/trending` | 1 | Trending posts from Reddit's front page |
-| `GET /v1/reddit/posts/{post_id}` | 2 | Get post details by ID |
-| `GET /v1/reddit/posts/{post_id}/comments` | 3 | Comment tree with depth control |
-| `GET /v1/reddit/posts/{post_id}/duplicates` | 3 | Cross-posts and duplicates |
+| `GET /v1/reddit/posts/trending` | 3 | Trending posts from Reddit's front page |
+| `GET /v1/reddit/posts/{post_id}` | 8 | Get post details by ID |
+| `GET /v1/reddit/posts/{post_id}/comments` | 15 | Comment tree with depth control |
+| `GET /v1/reddit/posts/{post_id}/duplicates` | 15 | Cross-posts and duplicates |
 
 ### Subreddits
 
 | Endpoint | Credits | Description |
 |----------|---------|-------------|
-| `GET /v1/reddit/subreddits/{subreddit}` | 2 | Subreddit metadata |
-| `GET /v1/reddit/subreddits/{subreddit}/posts` | 2 | Subreddit posts (hot/new/top/rising) |
-| `GET /v1/reddit/subreddits/{subreddit}/rules` | 1 | Subreddit rules |
-| `GET /v1/reddit/subreddits/{subreddit}/wiki` | 1 | List wiki pages |
-| `GET /v1/reddit/subreddits/{subreddit}/wiki/{page}` | 3 | Wiki page content |
-| `GET /v1/reddit/subreddits/popular` | 1 | Popular subreddits |
-| `GET /v1/reddit/subreddits/new` | 1 | New subreddits |
+| `GET /v1/reddit/subreddits/{subreddit}` | 5 | Subreddit metadata |
+| `GET /v1/reddit/subreddits/{subreddit}/posts` | 8 | Subreddit posts (hot/new/top/rising) |
+| `GET /v1/reddit/subreddits/{subreddit}/rules` | 3 | Subreddit rules |
+| `GET /v1/reddit/subreddits/{subreddit}/wiki` | 3 | List wiki pages |
+| `GET /v1/reddit/subreddits/{subreddit}/wiki/{page}` | 15 | Wiki page content |
+| `GET /v1/reddit/subreddits/popular` | 3 | Popular subreddits |
+| `GET /v1/reddit/subreddits/new` | 3 | New subreddits |
 
 ### Users
 
 | Endpoint | Credits | Description |
 |----------|---------|-------------|
-| `GET /v1/reddit/users/{username}` | 2 | User profile and karma |
-| `GET /v1/reddit/users/{username}/posts` | 2 | User's submitted posts |
-| `GET /v1/reddit/users/{username}/comments` | 2 | User's comment history |
-| `GET /v1/reddit/users/{username}/moderated` | 3 | Subreddits user moderates |
-| `GET /v1/reddit/users/{username}/trophies` | 1 | User's trophy case |
+| `GET /v1/reddit/users/{username}` | 5 | User profile and karma |
+| `GET /v1/reddit/users/{username}/posts` | 8 | User's submitted posts |
+| `GET /v1/reddit/users/{username}/comments` | 8 | User's comment history |
+| `GET /v1/reddit/users/{username}/moderated` | 15 | Subreddits user moderates |
+| `GET /v1/reddit/users/{username}/trophies` | 3 | User's trophy case |
 
 ## Pagination
 
@@ -162,6 +162,30 @@ The search endpoints support Reddit's full query syntax:
 | `nsfw:yes` | `nsfw:yes` | Include NSFW posts |
 | `self:yes` | `self:yes` | Only text posts |
 | `AND` / `OR` / `NOT` | `python AND tutorial` | Boolean operators |
+
+### Searching several subreddits
+
+Pass several subreddits to `subreddit`, joined with `+`, for example `subreddit=sales+startups+SaaS`. Post search then sends Reddit this query:
+
+```text
+(crm OR hubspot) (subreddit:sales OR subreddit:startups OR subreddit:SaaS)
+```
+
+Results stay inside the listed subreddits. You can also write the same `subreddit:` filters into `q` yourself.
+
+To list the newest posts from several subreddits without a keyword, use `GET /v1/reddit/subreddits/sales+startups+SaaS/posts?sort=new` and filter the posts on your side.
+
+### Query length limit
+
+Reddit search reads only the first 256 bytes (UTF-8) of a query and silently ignores the rest. A query over 256 bytes returns `422` instead of incomplete results. Most characters are 1 byte; accented and non-Latin characters take 2 to 4.
+
+With several subreddits, the whole combined query counts, so each subreddit uses 14 bytes plus the length of its name:
+
+```text
+bytes(q) + 1 + 14 × (number of subreddits) + bytes(all subreddit names) ≤ 256
+```
+
+With a short keyword list and typical subreddit names, about 10 subreddits fit in one request. Split longer lists across several requests and merge the results by post `id`.
 
 ## Response Fields
 

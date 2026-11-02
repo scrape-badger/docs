@@ -20,7 +20,7 @@
     "/v1/reddit/search/posts": {
       "get": {
         "summary": "Search Reddit posts",
-        "description": "Search Reddit's current web UI globally or within a subreddit.\n\nPass pagination.after unchanged with the same query, scope, sort and time\nfilter. Search cursors expire after 30 minutes. Reddit's native page may\ncontain fewer rows than limit; continue while after is present.",
+        "description": "Search Reddit's current web UI globally or within one or more subreddits.\n\nPass pagination.after unchanged with the same query, scope, sort and time\nfilter. Search cursors expire after 30 minutes. Reddit's native page may\ncontain fewer rows than limit; continue while after is present.\n\nReddit reads only the first 256 UTF-8 bytes of a search query and ignores\nthe rest, so a longer query returns 422. Several subreddits are searched as\n(q) (subreddit:a OR subreddit:b ...), and that whole string counts toward\nthe limit: split long subreddit lists across requests.",
         "operationId": "search_posts_v1_reddit_search_posts_get",
         "parameters": [
           {
@@ -29,10 +29,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "Search query",
+              "description": "Search query (Reddit search syntax), at most 256 UTF-8 bytes",
               "title": "Q"
             },
-            "description": "Search query"
+            "description": "Search query (Reddit search syntax), at most 256 UTF-8 bytes"
           },
           {
             "name": "subreddit",
@@ -47,10 +47,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Restrict to subreddit",
+              "description": "Restrict to a subreddit, or several joined with + (sales+startups)",
               "title": "Subreddit"
             },
-            "description": "Restrict to subreddit"
+            "description": "Restrict to a subreddit, or several joined with + (sales+startups)"
           },
           {
             "name": "sort",
@@ -132,7 +132,7 @@
     "/v1/reddit/search/subreddits": {
       "get": {
         "summary": "Search subreddits",
-        "description": "Search communities using Reddit's current web UI ranking and pagination.\n\nPass pagination.after unchanged with the same query. Search cursors expire\nafter 30 minutes. weekly_visitors and weekly_contributions are activity\ncounters, separate from the subscriber count.",
+        "description": "Search communities using Reddit's current web UI ranking and pagination.\n\nPass pagination.after unchanged with the same query. Search cursors expire\nafter 30 minutes. weekly_visitors and weekly_contributions are activity\ncounters, separate from the subscriber count. A query over 256 UTF-8 bytes\nreturns 422, because Reddit would silently drop the rest.",
         "operationId": "search_subreddits_v1_reddit_search_subreddits_get",
         "parameters": [
           {
@@ -141,10 +141,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "Search query",
+              "description": "Search query, at most 256 UTF-8 bytes",
               "title": "Q"
             },
-            "description": "Search query"
+            "description": "Search query, at most 256 UTF-8 bytes"
           },
           {
             "name": "limit",
@@ -202,7 +202,7 @@
     "/v1/reddit/search/users": {
       "get": {
         "summary": "Search users",
-        "description": "Search profiles using Reddit's current web UI ranking and pagination.\n\nPass pagination.after unchanged with the same query. Search cursors expire\nafter 30 minutes. The native page may contain fewer rows than limit.",
+        "description": "Search profiles using Reddit's current web UI ranking and pagination.\n\nPass pagination.after unchanged with the same query. Search cursors expire\nafter 30 minutes. The native page may contain fewer rows than limit. A query\nover 256 UTF-8 bytes returns 422, because Reddit would silently drop the rest.",
         "operationId": "search_users_v1_reddit_search_users_get",
         "parameters": [
           {
@@ -211,10 +211,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "Search query",
+              "description": "Search query, at most 256 UTF-8 bytes",
               "title": "Q"
             },
-            "description": "Search query"
+            "description": "Search query, at most 256 UTF-8 bytes"
           },
           {
             "name": "limit",
