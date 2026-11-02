@@ -358,6 +358,25 @@
             "description": "When true, chase Google's deferred AI Overview page_token with a follow-up fetch and merge the result into ai_overview. Adds ~1s when the SERP actually defers the overview."
           },
           {
+            "name": "expand_related_questions",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^(true|false|[0-9]{1,2})$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Open the People Also Ask questions and return their answers. `true` opens every question the page shows (usually four), a number opens the first N. Each answer arrives in that question's `text_blocks` and `references` (the AI-written answer Google shows when the question is clicked). Each answered question bills as one more Search request; a question that does not come back is not billed. Adds about a second per question. Implies `mode=full`.",
+              "title": "Expand Related Questions"
+            },
+            "description": "Open the People Also Ask questions and return their answers. `true` opens every question the page shows (usually four), a number opens the first N. Each answer arrives in that question's `text_blocks` and `references` (the AI-written answer Google shows when the question is clicked). Each answered question bills as one more Search request; a question that does not come back is not billed. Adds about a second per question. Implies `mode=full`."
+          },
+          {
             "name": "mode",
             "in": "query",
             "required": false,
@@ -10661,6 +10680,38 @@
               }
             ],
             "title": "Source Logo"
+          },
+          "text_blocks": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AiOverviewTextBlock"
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Text Blocks",
+            "description": "The answer Google shows when the question is opened, as AI Overview blocks. Only with expand_related_questions; null when the question was not opened or its answer did not come back."
+          },
+          "references": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AiOverviewReference"
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "References",
+            "description": "The sources of that answer; a block's reference_indexes are positions in this list. Only with expand_related_questions."
           }
         },
         "type": "object",
