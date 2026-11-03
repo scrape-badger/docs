@@ -48,6 +48,30 @@ Accepts `GET` (query params) or `POST` (JSON body) with identical fields.
   `POST`.
 </ParamField>
 
+<ParamField query="location" type="string">
+  Where the asker is. Perplexity answers a local question (`best dentist`,
+  `popular cafes`, `moving companies`) for this place. Without it, that place
+  is the exit's city, which changes from call to call (a `JP` exit can be in
+  Hamamatsu one call and Atsugi the next).
+
+  A city from the list below, or `lat,lng` in decimal degrees (up to 8 decimal
+  places), e.g. `35.6812,139.7671`. Case does not matter, and spaces and
+  underscores count as hyphens: `New York` and `new_york` both mean
+  `new-york`. Any other value is a **`400`**, not billed. A JSON `string` on
+  `POST`.
+
+  It does not change the egress. `country` still picks the exit and the answer
+  language, so pair the two: `country=JP&location=tokyo`. Questions that are
+  not local are unaffected.
+
+  <Expandable title="Cities">
+    - **Japan:** `tokyo`, `yokohama`, `osaka`, `nagoya`, `sapporo`, `fukuoka`, `kyoto`, `kobe`, `sendai`, `hiroshima`
+    - **Asia-Pacific:** `seoul`, `busan`, `taipei`, `hong-kong`, `singapore`, `bangkok`, `hanoi`, `ho-chi-minh-city`, `jakarta`, `kuala-lumpur`, `manila`, `mumbai`, `delhi`, `bangalore`, `sydney`, `melbourne`
+    - **Americas:** `new-york`, `los-angeles`, `chicago`, `san-francisco`, `houston`, `miami`, `seattle`, `washington`, `toronto`, `vancouver`, `mexico-city`, `sao-paulo`, `buenos-aires`
+    - **Europe:** `london`, `manchester`, `paris`, `berlin`, `munich`, `hamburg`, `frankfurt`, `madrid`, `barcelona`, `rome`, `milan`, `amsterdam`, `brussels`, `vienna`, `zurich`, `lisbon`, `warsaw`, `istanbul`
+  </Expandable>
+</ParamField>
+
 <ParamField query="focus" type="string" default="web">
   Retrieval focus: `web`, `scholar` (academic sources) or `social`
   (discussions and forums).
@@ -94,6 +118,7 @@ Accepts `GET` (query params) or `POST` (JSON body) with identical fields.
 <ResponseField name="model" type="string | null">Which model answered. Reported, not requestable.</ResponseField>
 <ResponseField name="backend_uuid" type="string | null">Perplexity's id for this answer.</ResponseField>
 <ResponseField name="country" type="string">The market that actually answered. Without `strict_country` it can differ from the `country` you asked for.</ResponseField>
+<ResponseField name="location" type="string | null">The `location` the ask was sent with, in canonical form, e.g. `tokyo` or `35.6812,139.7671`. `null` when you did not set one.</ResponseField>
 <ResponseField name="answer_length" type="integer">Length of `answer` in characters.</ResponseField>
 <ResponseField name="citation_count" type="integer">Number of entries in `citations`.</ResponseField>
 <ResponseField name="latency_ms" type="integer">End-to-end time in milliseconds.</ResponseField>
@@ -170,6 +195,40 @@ Retry later rather than dropping `strict_country`:
     "code": "country_unavailable",
     "message": "no DE exit answered in 16 attempts {...}; strict_country never falls back to another country"
   }
+}
+```
+
+## Location
+
+A question that names no place, such as `best dentist`, gets an answer for the
+asker's city. Without `location`, that is the exit's city, so it changes
+between calls. Set `location` to keep those answers on one place:
+
+```bash
+curl -G "https://scrapebadger.com/v1/perplexity/ask" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  --data-urlencode "prompt=best dentist" \
+  --data-urlencode "country=JP" \
+  --data-urlencode "location=tokyo" \
+  --max-time 120
+```
+
+Perplexity now answers for Tokyo. The response carries the value next to
+`country`:
+
+```json
+{
+  "country": "JP",
+  "location": "tokyo"
+}
+```
+
+An unknown city or a malformed `lat,lng` fails before any attempt is made. It
+is not billed:
+
+```json 400 Response
+{
+  "detail": "location must be a city (tokyo, osaka, seoul, new-york, london, ...) or 'lat,lng' in decimal degrees"
 }
 ```
 
