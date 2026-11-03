@@ -47,6 +47,6 @@ curl "https://scrapebadger.com/v1/google/search?q=are+noise+cancelling+headphone
 
 ## Fast search timeout
 
-With `mode=fast`, search has an 8-second processing budget shared by fetching, retries, fallback and parsing. If no result is ready within that budget, the API returns `503` with `Retry-After: 60`. Wait at least 60 seconds before retrying. Network transit and gateway processing can add to the time you observe.
+With `mode=fast`, search has a 12-second processing budget shared by fetching, retries, fallback and parsing. If no result is ready within that budget, the API returns `503` with `Retry-After: 60`. Wait at least 60 seconds before retrying. Network transit and gateway processing can add to the time you observe.
 
 This budget also applies to `/v1/google/light/search`. The dedicated Light endpoint cannot enable rich SERP features through `mode=full` or `ai_overview=true`. The budget does not apply to regular full Search.

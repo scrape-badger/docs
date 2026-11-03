@@ -28,7 +28,7 @@ Set `output=html` to receive the raw Google response instead of parsed JSON.
 
 `search_information.organic_results_state` is `Results for exact spelling`, `Results for spelling correction` (Google showed results for a corrected spelling), `Results with suggested correction` (Google suggested a spelling with "Did you mean" but kept your query) or `no_results`. `total_results` and `time_taken` are filled only when Google prints them. Light usually gets Google's basic page, which shows no result count or search time, so both are often `null` on Light. Use [regular Search](/api-reference/google/google-search/google-web-search) when you need them.
 
-Light has an eight-second processing budget, including fetching, fallback and
+Light has a 12-second processing budget, including fetching, fallback and
 parsing. If the budget expires, the response is `503` with `Retry-After`.
 
 The CLI command is `scrapebadger google light-search "vinted api"`. The MCP tool
