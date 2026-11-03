@@ -18,6 +18,33 @@ and related searches. No `mode` parameter is required on the Light endpoint.
 Legacy `/search?mode=fast` requests remain compatible at the regular route's
 20-credit price. Move to `/light/search` for the 10-credit rate.
 
+## People Also Ask answers
+
+Google loads each People Also Ask answer only when the question is clicked, so a
+plain search returns the questions without answers. Pass
+`expand_related_questions=true` to open every question the page shows (usually
+four), or a number such as `expand_related_questions=2` to open the first N.
+Each answered question in `related_questions` then carries:
+
+- `text_blocks`: the AI-written answer Google shows, as `paragraph`, `heading`
+  and `list` blocks, in the same shape as `ai_overview.text_blocks`.
+- `references`: the answer's sources, with `title`, `link`, `snippet` and
+  `source`. A block's `reference_indexes` are positions in this list.
+
+The answers are fetched during the same search, because Google answers a question
+only for the session that loaded the page. There is no token to expand a question
+later. A question whose answer did not come back keeps `text_blocks` and
+`references` as `null`; retry the search to get it. The search adds about a
+second per opened question, and the parameter implies `mode=full`.
+
+Each answered question is billed as one more regular Search request (20 credits
+today). A question that does not come back is not billed.
+
+```bash
+curl "https://scrapebadger.com/v1/google/search?q=are+noise+cancelling+headphones+worth+it&gl=us&hl=en&expand_related_questions=2" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
 ## Fast search timeout
 
 With `mode=fast`, search has an 8-second processing budget shared by fetching, retries, fallback and parsing. If no result is ready within that budget, the API returns `503` with `Retry-After: 60`. Wait at least 60 seconds before retrying. Network transit and gateway processing can add to the time you observe.
