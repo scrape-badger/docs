@@ -37,9 +37,10 @@ absolute publish timestamps, and search-box autocomplete.
 ## Markets
 
 Every endpoint takes a single `market` code in `language-COUNTRY` form
-(`en-US`, `de-DE`, `pt-BR`, …). There are no per-country domains — every
-market is served from `www.bing.com`; the market sets the result language and
-country ranking, and requests exit from an IP in the matching country.
+(`en-US`, `de-DE`, `pt-BR`, …). There are no per-country domains: every
+market is served from `www.bing.com`, and the `market` alone sets the result
+language and country ranking. Requests leave from one fast exit region for
+every market, because Bing localizes from `market`, not from the visitor's IP.
 
 [`GET /v1/bing/markets`](/api-reference/endpoint/bing/list-markets) (free)
 returns the curated reference set of 30 market codes. Any well-formed `mkt`
@@ -106,6 +107,12 @@ print(data["total_results"], "matches,", data["result_count"], "returned")
 server-rendered densely, so the default `count=35` is genuinely reachable.
 
 ## Other notes
+
+- **Some operator queries have no results for anonymous visitors.** Bing
+  answers some `site:` queries (for example `site:weibo.com` with
+  `market=zh-CN`) with an empty page for any visitor who is not signed in.
+  When that happens the API returns `200` with an empty `results` array, not
+  an error, so don't retry it.
 
 - **News comes from Bing's RSS feed**, not the HTML news cards. That is why
   publish times are absolute (`published_at`, `published_utc`) and the schema
