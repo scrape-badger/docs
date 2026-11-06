@@ -1,0 +1,51 @@
+---
+title: "Get a GitHub profile"
+description: "Parameters, pagination and explicit response schema for public GitHub profiles."
+openapi: "get /v1/github/profiles/{username}"
+---
+
+<Warning>
+  Prepared rollout reference. Examples are representative; live availability and
+  latency have not yet been verified.
+</Warning>
+
+**Credits: 10 per successful request in every tab**, including additional pages.
+The response is an unwrapped object with `profile` and mode-specific sections.
+
+## Valid parameter combinations
+
+| Tab | Allowed optional input | Pagination |
+| --- | --- | --- |
+| `overview` (default) | `year` from 1970 through the current year | No page/cursor input |
+| `repositories` | `page` starting at 1 | 30 rows; follow `pagination.next_page` while `has_next` is true |
+| `stars` (users only) | `next_page_token` | 30 rows; reuse the exact opaque `pagination.next_page_token` |
+
+Use `username` as a login or leading `@handle`; raw URLs and reserved website
+routes are rejected. Do not substitute a next-page URL for a cursor. Use your
+ScrapeBadger `X-API-Key`; a restricted key needs the `github` API scope.
+
+## Calendar and activity windows
+
+`year` selects a whole calendar year. Its activity timeline is December for past
+years and the current month for the current year. Without it, the calendar is the
+last 12 months and the activity timeline is the current month. `contributions.from`
+and `to` describe the calendar; `activity_from` and `activity_to` describe the
+activity window when published. Organizations omit user contribution sections.
+
+## Source availability and errors
+
+Missing fields or omitted sections mean unavailable/not applicable. Explicit
+`null` public metadata remains null. A `*_approximate` flag marks compact native
+counts; exact supplemental metadata keeps original website counts separately.
+Timestamp pairs use ISO `*_at` and Unix-seconds `*_utc`.
+
+Invalid tab/parameter combinations are rejected before source requests. Unknown
+handles return 404; invalid values return 400/422; authentication, scope, credit
+and account rate-limit errors follow the standard API contract. Source failures,
+challenge pages or unexpected markup return 502/503 and are not billed. An empty
+list is a verified native empty state, never a substitute for a source failure.
+
+See the [overview](/github/overview) for examples and the
+[endpoint reference](/api-reference/endpoint/github/get-profile) for the same
+OpenAPI operation. General search, standalone repository detail and trending are
+outside this profile endpoint.
