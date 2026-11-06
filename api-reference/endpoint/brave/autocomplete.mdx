@@ -1,0 +1,16 @@
+---
+title: "Autocomplete"
+openapi: "GET /v1/brave/autocomplete"
+description: "Native Brave search-box suggestions with optional entity descriptions and images."
+---
+
+Get suggestions for a partial query. `query` is nonblank, up to 2,048 characters;
+`country` defaults to `us` and accepts the [native locale codes](/api-reference/endpoint/brave/locales).
+
+**Credits:** 2 per nonempty successful response. Confirmed empty suggestions and errors are unbilled.
+
+`suggestions` includes `query`, `type`, `is_entity`, and optional `name`, `desc`,
+`img`, `category`, and `logo` when Brave provides them. The response also includes
+`result_count`, `source_url`, and observation time as `fetched_at`/`fetched_utc`.
+
+Invalid or unsupported parameters return `422`; a restricted key needs the `brave` scope.
