@@ -1,0 +1,48 @@
+---
+title: "Search vehicles"
+description: "Search current AutoScout24 vehicle listings with structured filters."
+openapi: "GET /v1/autoscout24/search"
+---
+
+**Credits:** 5 per successful request. Genuine empty searches and failures cost zero credits.
+
+Use native make/model slugs, such as `volkswagen` / `golf`, `bmw`, or `mercedes-benz`. A model requires a make. Unknown make/model pages return 404; they are not widened into an unrestricted search.
+
+Price ranges are in EUR, mileage in kilometres, power in kW, and year ranges apply to first registration. Minimum values must not exceed maximum values. `radius` requires `zip` and is measured in kilometres. Unsupported enum values and malformed ranges return 422.
+
+`sort_by` supports `best_match`, `price_asc`, `price_desc`, `mileage_asc`, `mileage_desc`, `registration_asc`, `registration_desc`, `power_asc`, `power_desc` and `newest`.
+
+| Parameter | Meaning |
+| --- | --- |
+| `market` | market |
+| `make` | Native make slug, e.g. volkswagen or bmw. |
+| `model` | Native model slug, e.g. golf. Requires make. |
+| `price_min` | price min |
+| `price_max` | price max |
+| `mileage_min` | Kilometres. |
+| `mileage_max` | mileage max |
+| `year_min` | year min |
+| `year_max` | year max |
+| `power_min` | Engine power in kW. |
+| `power_max` | power max |
+| `fuel_type` | fuel type |
+| `transmission` | transmission |
+| `body_type` | body type |
+| `seller_type` | seller type |
+| `condition` | condition |
+| `zip` | Postal code in the requested market. |
+| `radius` | Kilometres; requires zip. |
+| `sort_by` | sort by |
+| `page` | page |
+
+## Response fields
+
+`results[]` contains listing IDs and URLs, title/images, price/currency/evaluation flags, make/model/variant/version, mileage, registration month/year, power, displacement, fuel, transmission, damaged state, availability, location and seller information. Public seller fields include company/contact name, profile and imprint links, phone numbers and rating/count where present. `vehicle_details` and `wltp_values` retain the labels shown on the card; `vehicle` retains additional native vehicle attributes.
+
+Public optional fields also include leasing offers, delivery/video/360 indicators, original-price labels, seller-rating state, quality seals and online-purchase seller information. These fields reflect what the search card exposes and are absent when the source omits them.
+
+`filters` contains current native options. `applied_filters` records the source's applied query. `source_url` identifies the fetched search. `total_results`, `total_pages`, `page`, `has_next_page`, `next_page` and `pagination_cap` describe pagination.
+
+Source ordering can place promoted listings ahead of the selected sort. Promoted placement and changing inventory can repeat IDs; use `result_type`, `result_section`, `ad_tier` and `position` to interpret source rank and deduplicate IDs when collecting pages.
+
+Follow `next_page`; up to 200 pages are browsable per query. Narrow filters to cover deeper inventory. Full listing detail is not included.

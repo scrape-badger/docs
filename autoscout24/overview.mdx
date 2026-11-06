@@ -1,0 +1,53 @@
+---
+title: "AutoScout24 Search API"
+description: "Search vehicle listings across eight European marketplaces."
+---
+
+Search current vehicle listings with prices, mileage, registration, seller and location data. Use your ScrapeBadger API key; you do not need an AutoScout24 account or upstream API subscription.
+
+## Supported markets
+
+| Market | Country | Domain | Language |
+| --- | --- | --- | --- |
+| de | Germany | autoscout24.de | German |
+| at | Austria | autoscout24.at | German |
+| be | Belgium | autoscout24.be | French |
+| es | Spain | autoscout24.es | Spanish |
+| fr | France | autoscout24.fr | French |
+| it | Italy | autoscout24.it | Italian |
+| lu | Luxembourg | autoscout24.lu | French |
+| nl | Netherlands | autoscout24.nl | Dutch |
+
+All prices are in EUR and mileage is in kilometres. Switzerland uses a separate platform and is not included.
+
+## Endpoints and credits
+
+| Endpoint | Credits |
+| --- | --- |
+| [Search vehicles](/api-reference/endpoint/autoscout24/search) | 5 |
+| [Current filter options](/api-reference/endpoint/autoscout24/filters) | 2 |
+| [Supported markets](/api-reference/endpoint/autoscout24/markets) | 0 |
+| [Service health](/api-reference/endpoint/autoscout24/health) | 0 |
+
+Genuine empty searches and failed requests cost zero credits. At PAYG list pricing, 5 credits is $0.00075 per successful search ($0.75 per 1,000). Your current credit plan determines your actual cost.
+
+## Quickstart
+
+```bash
+curl 'https://scrapebadger.com/v1/autoscout24/search?market=de&make=volkswagen&model=golf&price_max=20000' \
+  -H 'X-API-Key: YOUR_API_KEY'
+```
+
+```bash CLI
+scrapebadger autoscout24 search --market de --make volkswagen --model golf --price-max 20000
+```
+
+Hosted MCP tools: `autoscout24_search_vehicles`, `autoscout24_list_filters`, `autoscout24_list_markets`.
+
+## Pagination and data scope
+
+Start with page 1 and follow `next_page`. Native pages normally contain 20 cards, but may contain fewer. Use `has_next_page` rather than the number of returned cards to decide whether to continue.
+
+AutoScout24 caps browsing at 200 pages per query, even when `total_results` is larger than 4,000. Narrow your price, year, mileage, make/model or location filters to reach more inventory. Inventory changes between requests, so a page walk is not a snapshot.
+
+This API returns search-card fields and listing links. Full listing detail is not included. Registration has month precision (`YYYY-MM`); no day or UTC timestamp is invented. A field can be null when the source card does not disclose it.
