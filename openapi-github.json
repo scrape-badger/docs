@@ -63,11 +63,10 @@
           {
             "name": "year",
             "in": "query",
-            "description": "Overview only. Whole calendar year; timeline is December for past years or the current month for the current year. Without year: last 12 months calendar and current-month timeline.",
+            "description": "Overview only: 1970 through the current UTC year; activity is December or current month",
             "schema": {
               "type": "integer",
-              "minimum": 1970,
-              "maximum": 2026
+              "minimum": 1970
             }
           },
           {
