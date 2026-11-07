@@ -73,7 +73,13 @@ currency. Other Yelp country sites are not supported yet.
 
 Every filter is checked against Yelp's response. If Yelp does not apply one for a search (for
 example a price level for plumbers), the request returns `422 filter_not_applied` instead of wider
-results. Unknown, repeated or malformed parameters return `422` before Yelp is contacted.
+results. Unknown, repeated or malformed parameters received by the API gateway return `422`
+before Yelp is contacted.
+
+Query validation runs after ingress parsing. Use `&` between parameters and percent-encode
+values (as in the examples above). The ingress treats a bare `;` as a parameter separator:
+`location=SF;page=2` reaches the gateway as `location=SF&page=2` and can perform a billed search,
+rather than return `422`. To include a semicolon inside a value, encode it as `%3B`.
 
 ## Pagination
 

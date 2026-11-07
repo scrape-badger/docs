@@ -17,7 +17,11 @@ comma lists; every filter must be applied by Yelp or the request returns `422 fi
 
 ## Errors
 
-Invalid, unsupported or malformed parameters return `422`. A location Yelp cannot find returns
+Invalid, unsupported or malformed parameters received by the API gateway return `422`.
+Ingress parsing happens first: a bare `;` separates parameters, so `location=SF;page=2` can
+perform a billed page-2 search. Use `&` between parameters and `%3B` for a semicolon inside a
+value; see the [query encoding notes](/yelp/overview#filters-and-sorting).
+A location Yelp cannot find returns
 `400 invalid_location`. Unavailable source content returns `503` instead of a billable empty result.
 A key without the `yelp` scope returns `403`.
 
