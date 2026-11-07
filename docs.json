@@ -333,8 +333,7 @@
               "api-reference/endpoint/yahoo/images",
               "api-reference/endpoint/yahoo/videos",
               "api-reference/endpoint/yahoo/news",
-              "api-reference/endpoint/yahoo/autocomplete",
-              "api-reference/endpoint/yahoo/list-markets"
+              "api-reference/endpoint/yahoo/autocomplete"
             ]
           }
         ]
