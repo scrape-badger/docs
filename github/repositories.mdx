@@ -1,0 +1,74 @@
+---
+title: "Get a GitHub repository"
+description: "Public repository statistics, native README, root files and latest commit."
+openapi: "get /v1/github/repositories/{owner}/{repo}"
+---
+
+Read a public repository on its default branch. Pass an owner login and
+repository name separately, not a URL. No GitHub token is required; authenticate
+with your ScrapeBadger `X-API-Key`. Restricted keys need the `github` scope.
+
+**Credits: 10 per successful uncached response.** Cache hits can cost zero;
+inspect `X-Credits-Used`. An empty repository still returns meaningful identity
+and its explicit empty state. Health and errors are free. Check
+[credits and pricing](/credits-and-pricing) for current currency rates.
+
+## Representative requests
+
+```bash
+curl 'https://scrapebadger.com/v1/github/repositories/cli/cli' \
+  -H 'X-API-Key: YOUR_API_KEY'
+scrapebadger github repository cli cli
+```
+
+Use MCP `github_get_repository(owner="cli", repo="cli")`. SDK method names are
+`client.github.get_repository("cli", "cli")` in Python and
+`client.github.getRepository("cli", "cli")` in Node. Verify your installed SDK
+version includes the operation before using it.
+
+## Inputs and handoff
+
+The owner is 1–39 letters, digits or hyphens. Repository names are 1–100 letters,
+digits, dots, hyphens or underscores, excluding `.` and `..`. Encode each path
+segment. No query parameters are accepted: market, ref, page, cursor and tab
+inputs are rejected. From a [profile repository summary](/github/profiles), pass
+`owner.login` and `name`; do not pass its complete URL as either identifier.
+Renamed/transferred repositories return their resolved public identity.
+
+## Understand the fields
+
+The response is unwrapped. `repository` contains identity/owner, description,
+website, default branch, topics, language/license and public state flags.
+Counts include stars, actual watcher subscriptions, forks and source-published
+issue/PR/commit/branch/tag/release/contributor/dependent counts when available.
+`watchers` is not the REST star alias. Website issue and pull-request counts are
+separate from `open_issues_and_pull_requests_count`. Display counts with
+`*_approximate` flags are estimates, not exact totals.
+
+`readme` includes displayed text, native rendered HTML, actual path/ref and
+heading metadata when present. It does not guess a README filename or convert
+rendered HTML back into original Markdown. `latest_commit` includes SHA/link,
+message, authors, committer and check state where public. Full timestamps have
+ISO `*_at` and Unix-seconds `*_utc` pairs.
+
+`files` is the native root preview, not a recursive tree. `files_count` counts
+root entries including directories; preserve truncation information. Optional
+language/release/contributor/funding/community-file previews depend on public
+source visibility. Preview lengths are not exhaustive membership totals.
+
+## Absence and errors
+
+Only a recognized native empty state sets `repository.is_empty=true`. Missing
+fields are unknown/not applicable and must not become invented zeroes. An
+explicit null stays null. Supplemental REST metadata availability is reported
+separately; it cannot replace native website sections. A failed expected native
+README/commit read is an unbilled error, not an empty success.
+
+Invalid inputs return 400/422. Missing/deleted/private resources share GitHub's
+public 404 verdict without revealing private existence. Transient challenge,
+throttle or invalid source state returns an unbilled source error. Standard
+authentication/scope/rate-limit errors also apply. Repository search, trending,
+private data and paginated child lists are separate from this operation.
+
+See the [endpoint reference](/api-reference/endpoint/github/get-repository) and
+[GitHub overview](/github/overview).

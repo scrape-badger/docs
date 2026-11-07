@@ -1,6 +1,6 @@
 ---
 title: "MCP Server"
-description: "Connect AI agents to ScrapeBadger via Model Context Protocol. 532 tools across 46 scraping APIs, including nine account and discovery helpers for Twitter/X, Instagram, Google, YouTube, TikTok, Amazon, eBay, Reddit, real estate, and web scraping. Latest MCP spec (2026-07-28), one-click OAuth for Claude."
+description: "Connect AI agents to ScrapeBadger via Model Context Protocol. 536 tools across 47 scraping APIs, including nine account and discovery helpers for Twitter/X, Instagram, Google, YouTube, TikTok, Amazon, eBay, Reddit, real estate, and web scraping. Latest MCP spec (2026-07-28), one-click OAuth for Claude."
 ---
 
 # MCP Server
@@ -14,7 +14,7 @@ ScrapeBadger provides a hosted MCP (Model Context Protocol) server at `mcp.scrap
 ## Key Features
 
 <CardGroup cols={3}>
-  <Card title="532 MCP tools" icon="wrench">
+  <Card title="536 MCP tools" icon="wrench">
     Every ScrapeBadger API endpoint is available as a typed MCP tool with structured parameters, annotations, and output schemas.
   </Card>
   <Card title="Zero Setup" icon="bolt">
@@ -39,12 +39,13 @@ ScrapeBadger provides a hosted MCP (Model Context Protocol) server at `mcp.scrap
 | Product | Tools | Description |
 |----------|-------|-------------|
 | **Brave Search** | 6 | Native web results and rich blocks, image/video/news search, suggestions, and locale choices. |
+| **Yelp** | 2 | Ranked local business search with ratings, categories, price, address and opening hours, ads separate; markets. |
 | **Etsy** | 8 | Etsy public ecommerce search, product, seller and review data. |
 | **AliExpress** | 8 | AliExpress public ecommerce search, product, seller and review data. |
 | **Target** | 11 | Search Target US products, retrieve variants and prices, read reviews and questions, and monitor stores and stock. |
 | **ASOS** | 7 | Search ASOS fashion products, retrieve rich product detail, monitor stock and prices, and browse navigation and search facets across storefronts. |
 | **Best Buy** | 10 | Search Best Buy US products, compare deals and specifications, read reviews and questions, and check ZIP-specific fulfillment. |
-| **GitHub** | 1 | `github_get_profile`: public user/org overview, repositories and user stars; 10 credits per successful uncached call. |
+| **GitHub** | 2 | `github_get_profile` and `github_get_repository`: public profiles and repository detail; 10 credits per successful uncached call. |
 | **Twitter/X** | 49 | Profiles, tweets, advanced search, trends, communities, lists, spaces, real-time stream monitors, filter rules |
 | **Instagram** | 39 | Profiles, posts, reels, stories, highlights, comments, followers, hashtags, locations, audio, search |
 | **Google** | 33 | Web search (SERP), Images, Videos, Lens, Maps, News, Trends, Jobs, Hotels, Shopping, Patents, Scholar, Finance, Flights |
@@ -76,7 +77,7 @@ ScrapeBadger provides a hosted MCP (Model Context Protocol) server at `mcp.scrap
 | **Apartments.com** | 3 | Rental search and property detail |
 | **ChatGPT** | 3 | `chatgpt_ask` (answer + citations from the real chatgpt.com), `chatgpt_brand_visibility` (AEO/GEO brand analysis), `chatgpt_list_models` |
 | **Perplexity** | 3 | Grounded answers with citations + brand-visibility scoring |
-| **AutoScout24** | 3 | Vehicle listing search, current make/model filters and eight supported European markets |
+| **AutoScout24** | 4 | Vehicle search, full listing specifications/equipment/photos, filters and eight European markets |
 | **Copilot** | 3 | Microsoft Copilot (Copilot Search in Bing) answers with citations + brand-visibility scoring, market list |
 | **Gemini** | 2 | Answers with cited web sources + brand-visibility scoring |
 | **Account** | 1 | Credit balance, tier, and rate-limit info |
@@ -203,7 +204,7 @@ To have specific APIs' tools listed directly, add `apis` to the URL:
 |-----|--------------|-----------------|
 | `https://mcp.scrapebadger.com/mcp` | 9 helpers (default) | ~2k tokens |
 | `https://mcp.scrapebadger.com/mcp?apis=google,amazon` | helpers + Google and Amazon tools | ~17k tokens |
-| `https://mcp.scrapebadger.com/mcp?apis=github` | helpers + `github_get_profile` | One additional tool schema |
+| `https://mcp.scrapebadger.com/mcp?apis=github` | helpers + `github_get_profile` and `github_get_repository` | Two additional tool schemas |
 | `https://mcp.scrapebadger.com/mcp?apis=all` | every tool | ~115k tokens |
 
 Use the API names `search_endpoints` returns (`google`, `google-play`, `amazon`, `twitter`, …). Every tool can be called by name on any URL, even when it isn't listed. Older clients and saved prompts that call `amazon_search` directly keep working.
