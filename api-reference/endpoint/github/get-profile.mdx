@@ -5,8 +5,8 @@ openapi: "get /v1/github/profiles/{username}"
 ---
 
 This is the same operation documented at [GitHub profiles](/github/profiles).
-Examples are representative; production availability and latency await rollout
-verification. Use a login or `@handle`, never a profile URL.
+Use a login or `@handle`, never a profile URL. Optional sections depend on public
+source visibility. Client timeout examples are not latency guarantees.
 
 - `overview` accepts `year` only.
 - `repositories` accepts `page` only, with 30 rows per page.

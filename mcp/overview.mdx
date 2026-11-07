@@ -1,6 +1,6 @@
 ---
 title: "MCP Server"
-description: "Connect AI agents to ScrapeBadger via Model Context Protocol. 524 product tools for Twitter/X, Instagram, Google, YouTube, TikTok, Amazon, eBay, Reddit, real estate, and web scraping. Latest MCP spec (2026-07-28), one-click OAuth for Claude."
+description: "Connect AI agents to ScrapeBadger via Model Context Protocol. 532 tools across 46 scraping APIs, including nine account and discovery helpers for Twitter/X, Instagram, Google, YouTube, TikTok, Amazon, eBay, Reddit, real estate, and web scraping. Latest MCP spec (2026-07-28), one-click OAuth for Claude."
 ---
 
 # MCP Server
@@ -14,7 +14,7 @@ ScrapeBadger provides a hosted MCP (Model Context Protocol) server at `mcp.scrap
 ## Key Features
 
 <CardGroup cols={3}>
-  <Card title="524 Product Tools" icon="wrench">
+  <Card title="532 MCP tools" icon="wrench">
     Every ScrapeBadger API endpoint is available as a typed MCP tool with structured parameters, annotations, and output schemas.
   </Card>
   <Card title="Zero Setup" icon="bolt">
@@ -44,7 +44,7 @@ ScrapeBadger provides a hosted MCP (Model Context Protocol) server at `mcp.scrap
 | **Target** | 11 | Search Target US products, retrieve variants and prices, read reviews and questions, and monitor stores and stock. |
 | **ASOS** | 7 | Search ASOS fashion products, retrieve rich product detail, monitor stock and prices, and browse navigation and search facets across storefronts. |
 | **Best Buy** | 10 | Search Best Buy US products, compare deals and specifications, read reviews and questions, and check ZIP-specific fulfillment. |
-| **GitHub** | 1 | `github_get_profile`: public user/org overview, repositories and user stars; 10 credits per call. Prepared rollout; live verification pending. |
+| **GitHub** | 1 | `github_get_profile`: public user/org overview, repositories and user stars; 10 credits per successful uncached call. |
 | **Twitter/X** | 49 | Profiles, tweets, advanced search, trends, communities, lists, spaces, real-time stream monitors, filter rules |
 | **Instagram** | 39 | Profiles, posts, reels, stories, highlights, comments, followers, hashtags, locations, audio, search |
 | **Google** | 33 | Web search (SERP), Images, Videos, Lens, Maps, News, Trends, Jobs, Hotels, Shopping, Patents, Scholar, Finance, Flights |
@@ -203,7 +203,7 @@ To have specific APIs' tools listed directly, add `apis` to the URL:
 |-----|--------------|-----------------|
 | `https://mcp.scrapebadger.com/mcp` | 9 helpers (default) | ~2k tokens |
 | `https://mcp.scrapebadger.com/mcp?apis=google,amazon` | helpers + Google and Amazon tools | ~17k tokens |
-| `https://mcp.scrapebadger.com/mcp?apis=github` | helpers + `github_get_profile` (prepared rollout) | One additional tool schema |
+| `https://mcp.scrapebadger.com/mcp?apis=github` | helpers + `github_get_profile` | One additional tool schema |
 | `https://mcp.scrapebadger.com/mcp?apis=all` | every tool | ~115k tokens |
 
 Use the API names `search_endpoints` returns (`google`, `google-play`, `amazon`, `twitter`, …). Every tool can be called by name on any URL, even when it isn't listed. Older clients and saved prompts that call `amazon_search` directly keep working.

@@ -3,10 +3,10 @@ title: "GitHub Profile API"
 description: "Public GitHub user and organization profiles, pinned or popular repositories, README and contribution activity."
 ---
 
-<Warning>
-  This reference describes the prepared GitHub rollout contract. Production
-  availability and latency have not yet been verified. Examples are representative.
-</Warning>
+<Note>
+  Optional fields depend on public source visibility. Examples illustrate the request
+  contract; client timeout settings are not endpoint latency guarantees.
+</Note>
 
 Read a public GitHub profile with one endpoint:
 `GET https://scrapebadger.com/v1/github/profiles/{username}`.
