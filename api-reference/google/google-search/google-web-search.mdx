@@ -125,3 +125,21 @@ Matching query, location, language, country, device, and time reduces difference
 between runs. Google can still vary rankings between sessions. For a fresh
 comparison, use `no_cache=true`; a fingerprint is a correlation hint and cannot
 be used to select or replay a session.
+
+## Google request fields
+
+Search sends `oq=q`, `sourceid=chrome`, and `ie=UTF-8` by default. Override them with the same-named parameters. An explicit empty string omits that field from the Google request. These are Google query parameters; `sourceid` does not change the browser User-Agent, and `ie` is an encoding hint.
+
+<ParamField query="oq" type="string">
+  Original query sent to Google. Defaults to q; an empty string omits it.
+</ParamField>
+
+<ParamField query="sourceid" type="string" default="chrome">
+  Google source identifier. Defaults to chrome; an empty string omits it.
+</ParamField>
+
+<ParamField query="ie" type="string" default="UTF-8">
+  Google input encoding hint. Defaults to UTF-8; an empty string omits it.
+</ParamField>
+
+The `udm=web` alias is accepted and sent to Google as `udm=14`. Inspect `search_parameters.google_parameters` to see the actual request. Matching these fields does not guarantee identical rankings across separate sessions.
