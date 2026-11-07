@@ -1,0 +1,20 @@
+---
+title: "Web search"
+openapi: "GET /v1/brave/search"
+description: "Web search from native Brave Search."
+---
+
+Returns organic results, FAQ, discussions, inline videos/news/images, related searches and other source-provided rich blocks. `page` is a 1-based native page ordinal; `count` slices one native page without changing its boundaries. Inspect `query_info` for source spelling corrections and query relaxation.
+
+**Credits:** 7. Confirmed empty results and failed requests are unbilled.
+
+`query` must be nonblank and no longer than 2,048 characters. Country and UI-language
+codes come from the [locale reference](/api-reference/endpoint/brave/locales).
+Safe-search accepts `off`, `moderate`, or `strict` (default).
+
+## Errors
+
+Invalid or unsupported parameters return `422`; unavailable source content returns
+an error instead of a billable empty result. A key without the `brave` scope returns `403`.
+
+See the [overview](/brave/overview) for pagination, fields and authentication.

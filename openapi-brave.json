@@ -1,0 +1,1984 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Brave Search API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/v1/brave/search": {
+      "get": {
+        "summary": "Web search",
+        "description": "Native Brave organic results, rich source blocks and page metadata. Seven credits.",
+        "operationId": "brave_web_search",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048,
+              "description": "Native Brave search query",
+              "title": "Query"
+            },
+            "description": "Native Brave search query"
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "us",
+                "all",
+                "ar",
+                "au",
+                "at",
+                "be",
+                "br",
+                "ca",
+                "cl",
+                "cn",
+                "dk",
+                "fi",
+                "fr",
+                "de",
+                "gr",
+                "hk",
+                "in",
+                "id",
+                "it",
+                "jp",
+                "kr",
+                "my",
+                "mx",
+                "nl",
+                "nz",
+                "no",
+                "ph",
+                "pl",
+                "pt",
+                "ru",
+                "sa",
+                "sg",
+                "za",
+                "es",
+                "se",
+                "ch",
+                "tw",
+                "tr",
+                "gb"
+              ],
+              "type": "string",
+              "description": "Native result region; see /locales",
+              "default": "us",
+              "title": "Country"
+            },
+            "description": "Native result region; see /locales"
+          },
+          {
+            "name": "ui_language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "en-us",
+                "az",
+                "id",
+                "ms",
+                "br",
+                "ca",
+                "cs",
+                "cy",
+                "da",
+                "de-de",
+                "et",
+                "en-ca",
+                "en-in",
+                "en-gb",
+                "es",
+                "eu",
+                "fr-ca",
+                "fr-fr",
+                "gl",
+                "hr",
+                "it",
+                "sw-ke",
+                "lv",
+                "lt",
+                "hu",
+                "nl",
+                "nb",
+                "pl",
+                "pt-br",
+                "ro",
+                "sq-al",
+                "sk",
+                "sl",
+                "sr-latn",
+                "fi-fi",
+                "sv",
+                "vi",
+                "tr",
+                "el",
+                "bg",
+                "ru",
+                "sr",
+                "uk",
+                "ka",
+                "th",
+                "ko",
+                "zh",
+                "zh-tw",
+                "ja-jp"
+              ],
+              "type": "string",
+              "description": "UI labels/date language; does not restrict result language",
+              "default": "en-us",
+              "title": "Ui Language"
+            },
+            "description": "UI labels/date language; does not restrict result language"
+          },
+          {
+            "name": "safe_search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "off",
+                "moderate",
+                "strict"
+              ],
+              "type": "string",
+              "default": "moderate",
+              "title": "Safe Search"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 10,
+              "minimum": 1,
+              "description": "1-based native page ordinal",
+              "default": 1,
+              "title": "Page"
+            },
+            "description": "1-based native page ordinal"
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 20,
+              "minimum": 1,
+              "description": "Slice one native page; does not change native page boundaries",
+              "default": 20,
+              "title": "Count"
+            },
+            "description": "Slice one native page; does not change native page boundaries"
+          },
+          {
+            "name": "freshness",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "any",
+                "day",
+                "week",
+                "month",
+                "year"
+              ],
+              "type": "string",
+              "default": "any",
+              "title": "Freshness"
+            }
+          },
+          {
+            "name": "spellcheck",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Allow native spelling correction",
+              "default": false,
+              "title": "Spellcheck"
+            },
+            "description": "Allow native spelling correction"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BraveSearchResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Brave"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/brave/images": {
+      "get": {
+        "summary": "Image search",
+        "description": "Native image batch with original URLs, source pages, thumbnails and dimensions.",
+        "operationId": "brave_image_search",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048,
+              "description": "Native Brave search query",
+              "title": "Query"
+            },
+            "description": "Native Brave search query"
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "us",
+                "all",
+                "ar",
+                "au",
+                "at",
+                "be",
+                "br",
+                "ca",
+                "cl",
+                "cn",
+                "dk",
+                "fi",
+                "fr",
+                "de",
+                "gr",
+                "hk",
+                "in",
+                "id",
+                "it",
+                "jp",
+                "kr",
+                "my",
+                "mx",
+                "nl",
+                "nz",
+                "no",
+                "ph",
+                "pl",
+                "pt",
+                "ru",
+                "sa",
+                "sg",
+                "za",
+                "es",
+                "se",
+                "ch",
+                "tw",
+                "tr",
+                "gb"
+              ],
+              "type": "string",
+              "description": "Native result region; see /locales",
+              "default": "us",
+              "title": "Country"
+            },
+            "description": "Native result region; see /locales"
+          },
+          {
+            "name": "ui_language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "en-us",
+                "az",
+                "id",
+                "ms",
+                "br",
+                "ca",
+                "cs",
+                "cy",
+                "da",
+                "de-de",
+                "et",
+                "en-ca",
+                "en-in",
+                "en-gb",
+                "es",
+                "eu",
+                "fr-ca",
+                "fr-fr",
+                "gl",
+                "hr",
+                "it",
+                "sw-ke",
+                "lv",
+                "lt",
+                "hu",
+                "nl",
+                "nb",
+                "pl",
+                "pt-br",
+                "ro",
+                "sq-al",
+                "sk",
+                "sl",
+                "sr-latn",
+                "fi-fi",
+                "sv",
+                "vi",
+                "tr",
+                "el",
+                "bg",
+                "ru",
+                "sr",
+                "uk",
+                "ka",
+                "th",
+                "ko",
+                "zh",
+                "zh-tw",
+                "ja-jp"
+              ],
+              "type": "string",
+              "description": "UI labels/date language; does not restrict result language",
+              "default": "en-us",
+              "title": "Ui Language"
+            },
+            "description": "UI labels/date language; does not restrict result language"
+          },
+          {
+            "name": "safe_search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "off",
+                "moderate",
+                "strict"
+              ],
+              "type": "string",
+              "default": "moderate",
+              "title": "Safe Search"
+            }
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "description": "Slice the initial native image batch",
+              "default": 50,
+              "title": "Count"
+            },
+            "description": "Slice the initial native image batch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BraveResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Brave"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/brave/videos": {
+      "get": {
+        "summary": "Video search",
+        "description": "Native video results with duration, creator, publisher and verified page ordinals.",
+        "operationId": "brave_video_search",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048,
+              "description": "Native Brave search query",
+              "title": "Query"
+            },
+            "description": "Native Brave search query"
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "us",
+                "all",
+                "ar",
+                "au",
+                "at",
+                "be",
+                "br",
+                "ca",
+                "cl",
+                "cn",
+                "dk",
+                "fi",
+                "fr",
+                "de",
+                "gr",
+                "hk",
+                "in",
+                "id",
+                "it",
+                "jp",
+                "kr",
+                "my",
+                "mx",
+                "nl",
+                "nz",
+                "no",
+                "ph",
+                "pl",
+                "pt",
+                "ru",
+                "sa",
+                "sg",
+                "za",
+                "es",
+                "se",
+                "ch",
+                "tw",
+                "tr",
+                "gb"
+              ],
+              "type": "string",
+              "description": "Native result region; see /locales",
+              "default": "us",
+              "title": "Country"
+            },
+            "description": "Native result region; see /locales"
+          },
+          {
+            "name": "ui_language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "en-us",
+                "az",
+                "id",
+                "ms",
+                "br",
+                "ca",
+                "cs",
+                "cy",
+                "da",
+                "de-de",
+                "et",
+                "en-ca",
+                "en-in",
+                "en-gb",
+                "es",
+                "eu",
+                "fr-ca",
+                "fr-fr",
+                "gl",
+                "hr",
+                "it",
+                "sw-ke",
+                "lv",
+                "lt",
+                "hu",
+                "nl",
+                "nb",
+                "pl",
+                "pt-br",
+                "ro",
+                "sq-al",
+                "sk",
+                "sl",
+                "sr-latn",
+                "fi-fi",
+                "sv",
+                "vi",
+                "tr",
+                "el",
+                "bg",
+                "ru",
+                "sr",
+                "uk",
+                "ka",
+                "th",
+                "ko",
+                "zh",
+                "zh-tw",
+                "ja-jp"
+              ],
+              "type": "string",
+              "description": "UI labels/date language; does not restrict result language",
+              "default": "en-us",
+              "title": "Ui Language"
+            },
+            "description": "UI labels/date language; does not restrict result language"
+          },
+          {
+            "name": "safe_search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "off",
+                "moderate",
+                "strict"
+              ],
+              "type": "string",
+              "default": "moderate",
+              "title": "Safe Search"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 10,
+              "minimum": 1,
+              "description": "1-based native page ordinal",
+              "default": 1,
+              "title": "Page"
+            },
+            "description": "1-based native page ordinal"
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 50,
+              "title": "Count"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BravePagedResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Brave"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/brave/news": {
+      "get": {
+        "summary": "News search",
+        "description": "Native news batch; relative source dates stay display strings.",
+        "operationId": "brave_news_search",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048,
+              "description": "Native Brave search query",
+              "title": "Query"
+            },
+            "description": "Native Brave search query"
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "us",
+                "all",
+                "ar",
+                "au",
+                "at",
+                "be",
+                "br",
+                "ca",
+                "cl",
+                "cn",
+                "dk",
+                "fi",
+                "fr",
+                "de",
+                "gr",
+                "hk",
+                "in",
+                "id",
+                "it",
+                "jp",
+                "kr",
+                "my",
+                "mx",
+                "nl",
+                "nz",
+                "no",
+                "ph",
+                "pl",
+                "pt",
+                "ru",
+                "sa",
+                "sg",
+                "za",
+                "es",
+                "se",
+                "ch",
+                "tw",
+                "tr",
+                "gb"
+              ],
+              "type": "string",
+              "description": "Native result region; see /locales",
+              "default": "us",
+              "title": "Country"
+            },
+            "description": "Native result region; see /locales"
+          },
+          {
+            "name": "ui_language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "en-us",
+                "az",
+                "id",
+                "ms",
+                "br",
+                "ca",
+                "cs",
+                "cy",
+                "da",
+                "de-de",
+                "et",
+                "en-ca",
+                "en-in",
+                "en-gb",
+                "es",
+                "eu",
+                "fr-ca",
+                "fr-fr",
+                "gl",
+                "hr",
+                "it",
+                "sw-ke",
+                "lv",
+                "lt",
+                "hu",
+                "nl",
+                "nb",
+                "pl",
+                "pt-br",
+                "ro",
+                "sq-al",
+                "sk",
+                "sl",
+                "sr-latn",
+                "fi-fi",
+                "sv",
+                "vi",
+                "tr",
+                "el",
+                "bg",
+                "ru",
+                "sr",
+                "uk",
+                "ka",
+                "th",
+                "ko",
+                "zh",
+                "zh-tw",
+                "ja-jp"
+              ],
+              "type": "string",
+              "description": "UI labels/date language; does not restrict result language",
+              "default": "en-us",
+              "title": "Ui Language"
+            },
+            "description": "UI labels/date language; does not restrict result language"
+          },
+          {
+            "name": "safe_search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "off",
+                "moderate",
+                "strict"
+              ],
+              "type": "string",
+              "default": "moderate",
+              "title": "Safe Search"
+            }
+          },
+          {
+            "name": "count",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "description": "Slice the initial native news batch",
+              "default": 35,
+              "title": "Count"
+            },
+            "description": "Slice the initial native news batch"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BraveResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Brave"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/brave/autocomplete": {
+      "get": {
+        "summary": "Autocomplete",
+        "description": "Native search-box suggestions with entity descriptions and images. Two credits.",
+        "operationId": "brave_autocomplete",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2048,
+              "title": "Query"
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "us",
+                "all",
+                "ar",
+                "au",
+                "at",
+                "be",
+                "br",
+                "ca",
+                "cl",
+                "cn",
+                "dk",
+                "fi",
+                "fr",
+                "de",
+                "gr",
+                "hk",
+                "in",
+                "id",
+                "it",
+                "jp",
+                "kr",
+                "my",
+                "mx",
+                "nl",
+                "nz",
+                "no",
+                "ph",
+                "pl",
+                "pt",
+                "ru",
+                "sa",
+                "sg",
+                "za",
+                "es",
+                "se",
+                "ch",
+                "tw",
+                "tr",
+                "gb"
+              ],
+              "type": "string",
+              "default": "us",
+              "title": "Country"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BraveAutocompleteResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Brave"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/brave/locales": {
+      "get": {
+        "summary": "List supported locales",
+        "description": "Native country and UI-language choices. Free; result language is a separate preference.",
+        "operationId": "brave_list_supported_locales",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BraveLocalesResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Brave"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BraveAutocompleteResponse": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "title": "Query"
+          },
+          "country": {
+            "type": "string",
+            "title": "Country"
+          },
+          "suggestions": {
+            "items": {
+              "$ref": "#/components/schemas/BraveSuggestion"
+            },
+            "type": "array",
+            "title": "Suggestions"
+          },
+          "result_count": {
+            "type": "integer",
+            "title": "Result Count"
+          },
+          "source_url": {
+            "type": "string",
+            "title": "Source Url"
+          },
+          "fetched_at": {
+            "type": "string",
+            "title": "Fetched At"
+          },
+          "fetched_utc": {
+            "type": "number",
+            "title": "Fetched Utc"
+          }
+        },
+        "type": "object",
+        "required": [
+          "query",
+          "country",
+          "suggestions",
+          "result_count",
+          "source_url",
+          "fetched_at",
+          "fetched_utc"
+        ],
+        "title": "BraveAutocompleteResponse"
+      },
+      "BraveLocaleOption": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "name"
+        ],
+        "title": "BraveLocaleOption"
+      },
+      "BraveLocalesResponse": {
+        "properties": {
+          "countries": {
+            "items": {
+              "$ref": "#/components/schemas/BraveLocaleOption"
+            },
+            "type": "array",
+            "title": "Countries"
+          },
+          "ui_languages": {
+            "items": {
+              "$ref": "#/components/schemas/BraveLocaleOption"
+            },
+            "type": "array",
+            "title": "Ui Languages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "countries",
+          "ui_languages"
+        ],
+        "title": "BraveLocalesResponse"
+      },
+      "BravePagedResponse": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "title": "Query"
+          },
+          "country": {
+            "type": "string",
+            "title": "Country"
+          },
+          "ui_language": {
+            "type": "string",
+            "title": "Ui Language"
+          },
+          "safe_search": {
+            "type": "string",
+            "title": "Safe Search"
+          },
+          "result_count": {
+            "type": "integer",
+            "title": "Result Count"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/BraveResult"
+            },
+            "type": "array",
+            "title": "Results"
+          },
+          "query_info": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Query Info"
+          },
+          "source_url": {
+            "type": "string",
+            "title": "Source Url"
+          },
+          "fetched_at": {
+            "type": "string",
+            "title": "Fetched At"
+          },
+          "fetched_utc": {
+            "type": "number",
+            "title": "Fetched Utc"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "has_next": {
+            "type": "boolean",
+            "title": "Has Next"
+          },
+          "next_page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Page"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "query",
+          "country",
+          "ui_language",
+          "safe_search",
+          "result_count",
+          "results",
+          "query_info",
+          "source_url",
+          "fetched_at",
+          "fetched_utc",
+          "page",
+          "has_next"
+        ],
+        "title": "BravePagedResponse"
+      },
+      "BraveResponse": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "title": "Query"
+          },
+          "country": {
+            "type": "string",
+            "title": "Country"
+          },
+          "ui_language": {
+            "type": "string",
+            "title": "Ui Language"
+          },
+          "safe_search": {
+            "type": "string",
+            "title": "Safe Search"
+          },
+          "result_count": {
+            "type": "integer",
+            "title": "Result Count"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/BraveResult"
+            },
+            "type": "array",
+            "title": "Results"
+          },
+          "query_info": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Query Info"
+          },
+          "source_url": {
+            "type": "string",
+            "title": "Source Url"
+          },
+          "fetched_at": {
+            "type": "string",
+            "title": "Fetched At"
+          },
+          "fetched_utc": {
+            "type": "number",
+            "title": "Fetched Utc"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "query",
+          "country",
+          "ui_language",
+          "safe_search",
+          "result_count",
+          "results",
+          "query_info",
+          "source_url",
+          "fetched_at",
+          "fetched_utc"
+        ],
+        "title": "BraveResponse"
+      },
+      "BraveResult": {
+        "properties": {
+          "position": {
+            "type": "integer",
+            "title": "Position"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "snippet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snippet"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "display_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Url"
+          },
+          "site_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Site Name"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type"
+          },
+          "subtype": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtype"
+          },
+          "is_live": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Live"
+          },
+          "profile": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile"
+          },
+          "meta_url": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Meta Url"
+          },
+          "thumbnail": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thumbnail"
+          },
+          "age": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age"
+          },
+          "page_age": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Age"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "published_utc": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published Utc"
+          },
+          "page_fetched": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Fetched"
+          },
+          "page_fetched_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Fetched At"
+          },
+          "page_fetched_utc": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Page Fetched Utc"
+          },
+          "sitelinks": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Sitelinks"
+          },
+          "article": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Article"
+          },
+          "book": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Book"
+          },
+          "organization": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organization"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "product": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product"
+          },
+          "product_cluster": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Cluster"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "recipe": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recipe"
+          },
+          "review": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review"
+          },
+          "software": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Software"
+          },
+          "faq": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Faq"
+          },
+          "qa": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qa"
+          },
+          "deep_results": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deep Results"
+          },
+          "cluster": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cluster"
+          },
+          "video": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Video"
+          },
+          "properties": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Properties"
+          },
+          "data": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data"
+          },
+          "family_friendly": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Family Friendly"
+          },
+          "confidence": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Confidence"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "position",
+          "title",
+          "url"
+        ],
+        "title": "BraveResult"
+      },
+      "BraveSearchResponse": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "title": "Query"
+          },
+          "country": {
+            "type": "string",
+            "title": "Country"
+          },
+          "ui_language": {
+            "type": "string",
+            "title": "Ui Language"
+          },
+          "safe_search": {
+            "type": "string",
+            "title": "Safe Search"
+          },
+          "result_count": {
+            "type": "integer",
+            "title": "Result Count"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/BraveResult"
+            },
+            "type": "array",
+            "title": "Results"
+          },
+          "query_info": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Query Info"
+          },
+          "source_url": {
+            "type": "string",
+            "title": "Source Url"
+          },
+          "fetched_at": {
+            "type": "string",
+            "title": "Fetched At"
+          },
+          "fetched_utc": {
+            "type": "number",
+            "title": "Fetched Utc"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "has_next": {
+            "type": "boolean",
+            "title": "Has Next"
+          },
+          "next_page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Page"
+          },
+          "faq": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Faq"
+          },
+          "discussions": {
+            "items": {
+              "$ref": "#/components/schemas/BraveResult"
+            },
+            "type": "array",
+            "title": "Discussions"
+          },
+          "videos": {
+            "items": {
+              "$ref": "#/components/schemas/BraveResult"
+            },
+            "type": "array",
+            "title": "Videos"
+          },
+          "news": {
+            "items": {
+              "$ref": "#/components/schemas/BraveResult"
+            },
+            "type": "array",
+            "title": "News"
+          },
+          "images": {
+            "items": {
+              "$ref": "#/components/schemas/BraveResult"
+            },
+            "type": "array",
+            "title": "Images"
+          },
+          "related_searches": {
+            "items": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Related Searches"
+          },
+          "rich_blocks": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Rich Blocks"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "query",
+          "country",
+          "ui_language",
+          "safe_search",
+          "result_count",
+          "results",
+          "query_info",
+          "source_url",
+          "fetched_at",
+          "fetched_utc",
+          "page",
+          "has_next"
+        ],
+        "title": "BraveSearchResponse"
+      },
+      "BraveSuggestion": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "title": "Query"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "is_entity": {
+            "type": "boolean",
+            "title": "Is Entity",
+            "default": false
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "desc": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Desc"
+          },
+          "img": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Img"
+          },
+          "category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category"
+          },
+          "logo": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logo"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "query",
+          "type"
+        ],
+        "title": "BraveSuggestion"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://scrapebadger.com"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Brave"
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ]
+}
