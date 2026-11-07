@@ -1,0 +1,42 @@
+---
+title: "Get listing details"
+description: "Full AutoScout24 vehicle specifications, equipment, photos, pricing and public seller contacts."
+openapi: "GET /v1/autoscout24/listing"
+---
+
+**Credits:** 10 per successful listing detail. Removed/missing listings and failed requests are unbilled. Cache hits can cost zero; use `X-Credits-Used` for the actual charge.
+
+Supply exactly one `url` or `listing_id` from [vehicle search](/api-reference/endpoint/autoscout24/search). A full HTTPS listing URL determines its supported market. A UUID without `market` defaults to Germany (`de`); an explicit market must match the URL host. Use de, at, be, es, fr, it, lu or nl. Swiss listings use a separate platform and are unsupported.
+
+```bash
+curl --get 'https://scrapebadger.com/v1/autoscout24/listing' \
+  --data-urlencode 'url=LISTING_URL_FROM_SEARCH' \
+  -H 'X-API-Key: YOUR_API_KEY'
+```
+
+```bash CLI
+scrapebadger autoscout24 listing --url LISTING_URL_FROM_SEARCH
+scrapebadger autoscout24 listing --listing-id UUID --market it
+```
+
+The hosted MCP tool is `autoscout24_get_listing`. Python: `await client.autoscout24.get_listing(url=listing_url)`. Node: `await client.autoscout24.getListing({url: listingUrl})`.
+
+## Response
+
+The envelope contains `market`, `source_url`, `listing` and `latency_ms`. The listing includes identity/title/canonical URL, readable description and source description HTML; numeric price/currency/mileage/power, month-precision registration, make/model/variant/version and basic specifications.
+
+`vehicle` retains complete useful native specifications and `rawData`, including taxonomy, drivetrain, body/interior, dimensions, condition, damage, roadworthiness, previous owners, maintenance, service and inspection, plus optional energy/WLTP/battery and environmental fields. Values absent upstream remain null or empty; an absent accident flag does not mean accident-free. Preserve raw/formatted values, units and fallback measurement basis.
+
+`equipment` preserves source groups and entries, including localized labels. Native equipment `id` can itself be a localized label; stable raw codes, when supplied, remain in `vehicle.rawData.equipment`. `images` includes the full native photo collection. `header_image` can be a different responsive size of the first photo. Optional media includes YouTube, 360 viewer, vehicle report and partner links.
+
+`prices` preserves public/dealer/suggested prices, gross/net amounts, VAT/deductibility, negotiation/on-request/final-price flags and median/evaluation ranges. Source bands are preserved even when their boundaries overlap or appear inconsistent. These are source asking-price assessments, not a reconstructed price history.
+
+`seller`, `ratings` and `location` preserve publicly supplied company/contact names, typed phone entries, dealer links/logo, rating/count/category/recommendation data, address and coordinates. `whatsapp_number`, leasing, warranty, financing/insurance, availability, delivery, seals and online purchase are optional. No buyer message, contact action or private account access is performed. Host locale and seller location are independent.
+
+`first_registration` has month precision (`YYYY-MM`); source first-of-month placeholders do not establish an actual registration day. Date-only availability retains its date without a fabricated Unix instant. Actual created/availability timestamps have ISO UTC and Unix pairs (`created_at/created_utc`, `available_at/available_utc`).
+
+## Errors and handoff
+
+The returned UUID must match the requested listing. Removed or missing source listings return an unbilled `404`; malformed locators, unsupported hosts, ambiguous URL plus UUID and market mismatches return `422`. Blocked, incomplete or inconsistent source data returns an unbilled `503`, never a successful empty object. Retain `X-Request-ID` for diagnostics.
+
+Detail returns one entity and has no pagination or search filters. Search pagination remains pages 1–200 using `next_page`. Listing content and availability can change after a search result was fetched. See [credits and pricing](/credits-and-pricing) for current plan prices.

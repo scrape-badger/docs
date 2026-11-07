@@ -1,6 +1,6 @@
 ---
-title: "GitHub Profile API"
-description: "Public GitHub user and organization profiles, pinned or popular repositories, README and contribution activity."
+title: "GitHub API"
+description: "Public GitHub user and organization profiles, pinned or popular repositories, README, contribution activity and public repository detail."
 ---
 
 <Note>
@@ -76,6 +76,18 @@ Use `github_get_profile(username, tab?, year?, page?, next_page_token?)` through
 free discovery helpers. SDK namespaces are generated from the API contract;
 release verification is required before relying on a published SDK version.
 
-This endpoint covers public profiles. General GitHub search, standalone repository
-detail, trending, private repositories and member-only organization views are
-separate from this surface.
+The profile endpoint covers public profiles; repository detail has its own endpoint
+below. General GitHub search, trending, private repositories and member-only
+organization views are not part of this API.
+
+## Public repository detail
+
+Use `GET /v1/github/repositories/{owner}/{repo}` for a public repository's
+default-branch statistics, topics, license, native README, root files and latest
+commit. Pass `owner.login` and `name` from a profile repository summary.
+Repository detail has no market, ref or pagination parameter. Each successful
+uncached response costs **10 credits**; health and failed requests cost zero.
+
+Representative integrations: `scrapebadger github repository cli cli` and
+`github_get_repository(owner="cli", repo="cli")` through MCP.
+See [repository parameters and fields](/github/repositories).

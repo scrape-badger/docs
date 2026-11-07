@@ -27,7 +27,8 @@
       "openapi-account.json",
       "openapi-github.json",
       "openapi-autoscout24.json",
-      "openapi-brave.json"
+      "openapi-brave.json",
+      "openapi-yelp.json"
     ],
     "baseUrl": "https://scrapebadger.com",
     "auth": {
@@ -1751,16 +1752,18 @@
         "tab": "GitHub",
         "groups": [
           {
-            "group": "GitHub Profile API",
+            "group": "GitHub API",
             "pages": [
               "github/overview",
-              "github/profiles"
+              "github/profiles",
+              "github/repositories"
             ]
           },
           {
             "group": "Endpoint reference",
             "pages": [
-              "api-reference/endpoint/github/get-profile"
+              "api-reference/endpoint/github/get-profile",
+              "api-reference/endpoint/github/get-repository"
             ]
           }
         ]
@@ -1778,6 +1781,7 @@
             "group": "Search and reference",
             "pages": [
               "api-reference/endpoint/autoscout24/search",
+              "api-reference/endpoint/autoscout24/listing",
               "api-reference/endpoint/autoscout24/filters",
               "api-reference/endpoint/autoscout24/markets",
               "api-reference/endpoint/autoscout24/health"
@@ -1803,6 +1807,24 @@
               "api-reference/endpoint/brave/news",
               "api-reference/endpoint/brave/autocomplete",
               "api-reference/endpoint/brave/locales"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Yelp",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "yelp/overview"
+            ]
+          },
+          {
+            "group": "API reference",
+            "pages": [
+              "api-reference/endpoint/yelp/search",
+              "api-reference/endpoint/yelp/markets"
             ]
           }
         ]

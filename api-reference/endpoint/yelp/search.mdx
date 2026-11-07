@@ -1,0 +1,28 @@
+---
+title: "Search businesses"
+openapi: "GET /v1/yelp/search"
+description: "Ranked Yelp businesses for a location, with ads kept separate."
+---
+
+Returns one page of up to ten organic businesses in Yelp's ranking, sponsored listings in `ads`,
+Yelp's filter options for the search and pagination metadata.
+
+**Credits:** 15 per page with results. Empty searches, failed requests and cache hits (`X-Cache: HIT`)
+are unbilled.
+
+`location` is required (at most 128 characters). `page` is 1 to 11. `features` and `price` are
+comma lists; every filter must be applied by Yelp or the request returns `422 filter_not_applied`.
+`query_matched: false` means Yelp could not place the query: it shows either its broader ranking
+(billed) or its own no-results page (`results: []`, free).
+
+## Errors
+
+Invalid, unsupported or malformed parameters received by the API gateway return `422`.
+Ingress parsing happens first: a bare `;` separates parameters, so `location=SF;page=2` can
+perform a billed page-2 search. Use `&` between parameters and `%3B` for a semicolon inside a
+value; see the [query encoding notes](/yelp/overview#filters-and-sorting).
+A location Yelp cannot find returns
+`400 invalid_location`. Unavailable source content returns `503` instead of a billable empty result.
+A key without the `yelp` scope returns `403`.
+
+See the [overview](/yelp/overview) for markets, filters, fields and pagination.

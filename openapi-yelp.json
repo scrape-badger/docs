@@ -1,0 +1,902 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Yelp Search API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/v1/yelp/markets": {
+      "get": {
+        "tags": [
+          "Yelp"
+        ],
+        "summary": "List markets",
+        "description": "Yelp sites this API verifiably searches. Free.",
+        "operationId": "yelp_list_markets",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/YelpMarketsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "x-availability": "active"
+      }
+    },
+    "/v1/yelp/search": {
+      "get": {
+        "tags": [
+          "Yelp"
+        ],
+        "summary": "Search businesses",
+        "description": "Ranked Yelp businesses for a location, with ads kept separate. 15 credits; empty results free.\n\nTen businesses per page, pages 1-11. Narrow the location, category or filters to reach\nmore businesses. Business detail and reviews are not part of this API.",
+        "operationId": "yelp_search_businesses",
+        "parameters": [
+          {
+            "name": "location",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "description": "Where to search, as typed into Yelp: city, neighbourhood, address or postcode.",
+              "title": "Location"
+            },
+            "description": "Where to search, as typed into Yelp: city, neighbourhood, address or postcode."
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 128
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "What to search for (e.g. pizza, plumbers). Optional when category is set.",
+              "title": "Query"
+            },
+            "description": "What to search for (e.g. pizza, plumbers). Optional when category is set."
+          },
+          {
+            "name": "market",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "us",
+                "ca"
+              ],
+              "type": "string",
+              "description": "Yelp site to search; see /markets.",
+              "default": "us",
+              "title": "Market"
+            },
+            "description": "Yelp site to search; see /markets."
+          },
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-z0-9_-]{1,64}$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Yelp category alias, e.g. pizza, coffee, plumbing.",
+              "title": "Category"
+            },
+            "description": "Yelp category alias, e.g. pizza, coffee, plumbing."
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "recommended",
+                "rating",
+                "review_count"
+              ],
+              "type": "string",
+              "default": "recommended",
+              "title": "Sort By"
+            }
+          },
+          {
+            "name": "price",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[1-4](,[1-4]){0,3}$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Comma-separated price levels 1-4 ($ to $$$$).",
+              "title": "Price"
+            },
+            "description": "Comma-separated price levels 1-4 ($ to $$$$)."
+          },
+          {
+            "name": "features",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Comma-separated refinements: delivery, takeout, reservations, outdoor_seating, good_for_kids, dogs_allowed, free_wifi, wheelchair_accessible.",
+              "title": "Features"
+            },
+            "description": "Comma-separated refinements: delivery, takeout, reservations, outdoor_seating, good_for_kids, dogs_allowed, free_wifi, wheelchair_accessible."
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 11,
+              "minimum": 1,
+              "description": "1-based page, ten businesses each; pages 1-11.",
+              "default": 1,
+              "title": "Page"
+            },
+            "description": "1-based page, ten businesses each; pages 1-11."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/YelpSearchResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "x-availability": "active"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "YelpBusiness": {
+        "properties": {
+          "position": {
+            "type": "integer",
+            "title": "Position",
+            "description": "1-based place in Yelp's organic order across pages (page 2 starts at 11): Yelp's own number where it numbers the results; services searches are unnumbered and keep Yelp's order. For ads, the slot order."
+          },
+          "is_ad": {
+            "type": "boolean",
+            "title": "Is Ad"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id",
+            "description": "Yelp encrypted business ID."
+          },
+          "alias": {
+            "type": "string",
+            "title": "Alias",
+            "description": "Business slug used in /biz/<alias>."
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "review_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Count"
+          },
+          "price": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price",
+            "description": "Price symbols as shown, e.g. $$."
+          },
+          "price_level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Level"
+          },
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/YelpCategory"
+            },
+            "type": "array",
+            "title": "Categories"
+          },
+          "neighborhoods": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Neighborhoods"
+          },
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address",
+            "description": "Street line as shown on the card."
+          },
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone",
+            "description": "Shown on sponsored cards only."
+          },
+          "timezone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timezone"
+          },
+          "opening_hours": {
+            "items": {
+              "$ref": "#/components/schemas/YelpHours"
+            },
+            "type": "array",
+            "title": "Opening Hours"
+          },
+          "snippet": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snippet",
+            "description": "Short excerpt, not a full review."
+          },
+          "snippet_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snippet Type"
+          },
+          "highlights": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Highlights"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags"
+          },
+          "photos": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Photos"
+          },
+          "alternate_names": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Alternate Names"
+          },
+          "is_service_area_business": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Service Area Business"
+          },
+          "is_yelp_guaranteed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Yelp Guaranteed"
+          },
+          "has_verified_license": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Has Verified License"
+          },
+          "ad_placement": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ad Placement",
+            "description": "Ads only: Yelp's ad slot."
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "position",
+          "is_ad",
+          "id",
+          "alias",
+          "name",
+          "url"
+        ],
+        "title": "YelpBusiness",
+        "description": "A business card as ranked on the search page; nullable fields are absent from some cards."
+      },
+      "YelpCategory": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "alias": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alias"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "title": "YelpCategory"
+      },
+      "YelpFilterGroup": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "options": {
+            "items": {
+              "$ref": "#/components/schemas/YelpFilterOption"
+            },
+            "type": "array",
+            "title": "Options"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "title",
+          "type",
+          "options"
+        ],
+        "title": "YelpFilterGroup"
+      },
+      "YelpFilterOption": {
+        "properties": {
+          "value": {
+            "type": "string",
+            "title": "Value"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "selected": {
+            "type": "boolean",
+            "title": "Selected"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "value",
+          "text",
+          "selected"
+        ],
+        "title": "YelpFilterOption"
+      },
+      "YelpHours": {
+        "properties": {
+          "day": {
+            "type": "string",
+            "title": "Day"
+          },
+          "open": {
+            "type": "string",
+            "title": "Open",
+            "description": "Local wall time HH:MM."
+          },
+          "close": {
+            "type": "string",
+            "title": "Close",
+            "description": "Local wall time HH:MM; may be past midnight."
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "day",
+          "open",
+          "close"
+        ],
+        "title": "YelpHours"
+      },
+      "YelpLink": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "name",
+          "url"
+        ],
+        "title": "YelpLink"
+      },
+      "YelpMarket": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "domain": {
+            "type": "string",
+            "title": "Domain"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "name",
+          "domain",
+          "language",
+          "currency"
+        ],
+        "title": "YelpMarket"
+      },
+      "YelpMarketsResponse": {
+        "properties": {
+          "markets": {
+            "items": {
+              "$ref": "#/components/schemas/YelpMarket"
+            },
+            "type": "array",
+            "title": "Markets"
+          }
+        },
+        "type": "object",
+        "required": [
+          "markets"
+        ],
+        "title": "YelpMarketsResponse"
+      },
+      "YelpResolvedLocation": {
+        "properties": {
+          "city": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "City"
+          },
+          "state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "State"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude",
+            "description": "Search centre, not a business."
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "title": "YelpResolvedLocation"
+      },
+      "YelpSearchResponse": {
+        "properties": {
+          "market": {
+            "type": "string",
+            "title": "Market"
+          },
+          "query": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Query"
+          },
+          "location": {
+            "type": "string",
+            "title": "Location"
+          },
+          "location_resolved": {
+            "$ref": "#/components/schemas/YelpResolvedLocation"
+          },
+          "did_you_mean": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Did You Mean"
+          },
+          "query_matched": {
+            "type": "boolean",
+            "title": "Query Matched",
+            "description": "False when Yelp could not place the query; results are then Yelp's broader ranking for the location, as Yelp shows them."
+          },
+          "total_results": {
+            "type": "integer",
+            "title": "Total Results",
+            "description": "Yelp's reported total; at most 110 are browsable."
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          },
+          "total_pages": {
+            "type": "integer",
+            "title": "Total Pages"
+          },
+          "has_next_page": {
+            "type": "boolean",
+            "title": "Has Next Page"
+          },
+          "next_page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Page"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/YelpBusiness"
+            },
+            "type": "array",
+            "title": "Results"
+          },
+          "ads": {
+            "items": {
+              "$ref": "#/components/schemas/YelpBusiness"
+            },
+            "type": "array",
+            "title": "Ads"
+          },
+          "filters": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/YelpFilterGroup"
+            },
+            "type": "object",
+            "title": "Filters"
+          },
+          "related_searches": {
+            "items": {
+              "$ref": "#/components/schemas/YelpLink"
+            },
+            "type": "array",
+            "title": "Related Searches"
+          },
+          "source_url": {
+            "type": "string",
+            "title": "Source Url"
+          },
+          "fetched_at": {
+            "type": "string",
+            "title": "Fetched At"
+          },
+          "fetched_utc": {
+            "type": "number",
+            "title": "Fetched Utc"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "market",
+          "query",
+          "location",
+          "location_resolved",
+          "query_matched",
+          "total_results",
+          "page",
+          "page_size",
+          "total_pages",
+          "has_next_page",
+          "results",
+          "ads",
+          "filters",
+          "related_searches",
+          "source_url",
+          "fetched_at",
+          "fetched_utc"
+        ],
+        "title": "YelpSearchResponse"
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://scrapebadger.com"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Yelp"
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ]
+}

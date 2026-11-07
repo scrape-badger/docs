@@ -1,0 +1,120 @@
+---
+title: "Yelp Search API"
+description: "Search ranked Yelp businesses for any location with ratings, review counts, categories, price, address and opening hours. Ads come back separately."
+---
+
+Search the public Yelp business listings a visitor sees for a location, with your ScrapeBadger key.
+Results keep Yelp's own ranking; sponsored listings are returned separately. You do not need a Yelp
+account or a Yelp Places API key. Business detail pages and reviews are not part of this API.
+
+## Endpoints and credits
+
+| Endpoint | Credits |
+| --- | --- |
+| [Search businesses](/api-reference/endpoint/yelp/search) | 15 per page with results |
+| [Markets](/api-reference/endpoint/yelp/markets) | 0 |
+
+A search with no matching businesses, failed requests, invalid input, filters Yelp does not apply,
+locations Yelp cannot find and repeats answered from the response cache (`X-Cache: HIT`) are not
+billed. Read `X-Credits-Used` for the charge on a response,
+and the [pricing page](https://scrapebadger.com/pricing) for the current price of credits. Keys
+restricted to particular APIs need the `yelp` scope.
+
+## Quickstart
+
+```bash
+curl -G "https://scrapebadger.com/v1/yelp/search" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  --data-urlencode "location=San Francisco, CA" \
+  --data-urlencode "query=pizza"
+```
+
+```python
+import os
+import httpx
+
+response = httpx.get(
+    "https://scrapebadger.com/v1/yelp/search",
+    headers={"X-API-Key": os.environ["SCRAPEBADGER_API_KEY"]},
+    params={"location": "Chicago, IL", "category": "coffee", "sort_by": "rating"},
+    timeout=120,
+)
+response.raise_for_status()
+for business in response.json()["results"]:
+    print(business["position"], business["name"], business["rating"], business["review_count"])
+```
+
+```javascript
+const response = await fetch("https://scrapebadger.com/v1/yelp/search?" +
+  new URLSearchParams({location: "Austin, TX", query: "tacos", features: "delivery,takeout"}), {
+  headers: {"X-API-Key": process.env.SCRAPEBADGER_API_KEY},
+});
+if (!response.ok) throw new Error(`HTTP ${response.status}`);
+const data = await response.json();
+console.log(data.results, data.ads);
+```
+
+## Markets
+
+`market=us` (www.yelp.com, default) and `market=ca` (www.yelp.ca). The free
+[markets endpoint](/api-reference/endpoint/yelp/markets) lists code, name, domain, language and
+currency. Other Yelp country sites are not supported yet.
+
+## Filters and sorting
+
+- `location` (required): a city, neighbourhood, address or postcode, as typed into Yelp.
+- `query`: what to look for, such as `pizza` or `plumbers`. Optional when `category` is set.
+- `category`: a Yelp category alias such as `pizza`, `coffee` or `plumbing`. Aliases appear in
+  `categories[].alias` and in the `filters` block of a previous response.
+- `sort_by`: `recommended` (default), `rating` or `review_count`. These are Yelp's own orders.
+- `price`: comma-separated levels `1` to `4` (`$` to `$$$$`), for example `1,2`.
+- `features`: comma-separated `delivery`, `takeout`, `reservations`, `outdoor_seating`,
+  `good_for_kids`, `dogs_allowed`, `free_wifi`, `wheelchair_accessible`.
+
+Every filter is checked against Yelp's response. If Yelp does not apply one for a search (for
+example a price level for plumbers), the request returns `422 filter_not_applied` instead of wider
+results. Unknown, repeated or malformed parameters received by the API gateway return `422`
+before Yelp is contacted.
+
+Query validation runs after ingress parsing. Use `&` between parameters and percent-encode
+values (as in the examples above). The ingress treats a bare `;` as a parameter separator:
+`location=SF;page=2` reaches the gateway as `location=SF&page=2` and can perform a billed search,
+rather than return `422`. To include a semicolon inside a value, encode it as `%3B`.
+
+## Pagination
+
+Ten businesses per page, `page` 1 to 11 (up to 110 businesses for one search). Yelp challenges
+direct requests for deeper pages. Follow `next_page` while `has_next_page` is true; the last page can
+hold fewer than ten businesses. To cover more of a city, split the search by neighbourhood,
+postcode or category and deduplicate by `id`.
+
+## Response
+
+The envelope carries `market`, `query`, `location`, `location_resolved` (the city, state, country and
+centre coordinates Yelp searched), `did_you_mean`, `query_matched`, `total_results` (Yelp's reported
+total), `page`, `page_size`, `total_pages`, `has_next_page`, `next_page`, `results`, `ads`, `filters`,
+`related_searches`, `source_url`, `fetched_at` (ISO 8601 UTC) and `fetched_utc` (Unix seconds).
+
+Each business has `position` (its 1-based place in Yelp's organic order across pages: Yelp's own
+number where Yelp numbers the results, Yelp's listed order for unnumbered services searches such as
+plumbers, and the slot order for ads), `is_ad`,
+`id`, `alias`, `name`, `url`, `rating`, `review_count`, `price`, `price_level`, `categories`
+(`title`, `alias`), `neighborhoods`, `address`, `city`, `phone` (shown on sponsored cards only),
+`timezone`, `opening_hours` (`day`, `open`, `close` in local time), `snippet`, `snippet_type`,
+`highlights`, `tags`, `photos`, `alternate_names`, `is_service_area_business`, `is_yelp_guaranteed`,
+`has_verified_license` and, for ads, `ad_placement`. Fields Yelp does not show are `null` or empty.
+Yelp's search page does not carry per-business coordinates.
+
+When Yelp cannot place a query (for example a nonsense word), `query_matched` is `false` and Yelp
+either shows its broader ranking for the location, returned as Yelp shows it and billed like any
+page, or its own no-results page. A search Yelp itself marks as having no results returns
+`results: []` and costs 0 credits.
+
+## Errors
+
+| Status | Meaning |
+| --- | --- |
+| `400 invalid_location` | Yelp could not find the location. Not billed. |
+| `403 insufficient_scope` | The key does not include the `yelp` scope. |
+| `422` | Invalid or unsupported input, or `filter_not_applied`. Not billed. |
+| `503 source_unavailable` | Yelp did not return a verified search page. Not billed; retry later. |
