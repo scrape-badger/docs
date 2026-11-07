@@ -1,0 +1,81 @@
+---
+title: "GitHub Profile API"
+description: "Public GitHub user and organization profiles, pinned or popular repositories, README and contribution activity."
+---
+
+<Warning>
+  This reference describes the prepared GitHub rollout contract. Production
+  availability and latency have not yet been verified. Examples are representative.
+</Warning>
+
+Read a public GitHub profile with one endpoint:
+`GET https://scrapebadger.com/v1/github/profiles/{username}`.
+Use a login or `@handle`, not a profile URL. Accounts are global, so you do not
+need a market or language parameter. Authenticate with your ScrapeBadger
+`X-API-Key`; no GitHub access token is required.
+
+## Choose a profile tab
+
+| Tab | Purpose | Optional parameter | Credits |
+| --- | --- | --- | --- |
+| `overview` (default) | Identity, pinned or popular repositories, README and public user contributions; organization overview sections | `year` | 10 |
+| `repositories` | Profile repository summaries, 30 per page | `page` | 10 |
+| `stars` | User starred repositories and star lists, 30 per page | `next_page_token` | 10 |
+
+`year` is overview-only, `page` repositories-only, and `next_page_token` stars-only.
+Organizations do not have the user stars mode or user contribution calendar.
+Every successful page costs the same 10 credits: $1.50 per 1,000 successful
+requests at PAYG. Your plan determines the credit price; check
+[credits and pricing](/credits-and-pricing).
+
+## Representative request
+
+```bash
+curl --get 'https://scrapebadger.com/v1/github/profiles/sindresorhus' \
+  --data-urlencode 'tab=overview' \
+  --data-urlencode 'year=2024' \
+  -H 'X-API-Key: YOUR_API_KEY'
+```
+
+For a past `year`, the calendar covers that whole year and the activity timeline
+covers December. For the current year the timeline covers the current month.
+Without `year`, the calendar covers the last 12 months and the timeline the
+current month. These windows are reported separately.
+
+## Understand the response
+
+The root object contains `profile` and the sections available for the requested
+account and tab. User overview can contain `pinned_repositories` or
+`popular_repositories`, `readme`, `organizations`, `achievements`, `highlights`,
+`sponsors`, `sponsoring`, and `contributions`. Organization overview can include
+`repositories`, `people`, `top_languages`, `topics`, and `verified_domains`.
+The [profile endpoint reference](/github/profiles) defines the full field schema.
+
+Counts from supplemental public metadata are exact where available. The original
+website counts remain in `followers_display_count` and `following_display_count`.
+Compact website counts that remain estimates have a `*_approximate` flag. Dates
+have ISO `*_at` and Unix-seconds `*_utc` fields where the source provides a timestamp.
+
+An omitted section is unavailable or not applicable; it is not proof of zero
+activity. An explicitly published `null` metadata value remains null. Empty lists
+require a recognized public empty state. A blocked or failed contribution read
+returns an unbilled error rather than an empty calendar.
+
+## Integrations
+
+Representative CLI commands:
+
+```bash
+scrapebadger github profile sindresorhus --year 2024
+scrapebadger github profile rails --tab repositories --page 2
+scrapebadger github profile sindresorhus --tab stars --next-page-token 'OPAQUE_TOKEN'
+```
+
+Use `github_get_profile(username, tab?, year?, page?, next_page_token?)` through
+[MCP](/mcp/overview). Add `?apis=github` to list the tool directly, or use the
+free discovery helpers. SDK namespaces are generated from the API contract;
+release verification is required before relying on a published SDK version.
+
+This endpoint covers public profiles. General GitHub search, standalone repository
+detail, trending, private repositories and member-only organization views are
+separate from this surface.
