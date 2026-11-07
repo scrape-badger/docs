@@ -1,0 +1,27 @@
+name: Reconcile endpoint lifecycle
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
+permissions:
+  contents: write
+concurrency:
+  group: endpoint-lifecycle
+  cancel-in-progress: false
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: python scripts/sync_endpoint_lifecycle.py .
+      - name: Publish changed documentation
+        run: |
+          git config user.name scrapebadger-bot
+          git config user.email bot@scrapebadger.com
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m 'Synchronize endpoint lifecycle from admin policy'
+            git push origin HEAD:main
+          fi
