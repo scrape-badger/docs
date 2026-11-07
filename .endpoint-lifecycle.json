@@ -1,7 +1,7 @@
 {
   "api-reference/endpoint/yahoo/list-markets.mdx": {
     "original": "591c1e025a1da370cb2d1868f766d8533ea7bf5e",
-    "generated": "81311df9a45334fd8ba36ef3f48c8c30de732b0e40241b9cb54e0edc3d541d5e"
+    "generated": null
   },
   "openapi-amazon.json": {
     "original": "9e33317a0c5162c504fdbb47e4b778acac01f273",
@@ -58,5 +58,9 @@
   "openapi-tiktok.json": {
     "original": "94201f21c1ce1c0098c840c29d9c6dfe9b3a1b66",
     "generated": "ac58f6fe7cd75979477186d8fad66f306ffd44b46bf004c833b83455f6a019c0"
+  },
+  "docs.json": {
+    "original": "38923805044067407620fa08a503854618fdf29d",
+    "generated": "136c395ffb9b0fea4a0b47b1a26300a4fb88b3bec8502676748b488886223b0f"
   }
 }
