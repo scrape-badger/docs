@@ -1,8 +1,4 @@
 {
-  "api-reference/endpoint/yahoo/list-markets.mdx": {
-    "original": "591c1e025a1da370cb2d1868f766d8533ea7bf5e",
-    "generated": "81311df9a45334fd8ba36ef3f48c8c30de732b0e40241b9cb54e0edc3d541d5e"
-  },
   "openapi-amazon.json": {
     "original": "9e33317a0c5162c504fdbb47e4b778acac01f273",
     "generated": "c71640875f582f8d0f18cd7baba070620330c8a6417c6ed00a97823d2ba1062c"
