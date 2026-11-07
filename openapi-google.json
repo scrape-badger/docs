@@ -566,10 +566,11 @@
                   "type": "null"
                 }
               ],
-              "description": "Google result filter: 14 web, 18 forums. Other verticals require output=html.",
-              "title": "Udm"
+              "description": "Google result filter: web or 14 for web, 18 for forums. Other verticals require output=html.",
+              "title": "Udm",
+              "pattern": "^(web|[0-9]{1,3})$"
             },
-            "description": "Google result filter: 14 web, 18 forums. Other verticals require output=html."
+            "description": "Google result filter: web or 14 for web, 18 for forums. Other verticals require output=html."
           },
           {
             "name": "no_cache",
@@ -781,6 +782,56 @@
               "title": "As Sitesearch"
             },
             "description": "Restrict results to a site."
+          },
+          {
+            "name": "oq",
+            "in": "query",
+            "required": false,
+            "description": "Original query sent to Google. Defaults to q; an empty string omits it.",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "name": "sourceid",
+            "in": "query",
+            "required": false,
+            "description": "Google source identifier. Defaults to chrome; an empty string omits it.",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "chrome"
+            }
+          },
+          {
+            "name": "ie",
+            "in": "query",
+            "required": false,
+            "description": "Google input encoding hint. Defaults to UTF-8; an empty string omits it.",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "UTF-8"
+            }
           }
         ],
         "responses": {
@@ -5716,10 +5767,11 @@
                   "type": "null"
                 }
               ],
-              "description": "Google result filter: 14 web, 18 forums. Other verticals require output=html.",
-              "title": "Udm"
+              "description": "Google result filter: web or 14 for web, 18 for forums. Other verticals require output=html.",
+              "title": "Udm",
+              "pattern": "^(web|[0-9]{1,3})$"
             },
-            "description": "Google result filter: 14 web, 18 forums. Other verticals require output=html."
+            "description": "Google result filter: web or 14 for web, 18 for forums. Other verticals require output=html."
           },
           {
             "name": "no_cache",
@@ -6093,6 +6145,56 @@
               "title": "Uds"
             },
             "description": "Google filter string."
+          },
+          {
+            "name": "oq",
+            "in": "query",
+            "required": false,
+            "description": "Original query sent to Google. Defaults to q; an empty string omits it.",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          {
+            "name": "sourceid",
+            "in": "query",
+            "required": false,
+            "description": "Google source identifier. Defaults to chrome; an empty string omits it.",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "chrome"
+            }
+          },
+          {
+            "name": "ie",
+            "in": "query",
+            "required": false,
+            "description": "Google input encoding hint. Defaults to UTF-8; an empty string omits it.",
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": "UTF-8"
+            }
           }
         ],
         "responses": {
