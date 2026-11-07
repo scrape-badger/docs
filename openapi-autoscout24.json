@@ -670,7 +670,8 @@
           {
             "ApiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     }
   },

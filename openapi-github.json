@@ -306,7 +306,8 @@
           }
         },
         "x-credit-cost": 10,
-        "x-rollout-status": "prepared"
+        "x-rollout-status": "prepared",
+        "x-availability": "active"
       }
     }
   },

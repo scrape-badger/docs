@@ -29,7 +29,8 @@
           {
             "ApiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     },
     "/v1/yelp/search": {
@@ -201,7 +202,8 @@
           {
             "ApiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     }
   },
