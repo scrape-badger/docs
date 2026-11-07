@@ -4,7 +4,7 @@
     "generated": "30216b790c783b915b0b5a4ea3a3c9603bbc6d1f91e69cef0f9e887f09488bd9"
   },
   "openapi-autoscout24.json": {
-    "original": "7be0ff5cbe58ec8096a950c23250ad52230f59e1",
+    "original": "2e5753d2a9989e26cd79c8dcc71d63ab619909a9",
     "generated": "906a8b1ec6972218aa9500585f7fdaf1a85b5ad581beb9996e7b9cd478174032"
   },
   "openapi-yelp.json": {
@@ -36,7 +36,7 @@
     "generated": "64602ecc44e5e3674c9c778c1aed61265bde80de3497a43a9e219a63d60d418b"
   },
   "openapi-github.json": {
-    "original": "643d1d851124ab6a7068d9c4ecd61a4b989bec20",
+    "original": "36d6a5e93d5e37fbc7b3ada3d121697a039e9812",
     "generated": "7cb8851d4169347b645e9c3346cd7667b331be95f9f38fdc4d73fab41c9321f6"
   },
   "openapi-reddit.json": {
