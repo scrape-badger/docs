@@ -1,0 +1,16 @@
+---
+title: "List supported locales"
+openapi: "GET /v1/brave/locales"
+description: "List supported locales from native Brave Search."
+---
+
+Returns native country and UI-language choices as `countries` and `ui_languages`, each with `code` and `name`. UI language controls labels, not result language. `all` is a country option for all regions.
+
+**Credits:** 0. Confirmed empty results and failed requests are unbilled.
+
+## Errors
+
+Invalid or unsupported parameters return `422`; unavailable source content returns
+an error instead of a billable empty result. A key without the `brave` scope returns `403`.
+
+See the [overview](/brave/overview) for pagination, fields and authentication.

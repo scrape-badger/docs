@@ -1,0 +1,20 @@
+---
+title: "Image search"
+openapi: "GET /v1/brave/images"
+description: "Image search from native Brave Search."
+---
+
+Returns the initial source image batch. `count` trims the batch; there is no pagination parameter. Original image URLs, thumbnails, dimensions and source-page metadata are returned when supplied.
+
+**Credits:** 7. Confirmed empty results and failed requests are unbilled.
+
+`query` must be nonblank and no longer than 2,048 characters. Country and UI-language
+codes come from the [locale reference](/api-reference/endpoint/brave/locales).
+Safe-search accepts `off`, `moderate`, or `strict` (default).
+
+## Errors
+
+Invalid or unsupported parameters return `422`; unavailable source content returns
+an error instead of a billable empty result. A key without the `brave` scope returns `403`.
+
+See the [overview](/brave/overview) for pagination, fields and authentication.

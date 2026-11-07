@@ -12,21 +12,23 @@
     "light": "/logo/light.png",
     "dark": "/logo/dark.png"
   },
-  "openapi": [
-    "https://scrapebadger.com/api/twitter-openapi.json",
-    "/openapi-web-scraping.json",
-    "/openapi-vinted.json",
-    "/openapi-amazon.json",
-    "/openapi-ebay.json",
-    "/openapi-realtor.json",
-    "/openapi-zillow.json",
-    "/openapi-youtube.json",
-    "/openapi-tiktok.json",
-    "/openapi-reddit.json",
-    "/openapi-google.json",
-    "/openapi-account.json"
-  ],
   "api": {
+    "openapi": [
+      "https://scrapebadger.com/api/twitter-openapi.json",
+      "openapi-web-scraping.json",
+      "openapi-vinted.json",
+      "openapi-amazon.json",
+      "openapi-ebay.json",
+      "openapi-realtor.json",
+      "openapi-zillow.json",
+      "openapi-tiktok.json",
+      "openapi-reddit.json",
+      "openapi-google.json",
+      "openapi-account.json",
+      "openapi-github.json",
+      "openapi-autoscout24.json",
+      "openapi-brave.json"
+    ],
     "baseUrl": "https://scrapebadger.com",
     "auth": {
       "method": "key",
@@ -1740,6 +1742,66 @@
               "api-reference/endpoint/bestbuy/products-sku-questions",
               "api-reference/endpoint/bestbuy/products-sku-availability",
               "api-reference/endpoint/bestbuy/products-sku"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "GitHub",
+        "groups": [
+          {
+            "group": "GitHub Profile API",
+            "pages": [
+              "github/overview",
+              "github/profiles"
+            ]
+          },
+          {
+            "group": "Endpoint reference",
+            "pages": [
+              "api-reference/endpoint/github/get-profile"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "AutoScout24",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "autoscout24/overview"
+            ]
+          },
+          {
+            "group": "Search and reference",
+            "pages": [
+              "api-reference/endpoint/autoscout24/search",
+              "api-reference/endpoint/autoscout24/filters",
+              "api-reference/endpoint/autoscout24/markets",
+              "api-reference/endpoint/autoscout24/health"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Brave",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "brave/overview"
+            ]
+          },
+          {
+            "group": "API reference",
+            "pages": [
+              "api-reference/endpoint/brave/search",
+              "api-reference/endpoint/brave/images",
+              "api-reference/endpoint/brave/videos",
+              "api-reference/endpoint/brave/news",
+              "api-reference/endpoint/brave/autocomplete",
+              "api-reference/endpoint/brave/locales"
             ]
           }
         ]

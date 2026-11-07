@@ -1,0 +1,1431 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AutoScout24 API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/v1/autoscout24/search": {
+      "get": {
+        "tags": [
+          "AutoScout24"
+        ],
+        "summary": "Search vehicles",
+        "description": "Search live vehicle cards, seller/location information and current filter taxonomy.\n\nBrowsing is capped at 200 pages (normally 20 cards each). Narrow the query\nto reach more inventory. Empty results cost zero credits. Listing detail\nis not included in this API.",
+        "operationId": "autoscout24_search_vehicles",
+        "parameters": [
+          {
+            "name": "market",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "de",
+                "at",
+                "be",
+                "es",
+                "fr",
+                "it",
+                "lu",
+                "nl"
+              ],
+              "type": "string",
+              "default": "de",
+              "title": "Market"
+            }
+          },
+          {
+            "name": "make",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Native make slug, e.g. volkswagen or bmw.",
+              "title": "Make"
+            },
+            "description": "Native make slug, e.g. volkswagen or bmw."
+          },
+          {
+            "name": "model",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Native model slug, e.g. golf. Requires make.",
+              "title": "Model"
+            },
+            "description": "Native model slug, e.g. golf. Requires make."
+          },
+          {
+            "name": "price_min",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Price Min"
+            }
+          },
+          {
+            "name": "price_max",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Price Max"
+            }
+          },
+          {
+            "name": "mileage_min",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Kilometres.",
+              "title": "Mileage Min"
+            },
+            "description": "Kilometres."
+          },
+          {
+            "name": "mileage_max",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Mileage Max"
+            }
+          },
+          {
+            "name": "year_min",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "maximum": 2100,
+                  "minimum": 1900
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Year Min"
+            }
+          },
+          {
+            "name": "year_max",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "maximum": 2100,
+                  "minimum": 1900
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Year Max"
+            }
+          },
+          {
+            "name": "power_min",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Engine power in kW.",
+              "title": "Power Min"
+            },
+            "description": "Engine power in kW."
+          },
+          {
+            "name": "power_max",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Power Max"
+            }
+          },
+          {
+            "name": "fuel_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "petrol",
+                    "diesel",
+                    "electric",
+                    "hybrid_petrol",
+                    "hybrid_diesel",
+                    "cng",
+                    "hydrogen",
+                    "lpg",
+                    "ethanol",
+                    "other"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Fuel Type"
+            }
+          },
+          {
+            "name": "transmission",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "automatic",
+                    "manual",
+                    "semi_automatic"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Transmission"
+            }
+          },
+          {
+            "name": "body_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "compact",
+                    "convertible",
+                    "coupe",
+                    "suv",
+                    "station_wagon",
+                    "sedan",
+                    "van",
+                    "transporter",
+                    "other"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Body Type"
+            }
+          },
+          {
+            "name": "seller_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "dealer",
+                    "private"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Seller Type"
+            }
+          },
+          {
+            "name": "condition",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "new",
+                    "used",
+                    "annual",
+                    "classic",
+                    "demo",
+                    "day_registration"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Condition"
+            }
+          },
+          {
+            "name": "zip",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 10
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Postal code in the requested market.",
+              "title": "Zip"
+            },
+            "description": "Postal code in the requested market."
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "maximum": 400,
+                  "minimum": 1
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Kilometres; requires zip.",
+              "title": "Radius"
+            },
+            "description": "Kilometres; requires zip."
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "best_match",
+                "price_asc",
+                "price_desc",
+                "mileage_asc",
+                "mileage_desc",
+                "registration_asc",
+                "registration_desc",
+                "power_asc",
+                "power_desc",
+                "newest"
+              ],
+              "type": "string",
+              "default": "best_match",
+              "title": "Sort By"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutoScout24SearchResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/autoscout24/filters": {
+      "get": {
+        "tags": [
+          "AutoScout24"
+        ],
+        "summary": "List search filters",
+        "description": "Current native make, model and vehicle filter options. Set make for its models.",
+        "operationId": "autoscout24_list_search_filters",
+        "parameters": [
+          {
+            "name": "market",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "de",
+                "at",
+                "be",
+                "es",
+                "fr",
+                "it",
+                "lu",
+                "nl"
+              ],
+              "type": "string",
+              "default": "de",
+              "title": "Market"
+            }
+          },
+          {
+            "name": "make",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Make"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutoScout24FiltersResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/autoscout24/markets": {
+      "get": {
+        "tags": [
+          "AutoScout24"
+        ],
+        "summary": "List markets",
+        "description": "Verified marketplaces, domains, languages and currency. Free reference endpoint.",
+        "operationId": "autoscout24_list_markets",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutoScout24MarketsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/autoscout24/health": {
+      "get": {
+        "tags": [
+          "AutoScout24"
+        ],
+        "summary": "Check AutoScout24 health",
+        "operationId": "autoscout24_check_autoscout24_health",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Health V1 Autoscout24 Health Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AutoScout24FiltersResponse": {
+        "properties": {
+          "market": {
+            "type": "string",
+            "title": "Market"
+          },
+          "source_url": {
+            "type": "string",
+            "title": "Source Url"
+          },
+          "filters": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Filters"
+          },
+          "latency_ms": {
+            "type": "integer",
+            "title": "Latency Ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "market",
+          "source_url",
+          "filters",
+          "latency_ms"
+        ],
+        "title": "AutoScout24FiltersResponse"
+      },
+      "AutoScout24Listing": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "cross_reference_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cross Reference Id"
+          },
+          "position": {
+            "type": "integer",
+            "title": "Position"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "images": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Images"
+          },
+          "online_purchase_images": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Online Purchase Images"
+          },
+          "price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency",
+            "default": "EUR"
+          },
+          "price_formatted": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Formatted"
+          },
+          "price_evaluation": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Evaluation"
+          },
+          "price_evaluation_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price Evaluation Enabled"
+          },
+          "price_details": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Price Details"
+          },
+          "old_price_formatted": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Old Price Formatted"
+          },
+          "is_super_deal": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Super Deal"
+          },
+          "is_conditional_price": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Conditional Price"
+          },
+          "vat_label_required": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vat Label Required"
+          },
+          "make": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Make"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "model_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Id"
+          },
+          "model_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Group"
+          },
+          "variant": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Variant"
+          },
+          "motor_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Motor Type"
+          },
+          "version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Version"
+          },
+          "subtitle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subtitle"
+          },
+          "article_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Article Type"
+          },
+          "offer_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Offer Type"
+          },
+          "fuel": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fuel"
+          },
+          "fuel_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fuel Type"
+          },
+          "transmission": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Transmission"
+          },
+          "mileage_km": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mileage Km"
+          },
+          "first_registration": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Registration",
+            "description": "Month precision, YYYY-MM; no invented day."
+          },
+          "registration_year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Registration Year"
+          },
+          "registration_month": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Registration Month"
+          },
+          "power_kw": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Power Kw"
+          },
+          "power_hp": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Power Hp"
+          },
+          "displacement_cc": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Displacement Cc"
+          },
+          "is_damaged": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Damaged"
+          },
+          "available_now": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Available Now"
+          },
+          "available_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Available At"
+          },
+          "available_utc": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Available Utc"
+          },
+          "availability_in_days": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Availability In Days"
+          },
+          "location": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Location"
+          },
+          "seller": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Seller"
+          },
+          "rating": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating"
+          },
+          "rating_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rating Count"
+          },
+          "ratings_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ratings Enabled"
+          },
+          "leasing": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Leasing"
+          },
+          "seals": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Seals"
+          },
+          "online_purchase": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Online Purchase"
+          },
+          "electric_vehicle_banner": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Electric Vehicle Banner"
+          },
+          "is_deliverable": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Deliverable"
+          },
+          "has_video": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Has Video"
+          },
+          "has_360_image": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Has 360 Image"
+          },
+          "interest_level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interest Level"
+          },
+          "is_trending": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Trending"
+          },
+          "ad_tier": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ad Tier"
+          },
+          "result_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result Type"
+          },
+          "result_section": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result Section"
+          },
+          "special_conditions": {
+            "items": {},
+            "type": "array",
+            "title": "Special Conditions"
+          },
+          "vehicle_details": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Vehicle Details"
+          },
+          "wltp_values": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Wltp Values"
+          },
+          "vehicle": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Vehicle",
+            "description": "Additional native vehicle attributes, including localized labels."
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "position",
+          "title",
+          "url"
+        ],
+        "title": "AutoScout24Listing",
+        "description": "Public data on a search card; nullable fields are absent from some cards."
+      },
+      "AutoScout24Market": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "domain": {
+            "type": "string",
+            "title": "Domain"
+          },
+          "country_code": {
+            "type": "string",
+            "title": "Country Code"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "name",
+          "domain",
+          "country_code",
+          "language",
+          "currency"
+        ],
+        "title": "AutoScout24Market"
+      },
+      "AutoScout24MarketsResponse": {
+        "properties": {
+          "markets": {
+            "items": {
+              "$ref": "#/components/schemas/AutoScout24Market"
+            },
+            "type": "array",
+            "title": "Markets"
+          }
+        },
+        "type": "object",
+        "required": [
+          "markets"
+        ],
+        "title": "AutoScout24MarketsResponse"
+      },
+      "AutoScout24SearchResponse": {
+        "properties": {
+          "market": {
+            "type": "string",
+            "title": "Market"
+          },
+          "source_url": {
+            "type": "string",
+            "title": "Source Url"
+          },
+          "total_results": {
+            "type": "integer",
+            "title": "Total Results"
+          },
+          "total_pages": {
+            "type": "integer",
+            "title": "Total Pages"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size",
+            "default": 20
+          },
+          "has_next_page": {
+            "type": "boolean",
+            "title": "Has Next Page"
+          },
+          "next_page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Page"
+          },
+          "pagination_cap": {
+            "type": "integer",
+            "title": "Pagination Cap",
+            "default": 200
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/AutoScout24Listing"
+            },
+            "type": "array",
+            "title": "Results"
+          },
+          "filters": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Filters"
+          },
+          "applied_filters": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Applied Filters"
+          },
+          "latency_ms": {
+            "type": "integer",
+            "title": "Latency Ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "market",
+          "source_url",
+          "total_results",
+          "total_pages",
+          "page",
+          "has_next_page",
+          "next_page",
+          "results",
+          "filters",
+          "applied_filters",
+          "latency_ms"
+        ],
+        "title": "AutoScout24SearchResponse"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "https://scrapebadger.com"
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+---
+title: "Get profile"
+description: "Read a public GitHub user or organization profile. All tabs cost 10 credits."
+openapi: "get /v1/github/profiles/{username}"
+---
+
+This is the same operation documented at [GitHub profiles](/github/profiles).
+Use a login or `@handle`, never a profile URL. Optional sections depend on public
+source visibility. Client timeout examples are not latency guarantees.
+
+- `overview` accepts `year` only.
+- `repositories` accepts `page` only, with 30 rows per page.
+- User-only `stars` accepts `next_page_token` only, with 30 rows per page.
+
+Every successful request costs **10 credits**. Read the
+[profile guide](/github/profiles) for calendar windows, pagination, null/omission
+semantics and unbilled source failures.

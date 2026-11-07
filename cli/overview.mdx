@@ -117,3 +117,17 @@ scrapebadger web scrape https://example.com --format markdown
 ## Vinted mobile data
 
 CLI 0.14.0 adds `scrapebadger vinted mobile-operations` and `scrapebadger vinted mobile <operation> --params <JSON>`. See [Vinted mobile API](/vinted/mobile-api) for copyable examples and all 77 operations.
+
+## Brave Search
+
+```bash
+scrapebadger brave search "coffee machine" --country de --ui-language de-de --freshness week
+scrapebadger brave videos "espresso tutorial" --page 2
+scrapebadger brave images "golden retriever" --count 10
+scrapebadger brave news "technology" --count 10
+scrapebadger brave autocomplete "coff"
+scrapebadger brave locales
+```
+
+Web/video pages follow native 1-based boundaries. `count` trims one page;
+images/news have no pagination parameter. See the [Brave overview](/brave/overview).

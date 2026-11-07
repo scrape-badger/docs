@@ -1,0 +1,104 @@
+---
+title: "Brave Search API"
+description: "Search native Brave web results and rich blocks, images, videos and news with locale, safe-search and pagination controls."
+---
+
+Search Brave's public index with your ScrapeBadger key. Get organic results and
+source-provided rich blocks, including knowledge blocks when available, or use the image, video and news endpoints.
+You do not need a Brave account or a separate Brave API key.
+
+## Endpoints and credits
+
+| Endpoint | Credits per nonempty response |
+| --- | --- |
+| [Web search](/api-reference/endpoint/brave/search) | 7 |
+| [Images](/api-reference/endpoint/brave/images) | 7 |
+| [Videos](/api-reference/endpoint/brave/videos) | 7 |
+| [News](/api-reference/endpoint/brave/news) | 7 |
+| [Autocomplete](/api-reference/endpoint/brave/autocomplete) | 2 |
+| [Locale choices](/api-reference/endpoint/brave/locales) | 0 |
+
+Confirmed empty results and failed requests are unbilled. Read `X-Credits-Used`
+for the charge on a response. Keys restricted to particular APIs need the `brave` scope.
+
+## Quickstart
+
+```bash
+curl -G "https://scrapebadger.com/v1/brave/search" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  --data-urlencode "query=coffee machine" \
+  --data-urlencode "country=us" \
+  --data-urlencode "freshness=week"
+```
+
+```python
+import os
+import httpx
+
+response = httpx.get(
+    "https://scrapebadger.com/v1/brave/search",
+    headers={"X-API-Key": os.environ["SCRAPEBADGER_API_KEY"]},
+    params={"query": "coffee machine", "page": 1},
+    timeout=120,
+)
+response.raise_for_status()
+data = response.json()
+for result in data["results"]:
+    print(result["position"], result["title"], result["url"])
+```
+
+```javascript
+const response = await fetch("https://scrapebadger.com/v1/brave/search?" +
+  new URLSearchParams({query: "coffee machine", page: "1"}), {
+  headers: {"X-API-Key": process.env.SCRAPEBADGER_API_KEY},
+});
+if (!response.ok) throw new Error(`HTTP ${response.status}`);
+const data = await response.json();
+console.log(data.results);
+```
+
+## Pagination and filters
+
+Web and video search accept a **1-based page ordinal** (`page=1` through `10`).
+Use `has_next` and `next_page` to continue. `count` trims one native page; it does
+not change Brave's page boundaries. You may receive fewer results than requested.
+Images and news return their initial source batch and have no page parameter.
+
+All search endpoints accept `country`, `ui_language`, and
+`safe_search=off|moderate|strict`. Use the free [locale reference](/api-reference/endpoint/brave/locales)
+for valid codes. UI language controls interface labels and date formatting; it
+is not a result-language filter. `country=all` selects all regions.
+
+Web search also accepts `freshness=any|day|week|month|year` and `spellcheck`.
+Read `query_info` for source spelling corrections and query relaxation. Brave
+can broaden a query even with spellcheck disabled. Unsupported parameters return `422`.
+
+## Result fields
+
+Every search response includes `results`, `result_count`, `query_info`,
+`source_url`, `country`, `ui_language`, `safe_search`, and the observation time
+as both `fetched_at` (ISO UTC) and `fetched_utc` (Unix seconds).
+
+Results include title, URL, position, snippets and source metadata. Web search
+also returns FAQ, discussions, related searches and inline media when Brave
+supplies them. Rich modules vary by query; an empty module array means Brave did
+not supply that module. Original image URLs, dimensions, video metadata and
+publisher profiles remain in their source-specific result fields.
+
+Relative article ages remain display strings. Absolute publication timestamps
+appear only when the source supplies a defensible date; observation time is
+separate from publication time. Brave AI Mode and generated answers are outside this API.
+
+## CLI and MCP
+
+```bash
+scrapebadger brave search "coffee machine" --freshness week --page 2
+scrapebadger brave images "golden retriever" --count 10
+scrapebadger brave videos "espresso tutorial" --page 2
+scrapebadger brave news "technology" --count 10
+scrapebadger brave locales
+```
+
+MCP tools: `brave_search`, `brave_images`, `brave_videos`, `brave_news`, `brave_autocomplete`, `brave_locales`.
+
+ScrapeBadger is independent and is not affiliated with or endorsed by Brave.

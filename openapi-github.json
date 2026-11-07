@@ -1,0 +1,2202 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ScrapeBadger GitHub Profile API",
+    "version": "1.0.0",
+    "description": "Prepared contract for public user and organization profiles. Production availability and latency are not yet verified. All examples are representative. Every mode costs 10 credits."
+  },
+  "servers": [
+    {
+      "url": "https://scrapebadger.com",
+      "description": "API base URL; rollout verification pending"
+    }
+  ],
+  "security": [
+    {
+      "apiKeyAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "GitHub",
+      "description": "Global public profiles; no market or language parameter."
+    }
+  ],
+  "paths": {
+    "/v1/github/profiles/{username}": {
+      "get": {
+        "operationId": "github_get_profile",
+        "summary": "Get profile",
+        "description": "Get public website profile sections plus supplemental public metadata. tab defaults overview. year is overview-only, page repositories-only, next_page_token stars-only. HTML sections remain required; failed native reads are errors, never empty successes. General search, standalone repository detail, trending and private member views are excluded.",
+        "tags": [
+          "GitHub"
+        ],
+        "x-credit-cost": 10,
+        "x-rollout-status": "prepared-awaiting-live-verification",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "description": "GitHub login or leading @handle, not a profile URL. Up to 39 login characters; reserved site routes and invalid logins are rejected.",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 40,
+              "pattern": "^@?[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$"
+            }
+          },
+          {
+            "name": "tab",
+            "in": "query",
+            "description": "Profile mode. Stars supports user accounts only.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "overview",
+                "repositories",
+                "stars"
+              ],
+              "default": "overview"
+            }
+          },
+          {
+            "name": "year",
+            "in": "query",
+            "description": "Overview only: 1970 through the current UTC year; activity is December or current month",
+            "schema": {
+              "type": "integer",
+              "minimum": 1970
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Repositories only. Positive page number; 30 repository rows per page. Follow pagination.next_page.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "next_page_token",
+            "in": "query",
+            "description": "Stars only. Exact opaque pagination.next_page_token from the prior response; not a URL. 30 rows per page.",
+            "schema": {
+              "type": "string",
+              "maxLength": 1024
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Unwrapped profile object. Source-specific sections may be omitted. Representative examples are abridged and not live production results.",
+            "headers": {
+              "X-Credits-Used": {
+                "description": "10 credits for every successful mode.",
+                "schema": {
+                  "type": "integer",
+                  "const": 10
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GitHubProfileResponse"
+                },
+                "examples": {
+                  "overview": {
+                    "summary": "Abridged representative user overview; not a production result",
+                    "value": {
+                      "profile": {
+                        "login": "example-user",
+                        "link": "https://github.com/example-user",
+                        "is_organization": false,
+                        "followers": 1234,
+                        "followers_display_count": 1200,
+                        "created_at": "2020-01-02T03:04:05Z",
+                        "created_utc": 1577934245.0
+                      }
+                    }
+                  },
+                  "repositories": {
+                    "summary": "Representative repository page; not a production result",
+                    "value": {
+                      "profile": {
+                        "login": "example-org",
+                        "link": "https://github.com/example-org",
+                        "is_organization": true
+                      },
+                      "repositories": [],
+                      "pagination": {
+                        "page": 2,
+                        "has_next": false
+                      }
+                    }
+                  },
+                  "stars": {
+                    "summary": "Representative stars pagination shape; not a production result",
+                    "value": {
+                      "profile": {
+                        "login": "example-user",
+                        "link": "https://github.com/example-user",
+                        "is_organization": false
+                      },
+                      "starred_repositories": [],
+                      "star_lists": [],
+                      "pagination": {
+                        "has_next": true,
+                        "next_page_token": "OPAQUE_TOKEN"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameter combination, invalid login, or organization stars.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GitHubProfileError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid ScrapeBadger API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GitHubProfileError"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Insufficient credits.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GitHubProfileError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "API key lacks github scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GitHubProfileError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown GitHub profile.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GitHubProfileError"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Invalid parameter value.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GitHubProfileError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Account request limit reached.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GitHubProfileError"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Upstream transport, challenge or parser failure; unbilled.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GitHubProfileError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Source unavailable or transport not configured; unbilled.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GitHubProfileError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
+    },
+    "schemas": {
+      "GitHubAccountPreview": {
+        "additionalProperties": true,
+        "properties": {
+          "login": {
+            "title": "Login",
+            "type": "string"
+          },
+          "link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Link"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Id"
+          },
+          "avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Avatar Url"
+          }
+        },
+        "required": [
+          "login"
+        ],
+        "title": "GitHubAccountPreview",
+        "type": "object"
+      },
+      "GitHubAchievement": {
+        "additionalProperties": true,
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Image"
+          },
+          "link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Link"
+          },
+          "count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Count"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "GitHubAchievement",
+        "type": "object"
+      },
+      "GitHubActivityBlock": {
+        "additionalProperties": true,
+        "properties": {
+          "type": {
+            "title": "Type",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Count"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/GitHubActivityRow"
+            },
+            "title": "Rows",
+            "type": "array"
+          }
+        },
+        "required": [
+          "type",
+          "summary",
+          "rows"
+        ],
+        "title": "GitHubActivityBlock",
+        "type": "object"
+      },
+      "GitHubActivityOverview": {
+        "additionalProperties": true,
+        "properties": {
+          "summary": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Summary"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "repositories": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/GitHubNamedLink"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Repositories"
+          },
+          "commits_percentage": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Commits Percentage"
+          },
+          "code_review_percentage": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Code Review Percentage"
+          },
+          "pull_requests_percentage": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Pull Requests Percentage"
+          },
+          "issues_percentage": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Issues Percentage"
+          }
+        },
+        "title": "GitHubActivityOverview",
+        "type": "object"
+      },
+      "GitHubActivityRow": {
+        "additionalProperties": true,
+        "properties": {
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Count"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Title"
+          },
+          "link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Link"
+          },
+          "repository": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Repository"
+          },
+          "repository_link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Repository Link"
+          },
+          "links": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/GitHubTextLink"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Links"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "created_utc": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Created Utc"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "GitHubActivityRow",
+        "type": "object"
+      },
+      "GitHubCalendarDay": {
+        "additionalProperties": true,
+        "properties": {
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "count": {
+            "minimum": 0,
+            "title": "Count",
+            "type": "integer"
+          },
+          "level": {
+            "maximum": 4,
+            "minimum": 0,
+            "title": "Level",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "date",
+          "count",
+          "level"
+        ],
+        "title": "GitHubCalendarDay",
+        "type": "object"
+      },
+      "GitHubContributions": {
+        "additionalProperties": true,
+        "properties": {
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "calendar": {
+            "items": {
+              "$ref": "#/components/schemas/GitHubCalendarDay"
+            },
+            "title": "Calendar",
+            "type": "array"
+          },
+          "from": {
+            "format": "date",
+            "title": "From",
+            "type": "string"
+          },
+          "to": {
+            "format": "date",
+            "title": "To",
+            "type": "string"
+          },
+          "activity_overview": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GitHubActivityOverview"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "activity": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/GitHubActivityBlock"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Activity"
+          },
+          "private_contributions": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Private Contributions"
+          },
+          "activity_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Activity From"
+          },
+          "activity_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Activity To"
+          },
+          "previous_activity_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Previous Activity Url"
+          },
+          "years": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Years"
+          }
+        },
+        "required": [
+          "total",
+          "calendar",
+          "from",
+          "to"
+        ],
+        "title": "GitHubContributions",
+        "type": "object"
+      },
+      "GitHubLanguage": {
+        "additionalProperties": true,
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "link": {
+            "title": "Link",
+            "type": "string"
+          },
+          "color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Color"
+          }
+        },
+        "required": [
+          "name",
+          "link"
+        ],
+        "title": "GitHubLanguage",
+        "type": "object"
+      },
+      "GitHubNamedLink": {
+        "additionalProperties": true,
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "link": {
+            "title": "Link",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "link"
+        ],
+        "title": "GitHubNamedLink",
+        "type": "object"
+      },
+      "GitHubPagination": {
+        "additionalProperties": true,
+        "properties": {
+          "has_next": {
+            "title": "Has Next",
+            "type": "boolean"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Page"
+          },
+          "next_page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Next Page"
+          },
+          "next_page_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Opaque cursor for the stars tab only.",
+            "title": "Next Page Token"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Total"
+          },
+          "page_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Page Count"
+          }
+        },
+        "required": [
+          "has_next"
+        ],
+        "title": "GitHubPagination",
+        "type": "object"
+      },
+      "GitHubProfile": {
+        "additionalProperties": true,
+        "properties": {
+          "login": {
+            "title": "Login",
+            "type": "string"
+          },
+          "link": {
+            "title": "Link",
+            "type": "string"
+          },
+          "is_organization": {
+            "title": "Is Organization",
+            "type": "boolean"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Id"
+          },
+          "node_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Node Id"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Type"
+          },
+          "user_view_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "User View Type"
+          },
+          "site_admin": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Site Admin"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Name"
+          },
+          "avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Avatar Url"
+          },
+          "bio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Bio"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "pronouns": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Pronouns"
+          },
+          "local_time": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Local Time"
+          },
+          "utc_offset": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Public profile UTC offset in hours.",
+            "title": "Utc Offset"
+          },
+          "company": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Company"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Location"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Email"
+          },
+          "website": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Website"
+          },
+          "twitter_username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Twitter Username"
+          },
+          "hireable": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Hireable"
+          },
+          "social_accounts": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/GitHubSocialAccount"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Social Accounts"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GitHubStatus"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "followers": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Exact when public metadata is available.",
+            "title": "Followers"
+          },
+          "following": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Following"
+          },
+          "repos": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Repos"
+          },
+          "public_repos": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Public Repos"
+          },
+          "public_gists": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Public Gists"
+          },
+          "followers_display_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Followers Display Count"
+          },
+          "following_display_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Following Display Count"
+          },
+          "followers_approximate": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Followers Approximate"
+          },
+          "following_approximate": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Following Approximate"
+          },
+          "repos_approximate": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Repos Approximate"
+          },
+          "starred_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Starred Count"
+          },
+          "starred_count_approximate": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Starred Count Approximate"
+          },
+          "projects_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Projects Count"
+          },
+          "projects_count_approximate": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Projects Count Approximate"
+          },
+          "packages_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Packages Count"
+          },
+          "packages_count_approximate": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Packages Count Approximate"
+          },
+          "sponsoring_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Sponsoring Count"
+          },
+          "sponsoring_count_approximate": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Sponsoring Count Approximate"
+          },
+          "is_sponsorable": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Is Sponsorable"
+          },
+          "sponsors_link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Sponsors Link"
+          },
+          "is_verified": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Is Verified"
+          },
+          "has_organization_projects": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Has Organization Projects"
+          },
+          "has_repository_projects": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Has Repository Projects"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "created_utc": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Created Utc"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "updated_utc": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Updated Utc"
+          },
+          "archived_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "format": "date-time",
+            "title": "Archived At"
+          },
+          "archived_utc": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Archived Utc"
+          },
+          "repos_display_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Repos Display Count"
+          }
+        },
+        "required": [
+          "login",
+          "link",
+          "is_organization"
+        ],
+        "title": "GitHubProfile",
+        "type": "object"
+      },
+      "GitHubReadme": {
+        "additionalProperties": true,
+        "properties": {
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "html": {
+            "title": "Html",
+            "type": "string"
+          },
+          "link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Link"
+          }
+        },
+        "required": [
+          "text",
+          "html"
+        ],
+        "title": "GitHubReadme",
+        "type": "object"
+      },
+      "GitHubRepository": {
+        "additionalProperties": true,
+        "properties": {
+          "position": {
+            "title": "Position",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "full_name": {
+            "title": "Full Name",
+            "type": "string"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/GitHubAccountPreview"
+          },
+          "link": {
+            "title": "Link",
+            "type": "string"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Id"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Description"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Language"
+          },
+          "language_color": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Language Color"
+          },
+          "stars": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Stars"
+          },
+          "forks": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Forks"
+          },
+          "issues": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Issues"
+          },
+          "pull_requests": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Pull Requests"
+          },
+          "stars_approximate": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Stars Approximate"
+          },
+          "forks_approximate": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Forks Approximate"
+          },
+          "issues_approximate": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Issues Approximate"
+          },
+          "pull_requests_approximate": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Pull Requests Approximate"
+          },
+          "visibility": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Visibility"
+          },
+          "is_fork": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Is Fork"
+          },
+          "license": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "License"
+          },
+          "topics": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Topics"
+          },
+          "participation": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Participation"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "updated_utc": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Updated Utc"
+          }
+        },
+        "required": [
+          "position",
+          "name",
+          "full_name",
+          "owner",
+          "link"
+        ],
+        "title": "GitHubRepository",
+        "type": "object"
+      },
+      "GitHubSocialAccount": {
+        "additionalProperties": true,
+        "properties": {
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "link": {
+            "title": "Link",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Label"
+          }
+        },
+        "required": [
+          "provider",
+          "link"
+        ],
+        "title": "GitHubSocialAccount",
+        "type": "object"
+      },
+      "GitHubStatus": {
+        "additionalProperties": true,
+        "properties": {
+          "emoji": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Emoji"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Message"
+          }
+        },
+        "title": "GitHubStatus",
+        "type": "object"
+      },
+      "GitHubTextLink": {
+        "additionalProperties": true,
+        "properties": {
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "link": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Link"
+          }
+        },
+        "required": [
+          "text"
+        ],
+        "title": "GitHubTextLink",
+        "type": "object"
+      },
+      "GitHubProfileResponse": {
+        "additionalProperties": true,
+        "description": "Unwrapped profile response, with mode-specific public sections.",
+        "properties": {
+          "profile": {
+            "$ref": "#/components/schemas/GitHubProfile"
+          },
+          "pinned_repositories": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/GitHubRepository"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Pinned Repositories"
+          },
+          "popular_repositories": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/GitHubRepository"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Popular Repositories"
+          },
+          "readme": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GitHubReadme"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "organizations": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/GitHubAccountPreview"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Organizations"
+          },
+          "sponsors": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/GitHubAccountPreview"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Sponsors"
+          },
+          "sponsoring": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/GitHubAccountPreview"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Sponsoring"
+          },
+          "additional_sponsors_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Additional Sponsors Count"
+          },
+          "additional_sponsoring_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Additional Sponsoring Count"
+          },
+          "achievements": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/GitHubAchievement"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Achievements"
+          },
+          "highlights": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/GitHubTextLink"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Highlights"
+          },
+          "contributions": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GitHubContributions"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Public user overview only; omitted for organizations and other tabs."
+          },
+          "repositories": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/GitHubRepository"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Repositories"
+          },
+          "starred_repositories": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/GitHubRepository"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Starred Repositories"
+          },
+          "star_lists": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/GitHubNamedLink"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Star Lists"
+          },
+          "pagination": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GitHubPagination"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "top_languages": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/GitHubLanguage"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Top Languages"
+          },
+          "topics": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Topics"
+          },
+          "people": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/GitHubAccountPreview"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "People"
+          },
+          "verified_domains": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Verified Domains"
+          }
+        },
+        "required": [
+          "profile"
+        ],
+        "title": "GitHubProfileResponse",
+        "type": "object"
+      },
+      "GitHubProfileError": {
+        "type": "object",
+        "properties": {
+          "detail": {
+            "type": [
+              "string",
+              "object",
+              "array"
+            ],
+            "description": "Error explanation or validation details."
+          }
+        },
+        "required": [
+          "detail"
+        ]
+      }
+    }
+  }
+}
