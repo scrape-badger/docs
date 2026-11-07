@@ -28,10 +28,9 @@ Set `output=html` to receive the raw Google response instead of parsed JSON.
 
 `search_information.organic_results_state` is `Results for exact spelling`, `Results for spelling correction` (Google showed results for a corrected spelling), `Results with suggested correction` (Google suggested a spelling with "Did you mean" but kept your query) or `no_results`. `total_results` and `time_taken` are filled only when Google prints them. Light usually gets Google's basic page, which shows no result count or search time, so both are often `null` on Light. Use [regular Search](/api-reference/google/google-search/google-web-search) when you need them.
 
-To keep searches fast, network URL resolution is limited to organic positions
-1–3 and does not wait for Google's verification timers. Links already present
-in the HTML stay resolved at any position. Other links can remain
-`google.com/goto` redirects, including a top-three link when Google delays it.
+Light attempts to resolve every organic result URL within one short lookup
+budget, without waiting for Google's verification timers. If Google delays a
+link or changes its response, that link can remain a `google.com/goto` redirect.
 Every result keeps its position. Treat a redirect as an unresolved destination
 when tracking rankings; do not count `google.com` as the ranking website.
 

@@ -20,10 +20,9 @@ Legacy `/search?mode=fast` requests remain compatible at the regular route's
 
 ## Google redirect links
 
-To keep searches fast, network URL resolution is limited to organic positions
-1–3 and does not wait for Google's verification timers. Links already present
-in the HTML stay resolved at any position. Other links can remain
-`google.com/goto` redirects, including a top-three link when Google delays it.
+Search attempts to resolve every organic result URL within one short lookup
+budget, without waiting for Google's verification timers. If Google delays a
+link or changes its response, that link can remain a `google.com/goto` redirect.
 Rich-feature links can also remain redirects.
 
 Every result keeps its position. Treat a Google redirect as an unresolved

@@ -19,10 +19,10 @@ searches only. Use regular Search for the complete SERP and available rich
 results. Failed requests and cache hits are free. Check `X-Credits-Used` for
 actual charges and `/api/public/pricing` for current prices and promotions.
 
-Search URL lookups are limited to organic positions 1–3 and skip Google's
-verification timers. Links already present in the HTML stay resolved at any
-position. Other organic and rich-feature links can remain `google.com/goto`
-redirects. All results and ranks are retained. See
+Search attempts to resolve every organic result URL within one short lookup
+budget and skips Google's verification timers. Organic and rich-feature links
+can remain `google.com/goto` redirects if resolution is unavailable. All results
+and ranks are retained. See
 [redirect-link behavior](/api-reference/google/google-search/google-web-search#google-redirect-links).
 
 ## Products
