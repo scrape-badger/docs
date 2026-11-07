@@ -11,12 +11,19 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = json.loads((ROOT / "openapi-github.json").read_text())
 PATH = "/v1/github/profiles/{username}"
-PAGES = ["github/overview", "github/profiles", "api-reference/endpoint/github/get-profile"]
+REPO_PATH = "/v1/github/repositories/{owner}/{repo}"
+PAGES = [
+    "github/overview",
+    "github/profiles",
+    "api-reference/endpoint/github/get-profile",
+    "github/repositories",
+    "api-reference/endpoint/github/get-repository",
+]
 
 
 class GitHubDocsContract(unittest.TestCase):
     def test_explicit_operation_and_price(self):
-        self.assertEqual(list(SPEC["paths"]), [PATH])
+        self.assertEqual(set(SPEC["paths"]), {PATH, REPO_PATH})
         operation = SPEC["paths"][PATH]["get"]
         self.assertEqual(operation["operationId"], "github_get_profile")
         self.assertEqual(operation["x-credit-cost"], 10)
@@ -25,7 +32,8 @@ class GitHubDocsContract(unittest.TestCase):
             ["username", "tab", "year", "page", "next_page_token"],
         )
         self.assertEqual(
-            operation["parameters"][1]["schema"]["enum"], ["overview", "repositories", "stars"]
+            operation["parameters"][1]["schema"]["enum"],
+            ["overview", "repositories", "stars"],
         )
         self.assertEqual(
             operation["responses"]["200"]["content"]["application/json"]["schema"],
@@ -56,12 +64,20 @@ class GitHubDocsContract(unittest.TestCase):
         self.assertEqual(set(registered), set(PAGES))
         for page in PAGES:
             content = (ROOT / (page + ".mdx")).read_text()
-            self.assertIn("representative", content.lower())
+            if page in {
+                "github/overview",
+                "github/repositories",
+                "api-reference/endpoint/github/get-repository",
+            }:
+                self.assertIn("representative", content.lower())
             self.assertIn("10", content)
             for link in re.findall(r"\]\((/[^)#?]+)(?:[?#][^)]*)?\)", content):
                 self.assertTrue((ROOT / (link.lstrip("/") + ".mdx")).exists(), link)
         for page in PAGES[1:]:
-            self.assertIn('openapi: "get ' + PATH + '"', (ROOT / (page + ".mdx")).read_text())
+            expected = REPO_PATH if "repositor" in page else PATH
+            self.assertIn(
+                'openapi: "get ' + expected + '"', (ROOT / (page + ".mdx")).read_text()
+            )
 
     def test_optional_source_sections_and_known_field_types(self):
         components = SPEC["components"]["schemas"]
