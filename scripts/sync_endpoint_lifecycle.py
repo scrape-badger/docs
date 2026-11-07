@@ -46,9 +46,9 @@ def reconcile(root, entries):
     known_apis = set()
     for page in root.rglob("*.mdx"):
         match = re.search(
-            r'^openapi:\s*["\']?(?:GET|POST|PUT|PATCH|DELETE)\s+/v1/([^/\s]+)',
+            r'^(?:openapi|api):\s*["\']?(?:GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s+(?:https?://[^/\s]+)?/v1/([^/\s]+)',
             page.read_text(),
-            re.M,
+            re.M | re.I,
         )
         if match and len(page.relative_to(root).parts) > 1:
             known_apis.add(match[1])
@@ -71,7 +71,9 @@ def reconcile(root, entries):
             continue
         text = file.read_text()
         match = re.search(
-            r'^openapi:\s*["\']?(GET|POST|PUT|PATCH|DELETE)\s+([^\s"\']+)', text, re.M
+            r'^(?:openapi|api):\s*["\']?(GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s+(?:https?://[^/\s]+)?([^\s"\']+)',
+            text,
+            re.M | re.I,
         )
         if not match or not match[2].startswith("/v1/") or match[2].startswith("/v1/account/"):
             continue
