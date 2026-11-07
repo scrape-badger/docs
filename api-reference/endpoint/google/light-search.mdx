@@ -42,3 +42,14 @@ is `google_light_search`, with `start` for pagination.
 
 See the [Light overview](/google-light/overview) or
 [regular Search](/api-reference/google/google-search/google-web-search).
+
+## Location and fresh requests
+
+Light resolves `location` into Google UULE, like full Search. It also accepts
+`uule`, paired `lat`/`lon`, `radius`, `color_scheme`, advanced `as_*` filters, and
+`no_cache=true`. Its response includes `search_parameters` and `search_metadata`
+to distinguish requested targeting from observed fetch details.
+
+See [location and request controls](/api-reference/google/google-search/google-web-search#location-and-request-controls)
+for validation rules and examples. Light remains a web-only API and cannot enable
+other search types or rich result blocks.
