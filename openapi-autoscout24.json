@@ -432,7 +432,8 @@
           {
             "ApiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     },
     "/v1/autoscout24/filters": {
@@ -507,7 +508,8 @@
           {
             "ApiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     },
     "/v1/autoscout24/markets": {
@@ -534,7 +536,8 @@
           {
             "ApiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     },
     "/v1/autoscout24/health": {
@@ -560,7 +563,8 @@
           {
             "ApiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     }
   },

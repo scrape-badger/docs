@@ -87,7 +87,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/users/{username}/videos": {
@@ -227,7 +228,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/users/{username}/followers": {
@@ -287,7 +289,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/users/{username}/following": {
@@ -347,7 +350,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/users/{username}/liked": {
@@ -407,7 +411,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/users/{username}/reposts": {
@@ -538,7 +543,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/videos/{video_id}": {
@@ -658,7 +664,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/videos/{video_id}/comments": {
@@ -761,7 +768,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/videos/{video_id}/related": {
@@ -892,7 +900,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/videos/{video_id}/transcript": {
@@ -948,7 +957,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/comments/{comment_id}/replies": {
@@ -1060,7 +1070,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/oembed": {
@@ -1117,7 +1128,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/hashtags/{name}": {
@@ -1172,7 +1184,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/hashtags/{name}/videos": {
@@ -1312,7 +1325,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/music/{music_id}": {
@@ -1370,7 +1384,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/music/{music_id}/videos": {
@@ -1510,7 +1525,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/search": {
@@ -1650,7 +1666,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/search/users": {
@@ -1737,7 +1754,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/search/videos": {
@@ -1877,7 +1895,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/search/hashtags": {
@@ -1960,7 +1979,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/trending/videos": {
@@ -2082,7 +2102,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/trending/hashtags": {
@@ -2154,7 +2175,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/trending/songs": {
@@ -2226,7 +2248,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/ads/search": {
@@ -2352,7 +2375,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/regions": {
@@ -2403,7 +2427,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/ads/advertisers": {
@@ -2472,7 +2497,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/ads/{ad_id}": {
@@ -2577,7 +2603,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/shop/categories": {
@@ -2655,7 +2682,8 @@
           "400": {
             "description": "Unsupported market or feature for the market"
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/shop/categories/{category_id}": {
@@ -2794,7 +2822,8 @@
           "400": {
             "description": "Unsupported market or feature for the market"
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/shop/search": {
@@ -2891,7 +2920,8 @@
           "400": {
             "description": "Unsupported market or feature for the market"
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/shop/bestsellers": {
@@ -2970,7 +3000,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/shop/stores/{seller_id}": {
@@ -3111,7 +3142,8 @@
           "404": {
             "description": "Unknown seller id"
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/shop/products/{product_id}": {
@@ -3327,7 +3359,8 @@
           "404": {
             "description": "Unknown product id"
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/shop/products/{product_id}/reviews": {
@@ -3477,7 +3510,8 @@
           "400": {
             "description": "Unsupported market or feature for the market"
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/tiktok/shop/mall": {
@@ -3556,7 +3590,8 @@
           {
             "ApiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     }
   },
@@ -5537,31 +5572,6 @@
         "title": "ShopVideo",
         "type": "object"
       },
-      "ShopRankingResponse": {
-        "properties": {
-          "products": {
-            "items": {
-              "$ref": "#/components/schemas/ShopProduct"
-            },
-            "title": "Products",
-            "type": "array"
-          },
-          "period": {
-            "default": "past_30_days",
-            "title": "Period",
-            "type": "string"
-          },
-          "region": {
-            "title": "Region",
-            "type": "string"
-          }
-        },
-        "required": [
-          "region"
-        ],
-        "title": "ShopRankingResponse",
-        "type": "object"
-      },
       "ShopCategory": {
         "properties": {
           "id": {
@@ -6412,31 +6422,6 @@
           "region"
         ],
         "title": "ShopStoreResponse",
-        "type": "object"
-      },
-      "ShopDealsResponse": {
-        "properties": {
-          "deal": {
-            "title": "Deal",
-            "type": "string"
-          },
-          "products": {
-            "items": {
-              "$ref": "#/components/schemas/ShopProduct"
-            },
-            "title": "Products",
-            "type": "array"
-          },
-          "region": {
-            "title": "Region",
-            "type": "string"
-          }
-        },
-        "required": [
-          "deal",
-          "region"
-        ],
-        "title": "ShopDealsResponse",
         "type": "object"
       },
       "ShopBestsellersResponse": {

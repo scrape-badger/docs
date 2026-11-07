@@ -30,7 +30,9 @@
         "operationId": "get-account-info",
         "summary": "Get Account Info",
         "description": "Check your credit balances, subscription details, plan tier, and rate limits. No credits are deducted for this call.",
-        "tags": ["Account"],
+        "tags": [
+          "Account"
+        ],
         "security": [
           {
             "apiKey": []
@@ -46,11 +48,11 @@
                   "properties": {
                     "credits_balance": {
                       "type": "integer",
-                      "description": "PAYG (pay-as-you-go) credit balance — never expires"
+                      "description": "PAYG (pay-as-you-go) credit balance \u2014 never expires"
                     },
                     "subscription_credits_balance": {
                       "type": "integer",
-                      "description": "Subscription wallet — current period's monthly allowance (0 if no subscription)"
+                      "description": "Subscription wallet \u2014 current period's monthly allowance (0 if no subscription)"
                     },
                     "total_credits_balance": {
                       "type": "integer",
@@ -59,7 +61,12 @@
                     "tier": {
                       "type": "string",
                       "description": "Account tier (free, basic, pro, enterprise)",
-                      "enum": ["free", "basic", "pro", "enterprise"]
+                      "enum": [
+                        "free",
+                        "basic",
+                        "pro",
+                        "enterprise"
+                      ]
                     },
                     "rate_limit_per_minute": {
                       "type": "integer",
@@ -80,11 +87,17 @@
                         },
                         "billing_cadence": {
                           "type": "string",
-                          "enum": ["monthly", "annual"]
+                          "enum": [
+                            "monthly",
+                            "annual"
+                          ]
                         },
                         "status": {
                           "type": "string",
-                          "enum": ["active", "past_due"]
+                          "enum": [
+                            "active",
+                            "past_due"
+                          ]
                         },
                         "current_period_start": {
                           "type": "string",

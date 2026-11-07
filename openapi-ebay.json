@@ -104,7 +104,7 @@
                 "ungraded"
               ]
             },
-            "description": "Item condition. `graded` / `ungraded` are eBay's trading-card conditions — slabbed (PSA/BGS/CGC) vs raw — so a card can be priced separately from its slabs."
+            "description": "Item condition. `graded` / `ungraded` are eBay's trading-card conditions \u2014 slabbed (PSA/BGS/CGC) vs raw \u2014 so a card can be priced separately from its slabs."
           },
           {
             "name": "buying_format",
@@ -150,7 +150,7 @@
             "name": "location",
             "in": "query",
             "required": false,
-            "description": "Item location. `domestic` returns only items located in this marketplace's own country (`domain=fr` → France only); `worldwide` widens to every country. Foreign listings are priced in the marketplace's currency after eBay CONVERTS them, so `domestic` is also how you get untouched native sale prices.",
+            "description": "Item location. `domestic` returns only items located in this marketplace's own country (`domain=fr` \u2192 France only); `worldwide` widens to every country. Foreign listings are priced in the marketplace's currency after eBay CONVERTS them, so `domestic` is also how you get untouched native sale prices.",
             "schema": {
               "type": "string",
               "enum": [
@@ -492,7 +492,7 @@
                               "boolean",
                               "null"
                             ],
-                            "description": "Always null — eBay renders its Sponsored badge into every card as anti-scraping bait, so promoted placements cannot be distinguished from organic results."
+                            "description": "Always null \u2014 eBay renders its Sponsored badge into every card as anti-scraping bait, so promoted placements cannot be distinguished from organic results."
                           }
                         }
                       }
@@ -535,7 +535,7 @@
                             "boolean",
                             "null"
                           ],
-                          "description": "True while eBay still offers a next page — the stop signal for bulk extraction. total_results is populated on completed/sold; total_pages may be null. Past the last page eBay re-serves it, so page on has_more rather than looping until empty."
+                          "description": "True while eBay still offers a next page \u2014 the stop signal for bulk extraction. total_results is populated on completed/sold; total_pages may be null. Past the last page eBay re-serves it, so page on has_more rather than looping until empty."
                         }
                       }
                     },
@@ -556,14 +556,15 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/ebay/search/by-image": {
       "post": {
         "operationId": "searchEbayByImage",
         "summary": "Search by Image",
-        "description": "Search active listings by image, running eBay's own visual search — the camera icon in eBay's search bar. Returns the same shape as `/v1/ebay/search`, with `query` set to null. There is deliberately no `sort_by`: eBay ignores sorting on a visual results page. Costs 16 credits (two round trips to eBay); failed requests are free.",
+        "description": "Search active listings by image, running eBay's own visual search \u2014 the camera icon in eBay's search bar. Returns the same shape as `/v1/ebay/search`, with `query` set to null. There is deliberately no `sort_by`: eBay ignores sorting on a visual results page. Costs 16 credits (two round trips to eBay); failed requests are free.",
         "tags": [
           "eBay Search"
         ],
@@ -616,7 +617,7 @@
                       "graded",
                       "ungraded"
                     ],
-                    "description": "Item condition. `graded` / `ungraded` are eBay's trading-card conditions — slabbed (PSA/BGS/CGC) vs raw — so a card can be priced separately from its slabs."
+                    "description": "Item condition. `graded` / `ungraded` are eBay's trading-card conditions \u2014 slabbed (PSA/BGS/CGC) vs raw \u2014 so a card can be priced separately from its slabs."
                   },
                   "buying_format": {
                     "type": "string",
@@ -648,7 +649,7 @@
                       "domestic",
                       "worldwide"
                     ],
-                    "description": "Item location. `domestic` returns only items located in this marketplace's own country (`domain=fr` → France only); `worldwide` widens to every country. Foreign listings are priced in the marketplace's currency after eBay CONVERTS them, so `domestic` is also how you get untouched native sale prices."
+                    "description": "Item location. `domestic` returns only items located in this marketplace's own country (`domain=fr` \u2192 France only); `worldwide` widens to every country. Foreign listings are priced in the marketplace's currency after eBay CONVERTS them, so `domestic` is also how you get untouched native sale prices."
                   },
                   "language": {
                     "type": "string",
@@ -1014,7 +1015,7 @@
                               "boolean",
                               "null"
                             ],
-                            "description": "Always null — eBay renders its Sponsored badge into every card as anti-scraping bait, so promoted placements cannot be distinguished from organic results."
+                            "description": "Always null \u2014 eBay renders its Sponsored badge into every card as anti-scraping bait, so promoted placements cannot be distinguished from organic results."
                           }
                         }
                       }
@@ -1057,7 +1058,7 @@
                             "boolean",
                             "null"
                           ],
-                          "description": "True while eBay still offers a next page — the stop signal for bulk extraction. total_results is populated on completed/sold; total_pages may be null. Past the last page eBay re-serves it, so page on has_more rather than looping until empty."
+                          "description": "True while eBay still offers a next page \u2014 the stop signal for bulk extraction. total_results is populated on completed/sold; total_pages may be null. Past the last page eBay re-serves it, so page on has_more rather than looping until empty."
                         }
                       }
                     },
@@ -1078,14 +1079,15 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/ebay/completed": {
       "get": {
         "operationId": "searchEbayCompleted",
         "summary": "Completed / Sold Listings",
-        "description": "Search eBay completed (sold) listings — the closing prices buyers actually paid, with the date each item sold. `sold` is `true` on the envelope and each result's `price` is the final sold price. Costs 8 credits; failed requests are free. Pass `query`, `seller` or both; `seller` alone returns everything that seller sold. Results are ordered by `ended_at`, newest first: eBay applies no other time order to sold listings, so `best_match`, `ending_soonest` and `newly_listed` all return it, and only the price sorts reorder.",
+        "description": "Search eBay completed (sold) listings \u2014 the closing prices buyers actually paid, with the date each item sold. `sold` is `true` on the envelope and each result's `price` is the final sold price. Costs 8 credits; failed requests are free. Pass `query`, `seller` or both; `seller` alone returns everything that seller sold. Results are ordered by `ended_at`, newest first: eBay applies no other time order to sold listings, so `best_match`, `ending_soonest` and `newly_listed` all return it, and only the price sorts reorder.",
         "tags": [
           "eBay Search"
         ],
@@ -1177,7 +1179,7 @@
                 "ungraded"
               ]
             },
-            "description": "Item condition. `graded` / `ungraded` are eBay's trading-card conditions — slabbed (PSA/BGS/CGC) vs raw — so a card can be priced separately from its slabs."
+            "description": "Item condition. `graded` / `ungraded` are eBay's trading-card conditions \u2014 slabbed (PSA/BGS/CGC) vs raw \u2014 so a card can be priced separately from its slabs."
           },
           {
             "name": "min_price",
@@ -1201,7 +1203,7 @@
             "name": "location",
             "in": "query",
             "required": false,
-            "description": "Item location. `domestic` returns only items located in this marketplace's own country (`domain=fr` → France only); `worldwide` widens to every country. Foreign listings are priced in the marketplace's currency after eBay CONVERTS them, so `domestic` is also how you get untouched native sale prices.",
+            "description": "Item location. `domestic` returns only items located in this marketplace's own country (`domain=fr` \u2192 France only); `worldwide` widens to every country. Foreign listings are priced in the marketplace's currency after eBay CONVERTS them, so `domestic` is also how you get untouched native sale prices.",
             "schema": {
               "type": "string",
               "enum": [
@@ -1554,7 +1556,7 @@
                               "boolean",
                               "null"
                             ],
-                            "description": "Always null — eBay renders its Sponsored badge into every card as anti-scraping bait, so promoted placements cannot be distinguished from organic results."
+                            "description": "Always null \u2014 eBay renders its Sponsored badge into every card as anti-scraping bait, so promoted placements cannot be distinguished from organic results."
                           }
                         }
                       }
@@ -1597,7 +1599,7 @@
                             "boolean",
                             "null"
                           ],
-                          "description": "True while eBay still offers a next page — the stop signal for bulk extraction. total_results is populated on completed/sold; total_pages may be null. Past the last page eBay re-serves it, so page on has_more rather than looping until empty."
+                          "description": "True while eBay still offers a next page \u2014 the stop signal for bulk extraction. total_results is populated on completed/sold; total_pages may be null. Past the last page eBay re-serves it, so page on has_more rather than looping until empty."
                         }
                       }
                     },
@@ -1618,7 +1620,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/ebay/items/{item_id}": {
@@ -2233,7 +2236,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/ebay/items/{item_id}/reviews": {
@@ -2433,7 +2437,7 @@
                             "boolean",
                             "null"
                           ],
-                          "description": "True while eBay still offers a next page — the stop signal for bulk extraction. total_results is populated on completed/sold; total_pages may be null. Past the last page eBay re-serves it, so page on has_more rather than looping until empty."
+                          "description": "True while eBay still offers a next page \u2014 the stop signal for bulk extraction. total_results is populated on completed/sold; total_pages may be null. Past the last page eBay re-serves it, so page on has_more rather than looping until empty."
                         }
                       }
                     },
@@ -2454,7 +2458,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/ebay/sellers/{username}": {
@@ -2598,7 +2603,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/ebay/sellers/{username}/items": {
@@ -2958,7 +2964,7 @@
                               "boolean",
                               "null"
                             ],
-                            "description": "Always null — eBay renders its Sponsored badge into every card as anti-scraping bait, so promoted placements cannot be distinguished from organic results."
+                            "description": "Always null \u2014 eBay renders its Sponsored badge into every card as anti-scraping bait, so promoted placements cannot be distinguished from organic results."
                           }
                         }
                       }
@@ -2992,7 +2998,7 @@
                             "boolean",
                             "null"
                           ],
-                          "description": "True while eBay still offers a next page — the stop signal for bulk extraction. total_results is populated on completed/sold; total_pages may be null. Past the last page eBay re-serves it, so page on has_more rather than looping until empty."
+                          "description": "True while eBay still offers a next page \u2014 the stop signal for bulk extraction. total_results is populated on completed/sold; total_pages may be null. Past the last page eBay re-serves it, so page on has_more rather than looping until empty."
                         }
                       }
                     },
@@ -3013,7 +3019,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/ebay/sellers/{username}/feedback": {
@@ -3148,7 +3155,7 @@
                             "boolean",
                             "null"
                           ],
-                          "description": "True while eBay still offers a next page — the stop signal for bulk extraction. total_results is populated on completed/sold; total_pages may be null. Past the last page eBay re-serves it, so page on has_more rather than looping until empty."
+                          "description": "True while eBay still offers a next page \u2014 the stop signal for bulk extraction. total_results is populated on completed/sold; total_pages may be null. Past the last page eBay re-serves it, so page on has_more rather than looping until empty."
                         }
                       }
                     },
@@ -3169,7 +3176,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/ebay/categories/{category_id}/items": {
@@ -3555,7 +3563,7 @@
                               "boolean",
                               "null"
                             ],
-                            "description": "Always null — eBay renders its Sponsored badge into every card as anti-scraping bait, so promoted placements cannot be distinguished from organic results."
+                            "description": "Always null \u2014 eBay renders its Sponsored badge into every card as anti-scraping bait, so promoted placements cannot be distinguished from organic results."
                           }
                         }
                       }
@@ -3598,7 +3606,7 @@
                             "boolean",
                             "null"
                           ],
-                          "description": "True while eBay still offers a next page — the stop signal for bulk extraction. total_results is populated on completed/sold; total_pages may be null. Past the last page eBay re-serves it, so page on has_more rather than looping until empty."
+                          "description": "True while eBay still offers a next page \u2014 the stop signal for bulk extraction. total_results is populated on completed/sold; total_pages may be null. Past the last page eBay re-serves it, so page on has_more rather than looping until empty."
                         }
                       }
                     },
@@ -3619,7 +3627,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/ebay/categories": {
@@ -3664,7 +3673,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/ebay/autocomplete": {
@@ -3725,7 +3735,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/ebay/markets": {
@@ -3786,7 +3797,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     }
   },

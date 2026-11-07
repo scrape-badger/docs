@@ -242,7 +242,8 @@
           {
             "ApiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     },
     "/v1/brave/images": {
@@ -439,7 +440,8 @@
           {
             "ApiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     },
     "/v1/brave/videos": {
@@ -648,7 +650,8 @@
           {
             "ApiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     },
     "/v1/brave/news": {
@@ -845,7 +848,8 @@
           {
             "ApiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     },
     "/v1/brave/autocomplete": {
@@ -946,7 +950,8 @@
           {
             "ApiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     },
     "/v1/brave/locales": {
@@ -973,7 +978,8 @@
           {
             "ApiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     }
   },

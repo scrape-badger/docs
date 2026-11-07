@@ -238,7 +238,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/vinted/items/{item_id}": {
@@ -286,7 +287,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/vinted/users/{user_id}": {
@@ -395,7 +397,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/vinted/users/{user_id}/items": {
@@ -475,7 +478,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/vinted/brands": {
@@ -544,7 +548,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/vinted/colors": {
@@ -596,7 +601,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/vinted/statuses": {
@@ -644,7 +650,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/vinted/markets": {
@@ -690,7 +697,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/vinted/mobile/operations": {
@@ -717,7 +725,8 @@
           {
             "apiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     },
     "/v1/vinted/mobile/{operation}": {
@@ -775,7 +784,8 @@
           {
             "apiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     },
     "/v1/vinted/search_by_image": {
@@ -848,7 +858,8 @@
           {
             "apiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     }
   },

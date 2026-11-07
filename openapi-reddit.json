@@ -126,7 +126,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/reddit/search/subreddits": {
@@ -196,7 +197,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/reddit/search/users": {
@@ -266,7 +268,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/reddit/posts/trending": {
@@ -349,7 +352,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/reddit/posts/{post_id}": {
@@ -389,7 +393,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/reddit/posts/{post_id}/comments": {
@@ -471,7 +476,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/reddit/posts/{post_id}/duplicates": {
@@ -539,7 +545,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/reddit/subreddits/{subreddit}": {
@@ -579,7 +586,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/reddit/subreddits/{subreddit}/posts": {
@@ -671,7 +679,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/reddit/subreddits/{subreddit}/rules": {
@@ -711,7 +720,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/reddit/subreddits/{subreddit}/wiki": {
@@ -751,7 +761,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/reddit/subreddits/{subreddit}/wiki/{page}": {
@@ -800,7 +811,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/reddit/subreddits/popular": {
@@ -859,7 +871,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/reddit/subreddits/new": {
@@ -918,7 +931,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/reddit/users/{username}": {
@@ -958,7 +972,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/reddit/users/{username}/posts": {
@@ -1046,7 +1061,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/reddit/users/{username}/comments": {
@@ -1134,7 +1150,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/reddit/users/{username}/moderated": {
@@ -1174,7 +1191,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/reddit/users/{username}/trophies": {
@@ -1214,7 +1232,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/reddit/domains/{domain}/posts": {
@@ -1302,7 +1321,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/reddit/health": {
@@ -1320,7 +1340,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       },
       "head": {
         "summary": "Reddit scraper health check",
@@ -1336,7 +1357,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     }
   },

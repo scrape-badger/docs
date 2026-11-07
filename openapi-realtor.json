@@ -237,7 +237,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/realtor/properties/{property_id}": {
@@ -283,7 +284,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/realtor/autocomplete": {
@@ -354,7 +356,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/realtor/markets": {
@@ -385,7 +388,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     }
   },

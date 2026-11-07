@@ -245,7 +245,8 @@
               }
             }
           }
-        }
+        },
+        "x-availability": "active"
       }
     }
   },
