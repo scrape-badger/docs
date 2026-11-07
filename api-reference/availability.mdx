@@ -1,0 +1,24 @@
+---
+title: "Endpoint availability"
+description: "Discover available endpoints and handle lifecycle errors."
+---
+
+Endpoint availability can change without an SDK or CLI upgrade. Read the live catalog at
+`https://scrapebadger.com/api/public/endpoint-catalog`, use `await client.endpoints()` in Python or Node.js,
+or run `scrapebadger endpoints` in the CLI.
+
+| Status | HTTP response | What to do |
+| --- | --- | --- |
+| Active | Normal endpoint response | Call the endpoint normally. |
+| Temporarily unavailable | 423 | Try again later. Do not repeatedly retry the same request. |
+| Deprecated | 410 | Stop using the endpoint and choose an available alternative. |
+
+Unavailable and deprecated requests do not reach the scraper and do not consume credits.
+Endpoints removed from public discovery return a generic 404 response. The live catalog omits them.
+
+The playground marks temporarily unavailable and deprecated endpoints. Public marketing lists show active endpoints.
+MCP and CLI discovery refresh from the live catalog. Documentation is reconciled automatically;
+Mintlify publication can lag the live API while the documentation update deploys.
+
+Existing installed SDK methods remain callable, but the API enforces the current status on every request.
+Use live discovery to build endpoint selectors instead of keeping a permanent local list.
