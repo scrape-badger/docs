@@ -40,7 +40,8 @@
           {
             "ApiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     },
     "/v1/facebook/marketplace/category/{category}": {
@@ -180,7 +181,8 @@
           {
             "ApiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     },
     "/v1/facebook/marketplace/item/{item_id}": {
@@ -228,7 +230,8 @@
           {
             "ApiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     },
     "/v1/facebook/marketplace/locations": {
@@ -255,7 +258,8 @@
           {
             "ApiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     },
     "/v1/facebook/marketplace/locations/resolve": {
@@ -364,7 +368,8 @@
           {
             "ApiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     },
     "/v1/facebook/marketplace/search": {
@@ -580,7 +585,8 @@
           {
             "ApiKeyAuth": []
           }
-        ]
+        ],
+        "x-availability": "active"
       }
     }
   },

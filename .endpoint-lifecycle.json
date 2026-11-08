@@ -11,6 +11,10 @@
     "original": "41eada8d95558b50117be313fba0549b9d524f4e",
     "generated": "5652049175e63e95788c04c870db1a1a399b9ccdf5a7eea163fd2e2d957d9c45"
   },
+  "openapi-facebook.json": {
+    "original": "63929d375daede0e3541802ed9af1fdaf0d858af",
+    "generated": "820c2d86442ea53d5ad426d40b5b1268cda767b18b44cb408cd96b752c3f1c7f"
+  },
   "openapi-autoscout24.json": {
     "original": "2e5753d2a9989e26cd79c8dcc71d63ab619909a9",
     "generated": "906a8b1ec6972218aa9500585f7fdaf1a85b5ad581beb9996e7b9cd478174032"
