@@ -33,11 +33,12 @@ detail, Group metadata and feeds, post and comment threads, and the public
 
 ## Features
 
-- **Marketplace search** — the headline surface. Keyword search across the
-  largest classifieds inventory in the world, with filters for price range,
-  age of listing, condition, delivery method and sort order. Returns
-  `price_amount` + `currency`, geo coordinates, photo galleries, condition
-  subtitles, `is_sold` / `is_pending` state and the seller actor.
+- **Marketplace search** — public keyword search by Facebook place, without a
+  Facebook account. Set `strict_filters=true` to enforce radius (km), age and
+  price bounds locally; `include_details=true` adds description, public photos
+  and approximate coordinates. Continuations explore bounded price ranges with
+  partial coverage. Sort all collected pages for newest-first monitoring.
+  See [verified search and daily monitoring](/api-reference/endpoint/facebook/marketplace-search#verified-search-and-daily-monitoring).
 - **Marketplace category browse** — walk a whole vertical (`vehicles`,
   `propertyrentals`, `electronics`, `apparel`, …) in one location, with the
   same price and sort filters.

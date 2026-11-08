@@ -1,0 +1,644 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Facebook Marketplace API",
+    "description": "Unified credit-based scraping API. https://docs.scrapebadger.com",
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": "https://scrapebadger.com"
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "paths": {
+    "/v1/facebook/marketplace/categories": {
+      "get": {
+        "tags": [
+          "Facebook"
+        ],
+        "summary": "List categories",
+        "description": "List Marketplace category slugs (free).",
+        "operationId": "facebook_list_categories",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Marketplace Categories V1 Facebook Marketplace Categories Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/facebook/marketplace/category/{category}": {
+      "get": {
+        "tags": [
+          "Facebook"
+        ],
+        "summary": "Browse a Marketplace category",
+        "description": "Browse Marketplace listings in a category (vehicles, electronics, ...).",
+        "operationId": "facebook_browse_a_marketplace_category",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Category"
+            }
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "nyc",
+              "title": "Location"
+            }
+          },
+          {
+            "name": "min_price",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Min Price"
+            }
+          },
+          {
+            "name": "max_price",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Max Price"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sort By"
+            }
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Radius around the location (km, or miles in the US)",
+              "title": "Radius"
+            },
+            "description": "Radius around the location (km, or miles in the US)"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "After"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Marketplace Category V1 Facebook Marketplace Category  Category  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/facebook/marketplace/item/{item_id}": {
+      "get": {
+        "tags": [
+          "Facebook"
+        ],
+        "summary": "Get a Marketplace item",
+        "description": "Get full detail for a single Marketplace listing.",
+        "operationId": "facebook_get_a_marketplace_item",
+        "parameters": [
+          {
+            "name": "item_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Item Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Marketplace Item V1 Facebook Marketplace Item  Item Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/facebook/marketplace/locations": {
+      "get": {
+        "tags": [
+          "Facebook"
+        ],
+        "summary": "List locations",
+        "description": "List common Marketplace location slugs (free).",
+        "operationId": "facebook_list_locations",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Marketplace Locations V1 Facebook Marketplace Locations Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/facebook/marketplace/locations/resolve": {
+      "get": {
+        "tags": [
+          "Facebook"
+        ],
+        "summary": "Resolve a town/postcode to a Marketplace location",
+        "description": "Resolve a town, postcode or coordinates to a Facebook Marketplace place id.\n\nFacebook keys Marketplace by place, not coordinates, and only a place slug or\nnumeric place id works as ``location``. Pass the returned ``place_id`` as\n``location`` on Marketplace search/category to centre results anywhere, not\njust the preset catalogue. Postcodes resolve exactly; a bare town name in an\nambiguous country is best paired with ``country`` (e.g. ``gb``).",
+        "operationId": "facebook_resolve_a_town_postcode_to_a_marketplace_location",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Town, city, postcode or address (e.g. 'Durham', 'DH1 3LE')",
+              "title": "Query"
+            },
+            "description": "Town, city, postcode or address (e.g. 'Durham', 'DH1 3LE')"
+          },
+          {
+            "name": "latitude",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Resolve this exact point instead",
+              "title": "Latitude"
+            },
+            "description": "Resolve this exact point instead"
+          },
+          {
+            "name": "longitude",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Longitude"
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "ISO country code hint for an ambiguous name (e.g. gb)",
+              "title": "Country"
+            },
+            "description": "ISO country code hint for an ambiguous name (e.g. gb)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Marketplace Resolve Location V1 Facebook Marketplace Locations Resolve Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/facebook/marketplace/search": {
+      "get": {
+        "tags": [
+          "Facebook"
+        ],
+        "summary": "Search Marketplace",
+        "description": "Search Facebook Marketplace listings by keyword and location.\n\n``location`` must be a Facebook location slug (``london``, ``newcastleupontyne``)\nor a numeric Facebook place id \u2014 the ``city_page_id`` on any listing is one.\nHuman-readable names such as ``Durham, UK`` are rejected with a 400 rather than\nsilently searching Facebook's San Francisco default.\n\nSet strict_filters=true for locally enforced radius (always km) and age.\nPublic price-range continuations are bounded to eight pages; sort the full\ncollected set for newest-first monitoring. Coverage and freshness are partial.",
+        "operationId": "facebook_search_marketplace",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Search keywords",
+              "title": "Query"
+            },
+            "description": "Search keywords"
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Marketplace location slug or numeric place id",
+              "default": "nyc",
+              "title": "Location"
+            },
+            "description": "Marketplace location slug or numeric place id"
+          },
+          {
+            "name": "min_price",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Min Price"
+            }
+          },
+          {
+            "name": "max_price",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Max Price"
+            }
+          },
+          {
+            "name": "days_since_listed",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Days Since Listed"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sort By"
+            }
+          },
+          {
+            "name": "item_condition",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Item Condition"
+            }
+          },
+          {
+            "name": "delivery_method",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Delivery Method"
+            }
+          },
+          {
+            "name": "radius",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Search radius around the location (km, or miles in the US)",
+              "title": "Radius"
+            },
+            "description": "Search radius around the location (km, or miles in the US)"
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "After"
+            }
+          },
+          {
+            "name": "strict_filters",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Verify radius in km and age locally; use bounded public search continuations with partial-coverage diagnostics",
+              "default": false,
+              "title": "Strict Filters"
+            },
+            "description": "Verify radius in km and age locally; use bounded public search continuations with partial-coverage diagnostics"
+          },
+          {
+            "name": "include_details",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Enrich returned listings with full public descriptions and photos; enables verified search",
+              "default": false,
+              "title": "Include Details"
+            },
+            "description": "Enrich returned listings with full public descriptions and photos; enables verified search"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Marketplace Search V1 Facebook Marketplace Search Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
+    },
+    "schemas": {
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}

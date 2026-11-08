@@ -28,7 +28,8 @@
       "openapi-github.json",
       "openapi-autoscout24.json",
       "openapi-brave.json",
-      "openapi-yelp.json"
+      "openapi-yelp.json",
+      "openapi-facebook.json"
     ],
     "baseUrl": "https://scrapebadger.com",
     "auth": {
