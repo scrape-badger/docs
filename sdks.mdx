@@ -69,6 +69,48 @@ func main() {
 
 </CodeGroup>
 
+## Bypassing the cache
+
+An identical request within 60 seconds returns the cached response at 0 credits.
+To get a fresh response, send the `Cache-Control: no-cache` header. It is off by
+default. See [Bypassing the cache](/credits-and-pricing#bypassing-the-cache).
+
+The Python and Node.js SDKs (0.77.0 or later) have an option for it:
+
+<CodeGroup>
+
+```python Python
+from scrapebadger import ScrapeBadger
+
+# Every request from this client
+client = ScrapeBadger(api_key="YOUR_API_KEY", no_cache=True)
+
+# One call only
+client = ScrapeBadger(api_key="YOUR_API_KEY")
+await client.with_options(no_cache=True).perplexity.ask_perplexity_a_question_post(
+    payload={"prompt": "best crm for startups"}
+)
+```
+
+```javascript Node.js
+import { ScrapeBadger } from "scrapebadger";
+
+// Every request from this client
+const fresh = new ScrapeBadger({ apiKey: "YOUR_API_KEY", noCache: true });
+
+// One call only
+const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" });
+await client
+  .withOptions({ noCache: true })
+  .perplexity.askPerplexityAQuestionPost({ prompt: "best crm for startups" });
+```
+
+</CodeGroup>
+
+In the other SDKs, set `Cache-Control: no-cache` as a default header on the API
+client, the same way you set `x-api-key`. For example, in Dart:
+`sb.dio.options.headers['Cache-Control'] = 'no-cache';`
+
 <Note>
 The generated SDK repositories are replaced wholesale on every API change —
 never send pull requests to them. Issues and feature requests belong on the

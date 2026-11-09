@@ -19,10 +19,25 @@ Accepts `GET` (query params) or `POST` (JSON body).
   examples use 120 s). A cached Copilot answer returns in under 1 s.
 </Warning>
 
+<Note>
+  Repeating an identical request within 60 seconds returns the cached answer at
+  0 credits, marked `X-Cache: HIT`. To get a fresh answer every time, for
+  example to measure how answers vary, send the `Cache-Control: no-cache`
+  header. Each fresh answer is billed. See
+  [Bypassing the cache](/credits-and-pricing#bypassing-the-cache).
+  The header does not change Copilot's own reuse of a recent answer
+  (`cached: true`).
+</Note>
+
 ## Authorization
 
 <ParamField header="X-API-Key" type="string" required>
   Your ScrapeBadger API key.
+</ParamField>
+
+<ParamField header="Cache-Control" type="string">
+  Optional. Send `no-cache` to skip the 60-second duplicate-request cache and
+  get a fresh answer. The request is billed as normal.
 </ParamField>
 
 ## Query Parameters

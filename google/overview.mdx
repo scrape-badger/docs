@@ -263,7 +263,7 @@ Every response tells you how it was served:
 
 | Header | Meaning |
 | --- | --- |
-| `X-Cache` | `MISS` — fetched fresh from Google. `HIT` — served from the cache. `COALESCED` — merged with an identical request that was already running. |
+| `X-Cache` | `MISS` — fetched fresh from Google. `HIT` — served from the cache. `COALESCED` — merged with an identical request that was already running. `BYPASS` — fetched fresh because you asked to skip the cache. |
 | `X-Cache-TTL-Remaining` | Seconds until the cached response expires (only on `HIT` / `COALESCED`). |
 | `Age` | Seconds since the response was fetched from Google (only on `HIT` / `COALESCED`). |
 
@@ -277,9 +277,16 @@ curl -i "https://scrapebadger.com/v1/google/ai-mode/search?q=what+is+scrapebadge
 # X-Credits-Used: 0
 ```
 
-<Note>
-  To force a fresh result, change any query parameter — a different query string is a different cache entry.
-</Note>
+### Bypassing the cache
+
+To force a fresh result, send the `Cache-Control: no-cache` request header, or add the `no_cache=true` query parameter. The request skips both this cache and the 60-second [duplicate-request cache](/credits-and-pricing#bypassing-the-cache). It is billed as normal and returns `X-Cache: BYPASS`. It does not replace the cached response.
+
+```bash
+curl -i "https://scrapebadger.com/v1/google/ai-mode/search?q=what+is+scrapebadger" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  -H "Cache-Control: no-cache"
+# X-Cache: BYPASS
+```
 
 ## Legal & Compliance
 

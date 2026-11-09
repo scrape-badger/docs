@@ -21,12 +21,19 @@ sees.
 </Info>
 
 <Warning>
-  **Answers take 20-25s ungrounded, 30-70s with web search.** This is a live browse of chatgpt.com, not a
-  cached lookup — the clock includes ChatGPT composing the answer and, when it
+  **Answers take 20-25s ungrounded, 30-70s with web search.** Each answer is a live browse of
+  chatgpt.com — the clock includes ChatGPT composing the answer and, when it
   browses, running its own web search. Set your HTTP client timeout to **130 s**;
   the default 5–10 s timeout in most SDKs will abort the call. At volume, run asks
   [asynchronously](/long-running-requests).
 </Warning>
+
+<Note>
+  Repeating an identical request within 60 seconds returns the cached answer at
+  0 credits, marked `X-Cache: HIT`. To get a fresh answer every time, send the
+  `Cache-Control: no-cache` header. See
+  [Bypassing the cache](/credits-and-pricing#bypassing-the-cache).
+</Note>
 
 ## Features
 

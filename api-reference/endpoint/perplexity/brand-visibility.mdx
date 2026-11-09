@@ -14,14 +14,27 @@ Accepts `GET` (query params) or `POST` (JSON body).
 **Credits:** 25
 
 <Warning>
-  This is a live answer, not a cache. A call can take up to about 75 s while
+  A call can take up to about 75 s while
   exits are tried, so set your client timeout to at least 90 s.
 </Warning>
+
+<Note>
+  Repeating an identical request within 60 seconds returns the cached answer at
+  0 credits, marked `X-Cache: HIT`. To get a fresh answer every time, for
+  example to measure how answers vary, send the `Cache-Control: no-cache`
+  header. Each fresh answer is billed. See
+  [Bypassing the cache](/credits-and-pricing#bypassing-the-cache).
+</Note>
 
 ## Authorization
 
 <ParamField header="X-API-Key" type="string" required>
   Your ScrapeBadger API key.
+</ParamField>
+
+<ParamField header="Cache-Control" type="string">
+  Optional. Send `no-cache` to skip the 60-second duplicate-request cache and
+  get a fresh answer. The request is billed as normal.
 </ParamField>
 
 ## Query Parameters

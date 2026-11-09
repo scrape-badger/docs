@@ -221,6 +221,24 @@ Use the API names `search_endpoints` returns (`google`, `google-play`, `amazon`,
 It reaches every endpoint through `call_endpoint`. Both endpoints return oversized results as an outline plus a `result_id`, and long calls as a `request_id`. See [AI Agents](/ai-agents).
 
 
+## Fresh results
+
+An identical call within 60 seconds returns the cached response at 0 credits.
+To get a fresh result, pass `no_cache: true` in the tool call. It is off by
+default, and the fresh call is billed as normal. For example, these
+`call_endpoint` arguments always ask Perplexity again:
+
+```json
+{
+  "name": "perplexity_ask",
+  "params": { "prompt": "best crm for startups" },
+  "no_cache": true
+}
+```
+
+The self-hosted `scrapebadger-mcp` package supports `no_cache` from 0.7.0. See
+[Bypassing the cache](/credits-and-pricing#bypassing-the-cache).
+
 ## Vinted mobile reads
 
 Call `vinted_mobile_operations` to discover parameters and examples, then call `vinted_mobile_read` with `operation`, `market`, and a `parameters` object. See the [mobile API catalog](/vinted/mobile-api) for pricing, sold comparables, seller reviews, shipping, and reference data.

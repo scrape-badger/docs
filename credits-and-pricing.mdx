@@ -63,13 +63,63 @@ If you send the same request again within **60 seconds**, the cached response is
 - A cached response has the `X-Cache: HIT` header, an `Age` header (seconds since the original call) and `X-Credits-Used: 0`.
 - If identical requests are sent at the same time, only the first one runs and is billed. The others wait for it and get its result for free.
 - Only successful responses that cost credits are cached. Errors and empty results that cost 0 credits are not cached, so retrying them still makes a real request.
-- To force a fresh result, send `Cache-Control: no-cache`. That request is billed as normal.
+- The cache is per API key. You never receive a response that was made for another account, or for another key on your account.
 - Cached responses still count toward your [rate limit](/rate-limits).
 
-```bash
+### Bypassing the cache
+
+To get a fresh result, send the `Cache-Control: no-cache` request header. It works on every endpoint and is off by default.
+
+- The request runs again and is billed as normal.
+- It does not replace the cached response. A later request without the header can still get the earlier cached response until it expires.
+- Google endpoints and [Detect](/api-reference/endpoint/web-scraping/detect) keep their own 5-minute caches. The header skips those too.
+
+Use it when you repeat a request on purpose, for example to measure how AI answers vary for the same prompt.
+
+<CodeGroup>
+
+```bash cURL
 curl -H "x-api-key: $SCRAPEBADGER_API_KEY" -H "Cache-Control: no-cache" \
-  "https://scrapebadger.com/v1/facebook/posts/1113411791332972"
+  "https://scrapebadger.com/v1/perplexity/ask?prompt=best+crm+for+startups"
 ```
+
+```python Python
+from scrapebadger import ScrapeBadger
+
+# Every request from this client skips the cache
+async with ScrapeBadger(api_key="YOUR_API_KEY", no_cache=True) as client:
+    answer = await client.perplexity.ask_perplexity_a_question_post(
+        payload={"prompt": "best crm for startups"}
+    )
+
+# Or skip it for one call only
+async with ScrapeBadger(api_key="YOUR_API_KEY") as client:
+    answer = await client.with_options(no_cache=True).perplexity.ask_perplexity_a_question_post(
+        payload={"prompt": "best crm for startups"}
+    )
+```
+
+```javascript Node.js
+import { ScrapeBadger } from "scrapebadger";
+
+// Every request from this client skips the cache
+const fresh = new ScrapeBadger({ apiKey: "YOUR_API_KEY", noCache: true });
+await fresh.perplexity.askPerplexityAQuestionPost({ prompt: "best crm for startups" });
+
+// Or skip it for one call only
+const client = new ScrapeBadger({ apiKey: "YOUR_API_KEY" });
+await client
+  .withOptions({ noCache: true })
+  .perplexity.askPerplexityAQuestionPost({ prompt: "best crm for startups" });
+```
+
+```bash CLI
+scrapebadger --no-cache web scrape https://example.com
+```
+
+</CodeGroup>
+
+The SDK option needs `scrapebadger` 0.77.0 or later for Python and Node.js. In MCP tools, pass `no_cache: true`.
 
 ## Free Credits
 
@@ -104,6 +154,9 @@ We offer a range of credit packages to suit different needs. Larger packages off
   </Accordion>
   <Accordion title="Am I charged for repeating the same request?">
     No, not if you repeat it within 60 seconds. An identical request (same API key, endpoint, parameters and body) in that window returns the cached response at **0 credits**, marked `X-Cache: HIT`. See [Repeated requests are free for 60 seconds](#repeated-requests-are-free-for-60-seconds).
+  </Accordion>
+  <Accordion title="How do I get a fresh response instead of the cached one?">
+    Send the `Cache-Control: no-cache` request header. The request runs again and is billed as normal. See [Bypassing the cache](#bypassing-the-cache).
   </Accordion>
   <Accordion title="Am I charged for repeating the same Google request?">
     No. Google endpoints cache successful responses for 5 minutes. A repeat of the same endpoint with the same query parameters within that window — or sent while an identical request is still running — is served from the cache at **0 credits** and marked with an `X-Cache: HIT` or `X-Cache: COALESCED` response header. See [Google — Response Caching](/google/overview#response-caching).

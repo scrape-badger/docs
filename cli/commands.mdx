@@ -220,3 +220,16 @@ See [Vinted image search](/vinted/image-search) for all filters and pagination.
 | `scrapebadger feedback "<summary>"` | Ask for a missing API or field |
 
 Every API command saves its full JSON response under `~/.cache/scrapebadger/results/` and prints the path, credits and `result_id` to stderr. stdout is unchanged. Use `scrapebadger --no-save <command>` or `SCRAPEBADGER_SAVE=0` to turn this off.
+
+## Global options
+
+Global options go before the command group.
+
+| Option | Description |
+|---|---|
+| `--no-cache` | Skip the 60-second duplicate-request cache and get a fresh result. Sends `Cache-Control: no-cache`. The request is billed as normal. See [Bypassing the cache](/credits-and-pricing#bypassing-the-cache). |
+| `--no-save` | Don't save responses under `~/.cache/scrapebadger/results/`. |
+
+```bash
+scrapebadger --no-cache web scrape https://example.com
+```

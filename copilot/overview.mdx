@@ -58,7 +58,10 @@ market sees.
 
   Copilot is non-deterministic: the same prompt asked twice can produce
   different wording and different sources. For monitoring, sample repeatedly
-  and aggregate rather than trusting a single call.
+  and aggregate rather than trusting a single call. Send
+  `Cache-Control: no-cache` on each sample: an identical request within 60
+  seconds otherwise returns the cached answer. See
+  [Bypassing the cache](/credits-and-pricing#bypassing-the-cache).
 </Warning>
 
 ## Credits

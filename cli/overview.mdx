@@ -83,6 +83,16 @@ Use `--fields` (`-f`) to include only specific columns:
 scrapebadger twitter trends -o csv -f name,domain_context
 ```
 
+## Fresh results
+
+An identical request within 60 seconds returns the cached response at 0 credits.
+Add the global `--no-cache` option to get a fresh result. It goes before the
+command group, and the request is billed as normal.
+
+```bash
+scrapebadger --no-cache web scrape https://example.com
+```
+
 ## Commands
 
 | Group | Commands |
