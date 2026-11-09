@@ -45,7 +45,7 @@ ScrapeBadger provides a hosted MCP (Model Context Protocol) server at `mcp.scrap
 | **Target** | 11 | Search Target US products, retrieve variants and prices, read reviews and questions, and monitor stores and stock. |
 | **ASOS** | 7 | Search ASOS fashion products, retrieve rich product detail, monitor stock and prices, and browse navigation and search facets across storefronts. |
 | **Best Buy** | 10 | Search Best Buy US products, compare deals and specifications, read reviews and questions, and check ZIP-specific fulfillment. |
-| **GitHub** | 2 | `github_get_profile` and `github_get_repository`: public profiles and repository detail; 10 credits per successful uncached call. |
+| **GitHub** | 2 | `github_get_profile` and `github_get_repository`: public profiles and repository detail; 10 credits per successful call. |
 | **Twitter/X** | 49 | Profiles, tweets, advanced search, trends, communities, lists, spaces, real-time stream monitors, filter rules |
 | **Instagram** | 39 | Profiles, posts, reels, stories, highlights, comments, followers, hashtags, locations, audio, search |
 | **Google** | 33 | Web search (SERP), Images, Videos, Lens, Maps, News, Trends, Jobs, Hotels, Shopping, Patents, Scholar, Finance, Flights |
@@ -190,19 +190,19 @@ Health check: `https://mcp.scrapebadger.com/health`
 
 ## Tool discovery and toolsets
 
-Listing every tool up front would put ~115k tokens of tool schemas into your agent's context before it reads your message. Some clients also cap the number of tools they pass on (Cursor reportedly at 40). So by default the endpoint lists only nine small helper tools. Your agent reaches every endpoint through them:
+Listing every tool up front would put ~115k tokens of tool schemas into your agent's context before it reads your message. Some clients also cap the number of tools they pass on (Cursor reportedly at 40). So by default the endpoint lists only eight small helper tools. Your agent reaches every endpoint through them:
 
 1. `search_endpoints("google maps reviews")` finds the tool.
 2. `describe_endpoint("google_maps_reviews")` returns its parameters, credit cost and latency.
 3. `call_endpoint("google_maps_reviews", {...})` runs it. Use `jq`, `fields` or `max_items` to trim the response.
 
-The other helpers are `quote_call`, `read_result`, `get_request`, `get_account_info`, `report_bug` and `send_feedback`. All are free.
+The other helpers are `quote_call`, `get_request`, `get_account_info`, `report_bug` and `send_feedback`. All are free.
 
 To have specific APIs' tools listed directly, add `apis` to the URL:
 
 | URL | Tools listed | Approx. context |
 |-----|--------------|-----------------|
-| `https://mcp.scrapebadger.com/mcp` | 9 helpers (default) | ~2k tokens |
+| `https://mcp.scrapebadger.com/mcp` | 8 helpers (default) | ~2k tokens |
 | `https://mcp.scrapebadger.com/mcp?apis=google,amazon` | helpers + Google and Amazon tools | ~17k tokens |
 | `https://mcp.scrapebadger.com/mcp?apis=github` | helpers + `github_get_profile` and `github_get_repository` | Two additional tool schemas |
 | `https://mcp.scrapebadger.com/mcp?apis=all` | every tool | ~115k tokens |
@@ -214,11 +214,11 @@ Use the API names `search_endpoints` returns (`google`, `google-play`, `amazon`,
 `https://mcp.scrapebadger.com/mcp/lean` serves only the helper tools, for clients that load every tool definition into context:
 - `search_endpoints` and `describe_endpoint`
 - `quote_call` and `call_endpoint`
-- `read_result` and `get_request`
+- `get_request`
 - `report_bug` and `send_feedback`
 - `get_account_info`
 
-It reaches every endpoint through `call_endpoint`. Both endpoints return oversized results as an outline plus a `result_id`, and long calls as a `request_id`. See [AI Agents](/ai-agents).
+It reaches every endpoint through `call_endpoint`. Both endpoints return oversized results as a preview; call again with `jq`, `fields` or `max_items` to get the part you need (the new call is billed, because results are not stored). Long calls return a `request_id`. See [AI Agents](/ai-agents).
 
 
 ## Vinted mobile reads

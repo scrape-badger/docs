@@ -31,7 +31,7 @@ You can open the UTF-8 CSV in Excel, Google Sheets, or your own analysis tools. 
 
 The export contains your own retained usage records across your API keys. It includes successful and failed requests recorded in the usage log. It does not contain API secrets, scraped response data, or separate Twitter stream-monitor and filter-rule billing logs.
 
-Some requests served before usage logging, including some gateway-cache hits, do not create a usage record and will not appear in the export. This is a download of recorded request history, not a record of every network request your client sent.
+Some requests answered before usage logging do not create a usage record and will not appear in the export. This is a download of recorded request history, not a record of every network request your client sent.
 
 <Note>
   To check one request's charge immediately, read its `X-Credits-Used` response header. To download invoices, open [Invoices](https://scrapebadger.com/dashboard/invoices).

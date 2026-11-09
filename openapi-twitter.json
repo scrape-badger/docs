@@ -2537,7 +2537,8 @@
       "get": {
         "operationId": "listStreamDeliveryLogs",
         "summary": "List delivery logs",
-        "description": "List tweet delivery logs for stream monitors. Shows each detected tweet with detection latency, delivery status, and webhook response details. Useful for monitoring stream health and debugging delivery issues.",
+        "description": "Removed on 2026-11-09. ScrapeBadger no longer stores delivered tweets, so this endpoint always answers `410 Gone` with `\"error\": \"delivery_logs_removed\"`. Each tweet is delivered to your webhook (or WebSocket connection) only; keep your own log at your receiver.",
+        "deprecated": true,
         "tags": [
           "Stream Logs"
         ],
@@ -2576,41 +2577,19 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successfully retrieved delivery logs.",
+          "410": {
+            "description": "Gone: delivery logs were removed.",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "logs": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/TweetDeliveryLogResponse"
-                      }
-                    },
-                    "total": {
-                      "type": "integer",
-                      "description": "Total number of delivery logs."
-                    },
-                    "page": {
-                      "type": "integer",
-                      "description": "Current page number."
-                    },
-                    "page_size": {
-                      "type": "integer",
-                      "description": "Number of items per page."
-                    }
-                  }
+                "example": {
+                  "error": "delivery_logs_removed",
+                  "detail": "Tweet delivery logs were removed: ScrapeBadger no longer stores delivered tweets. Each tweet is delivered to your webhook only; keep your own log there."
                 }
               }
             }
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-          },
-          "402": {
-            "$ref": "#/components/responses/PaymentRequired"
           },
           "429": {
             "$ref": "#/components/responses/RateLimitExceeded"
@@ -3137,7 +3116,8 @@
       "get": {
         "operationId": "getFilterRuleDeliveryLogs",
         "summary": "Get filter rule delivery logs",
-        "description": "List tweet delivery logs for a specific filter rule. Shows each detected tweet with detection latency, delivery status, and webhook response details.",
+        "description": "Removed on 2026-11-09. ScrapeBadger no longer stores delivered tweets, so this endpoint always answers `410 Gone` with `\"error\": \"delivery_logs_removed\"`. Each tweet is delivered to your webhook (or WebSocket connection) only; keep your own log at your receiver.",
+        "deprecated": true,
         "tags": [
           "Filter Rules"
         ],
@@ -3176,41 +3156,19 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "Successfully retrieved filter rule delivery logs.",
+          "410": {
+            "description": "Gone: delivery logs were removed.",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "logs": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/FilterRuleDeliveryLogResponse"
-                      }
-                    },
-                    "total": {
-                      "type": "integer",
-                      "description": "Total number of delivery logs."
-                    },
-                    "page": {
-                      "type": "integer",
-                      "description": "Current page number."
-                    },
-                    "page_size": {
-                      "type": "integer",
-                      "description": "Number of items per page."
-                    }
-                  }
+                "example": {
+                  "error": "delivery_logs_removed",
+                  "detail": "Tweet delivery logs were removed: ScrapeBadger no longer stores delivered tweets. Each tweet is delivered to your webhook only; keep your own log there."
                 }
               }
             }
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
-          },
-          "402": {
-            "$ref": "#/components/responses/PaymentRequired"
           },
           "429": {
             "$ref": "#/components/responses/RateLimitExceeded"
@@ -5108,158 +5066,6 @@
             "type": "string",
             "format": "date-time",
             "description": "Timestamp when the rule was last updated."
-          }
-        }
-      },
-      "TweetDeliveryLogResponse": {
-        "type": "object",
-        "description": "Log entry for a tweet delivered by a stream monitor.",
-        "required": [
-          "id",
-          "monitor_id",
-          "tweet_id",
-          "delivery_status"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Unique log entry identifier."
-          },
-          "monitor_id": {
-            "type": "string",
-            "description": "ID of the stream monitor that detected the tweet."
-          },
-          "monitor_name": {
-            "type": "string",
-            "description": "Name of the stream monitor."
-          },
-          "tweet_id": {
-            "type": "string",
-            "description": "ID of the detected tweet."
-          },
-          "author_username": {
-            "type": "string",
-            "description": "Username of the tweet author."
-          },
-          "tweet_text_preview": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Truncated preview of the tweet text."
-          },
-          "tweet_url": {
-            "type": "string",
-            "description": "Full URL to the tweet on Twitter/X."
-          },
-          "tweet_published_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Timestamp when the tweet was originally published."
-          },
-          "detected_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Timestamp when the tweet was detected by the monitor."
-          },
-          "latency_ms": {
-            "type": "integer",
-            "description": "Detection latency in milliseconds (time between tweet publication and detection)."
-          },
-          "latency_badge": {
-            "type": "string",
-            "description": "Human-readable latency badge (e.g., \"fast\", \"normal\", \"slow\")."
-          },
-          "delivery_status": {
-            "type": "string",
-            "description": "Overall delivery status (e.g., \"delivered\", \"failed\", \"pending\")."
-          },
-          "webhook_status_code": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "description": "HTTP status code returned by the webhook endpoint, if applicable."
-          },
-          "webhook_attempts": {
-            "type": "integer",
-            "description": "Number of webhook delivery attempts."
-          }
-        }
-      },
-      "FilterRuleDeliveryLogResponse": {
-        "type": "object",
-        "description": "Log entry for a tweet delivered by a filter rule.",
-        "required": [
-          "id",
-          "rule_id",
-          "tweet_id",
-          "delivery_status"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "Unique log entry identifier."
-          },
-          "rule_id": {
-            "type": "string",
-            "description": "ID of the filter rule that matched the tweet."
-          },
-          "rule_tag": {
-            "type": "string",
-            "description": "Tag label of the filter rule."
-          },
-          "tweet_id": {
-            "type": "string",
-            "description": "ID of the matched tweet."
-          },
-          "author_username": {
-            "type": "string",
-            "description": "Username of the tweet author."
-          },
-          "tweet_text_preview": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Truncated preview of the tweet text."
-          },
-          "tweet_url": {
-            "type": "string",
-            "description": "Full URL to the tweet on Twitter/X."
-          },
-          "tweet_published_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Timestamp when the tweet was originally published."
-          },
-          "detected_at": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Timestamp when the tweet was detected by the filter rule."
-          },
-          "latency_ms": {
-            "type": "integer",
-            "description": "Detection latency in milliseconds."
-          },
-          "latency_badge": {
-            "type": "string",
-            "description": "Human-readable latency badge (e.g., \"fast\", \"normal\", \"slow\")."
-          },
-          "delivery_status": {
-            "type": "string",
-            "description": "Overall delivery status (e.g., \"delivered\", \"failed\", \"pending\")."
-          },
-          "webhook_status_code": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "description": "HTTP status code returned by the webhook endpoint, if applicable."
-          },
-          "webhook_attempts": {
-            "type": "integer",
-            "description": "Number of webhook delivery attempts."
           }
         }
       },

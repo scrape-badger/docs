@@ -1,6 +1,6 @@
 ---
 title: "Google Light Search API"
-description: "Google organic results and related searches for 10 credits per successful uncached request."
+description: "Google organic results and related searches for 10 credits per successful request."
 ---
 
 Google Light Search has a dedicated endpoint:
@@ -9,12 +9,12 @@ It returns `search_information`, `organic_results`, `related_searches` and
 `pagination`. It skips ads, AI Overviews, Knowledge Graph, People Also Ask,
 local results, news, videos and shopping blocks.
 
-| Endpoint | Data | Credits per successful uncached request |
+| Endpoint | Data | Credits per successful request |
 | --- | --- | --- |
 | `/v1/google/light/search` | Organic results and related searches | **10** |
 | `/v1/google/search` | Full SERP, including available rich results | **20** |
 
-Failed requests and cached responses are not charged. The response header
+Failed requests are not charged. The response header
 `X-Credits-Used` reports the actual charge. Check
 `https://scrapebadger.com/api/public/pricing` for current prices and promotions.
 

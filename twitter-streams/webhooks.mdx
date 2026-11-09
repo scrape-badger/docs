@@ -90,7 +90,7 @@ function verifySignature(payload, signature, secret) {
 
 - ScrapeBadger expects a **2xx response** within **10 seconds**
 - Failed deliveries are retried up to **3 times** with exponential backoff
-- Delivery status is visible in the [delivery logs endpoint](/api-reference/endpoint/streams/list-delivery-logs)
+- ScrapeBadger doesn't store delivered tweets or keep a delivery log. Log what your receiver gets, including failures you return.
 
 ## Testing webhooks
 

@@ -1,6 +1,6 @@
 ---
 title: "Get repository"
-description: "Retrieve public default-branch repository detail; 10 credits per uncached response."
+description: "Retrieve public default-branch repository detail; 10 credits per successful response."
 openapi: "get /v1/github/repositories/{owner}/{repo}"
 ---
 
@@ -8,4 +8,4 @@ Representative request: `GET /v1/github/repositories/cli/cli`.
 Pass owner and repository name separately; no query options are supported.
 Read [repository fields and availability](/github/repositories) for native
 README, latest commit, count precision, root previews and unbilled failures.
-Every successful uncached response costs **10 credits**.
+Every successful response costs **10 credits**.

@@ -4,7 +4,7 @@ description: Analyze a URL for anti-bot and CAPTCHA systems without performing a
 openapi: POST /v1/web/detect
 ---
 
-Quickly scan a URL to identify which anti-bot and CAPTCHA systems are in use. Results are cached per domain for 5 minutes — cached hits cost **0 credits**.
+Quickly scan a URL to identify which anti-bot and CAPTCHA systems are in use. Every scan is fresh and costs **1 credit**.
 
 ## Request Body
 
@@ -87,7 +87,7 @@ Quickly scan a URL to identify which anti-bot and CAPTCHA systems are in use. Re
 </ResponseField>
 
 <ResponseField name="credits_used" type="integer">
-  Credits charged for this request. `1` for a fresh scan, `0` for a cached result.
+  Credits charged for this request: `1` for each scan.
 </ResponseField>
 
 <ResponseField name="duration_ms" type="integer">
@@ -183,25 +183,6 @@ console.log(detection.antibot_systems);
   "recommendation": null,
   "credits_used": 1,
   "duration_ms": 380
-}
-```
-
-```json 200 — Cached Result
-{
-  "url": "https://protected-site.com",
-  "antibot_systems": [
-    {
-      "system": "cloudflare_turnstile",
-      "confidence": 0.92,
-      "details": "Turnstile widget detected in page HTML"
-    }
-  ],
-  "captcha_systems": [],
-  "is_blocked": true,
-  "blocking_type": "cloudflare",
-  "recommendation": "Use browser engine with anti_bot enabled",
-  "credits_used": 0,
-  "duration_ms": 12
 }
 ```
 

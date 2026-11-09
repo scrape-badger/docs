@@ -128,31 +128,16 @@ Tweets from a filter rule also carry `"source": "filter_rule"`, `rule_id` and `t
 | `4003` | More than 5 connections for this API key |
 | `4403` | Request IP isn't on the key's allowlist, or the key lacks the Twitter permission |
 
-## Delivery status and missed tweets
+## Missed tweets
 
 WebSocket delivery is live only: tweets aren't queued or replayed. A tweet detected while none of your connections is open isn't sent again.
 
-Each tweet a monitor detects is recorded in the delivery log (`GET /v1/twitter/stream/logs`) with a `delivery_status`:
-
-| Status | Meaning |
-|--------|---------|
-| `websocket_delivered` | Sent to at least one open WebSocket connection |
-| `pending` | No WebSocket connection was open for the API key when the tweet was detected |
-| `webhook_delivered` / `webhook_failed` | Result of webhook delivery, for monitors with a `webhook_url` |
-
-To make sure you receive everything, backfill after every reconnect:
-
-```bash
-curl "https://scrapebadger.com/v1/twitter/stream/logs?delivery_status=pending&page_size=100" \
-  -H "X-API-Key: YOUR_API_KEY"
-```
-
-Skip any `tweet_id` you've already processed, and fetch the rest with [Get tweets by IDs](/api-reference/endpoint/tweets/get-tweets-by-ids) if you need the full object. The log keeps the most recent 100 entries per monitor, so backfill promptly.
+ScrapeBadger doesn't store delivered tweets, so there is no delivery log to backfill from (`GET /v1/twitter/stream/logs` answers `410 Gone` since 2026-11-09). Keep your own log of the tweets you receive. To cover a gap after a disconnect, query [Advanced search](/api-reference/endpoint/tweets/advanced-search) for the monitored accounts (`from:handle`) over the window you missed; those calls are billed normally.
 
 ## Best practices
 
 1. **Reply to every ping**, or the connection is dropped after 70 seconds
-2. **Reconnect on every close** with exponential backoff, then backfill `pending` tweets from the delivery log
+2. **Reconnect on every close** with exponential backoff; cover any gap with [Advanced search](/api-reference/endpoint/tweets/advanced-search)
 3. **Process messages asynchronously** so a slow handler doesn't delay your pong
 4. **Deduplicate by `tweet_id`.** With several connections open, each one receives every event
 5. **Use [webhooks](/twitter-streams/webhooks)** when you need guaranteed delivery. Webhooks are retried, WebSocket is not

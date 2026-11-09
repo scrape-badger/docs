@@ -24,8 +24,8 @@ need a market or language parameter. Authenticate with your ScrapeBadger
 
 `year` is overview-only, `page` repositories-only, and `next_page_token` stars-only.
 Organizations do not have the user stars mode or user contribution calendar.
-Every successful uncached page costs 10 credits. Use `X-Credits-Used` to check
-the actual charge; cache hits can be free. Your plan determines the currency
+Every successful page costs 10 credits. Use `X-Credits-Used` to check
+the actual charge. Your plan determines the currency
 price of credits; check [credits and pricing](/credits-and-pricing).
 
 ## Representative request
@@ -86,7 +86,7 @@ Use `GET /v1/github/repositories/{owner}/{repo}` for a public repository's
 default-branch statistics, topics, license, native README, root files and latest
 commit. Pass `owner.login` and `name` from a profile repository summary.
 Repository detail has no market, ref or pagination parameter. Each successful
-uncached response costs **10 credits**; health and failed requests cost zero.
+response costs **10 credits**; health and failed requests cost zero.
 
 Representative integrations: `scrapebadger github repository cli cli` and
 `github_get_repository(owner="cli", repo="cli")` through MCP.

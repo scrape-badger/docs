@@ -578,11 +578,11 @@
             "required": false,
             "schema": {
               "type": "boolean",
-              "description": "Bypass result caches and request a fresh Google fetch.",
+              "description": "Ignored: responses are never cached, so every request is fetched fresh. Accepted for compatibility.",
               "default": false,
               "title": "No Cache"
             },
-            "description": "Bypass result caches and request a fresh Google fetch."
+            "description": "Ignored: responses are never cached, so every request is fetched fresh. Accepted for compatibility."
           },
           {
             "name": "as_dt",
@@ -5779,11 +5779,11 @@
             "required": false,
             "schema": {
               "type": "boolean",
-              "description": "Bypass result caches and request a fresh Google fetch.",
+              "description": "Ignored: responses are never cached, so every request is fetched fresh. Accepted for compatibility.",
               "default": false,
               "title": "No Cache"
             },
-            "description": "Bypass result caches and request a fresh Google fetch."
+            "description": "Ignored: responses are never cached, so every request is fetched fresh. Accepted for compatibility."
           },
           {
             "name": "as_dt",

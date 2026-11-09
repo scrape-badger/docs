@@ -9,14 +9,14 @@ Programmatic access to **16 Google product APIs** with structured JSON responses
 
 ## Choose full Search or Light Search
 
-| Product | Endpoint | Credits per successful uncached request |
+| Product | Endpoint | Credits per successful request |
 | --- | --- | --- |
 | Full Search | `GET /v1/google/search` | 20 |
 | Light Search | `GET /v1/google/light/search` | 10 |
 
 Use [Light Search](/google-light/overview) for organic results and related
 searches only. Use regular Search for the complete SERP and available rich
-results. Failed requests and cache hits are free. Check `X-Credits-Used` for
+results. Failed requests are free. Check `X-Credits-Used` for
 actual charges and `/api/public/pricing` for current prices and promotions.
 
 Search attempts to resolve every organic result URL within one short lookup
@@ -251,35 +251,9 @@ Per-endpoint credit pricing is configured by ScrapeBadger admins and returned li
   Query `GET /api/public/pricing` in your integration to cache the current per-endpoint cost — don't hardcode credit numbers, they can be adjusted.
 </Tip>
 
-## Response Caching
+## No response caching
 
-Every Google endpoint keeps a shared **5-minute** result cache. A request with the same endpoint and the same query parameters (`q`, `gl`, `hl`, `location`, `num`, `start`, …) as a recent successful request is answered from the cache instead of fetching Google again. Your API key is not part of the cache key, whether you send it as a header or a query parameter.
-
-- **Cached responses are free.** They cost **0 credits** and return `X-Credits-Used: 0`.
-- **Identical requests sent at the same time are merged.** If you send the same request again while the first is still running, the second one waits for the first and receives the same response (also free).
-- **Only successful responses with data are cached.** Errors, `503 Service Unavailable`, and empty results are never cached, so a retry always makes a fresh attempt.
-
-Every response tells you how it was served:
-
-| Header | Meaning |
-| --- | --- |
-| `X-Cache` | `MISS` — fetched fresh from Google. `HIT` — served from the cache. `COALESCED` — merged with an identical request that was already running. |
-| `X-Cache-TTL-Remaining` | Seconds until the cached response expires (only on `HIT` / `COALESCED`). |
-| `Age` | Seconds since the response was fetched from Google (only on `HIT` / `COALESCED`). |
-
-```bash
-curl -i "https://scrapebadger.com/v1/google/ai-mode/search?q=what+is+scrapebadger" \
-  -H "X-API-Key: YOUR_API_KEY"
-# second identical call within 5 minutes:
-# X-Cache: HIT
-# X-Cache-TTL-Remaining: 287
-# Age: 13
-# X-Credits-Used: 0
-```
-
-<Note>
-  To force a fresh result, change any query parameter — a different query string is a different cache entry.
-</Note>
+Google endpoints don't cache responses. Every request fetches Google again and is billed as normal, even if you sent the identical request a moment earlier. The `no_cache` parameter is still accepted for compatibility, but it has no effect.
 
 ## Legal & Compliance
 
