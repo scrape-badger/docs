@@ -85,11 +85,9 @@ The anti-bot solver and video recording are not billed on top — they force the
   Use the `max_cost` parameter to set a credit budget per request. The request will fail rather than exceed your budget. The exact charge is returned in `credits_used` and the `X-Credits-Used` response header.
 </Tip>
 
-## Caching
+## No caching
 
-`/v1/web/detect` caches its result per domain for **5 minutes**. A cached `detect` response is returned with status `200` and costs **0 credits** — handy when you probe the same domain repeatedly. To get a fresh detection within that window, wait for the 5-minute TTL to lapse.
-
-`/v1/web/scrape` does **not** cache page content: every scrape performs a fresh crawl and is billed for the engine that produced the result. There is no stale-content window to work around.
+Neither `/v1/web/detect` nor `/v1/web/scrape` caches results. Every detect call runs a fresh scan and costs 1 credit, and every scrape performs a fresh crawl and is billed for the engine that produced the result. There is no stale-content window to work around.
 
 ## Unsupported Sites
 

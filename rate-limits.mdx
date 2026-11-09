@@ -128,8 +128,8 @@ def fetch_with_rate_limit(url: str, api_key: str):
   <Card title="Use request queuing" icon="check">
     Queue requests and process them at a controlled rate to stay within your limits.
   </Card>
-  <Card title="Cache responses" icon="check">
-    Cache API responses where appropriate to reduce the number of requests you need to make.
+  <Card title="Store results on your side" icon="check">
+    ScrapeBadger doesn't cache responses, so an identical repeat call is billed again. Keep results on your side where appropriate to reduce the number of requests you need to make.
   </Card>
 </CardGroup>
 
@@ -153,7 +153,7 @@ def fetch_with_rate_limit(url: str, api_key: str):
     The API returns a 429 Too Many Requests response with details about when you can retry. Use the `Retry-After` header to know when to try again.
   </Accordion>
   <Accordion title="Which calls count against my rate limit?">
-    Every `/v1` call, including the free ones: `/v1/quote` (an agent's `quote_call`) and `/v1/account/me` (`get_account_info`) count like a scrape. On the Free tier's 5 requests per minute, quoting before each call halves how many calls you can make. Re-reading a result (`/v1/results/{result_id}`) and polling an async request (`/v1/requests/{request_id}`) do not count.
+    Every `/v1` call, including the free ones: `/v1/quote` (an agent's `quote_call`) and `/v1/account/me` (`get_account_info`) count like a scrape. On the Free tier's 5 requests per minute, quoting before each call halves how many calls you can make. Polling an async request (`/v1/requests/{request_id}`) does not count.
   </Accordion>
   <Accordion title="Do failed requests count against my rate limit?">
     Yes, all requests (successful or not) count against your rate limit. However, rate limits are generous and designed to accommodate normal usage patterns.

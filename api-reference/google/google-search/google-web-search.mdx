@@ -10,7 +10,7 @@ openapi: "GET /v1/google/search"
 
 ## Search pricing
 
-Regular Search costs **20 credits** per successful uncached request.
+Regular Search costs **20 credits** per successful request.
 [Google Light Search](/api-reference/endpoint/google/light-search) has a dedicated
 `/v1/google/light/search` endpoint and costs **10 credits** for organic results
 and related searches. No `mode` parameter is required on the Light endpoint.
@@ -86,11 +86,12 @@ resolved location supplies the country, then the `domain` country hint, then `us
 `google_domain` is an alias for `domain`. Requests use `www.google.com` with the
 resolved country preference; the response shows the actual request URL.
 
-Both Search and Light accept `color_scheme=light|dark`, `no_cache=true`, and the
+Both Search and Light accept `color_scheme=light|dark` and the
 advanced Google controls `as_dt`, `as_epq`, `as_eq`, `as_lq`, `as_nlo`, `as_nhi`,
 `as_oq`, `as_q`, `as_qdr`, `as_rq`, and `as_sitesearch`. Google may change or stop
-honoring individual advanced operators. `no_cache=true` bypasses all response
-cache layers; each successful fresh request is billed normally.
+honoring individual advanced operators. Responses are never cached: every
+request is fetched fresh and billed normally. `no_cache` is still accepted but
+has no effect.
 
 Full Search accepts `udm=14` (web) and `udm=18` (forums) for parsed JSON. Other
 `udm` values and `tbm=isch|lcl|vid|nws|shop|pts|bks` require `output=html`.
@@ -103,8 +104,7 @@ curl --get 'https://scrapebadger.com/v1/google/search' \
   --data-urlencode 'q=vinted api' \
   --data-urlencode 'location=New York,New York,United States' \
   --data-urlencode 'gl=us' \
-  --data-urlencode 'hl=en' \
-  --data-urlencode 'no_cache=true'
+  --data-urlencode 'hl=en'
 ```
 
 ### Diagnose differing rankings
@@ -118,13 +118,12 @@ Google used that location.
 when the upstream session is known. Unknown observed location and exit country
 remain `null`. No cookies, proxy credentials, slot IDs, or IPs are exposed.
 If organic results came from a second fallback page, `organic_results_url`
-and `mixed_sources` identify that situation. Cache hits retain the original
-fetch diagnostics; inspect `X-Cache` and `Age` for cache status.
+and `mixed_sources` identify that situation.
 
 Matching query, location, language, country, device, and time reduces differences
-between runs. Google can still vary rankings between sessions. For a fresh
-comparison, use `no_cache=true`; a fingerprint is a correlation hint and cannot
-be used to select or replay a session.
+between runs. Google can still vary rankings between sessions. Every request is
+fetched fresh; a fingerprint is a correlation hint and cannot be used to select
+or replay a session.
 
 ## Google request fields
 

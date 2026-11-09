@@ -24,7 +24,7 @@ Add `Prefer: respond-async, wait=25` to any read request. Async calls are not bo
    "next_action": {"method": "GET", "url": "/v1/requests/…"}}
   ```
 
-Poll `GET /v1/requests/{request_id}`. Polling is free. It returns `202` while the call runs, then the original status, headers and body. Results stay available for about 15 minutes.
+Poll `GET /v1/requests/{request_id}`. Polling is free. It returns `202` while the call runs, then the original status, headers and body. The finished result is held in memory only, never written to disk, for at most 15 minutes so you can collect it. After that, polling returns `404 request_not_found`.
 
 The call is billed once, when it completes. A call that never completes is not billed. Don't re-send the original request while it runs: that starts, and bills, a second call.
 
@@ -90,7 +90,7 @@ Add `X-Callback-URL: https://your-server.example/hook` to an async call (it need
 }
 ```
 
-- `status` and `body` are the call's own, errors included. A body over 1 MB is left out (`"body": null, "body_omitted": true`): fetch it from `result_url` within about 15 minutes.
+- `status` and `body` are the call's own, errors included. A body over 1 MB is left out (`"body": null, "body_omitted": true`): fetch it from `result_url` within 15 minutes.
 - The URL must be `https` on a public address. Private, loopback and cloud-metadata addresses are refused, and redirects are not followed. A bad URL gets `400 invalid_callback_url` before the call runs, and nothing is billed.
 - Answer with any `2xx`. On a timeout, a connection error, `408`, `429` or `5xx`, the delivery is retried after 10 s, 60 s and 5 min (4 attempts in total). Other statuses are final. Deliveries can repeat, so deduplicate on `request_id`.
 - `GET /v1/requests/{request_id}` reports the delivery: as a `callback` object (`status`: `pending` / `delivered` / `failed`, `attempts`, `last_error`) while the call runs, and as `X-Callback-Status` and `X-Callback-Attempts` headers on the final response.
