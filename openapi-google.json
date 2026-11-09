@@ -855,8 +855,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/maps/search": {
@@ -956,8 +955,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/maps/place": {
@@ -1051,8 +1049,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/maps/reviews": {
@@ -1184,8 +1181,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/maps/photos": {
@@ -1254,8 +1250,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/maps/posts": {
@@ -1342,8 +1337,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/news/search": {
@@ -1426,8 +1420,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/news/topics": {
@@ -1517,8 +1510,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/news/trending": {
@@ -1588,8 +1580,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/hotels/search": {
@@ -1812,8 +1803,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/hotels/details": {
@@ -1920,8 +1910,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/trends/interest": {
@@ -2014,8 +2003,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/trends/regions": {
@@ -2101,8 +2089,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/trends/related": {
@@ -2167,8 +2154,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/trends/trending": {
@@ -2238,8 +2224,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/trends/autocomplete": {
@@ -2308,8 +2293,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/trends/search": {
@@ -2469,8 +2453,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/trends/trending-now": {
@@ -2586,8 +2569,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/jobs/search": {
@@ -2900,8 +2882,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/shopping/search": {
@@ -3061,8 +3042,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/shopping/product/click": {
@@ -3185,8 +3165,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/shopping/product": {
@@ -3251,8 +3230,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/patents/search": {
@@ -3503,8 +3481,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/patents/detail": {
@@ -3549,8 +3526,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/scholar/search": {
@@ -3682,8 +3658,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/scholar/profiles": {
@@ -3776,8 +3751,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/scholar/author": {
@@ -3861,8 +3835,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/scholar/author/citation": {
@@ -3919,8 +3892,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/scholar/cite": {
@@ -3977,8 +3949,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/autocomplete": {
@@ -4047,8 +4018,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/images/search": {
@@ -4214,8 +4184,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/videos/search": {
@@ -4327,8 +4296,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/finance/quote": {
@@ -4385,8 +4353,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/ai-mode/search": {
@@ -4467,8 +4434,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/lens/search": {
@@ -4627,8 +4593,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/local/search": {
@@ -4772,8 +4737,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/products/detail": {
@@ -4907,8 +4871,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/shorts/search": {
@@ -5016,8 +4979,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/flights/search": {
@@ -5296,8 +5258,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/health": {
@@ -5331,8 +5292,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/flights/booking_options": {
@@ -5413,8 +5373,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/google/light/search": {
@@ -6219,8 +6178,7 @@
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     }
   },

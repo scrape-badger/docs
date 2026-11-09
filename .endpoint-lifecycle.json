@@ -7,10 +7,6 @@
     "original": "46913ea805c51acf56e3a56f1ae9c67decfd6003",
     "generated": "30216b790c783b915b0b5a4ea3a3c9603bbc6d1f91e69cef0f9e887f09488bd9"
   },
-  "openapi-google.json": {
-    "original": "41eada8d95558b50117be313fba0549b9d524f4e",
-    "generated": "5652049175e63e95788c04c870db1a1a399b9ccdf5a7eea163fd2e2d957d9c45"
-  },
   "openapi-facebook.json": {
     "original": "63929d375daede0e3541802ed9af1fdaf0d858af",
     "generated": "820c2d86442ea53d5ad426d40b5b1268cda767b18b44cb408cd96b752c3f1c7f"
@@ -42,10 +38,6 @@
   "openapi-brave.json": {
     "original": "fef702b3678289de5ffc1f7a28c8fe349e528c5e",
     "generated": "55a826c16378901d842ddda625373536a3fbf0109f6006e56818f6138c1bb902"
-  },
-  "openapi-twitter.json": {
-    "original": "3de5a491c02ecca6ac592869701c9d6435ec6353",
-    "generated": "d8e32c39cf0e6e35181f50c50837d92efbdeca5f182cffaca63b0e421f442d05"
   },
   "openapi-ebay.json": {
     "original": "e584079a3a7c88d45bf942ab654f863d5284a530",

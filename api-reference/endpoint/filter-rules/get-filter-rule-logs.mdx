@@ -1,4 +1,9 @@
 ---
 title: "Get Filter Rule Logs"
 openapi: get /v1/twitter/stream/filter-rules/{rule_id}/logs
+deprecated: true
 ---
+
+<Warning>
+Removed on 2026-11-09. ScrapeBadger no longer stores delivered tweets, so this endpoint always answers `410 Gone` with `"error": "delivery_logs_removed"`. Each tweet is delivered to your webhook only. Keep your own log at your receiver.
+</Warning>
