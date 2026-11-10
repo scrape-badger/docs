@@ -39,8 +39,9 @@ sees.
   each flagged `cited: true/false`. `citations` is the subset it actually
   referenced. Most APIs only give you the second list.
 - **Did it really browse?** — `web_search_triggered` tells you whether ChatGPT
-  ran a web search or answered from its own weights. Force it with
-  `web_search=force`, or suppress it with `web_search=off`.
+  ran a web search or answered from its own weights. Ask for one with
+  `web_search=force` (more likely, not guaranteed), or suppress it with
+  `web_search=off`.
 - **Brand visibility (AEO/GEO) built in** — one call returns mention counts,
   position score, share of voice against named competitors, and whether your
   domain was cited. No separate subscription.
@@ -205,8 +206,9 @@ Five things that are genuinely ours:
   <Accordion title="I got an answer with no citations. Is that a bug?">
     Check `web_search_triggered`. If it is `false`, ChatGPT answered from its
     training data and there were no sources to cite — that is normal for
-    general-knowledge prompts. Set `web_search=force` if you always want it to
-    browse.
+    general-knowledge prompts. Set `web_search=force` to make browsing more
+    likely. It does not guarantee a search or citations, and a `2xx` answer is
+    billed whether or not it has citations.
   </Accordion>
   <Accordion title="Will the same prompt always give the same answer?">
     No. ChatGPT is non-deterministic, and the live web changes. For tracking,
@@ -216,7 +218,10 @@ Five things that are genuinely ours:
   <Accordion title="Does country change the answer?">
     It changes the egress country of the request, which affects the localised
     results ChatGPT retrieves and can change the answer's emphasis and language.
-    Pass any ISO-3166 alpha-2 code; the default is `US`.
+    Pass any ISO-3166 alpha-2 code; the default is `US`. Targeting is
+    country-level, not city-level. A country with no available exit fails with
+    `502` and is not billed; the ask never falls back to another country. See
+    [Proxy countries](/web-scraping/proxy-countries) for measured coverage.
   </Accordion>
   <Accordion title="What happens if a request fails?">
     You get `{"detail": {"code": ..., "message": ...}}` with an HTTP status of

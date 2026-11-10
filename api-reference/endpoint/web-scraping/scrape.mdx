@@ -67,13 +67,14 @@ openapi: POST /v1/web/scrape
 
   | Value | Pool | Surcharge |
   |-------|------|-----------|
-  | `simple` | Datacenter | **+2 credits** |
-  | `premium` | Residential | **+5 credits** |
-  | `ultra` | Premium residential / mobile | **+12 credits** |
+  | `simple` | Standard shared pool — the cheapest, with the fewest guarantees about IP type and reputation | **+1 credit** |
+  | `premium` | Residential IPs | **+3 credits** |
+  | `ultra` | Residential IPs from our highest-trust providers | **+8 credits** |
 
-  Stay on `simple` unless the target actually blocks datacenter IPs — moving to
-  `premium` makes a browser scrape 10 credits instead of 7. Use
-  [`max_cost`](#param-max-cost) if you want a hard ceiling.
+  Stay on `simple` unless the target actually blocks requests from it — moving
+  to `premium` makes a browser scrape 8 credits instead of 6. Use
+  [`max_cost`](#param-max-cost) if you want a hard ceiling. Country coverage
+  differs slightly per tier: see [Proxy countries](/web-scraping/proxy-countries).
 </ParamField>
 
 <ParamField body="format" type="string" default="html">
@@ -193,13 +194,22 @@ openapi: POST /v1/web/scrape
 </ParamField>
 
 <ParamField body="country" type="string">
-  ISO 3166-1 alpha-2 country code for proxy geo-targeting. Routes the request through a proxy in the specified country.
+  ISO 3166-1 alpha-2 country code for the proxy exit. The request goes out from
+  an IP in that country. Without it, requests exit from the US.
 
   ```json
   { "country": "US" }
   ```
 
-  Common values: `US`, `GB`, `DE`, `FR`, `JP`, `BR`, `AU`.
+  Any alpha-2 code is accepted; there is no allow-list. Targeting is
+  country-level, not city-level: the exit's city varies between requests. If no
+  exit is available in the country (for example `KP`), the scrape fails instead
+  of falling back to another country: HTTP `200` with `success: false` and
+  `error: "fetch_failed"`, charged **0 credits**. A
+  [per-host override](#per-host-overrides-and-automatic-unblocking) that pins a
+  country takes precedence over yours. See
+  [Proxy countries](/web-scraping/proxy-countries) for which countries had exits
+  on each `proxy_tier` when we last measured.
 </ParamField>
 
 <ParamField body="custom_headers" type="object">
@@ -319,9 +329,9 @@ charged on every request, which is why nothing costs 1 credit in practice.
 |-----------|---------|
 | HTTP engine (`http`) | 1 |
 | Browser engine (`browser`) | 5 |
-| `proxy_tier: simple` (default) | +2 |
-| `proxy_tier: premium` | +5 |
-| `proxy_tier: ultra` | +12 |
+| `proxy_tier: simple` (default) | +1 |
+| `proxy_tier: premium` | +3 |
+| `proxy_tier: ultra` | +8 |
 | `ai_extract` | +2 |
 | `anti_bot`, when a solver is actually invoked | +5 |
 | `screenshot`, `video`, `js_scenario`, `eval_js`, `wait_for` | +0 |
@@ -330,10 +340,12 @@ Common totals:
 
 | Request | Total |
 |---------|-------|
-| Simple page, default tier | **3** |
-| JS-rendered page, default tier | **7** |
-| JS-rendered page, `premium` tier | **10** |
-| Simple page + `ai_extract` | **5** |
+| Simple page, default tier | **2** |
+| Simple page, `premium` tier | **4** |
+| Simple page, `ultra` tier | **9** |
+| JS-rendered page, default tier | **6** |
+| JS-rendered page, `premium` tier | **8** |
+| Simple page + `ai_extract` | **4** |
 
 The exact amount charged is always in the `X-Credits-Used` response header and
 the `credits_used` body field — trust those over any estimate. A request
@@ -787,6 +799,7 @@ Infinite scroll:
 
 | Status | Description |
 |--------|-------------|
+| `200` with `success: false` | `error: "fetch_failed"`: no response from the target at all, including when no proxy exit is available in the requested `country`. Never charged. |
 | `400` | Invalid URL (including a hostname confirmed not to exist), cost exceeds `max_cost`, or requested engine not available. Never charged. |
 | `402` | Insufficient credits |
 | `422` | Blocking detected after all retries exhausted (`error: "blocking_page_detected"`, with `block_kind`, `vendor`, `vendors`, `unblock` and, for a CAPTCHA wall, the gating `captcha` at the top level; the scrape result is in `data`). `vendors` lists every protection vendor seen on the page, the block's own first: a site can put two in front of one page, such as a Cloudflare challenge before PerimeterX. A request that runs out of time while retrying (about 165 s) returns this 422 rather than a gateway timeout; the `wait_for` selector never appeared (`error: "wait_for_timeout"`); a `js_scenario` step failed (`error: "js_scenario_failed"`); or the body contained an unknown field (`error: "unknown_request_field"`). Never charged. |
@@ -864,7 +877,7 @@ There is no `return_cookies` or `form_data` parameter. To read cookies use
   "content": "# Products\n\n...",
   "format": "markdown",
   "engine_used": "http",
-  "credits_used": 12,
+  "credits_used": 4,
   "duration_ms": 2150,
   "retries_used": 0,
   "content_length": 8432,

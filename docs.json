@@ -75,7 +75,8 @@
           {
             "group": "Overview",
             "pages": [
-              "web-scraping/overview"
+              "web-scraping/overview",
+              "web-scraping/proxy-countries"
             ]
           },
           {

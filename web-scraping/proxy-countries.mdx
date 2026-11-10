@@ -1,0 +1,326 @@
+---
+title: "Proxy countries"
+description: "How the country parameter picks the exit country, and which countries had exits on each proxy tier when we measured on 2026-11-10."
+---
+
+The `country` parameter on [`/v1/web/scrape`](/api-reference/endpoint/web-scraping/scrape)
+picks the country your request exits from. The same parameter exists on
+`/v1/web/detect`, `/v1/web/screenshot` and `/v1/web/extract`. This page explains
+how it behaves and lists which countries had exits on each
+[proxy tier](#proxy-tiers) when we last measured.
+
+## How `country` works
+
+- **Any ISO 3166-1 alpha-2 code.** There is no allow-list. The code is passed to
+  our residential proxy providers as is, so `"country": "KR"` exits from an IP
+  in South Korea.
+- **Country-level, not city-level.** The exit's city changes from request to
+  request. On the measurement day, `KR` exits were in Seoul, Anseong, Daegu,
+  Changwon and other cities. You cannot pick a city.
+- **No fallback to another country.** If no exit is available in the country
+  you asked for (for example `KP`), the scrape fails instead of going out from
+  somewhere else. `/v1/web/scrape` returns HTTP `200` with `success: false` and
+  `error: "fetch_failed"`. Failed requests are **not billed**.
+- **Default.** Without `country`, requests exit from the US.
+- **Per-host overrides.** A host with a
+  [per-host override](/api-reference/endpoint/web-scraping/scrape#per-host-overrides-and-automatic-unblocking)
+  that pins a country uses the override's country instead of yours.
+
+## Proxy tiers
+
+`proxy_tier` picks the pool the exit comes from. Its surcharge is added to every
+request on top of the engine cost. See
+[Credit costs](/api-reference/endpoint/web-scraping/scrape#credit-costs).
+
+| Tier | Pool | Surcharge |
+|------|------|-----------|
+| `simple` (default) | Standard shared pool. The cheapest, with the fewest guarantees about IP type and reputation. | +1 credit |
+| `premium` | Residential IPs | +3 credits |
+| `ultra` | Residential IPs from our highest-trust providers | +8 credits |
+
+Coverage differs slightly between tiers. Check the tables below before you pick
+a tier for a small country.
+
+## Coverage on 2026-11-10
+
+We sent one request per country and tier through `/v1/web/scrape` to an IP
+geolocation service (ipinfo.io), retrying once on failure. A tier counts as
+covered when the exit IP geolocated in the requested country.
+
+- **232** country codes tested: ISO 3166-1 alpha-2, plus `XK` for Kosovo.
+- **215** had an exit in the requested country on at least one tier.
+- **205** had an exit on all three tiers.
+
+<Warning>
+  This is a snapshot, not a guarantee. Providers add and drop exits, so coverage
+  changes over time. If a country matters to you, check it yourself: scrape an
+  IP geolocation page with the same `country` and `proxy_tier`, and compare the
+  country it reports.
+</Warning>
+
+### No exit on any tier
+
+Åland Islands (`AX`), American Samoa (`AS`), Antarctica (`AQ`), Cuba (`CU`), Eritrea (`ER`), Iran (`IR`), Kiribati (`KI`), Nauru (`NR`), North Korea (`KP`), Saint Barthélemy (`BL`), Saint Helena (`SH`), Saint Pierre and Miquelon (`PM`), Svalbard and Jan Mayen (`SJ`), Tonga (`TO`), Turkmenistan (`TM`), Vanuatu (`VU`), Wallis and Futuna (`WF`).
+
+### Covered on some tiers only
+
+| Country | Code | `simple` | `premium` | `ultra` |
+|---------|------|:--------:|:---------:|:-------:|
+| Bhutan | `BT` | — | — | ✓ |
+| Burundi | `BI` | ✓ | ✓ | — |
+| Faroe Islands | `FO` | ✓ | ✓ | — |
+| Guinea-Bissau | `GW` | — | ✓ | — |
+| Jamaica | `JM` | ✓ | — | ✓ |
+| Kenya | `KE` | ✓ | — | ✓ |
+| Liberia | `LR` | ✓ | ✓ | — |
+| Samoa | `WS` | ✓ | ✓ | — |
+| Tanzania | `TZ` | — | ✓ | ✓ |
+| Timor-Leste | `TL` | — | ✓ | ✓ |
+
+### All countries
+
+| Country | Code | `simple` | `premium` | `ultra` |
+|---------|------|:--------:|:---------:|:-------:|
+| Afghanistan | `AF` | ✓ | ✓ | ✓ |
+| Åland Islands | `AX` | — | — | — |
+| Albania | `AL` | ✓ | ✓ | ✓ |
+| Algeria | `DZ` | ✓ | ✓ | ✓ |
+| American Samoa | `AS` | — | — | — |
+| Andorra | `AD` | ✓ | ✓ | ✓ |
+| Angola | `AO` | ✓ | ✓ | ✓ |
+| Anguilla | `AI` | ✓ | ✓ | ✓ |
+| Antarctica | `AQ` | — | — | — |
+| Antigua and Barbuda | `AG` | ✓ | ✓ | ✓ |
+| Argentina | `AR` | ✓ | ✓ | ✓ |
+| Armenia | `AM` | ✓ | ✓ | ✓ |
+| Aruba | `AW` | ✓ | ✓ | ✓ |
+| Australia | `AU` | ✓ | ✓ | ✓ |
+| Austria | `AT` | ✓ | ✓ | ✓ |
+| Azerbaijan | `AZ` | ✓ | ✓ | ✓ |
+| Bahamas | `BS` | ✓ | ✓ | ✓ |
+| Bahrain | `BH` | ✓ | ✓ | ✓ |
+| Bangladesh | `BD` | ✓ | ✓ | ✓ |
+| Barbados | `BB` | ✓ | ✓ | ✓ |
+| Belarus | `BY` | ✓ | ✓ | ✓ |
+| Belgium | `BE` | ✓ | ✓ | ✓ |
+| Belize | `BZ` | ✓ | ✓ | ✓ |
+| Benin | `BJ` | ✓ | ✓ | ✓ |
+| Bermuda | `BM` | ✓ | ✓ | ✓ |
+| Bhutan | `BT` | — | — | ✓ |
+| Bolivia | `BO` | ✓ | ✓ | ✓ |
+| Bosnia and Herzegovina | `BA` | ✓ | ✓ | ✓ |
+| Botswana | `BW` | ✓ | ✓ | ✓ |
+| Brazil | `BR` | ✓ | ✓ | ✓ |
+| British Virgin Islands | `VG` | ✓ | ✓ | ✓ |
+| Brunei | `BN` | ✓ | ✓ | ✓ |
+| Bulgaria | `BG` | ✓ | ✓ | ✓ |
+| Burkina Faso | `BF` | ✓ | ✓ | ✓ |
+| Burundi | `BI` | ✓ | ✓ | — |
+| Cabo Verde | `CV` | ✓ | ✓ | ✓ |
+| Cambodia | `KH` | ✓ | ✓ | ✓ |
+| Cameroon | `CM` | ✓ | ✓ | ✓ |
+| Canada | `CA` | ✓ | ✓ | ✓ |
+| Central African Republic | `CF` | ✓ | ✓ | ✓ |
+| Chad | `TD` | ✓ | ✓ | ✓ |
+| Chile | `CL` | ✓ | ✓ | ✓ |
+| China | `CN` | ✓ | ✓ | ✓ |
+| Colombia | `CO` | ✓ | ✓ | ✓ |
+| Comoros | `KM` | ✓ | ✓ | ✓ |
+| Congo | `CG` | ✓ | ✓ | ✓ |
+| Congo (DRC) | `CD` | ✓ | ✓ | ✓ |
+| Cook Islands | `CK` | ✓ | ✓ | ✓ |
+| Costa Rica | `CR` | ✓ | ✓ | ✓ |
+| Croatia | `HR` | ✓ | ✓ | ✓ |
+| Cuba | `CU` | — | — | — |
+| Curaçao | `CW` | ✓ | ✓ | ✓ |
+| Cyprus | `CY` | ✓ | ✓ | ✓ |
+| Czechia | `CZ` | ✓ | ✓ | ✓ |
+| Denmark | `DK` | ✓ | ✓ | ✓ |
+| Djibouti | `DJ` | ✓ | ✓ | ✓ |
+| Dominica | `DM` | ✓ | ✓ | ✓ |
+| Dominican Republic | `DO` | ✓ | ✓ | ✓ |
+| Ecuador | `EC` | ✓ | ✓ | ✓ |
+| Egypt | `EG` | ✓ | ✓ | ✓ |
+| El Salvador | `SV` | ✓ | ✓ | ✓ |
+| Equatorial Guinea | `GQ` | ✓ | ✓ | ✓ |
+| Eritrea | `ER` | — | — | — |
+| Estonia | `EE` | ✓ | ✓ | ✓ |
+| Eswatini | `SZ` | ✓ | ✓ | ✓ |
+| Ethiopia | `ET` | ✓ | ✓ | ✓ |
+| Falkland Islands | `FK` | ✓ | ✓ | ✓ |
+| Faroe Islands | `FO` | ✓ | ✓ | — |
+| Fiji | `FJ` | ✓ | ✓ | ✓ |
+| Finland | `FI` | ✓ | ✓ | ✓ |
+| France | `FR` | ✓ | ✓ | ✓ |
+| French Guiana | `GF` | ✓ | ✓ | ✓ |
+| French Polynesia | `PF` | ✓ | ✓ | ✓ |
+| Gabon | `GA` | ✓ | ✓ | ✓ |
+| Gambia | `GM` | ✓ | ✓ | ✓ |
+| Georgia | `GE` | ✓ | ✓ | ✓ |
+| Germany | `DE` | ✓ | ✓ | ✓ |
+| Ghana | `GH` | ✓ | ✓ | ✓ |
+| Gibraltar | `GI` | ✓ | ✓ | ✓ |
+| Greece | `GR` | ✓ | ✓ | ✓ |
+| Greenland | `GL` | ✓ | ✓ | ✓ |
+| Grenada | `GD` | ✓ | ✓ | ✓ |
+| Guadeloupe | `GP` | ✓ | ✓ | ✓ |
+| Guam | `GU` | ✓ | ✓ | ✓ |
+| Guatemala | `GT` | ✓ | ✓ | ✓ |
+| Guernsey | `GG` | ✓ | ✓ | ✓ |
+| Guinea | `GN` | ✓ | ✓ | ✓ |
+| Guinea-Bissau | `GW` | — | ✓ | — |
+| Guyana | `GY` | ✓ | ✓ | ✓ |
+| Haiti | `HT` | ✓ | ✓ | ✓ |
+| Honduras | `HN` | ✓ | ✓ | ✓ |
+| Hong Kong | `HK` | ✓ | ✓ | ✓ |
+| Hungary | `HU` | ✓ | ✓ | ✓ |
+| Iceland | `IS` | ✓ | ✓ | ✓ |
+| India | `IN` | ✓ | ✓ | ✓ |
+| Indonesia | `ID` | ✓ | ✓ | ✓ |
+| Iran | `IR` | — | — | — |
+| Iraq | `IQ` | ✓ | ✓ | ✓ |
+| Ireland | `IE` | ✓ | ✓ | ✓ |
+| Isle of Man | `IM` | ✓ | ✓ | ✓ |
+| Israel | `IL` | ✓ | ✓ | ✓ |
+| Italy | `IT` | ✓ | ✓ | ✓ |
+| Ivory Coast | `CI` | ✓ | ✓ | ✓ |
+| Jamaica | `JM` | ✓ | — | ✓ |
+| Japan | `JP` | ✓ | ✓ | ✓ |
+| Jersey | `JE` | ✓ | ✓ | ✓ |
+| Jordan | `JO` | ✓ | ✓ | ✓ |
+| Kazakhstan | `KZ` | ✓ | ✓ | ✓ |
+| Kenya | `KE` | ✓ | — | ✓ |
+| Kiribati | `KI` | — | — | — |
+| Kosovo | `XK` | ✓ | ✓ | ✓ |
+| Kuwait | `KW` | ✓ | ✓ | ✓ |
+| Kyrgyzstan | `KG` | ✓ | ✓ | ✓ |
+| Laos | `LA` | ✓ | ✓ | ✓ |
+| Latvia | `LV` | ✓ | ✓ | ✓ |
+| Lebanon | `LB` | ✓ | ✓ | ✓ |
+| Lesotho | `LS` | ✓ | ✓ | ✓ |
+| Liberia | `LR` | ✓ | ✓ | — |
+| Libya | `LY` | ✓ | ✓ | ✓ |
+| Liechtenstein | `LI` | ✓ | ✓ | ✓ |
+| Lithuania | `LT` | ✓ | ✓ | ✓ |
+| Luxembourg | `LU` | ✓ | ✓ | ✓ |
+| Macao | `MO` | ✓ | ✓ | ✓ |
+| Madagascar | `MG` | ✓ | ✓ | ✓ |
+| Malawi | `MW` | ✓ | ✓ | ✓ |
+| Malaysia | `MY` | ✓ | ✓ | ✓ |
+| Maldives | `MV` | ✓ | ✓ | ✓ |
+| Mali | `ML` | ✓ | ✓ | ✓ |
+| Malta | `MT` | ✓ | ✓ | ✓ |
+| Marshall Islands | `MH` | ✓ | ✓ | ✓ |
+| Martinique | `MQ` | ✓ | ✓ | ✓ |
+| Mauritania | `MR` | ✓ | ✓ | ✓ |
+| Mauritius | `MU` | ✓ | ✓ | ✓ |
+| Mayotte | `YT` | ✓ | ✓ | ✓ |
+| Mexico | `MX` | ✓ | ✓ | ✓ |
+| Micronesia | `FM` | ✓ | ✓ | ✓ |
+| Moldova | `MD` | ✓ | ✓ | ✓ |
+| Monaco | `MC` | ✓ | ✓ | ✓ |
+| Mongolia | `MN` | ✓ | ✓ | ✓ |
+| Montenegro | `ME` | ✓ | ✓ | ✓ |
+| Morocco | `MA` | ✓ | ✓ | ✓ |
+| Mozambique | `MZ` | ✓ | ✓ | ✓ |
+| Myanmar | `MM` | ✓ | ✓ | ✓ |
+| Namibia | `NA` | ✓ | ✓ | ✓ |
+| Nauru | `NR` | — | — | — |
+| Nepal | `NP` | ✓ | ✓ | ✓ |
+| Netherlands | `NL` | ✓ | ✓ | ✓ |
+| New Caledonia | `NC` | ✓ | ✓ | ✓ |
+| New Zealand | `NZ` | ✓ | ✓ | ✓ |
+| Nicaragua | `NI` | ✓ | ✓ | ✓ |
+| Niger | `NE` | ✓ | ✓ | ✓ |
+| Nigeria | `NG` | ✓ | ✓ | ✓ |
+| North Korea | `KP` | — | — | — |
+| North Macedonia | `MK` | ✓ | ✓ | ✓ |
+| Northern Mariana Islands | `MP` | ✓ | ✓ | ✓ |
+| Norway | `NO` | ✓ | ✓ | ✓ |
+| Oman | `OM` | ✓ | ✓ | ✓ |
+| Pakistan | `PK` | ✓ | ✓ | ✓ |
+| Palau | `PW` | ✓ | ✓ | ✓ |
+| Palestine | `PS` | ✓ | ✓ | ✓ |
+| Panama | `PA` | ✓ | ✓ | ✓ |
+| Papua New Guinea | `PG` | ✓ | ✓ | ✓ |
+| Paraguay | `PY` | ✓ | ✓ | ✓ |
+| Peru | `PE` | ✓ | ✓ | ✓ |
+| Philippines | `PH` | ✓ | ✓ | ✓ |
+| Poland | `PL` | ✓ | ✓ | ✓ |
+| Portugal | `PT` | ✓ | ✓ | ✓ |
+| Puerto Rico | `PR` | ✓ | ✓ | ✓ |
+| Qatar | `QA` | ✓ | ✓ | ✓ |
+| Réunion | `RE` | ✓ | ✓ | ✓ |
+| Romania | `RO` | ✓ | ✓ | ✓ |
+| Russia | `RU` | ✓ | ✓ | ✓ |
+| Rwanda | `RW` | ✓ | ✓ | ✓ |
+| Saint Barthélemy | `BL` | — | — | — |
+| Saint Helena | `SH` | — | — | — |
+| Saint Kitts and Nevis | `KN` | ✓ | ✓ | ✓ |
+| Saint Lucia | `LC` | ✓ | ✓ | ✓ |
+| Saint Martin | `MF` | ✓ | ✓ | ✓ |
+| Saint Pierre and Miquelon | `PM` | — | — | — |
+| Saint Vincent and the Grenadines | `VC` | ✓ | ✓ | ✓ |
+| Samoa | `WS` | ✓ | ✓ | — |
+| San Marino | `SM` | ✓ | ✓ | ✓ |
+| São Tomé and Príncipe | `ST` | ✓ | ✓ | ✓ |
+| Saudi Arabia | `SA` | ✓ | ✓ | ✓ |
+| Senegal | `SN` | ✓ | ✓ | ✓ |
+| Serbia | `RS` | ✓ | ✓ | ✓ |
+| Seychelles | `SC` | ✓ | ✓ | ✓ |
+| Sierra Leone | `SL` | ✓ | ✓ | ✓ |
+| Singapore | `SG` | ✓ | ✓ | ✓ |
+| Sint Maarten | `SX` | ✓ | ✓ | ✓ |
+| Slovakia | `SK` | ✓ | ✓ | ✓ |
+| Slovenia | `SI` | ✓ | ✓ | ✓ |
+| Solomon Islands | `SB` | ✓ | ✓ | ✓ |
+| Somalia | `SO` | ✓ | ✓ | ✓ |
+| South Africa | `ZA` | ✓ | ✓ | ✓ |
+| South Korea | `KR` | ✓ | ✓ | ✓ |
+| South Sudan | `SS` | ✓ | ✓ | ✓ |
+| Spain | `ES` | ✓ | ✓ | ✓ |
+| Sri Lanka | `LK` | ✓ | ✓ | ✓ |
+| Sudan | `SD` | ✓ | ✓ | ✓ |
+| Suriname | `SR` | ✓ | ✓ | ✓ |
+| Svalbard and Jan Mayen | `SJ` | — | — | — |
+| Sweden | `SE` | ✓ | ✓ | ✓ |
+| Switzerland | `CH` | ✓ | ✓ | ✓ |
+| Syria | `SY` | ✓ | ✓ | ✓ |
+| Taiwan | `TW` | ✓ | ✓ | ✓ |
+| Tajikistan | `TJ` | ✓ | ✓ | ✓ |
+| Tanzania | `TZ` | — | ✓ | ✓ |
+| Thailand | `TH` | ✓ | ✓ | ✓ |
+| Timor-Leste | `TL` | — | ✓ | ✓ |
+| Togo | `TG` | ✓ | ✓ | ✓ |
+| Tonga | `TO` | — | — | — |
+| Trinidad and Tobago | `TT` | ✓ | ✓ | ✓ |
+| Tunisia | `TN` | ✓ | ✓ | ✓ |
+| Turkey | `TR` | ✓ | ✓ | ✓ |
+| Turkmenistan | `TM` | — | — | — |
+| Tuvalu | `TV` | ✓ | ✓ | ✓ |
+| U.S. Virgin Islands | `VI` | ✓ | ✓ | ✓ |
+| Uganda | `UG` | ✓ | ✓ | ✓ |
+| Ukraine | `UA` | ✓ | ✓ | ✓ |
+| United Arab Emirates | `AE` | ✓ | ✓ | ✓ |
+| United Kingdom | `GB` | ✓ | ✓ | ✓ |
+| United States | `US` | ✓ | ✓ | ✓ |
+| Uruguay | `UY` | ✓ | ✓ | ✓ |
+| Uzbekistan | `UZ` | ✓ | ✓ | ✓ |
+| Vanuatu | `VU` | — | — | — |
+| Venezuela | `VE` | ✓ | ✓ | ✓ |
+| Vietnam | `VN` | ✓ | ✓ | ✓ |
+| Wallis and Futuna | `WF` | — | — | — |
+| Yemen | `YE` | ✓ | ✓ | ✓ |
+| Zambia | `ZM` | ✓ | ✓ | ✓ |
+| Zimbabwe | `ZW` | ✓ | ✓ | ✓ |
+
+## Other endpoints
+
+[ChatGPT](/api-reference/endpoint/chatgpt/ask) and
+[Gemini](/api-reference/endpoint/gemini/ask) asks also use `country` as the exit
+country, with exits from the same providers. They were not measured
+separately. A country with no exit fails there with `502` and is not billed.
+
+Google AI Mode's `gl` is different. It sets Google's market, not the exit
+country. See
+[Google AI Mode search](/api-reference/google/google-ai-mode/google-ai-mode-search#country-and-language).
