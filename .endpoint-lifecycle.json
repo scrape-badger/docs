@@ -7,10 +7,6 @@
     "original": "46913ea805c51acf56e3a56f1ae9c67decfd6003",
     "generated": "30216b790c783b915b0b5a4ea3a3c9603bbc6d1f91e69cef0f9e887f09488bd9"
   },
-  "openapi-google.json": {
-    "original": "c437249165ce0e84ba436e56e4ea8648aeee8cfb",
-    "generated": "1472f7fc8a020a71b0f5c76d7f5de08881488519521fd8399b8bf9b34388b09c"
-  },
   "openapi-facebook.json": {
     "original": "63929d375daede0e3541802ed9af1fdaf0d858af",
     "generated": "820c2d86442ea53d5ad426d40b5b1268cda767b18b44cb408cd96b752c3f1c7f"

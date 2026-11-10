@@ -4,6 +4,152 @@ description: "Get AI-generated search results from Google AI Mode."
 openapi: "GET /v1/google/ai-mode/search"
 ---
 
+## Country and language
+
+`gl` and `hl` are passed to Google as its country (market) and language
+parameters. They shape the answer Google writes. They do **not** choose where
+the request exits from: AI Mode is answered from a pool of pre-warmed Google
+sessions whose exits are in a fixed set of countries, so do not expect the exit
+IP to be in the `gl` country.
+
+To answer as if the user were in a particular city or district, use
+[location targeting](#location-targeting).
+
+## Location targeting
+
+AI Mode answers "near me" and other local questions for the place you give it,
+down to the city or district, whatever country the request exits from. Pass
+**one** of these:
+
+| Parameter | Value |
+|---|---|
+| `location` | A Google canonical location name such as `Wonju-si,Gangwon-do,South Korea`, a Google geo target criteria ID such as `1009889`, or a short name that is unambiguous, such as `Wonju-si`. With `gl`, a short name is looked up in that country only. |
+| `lat` and `lon` | Latitude (-90 to 90) and longitude (-180 to 180) in decimal degrees. Send both. |
+| `uule` | A Google UULE value in its `w+` (canonical name) or `j+` (coordinates) form. URL-encode it so the `+` survives. Other forms, such as `a+`, are rejected. |
+
+When you send `location` without `gl`, `gl` becomes the location's country:
+`location=Wonju-si` answers with `gl=kr`. A `gl` you send is always kept.
+`lat`/`lon` and `uule` leave `gl` at its default of `us`, so set `gl` yourself
+when the place is outside the US. `hl` is never inferred; set it for an answer
+in the local language.
+
+Answers verified on 2026-11-10:
+
+| Request | The answer is localised to |
+|---|---|
+| `location=Jeju-si` | 제주특별자치도 제주시 (Jeju City) |
+| `lat` and `lon` in Busan | 부산광역시 연제구 (Yeonje-gu, Busan) |
+| `gl=us` with `lat` and `lon` in Austin | Austin, Texas (Congress Avenue Historic District) |
+
+<CodeGroup>
+
+```bash cURL
+curl --get 'https://scrapebadger.com/v1/google/ai-mode/search' \
+  -H 'x-api-key: YOUR_API_KEY' \
+  --data-urlencode 'q=근처 맛집 추천' \
+  --data-urlencode 'location=Wonju-si,Gangwon-do,South Korea' \
+  --data-urlencode 'hl=ko' \
+  --data-urlencode 'include_html=false'
+
+# Coordinates: Congress Avenue, Austin, Texas
+curl --get 'https://scrapebadger.com/v1/google/ai-mode/search' \
+  -H 'x-api-key: YOUR_API_KEY' \
+  --data-urlencode 'q=best coffee near me' \
+  --data-urlencode 'lat=30.2672' \
+  --data-urlencode 'lon=-97.7431' \
+  --data-urlencode 'gl=us' \
+  --data-urlencode 'include_html=false'
+```
+
+```python Python
+from scrapebadger import ScrapeBadger  # SDK 0.77.0 or later
+
+async with ScrapeBadger(api_key="YOUR_API_KEY") as client:
+    answer = await client.google.ai_mode.search(
+        "근처 맛집 추천",
+        location="Wonju-si,Gangwon-do,South Korea",
+        hl="ko",
+        include_html=False,
+    )
+    print(answer["country"], answer["location"]["resolved"])  # kr Wonju-si,...
+
+    austin = await client.google.ai_mode.search(
+        "best coffee near me", lat=30.2672, lon=-97.7431, gl="us", include_html=False
+    )
+    print(austin["markdown"])
+```
+
+```typescript Node
+import { ScrapeBadger } from 'scrapebadger' // SDK 0.77.0 or later
+
+const client = new ScrapeBadger({ apiKey: 'YOUR_API_KEY' })
+
+const answer = await client.google.aiMode.search({
+  q: '근처 맛집 추천',
+  location: 'Wonju-si,Gangwon-do,South Korea',
+  hl: 'ko',
+  include_html: false,
+})
+console.log(answer.country, answer.location?.resolved) // kr Wonju-si,...
+
+const austin = await client.google.aiMode.search({
+  q: 'best coffee near me',
+  lat: 30.2672,
+  lon: -97.7431,
+  gl: 'us',
+  include_html: false,
+})
+console.log(austin.markdown)
+```
+
+</CodeGroup>
+
+### Location in the response
+
+A located answer adds a `location` object, and `country` is the effective `gl`.
+Responses to requests without `location`, `uule`, `lat` or `lon` are unchanged.
+
+```json
+{
+  "country": "kr",
+  "language": "ko",
+  "location": {
+    "requested": "Wonju-si",
+    "resolved": "Wonju-si,Gangwon-do,South Korea",
+    "latitude": null,
+    "longitude": null,
+    "uule": "w+CAIQICIfV29uanUtc2ksR2FuZ3dvbi1kbyxTb3V0aCBLb3JlYQ"
+  }
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `requested` | The `location` you sent. `null` for `uule` and `lat`/`lon` requests. |
+| `resolved` | The Google canonical name `location` resolved to. `null` unless you sent `location`. |
+| `latitude`, `longitude` | The `lat` and `lon` you sent. `null` otherwise. |
+| `uule` | The UULE value sent to Google: `w+` for a location name, `j+` for coordinates, or your `uule` as given. |
+
+### Location errors
+
+These requests are rejected with `422` and a `{"detail": "..."}` body:
+
+| Request | `detail` |
+|---|---|
+| More than one of `location`, `uule`, `lat`/`lon` | `Use only one of location, uule, or lat/lon.` |
+| `lat` without `lon`, or `lon` without `lat` | `lat and lon must be supplied together.` |
+| A `location` Google does not list | `Unknown location; use a canonical Google location name or lat/lon.` |
+| A short name that matches several places, such as `location=Austin&gl=us` | `Ambiguous location; use a canonical name: Austin,Arkansas,United States; Austin,Indiana,United States; ...` (up to eight candidates; retry with one of them) |
+| A `uule` that is not in `w+` or `j+` form | `AI Mode takes uule in its w+ (canonical name) or j+ (coordinates) form; use location or lat/lon instead.` |
+
+A `lat` or `lon` outside its range fails standard parameter validation, also
+with `422`.
+
+A located request that cannot be answered right now returns `503`. Located
+requests have no fallback to a browser render, so they can return `503` where
+the same question without a location would have been answered. They are not
+billed; retry as described below.
+
 ## Temporary unavailability
 
 If the service cannot obtain a complete AI Mode answer, it returns `503 Service
