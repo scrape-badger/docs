@@ -4395,7 +4395,7 @@
           "Google AI Mode"
         ],
         "summary": "Google AI Mode search",
-        "description": "Get AI-generated search results from Google AI Mode.\n\nReturns the structured `text_blocks` (paragraphs, headings, comparison `table` blocks and lists), a flat `references` source list, a compact `markdown` rendering of the whole answer and \u2014 unless `include_html` is false \u2014 the raw `answer_html` body.\n\n`gl` and `hl` are Google's country (market) and language parameters. They shape the answer but do not choose the exit IP: AI Mode is answered from a pool of pre-warmed sessions whose exits are in a fixed set of countries. There is no city or location targeting on AI Mode; for city-level results from classic Google Search use `/v1/google/search` with `location` or `uule`.",
+        "description": "Get AI-generated search results from Google AI Mode.\n\n**Currently returns HTTP 501.** As of 2026 Google has repurposed\nthe historical ``udm=50`` parameter \u2014 it now opens the Visual Search\nhistory prompt, not a dedicated AI Mode surface. There is no\nstandalone ``/search?udm=50`` URL that returns AI-only content\nanymore; AI Overview blocks are rendered inside regular SERPs\ninstead, gated on query + user + geolocation signals.\n\n**Recommended workaround:** call\n``/v1/google/search?q=<query>&ai_overview=true``. The main SERP\nendpoint already parses the ``ai_overview`` block when Google\nincludes one in the response, and the ``ai_overview=true`` flag\nautomatically chases the deferred ``page_token`` follow-up fetch\nwhen Google serves the overview lazily. That's the exact data this\nendpoint was originally meant to return.\n\nThis route remains registered so the product catalog, docs, and\nSDKs don't break \u2014 it will be re-enabled if/when Google ships a\nstable dedicated AI Mode surface again.",
         "operationId": "search_ai_mode_api_v1_ai_mode_search_get",
         "parameters": [
           {
@@ -4415,11 +4415,11 @@
             "required": false,
             "schema": {
               "type": "string",
-              "description": "Google country (market) code, e.g. `us`, `de`. Localises the answer; it does not set the country of the exit IP.",
+              "description": "Country code",
               "default": "us",
               "title": "Gl"
             },
-            "description": "Google country (market) code, e.g. `us`, `de`. Localises the answer; it does not set the country of the exit IP."
+            "description": "Country code"
           },
           {
             "name": "hl",

@@ -23,10 +23,6 @@
     "original": "204d0a57fb592054e1f6d322fcc71f88f33d3112",
     "generated": "6a644c6ba5b5d5bf437e4c7d2d517a68268e04b57f4b64a35b4e55baf37dafb1"
   },
-  "openapi-web-scraping.json": {
-    "original": "b6c96c1a34794568a2cf90d95866a2572c6a94cf",
-    "generated": "9b2496a6dc5ecf806db50aafe5f8137247ba9cea196984024639c5cbbf328f7d"
-  },
   "openapi-account.json": {
     "original": "dd43dfadbd9785594748e0f3f3f7ccc0fcf7391c",
     "generated": "5bce4b964994e633ace744f76b5cc795ce834da58275a80808b7ba9c7221d924"

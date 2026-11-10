@@ -28,9 +28,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "url"
-                ],
+                "required": ["url"],
                 "properties": {
                   "url": {
                     "type": "string",
@@ -39,15 +37,7 @@
                   "method": {
                     "type": "string",
                     "default": "GET",
-                    "enum": [
-                      "GET",
-                      "POST",
-                      "PUT",
-                      "PATCH",
-                      "DELETE",
-                      "HEAD",
-                      "OPTIONS"
-                    ],
+                    "enum": ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
                     "description": "HTTP method. POST/PUT/PATCH require request_body."
                   },
                   "request_body": {
@@ -61,11 +51,7 @@
                   "proxy_tier": {
                     "type": "string",
                     "default": "simple",
-                    "enum": [
-                      "simple",
-                      "premium",
-                      "ultra"
-                    ],
+                    "enum": ["simple", "premium", "ultra"],
                     "description": "Proxy pool to route through: simple = standard shared pool (cheapest, fewest guarantees about IP type), premium = residential IPs, ultra = residential IPs from our highest-trust providers. Its surcharge is added to EVERY request: simple +1, premium +3, ultra +8 credits."
                   },
                   "eval_js": {
@@ -75,20 +61,13 @@
                   "engine": {
                     "type": "string",
                     "default": "auto",
-                    "enum": [
-                      "auto",
-                      "browser"
-                    ],
+                    "enum": ["auto", "browser"],
                     "description": "Scraping engine tier to use."
                   },
                   "format": {
                     "type": "string",
                     "default": "html",
-                    "enum": [
-                      "html",
-                      "markdown",
-                      "text"
-                    ],
+                    "enum": ["html", "markdown", "text"],
                     "description": "Output format for the scraped content."
                   },
                   "render_js": {
@@ -182,12 +161,7 @@
             "headers": {
               "X-Credits-Used": {
                 "description": "Credits charged for this rejected request.",
-                "schema": {
-                  "type": "integer",
-                  "enum": [
-                    0
-                  ]
-                }
+                "schema": { "type": "integer", "enum": [0] }
               }
             },
             "content": {
@@ -195,12 +169,8 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": {
-                      "type": "string"
-                    },
-                    "detail": {
-                      "type": "string"
-                    }
+                    "error": { "type": "string" },
+                    "detail": { "type": "string" }
                   }
                 }
               }
@@ -213,85 +183,34 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "success": {
-                      "type": "boolean"
-                    },
-                    "url": {
-                      "type": "string"
-                    },
-                    "status_code": {
-                      "type": "integer"
-                    },
-                    "content": {
-                      "type": "string"
-                    },
-                    "format": {
-                      "type": "string"
-                    },
-                    "engine_used": {
-                      "type": "string"
-                    },
-                    "credits_used": {
-                      "type": "integer"
-                    },
-                    "duration_ms": {
-                      "type": "integer"
-                    },
-                    "retries_used": {
-                      "type": "integer"
-                    },
-                    "content_length": {
-                      "type": "integer"
-                    },
-                    "screenshot_url": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "video_url": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "headers": {
-                      "type": "object"
-                    },
-                    "blocking_detected": {
-                      "type": "boolean"
-                    },
-                    "blocking_details": {
-                      "type": "object",
-                      "nullable": true
-                    },
-                    "antibot_systems": {
-                      "type": "array"
-                    },
-                    "captcha_systems": {
-                      "type": "array"
-                    },
-                    "anti_bot_solved": {
-                      "type": "boolean"
-                    },
-                    "solver_used": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "ai_extraction": {
-                      "nullable": true
-                    },
-                    "ai_model": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "ai_error": {
-                      "type": "string",
-                      "nullable": true
-                    }
+                    "success": { "type": "boolean" },
+                    "url": { "type": "string" },
+                    "status_code": { "type": "integer" },
+                    "content": { "type": "string" },
+                    "format": { "type": "string" },
+                    "engine_used": { "type": "string" },
+                    "credits_used": { "type": "integer" },
+                    "duration_ms": { "type": "integer" },
+                    "retries_used": { "type": "integer" },
+                    "content_length": { "type": "integer" },
+                    "screenshot_url": { "type": "string", "nullable": true },
+                    "video_url": { "type": "string", "nullable": true },
+                    "headers": { "type": "object" },
+                    "blocking_detected": { "type": "boolean" },
+                    "blocking_details": { "type": "object", "nullable": true },
+                    "antibot_systems": { "type": "array" },
+                    "captcha_systems": { "type": "array" },
+                    "anti_bot_solved": { "type": "boolean" },
+                    "solver_used": { "type": "string", "nullable": true },
+                    "ai_extraction": { "nullable": true },
+                    "ai_model": { "type": "string", "nullable": true },
+                    "ai_error": { "type": "string", "nullable": true }
                   }
                 }
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     },
     "/v1/web/detect": {
@@ -305,9 +224,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": [
-                  "url"
-                ],
+                "required": ["url"],
                 "properties": {
                   "url": {
                     "type": "string",
@@ -320,7 +237,7 @@
                   },
                   "country": {
                     "type": "string",
-                    "description": "ISO 3166-1 alpha-2 country code for proxy geo-targeting."
+                    "description": "ISO 3166-1 alpha-2 country code for the proxy exit; the request goes out from an IP in that country (default US). Any alpha-2 code is accepted, with no allow-list. Targeting is country-level, not city-level. If no exit is available in that country the scrape fails (HTTP 200, success=false, error=fetch_failed) and is not billed; it never falls back to another country. A per-host override that pins a country takes precedence. Measured coverage per proxy tier: https://docs.scrapebadger.com/web-scraping/proxy-countries"
                   }
                 }
               }
@@ -335,39 +252,20 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "url": {
-                      "type": "string"
-                    },
-                    "antibot_systems": {
-                      "type": "array"
-                    },
-                    "captcha_systems": {
-                      "type": "array"
-                    },
-                    "is_blocked": {
-                      "type": "boolean"
-                    },
-                    "blocking_type": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "recommendation": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "credits_used": {
-                      "type": "integer"
-                    },
-                    "duration_ms": {
-                      "type": "integer"
-                    }
+                    "url": { "type": "string" },
+                    "antibot_systems": { "type": "array" },
+                    "captcha_systems": { "type": "array" },
+                    "is_blocked": { "type": "boolean" },
+                    "blocking_type": { "type": "string", "nullable": true },
+                    "recommendation": { "type": "string", "nullable": true },
+                    "credits_used": { "type": "integer" },
+                    "duration_ms": { "type": "integer" }
                   }
                 }
               }
             }
           }
-        },
-        "x-availability": "active"
+        }
       }
     }
   },
