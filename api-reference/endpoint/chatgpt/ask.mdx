@@ -32,8 +32,14 @@ Accepts `GET` (query params) or `POST` (JSON body) with identical fields.
 </ParamField>
 
 <ParamField query="country" type="string" default="US">
-  ISO-3166 alpha-2 egress country, e.g. `US`, `GB`, `DE`. Changes the localised
-  results ChatGPT retrieves.
+  ISO-3166 alpha-2 egress country, e.g. `US`, `GB`, `DE`: the ask exits from an
+  IP in that country. Changes the localised results ChatGPT retrieves.
+
+  Any alpha-2 code is accepted; there is no allow-list. Targeting is
+  country-level, not city-level. A country with no available exit (for example
+  `KP`) fails with `502` and is not billed. The ask never falls back to another
+  country. See [Proxy countries](/web-scraping/proxy-countries) for measured
+  coverage.
 </ParamField>
 
 <ParamField query="web_search" type="string" default="auto">
@@ -44,6 +50,8 @@ Accepts `GET` (query params) or `POST` (JSON body) with identical fields.
   - `off` — answer from the model's own knowledge only.
 
   Check `web_search_triggered` in the response for what actually happened.
+  `force` makes browsing more likely but does not guarantee it, or any
+  citations. A `2xx` answer is billed whether or not it has citations.
 </ParamField>
 
 <ParamField query="image_url" type="string">

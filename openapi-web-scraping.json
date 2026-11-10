@@ -66,7 +66,7 @@
                       "premium",
                       "ultra"
                     ],
-                    "description": "Proxy pool to route through. Its surcharge is added to EVERY request: simple +1, premium +8, ultra +8 credits."
+                    "description": "Proxy pool to route through: simple = standard shared pool (cheapest, fewest guarantees about IP type), premium = residential IPs, ultra = residential IPs from our highest-trust providers. Its surcharge is added to EVERY request: simple +1, premium +3, ultra +8 credits."
                   },
                   "eval_js": {
                     "type": "string",
@@ -132,7 +132,7 @@
                   },
                   "country": {
                     "type": "string",
-                    "description": "ISO 3166-1 alpha-2 country code for proxy geo-targeting."
+                    "description": "ISO 3166-1 alpha-2 country code for the proxy exit; the request goes out from an IP in that country (default US). Any alpha-2 code is accepted, with no allow-list. Targeting is country-level, not city-level. If no exit is available in that country the scrape fails (HTTP 200, success=false, error=fetch_failed) and is not billed; it never falls back to another country. A per-host override that pins a country takes precedence. Measured coverage per proxy tier: https://docs.scrapebadger.com/web-scraping/proxy-countries"
                   },
                   "custom_headers": {
                     "type": "object",

@@ -25,8 +25,8 @@ Scrape any public webpage and get back clean HTML, Markdown, or plain text. The 
   <Card title="Screenshots" icon="camera">
     Capture full-page PNG screenshots of any webpage.
   </Card>
-  <Card title="Geo-Targeting" icon="globe">
-    Route requests through proxies in 37+ countries to access location-specific content.
+  <Card title="Geo-Targeting" icon="globe" href="/web-scraping/proxy-countries">
+    Route requests through exits in 200+ countries by ISO country code. Targeting is country-level, not city-level. See the coverage list.
   </Card>
 </CardGroup>
 
@@ -65,9 +65,9 @@ Every request pays an **engine cost plus a `proxy_tier` surcharge**. The engine 
 |-----------|------|
 | HTTP engine — simple pages in `engine: auto` | 1 credit |
 | Browser engine — `render_js`, `anti_bot`, `video`, or auto-escalation | 5 credits |
-| Proxy tier `simple` (default) | +2 credits |
-| Proxy tier `premium` | +5 credits |
-| Proxy tier `ultra` | +12 credits |
+| Proxy tier `simple` (default) | +1 credit |
+| Proxy tier `premium` | +3 credits |
+| Proxy tier `ultra` | +8 credits |
 | AI extraction (`ai_extract: true`) | +2 credits |
 | Retries | Free |
 | Failed requests | 0 credits |
@@ -76,10 +76,11 @@ The anti-bot solver and video recording are not billed on top — they force the
 
 | Request | Total |
 |---------|-------|
-| HTTP page, `simple` proxy (cheapest possible scrape) | 3 credits |
-| Browser render, `simple` proxy | 7 credits |
-| HTTP page, `premium` proxy | 6 credits |
-| Browser render, `premium` proxy | 10 credits |
+| HTTP page, `simple` proxy (cheapest possible scrape) | 2 credits |
+| Browser render, `simple` proxy | 6 credits |
+| HTTP page, `premium` proxy | 4 credits |
+| Browser render, `premium` proxy | 8 credits |
+| HTTP page, `ultra` proxy | 9 credits |
 
 <Tip>
   Use the `max_cost` parameter to set a credit budget per request. The request will fail rather than exceed your budget. The exact charge is returned in `credits_used` and the `X-Credits-Used` response header.

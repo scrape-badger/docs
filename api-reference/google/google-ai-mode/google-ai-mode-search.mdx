@@ -4,6 +4,18 @@ description: "Get AI-generated search results from Google AI Mode."
 openapi: "GET /v1/google/ai-mode/search"
 ---
 
+## Country and language
+
+`gl` and `hl` are passed to Google as its country (market) and language
+parameters. They shape the answer Google writes. They do **not** choose where
+the request exits from: AI Mode is answered from a pool of pre-warmed Google
+sessions whose exits are in a fixed set of countries, so do not expect the exit
+IP to be in the `gl` country.
+
+AI Mode has no city or location targeting. For city-level results from classic
+Google Search, use [`/v1/google/search`](/api-reference/google/google-search/google-web-search#location-and-request-controls)
+with `location` or `uule`.
+
 ## Temporary unavailability
 
 If the service cannot obtain a complete AI Mode answer, it returns `503 Service
