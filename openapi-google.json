@@ -4395,7 +4395,7 @@
           "Google AI Mode"
         ],
         "summary": "Google AI Mode search",
-        "description": "Get AI-generated search results from Google AI Mode.\n\n**Currently returns HTTP 501.** As of 2026 Google has repurposed\nthe historical ``udm=50`` parameter \u2014 it now opens the Visual Search\nhistory prompt, not a dedicated AI Mode surface. There is no\nstandalone ``/search?udm=50`` URL that returns AI-only content\nanymore; AI Overview blocks are rendered inside regular SERPs\ninstead, gated on query + user + geolocation signals.\n\n**Recommended workaround:** call\n``/v1/google/search?q=<query>&ai_overview=true``. The main SERP\nendpoint already parses the ``ai_overview`` block when Google\nincludes one in the response, and the ``ai_overview=true`` flag\nautomatically chases the deferred ``page_token`` follow-up fetch\nwhen Google serves the overview lazily. That's the exact data this\nendpoint was originally meant to return.\n\nThis route remains registered so the product catalog, docs, and\nSDKs don't break \u2014 it will be re-enabled if/when Google ships a\nstable dedicated AI Mode surface again.",
+        "description": "Get AI-generated search results from Google AI Mode.\n\nReturns the structured `text_blocks` (paragraphs, headings, comparison\n`table` blocks and lists), a flat `references` source list, a compact\n`markdown` rendering of the whole answer and \u2014 unless `include_html`\nis false \u2014 the raw `answer_html` body.\n\n`location`, `uule` or `lat`/`lon` localise the answer (\"near me\", local\nresults) to that place, down to the city or district, wherever the\nrequest exits from. Located answers echo a `location` object.",
         "operationId": "search_ai_mode_api_v1_ai_mode_search_get",
         "parameters": [
           {
@@ -4415,11 +4415,11 @@
             "required": false,
             "schema": {
               "type": "string",
-              "description": "Country code",
+              "description": "Google country (market) code. It shapes the answer; it does not pick the exit IP's country. Defaults to the `location`'s country when `location` is set.",
               "default": "us",
               "title": "Gl"
             },
-            "description": "Country code"
+            "description": "Google country (market) code. It shapes the answer; it does not pick the exit IP's country. Defaults to the `location`'s country when `location` is set."
           },
           {
             "name": "hl",
@@ -4439,11 +4439,87 @@
             "required": false,
             "schema": {
               "type": "boolean",
+              "description": "Include the raw `answer_html` (full answer body HTML) in the response for maximum parity. It can be 100s of KB \u2014 set false when you only need the structured `text_blocks` + `markdown`.",
               "default": true,
-              "description": "Include the raw answer_html body (can be 100s of KB). Set false for just text_blocks + markdown.",
               "title": "Include Html"
             },
-            "description": "Include the raw answer_html body (can be 100s of KB). Set false for just text_blocks + markdown."
+            "description": "Include the raw `answer_html` (full answer body HTML) in the response for maximum parity. It can be 100s of KB \u2014 set false when you only need the structured `text_blocks` + `markdown`."
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Answer as if the user were here: a Google canonical location name (e.g. `Wonju-si,Gangwon-do,South Korea`), a Google criteria ID, or an unambiguous short name within `gl`. Use only one of location, uule, or lat/lon.",
+              "title": "Location"
+            },
+            "description": "Answer as if the user were here: a Google canonical location name (e.g. `Wonju-si,Gangwon-do,South Korea`), a Google criteria ID, or an unambiguous short name within `gl`. Use only one of location, uule, or lat/lon."
+          },
+          {
+            "name": "uule",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A Google UULE value in its `w+` (canonical name) or `j+` (coordinates) form.",
+              "title": "Uule"
+            },
+            "description": "A Google UULE value in its `w+` (canonical name) or `j+` (coordinates) form."
+          },
+          {
+            "name": "lat",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "maximum": 90,
+                  "minimum": -90
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Latitude of the user's location (with lon).",
+              "title": "Lat"
+            },
+            "description": "Latitude of the user's location (with lon)."
+          },
+          {
+            "name": "lon",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "maximum": 180,
+                  "minimum": -180
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Longitude of the user's location (with lat).",
+              "title": "Lon"
+            },
+            "description": "Longitude of the user's location (with lat)."
           }
         ],
         "responses": {
@@ -6366,7 +6442,8 @@
           "country": {
             "type": "string",
             "title": "Country",
-            "default": "us"
+            "default": "us",
+            "description": "The effective `gl`: the location's country when `location` set it and `gl` was not sent."
           },
           "markdown": {
             "anyOf": [
@@ -6391,6 +6468,17 @@
             ],
             "title": "Answer Html",
             "description": "Raw answer body HTML (script/style stripped). Omitted when include_html=false."
+          },
+          "location": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiModeLocation"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Present only on located requests (`location`, `uule` or `lat`/`lon`)."
           }
         },
         "type": "object",
@@ -14667,6 +14755,73 @@
         },
         "title": "RichSnippetBlock",
         "type": "object"
+      },
+      "AiModeLocation": {
+        "properties": {
+          "requested": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requested",
+            "description": "The `location` as sent; null for `uule` and `lat`/`lon` requests."
+          },
+          "resolved": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved",
+            "description": "The Google canonical location name `location` resolved to; null unless `location` was sent."
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude",
+            "description": "`lat` as sent; null unless coordinates were sent."
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude",
+            "description": "`lon` as sent; null unless coordinates were sent."
+          },
+          "uule": {
+            "type": "string",
+            "title": "Uule",
+            "description": "The UULE value sent to Google (`w+` for a location name, `j+` for coordinates)."
+          }
+        },
+        "type": "object",
+        "required": [
+          "requested",
+          "resolved",
+          "latitude",
+          "longitude",
+          "uule"
+        ],
+        "title": "AiModeLocation",
+        "description": "What a located AI Mode request asked for and what Google received."
       }
     },
     "securitySchemes": {
