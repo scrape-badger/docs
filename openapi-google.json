@@ -2872,11 +2872,11 @@
                 "serp"
               ],
               "type": "string",
-              "description": "Data source. ``rpc`` (default, ~300 ms) replays Google's own ``r06xKb`` batchexecute RPC on the Google Careers portal \u2014 clean JSON, 20 roles per page, scope = Google's internal openings. ``serp`` uses the public Jobs search vertical (``udm=8``, SERP-embedded, 3rd-party aggregator) and costs more latency because Google gates it behind JS.",
+              "description": "Data source. ``rpc`` (default, ~300 ms) replays Google's own ``r06xKb`` batchexecute RPC on the Google Careers portal \u2014 clean JSON, 20 roles per page, scope = Google's internal openings. ``serp`` uses the public Jobs search vertical (``udm=8``, SERP-embedded, 3rd-party aggregator) and uses HTTP retrieval with browser fallback inside a 45-second budget. Descriptions contain the text Google supplies, which can be a preview in some locales; apply_links point to the original listings.",
               "default": "rpc",
               "title": "Mode"
             },
-            "description": "Data source. ``rpc`` (default, ~300 ms) replays Google's own ``r06xKb`` batchexecute RPC on the Google Careers portal \u2014 clean JSON, 20 roles per page, scope = Google's internal openings. ``serp`` uses the public Jobs search vertical (``udm=8``, SERP-embedded, 3rd-party aggregator) and costs more latency because Google gates it behind JS."
+            "description": "Data source. ``rpc`` (default, ~300 ms) replays Google's own ``r06xKb`` batchexecute RPC on the Google Careers portal \u2014 clean JSON, 20 roles per page, scope = Google's internal openings. ``serp`` uses the public Jobs search vertical (``udm=8``, SERP-embedded, 3rd-party aggregator) and uses HTTP retrieval with browser fallback inside a 45-second budget. Descriptions contain the text Google supplies, which can be a preview in some locales; apply_links point to the original listings."
           }
         ],
         "responses": {

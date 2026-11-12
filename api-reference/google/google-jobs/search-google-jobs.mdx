@@ -1,5 +1,27 @@
 ---
 title: "Search Google Jobs"
-description: "Search Google Jobs"
+description: "Search public Google Jobs listings or Google Careers openings"
 openapi: "GET /v1/google/jobs/search"
 ---
+
+Use `mode=serp` for public job listings from employers and job boards. The default
+`mode=rpc` searches Google's own Careers openings.
+
+In SERP mode, `description` contains the text Google includes for that listing.
+When Google supplies a full description, the response includes the text hidden
+behind “Show more.” Some markets, including Spanish results, may expose only a
+short preview of about 400 characters. Use `apply_links` to open the original
+posting when you need the full text. `job_highlights` contains Google's structured
+qualifications, responsibilities, and benefits when present; it can be `null`.
+
+A successful empty `jobs` array means Google explicitly reported no matching
+jobs. Blocked pages and failed fetches return an error. Requests use a bounded
+retrieval window of up to 45 seconds; allow at least 60 seconds for your client's
+timeout, including network overhead.
+
+```bash
+curl --max-time 60 --get 'https://scrapebadger.com/v1/google/jobs/search' \
+  -H 'X-API-Key: YOUR_API_KEY' \
+  --data-urlencode 'q=marinero empleo España' \
+  --data 'mode=serp&gl=es&hl=es'
+```
