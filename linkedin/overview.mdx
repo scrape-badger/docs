@@ -32,8 +32,12 @@ courses, and a geo/company typeahead for resolving filter ids.
   website, industry, size, headquarters, specialties, follower and employee
   counts, by `universal_name` slug.
 - **Member profiles** — a public member's logged-out profile: headline,
-  location, about, experience, education, languages and awards, by vanity
-  `public_id`.
+  location, about, detailed experience and education, languages and awards,
+  volunteering, recommendations, instructor courses, recent posts and articles,
+  by vanity `public_id`.
+- **Authenticated full profiles** — a separately labelled `/full` tier with
+  paginated position groups, skills, certifications, honors, publications,
+  projects, courses, organizations, patents and test scores.
 - **Posts & articles** — a public post or Pulse article with author, body,
   reactions and top-level comments.
 - **LinkedIn Learning** — a course's title, description, provider, workload,
@@ -44,12 +48,12 @@ courses, and a geo/company typeahead for resolving filter ids.
 ## Honesty caveat
 
 <Warning>
-  These endpoints read LinkedIn's **public, logged-out** surface only. A
-  member profile is the JSON-LD subset LinkedIn exposes to signed-out visitors
-  — **not** the full logged-in record: no contact info, no connection graph,
-  and only the coarse skills/experience LinkedIn chooses to render publicly.
-  **People search, employee search and full skill lists are out of scope** —
-  they are auth-gated and not available here.
+  Except for the separately labelled `/full` tier, these endpoints read
+  LinkedIn's **public, logged-out** surface. Public profiles include only the
+  fields LinkedIn exposes to signed-out visitors, which vary by profile and
+  response variant. People search, employee search, contact info and connection
+  graphs remain out of scope. The `/full` route uses a server-owned
+  authenticated session and is limited to what that session may view.
 </Warning>
 
 ## Coverage
@@ -73,6 +77,7 @@ courses, and a geo/company typeahead for resolving filter ids.
 | Get company | `GET /v1/linkedin/companies/{universal_name}` | 9 |
 | Get school | `GET /v1/linkedin/schools/{universal_name}` | 9 |
 | Get profile | `GET /v1/linkedin/profiles/{public_id}` | 12 |
+| Get full profile | `GET /v1/linkedin/profiles/{public_id}/full` | 16 |
 | Get post | `GET /v1/linkedin/posts/{post_slug}` | 8 |
 | Get article | `GET /v1/linkedin/articles/{article_slug}` | 8 |
 | Get course | `GET /v1/linkedin/learning/{course_slug}` | 8 |

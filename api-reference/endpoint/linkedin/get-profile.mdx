@@ -37,25 +37,39 @@ Fetch a member's public LinkedIn profile by their vanity `public_id` (the
 ## Response
 
 <ResponseField name="profile" type="object">
-  The `Profile`.
+  The `Profile`. `access_scope` is `public` for this endpoint.
 
   <Expandable title="profile">
     <ResponseField name="public_id" type="string" />
     <ResponseField name="linkedin_url" type="string" />
+    <ResponseField name="access_scope" type="string">`public`.</ResponseField>
     <ResponseField name="name" type="string" />
     <ResponseField name="headline" type="string" />
     <ResponseField name="location" type="string" />
     <ResponseField name="country" type="string" />
     <ResponseField name="about" type="string" />
     <ResponseField name="image" type="string" />
+    <ResponseField name="cover_image" type="string" />
     <ResponseField name="follower_count" type="integer" />
+    <ResponseField name="connection_count" type="string">Displayed connection count, when public.</ResponseField>
+    <ResponseField name="badges" type="string[]">For example, `Creator` or `Top Voice`.</ResponseField>
+    <ResponseField name="websites" type="string[]" />
     <ResponseField name="job_titles" type="string[]" />
     <ResponseField name="current_company" type="string" />
     <ResponseField name="current_company_url" type="string" />
-    <ResponseField name="experience" type="Experience[]">Each: `company`, `company_url`, `start_year`, `end_year`.</ResponseField>
-    <ResponseField name="education" type="Education[]">Each: `school`, `school_url`, `start_year`, `end_year`.</ResponseField>
+    <ResponseField name="experience" type="Experience[]">Each can include `title`, `company`, `company_url`, `location`, `employment_type`, `description`, `date_range`, `duration`, `start_year`, `end_year`, and `is_current`.</ResponseField>
+    <ResponseField name="education" type="Education[]">Each can include `school`, `school_url`, `degree`, `field_of_study`, `description`, `date_range`, `start_year`, and `end_year`.</ResponseField>
     <ResponseField name="languages" type="string[]" />
+    <ResponseField name="language_details" type="Language[]">Each: `name`, `proficiency`.</ResponseField>
     <ResponseField name="awards" type="string[]" />
+    <ResponseField name="award_details" type="Award[]">Each: `title`, `issuer`, `issued_on`, `url`, `description`.</ResponseField>
+    <ResponseField name="volunteering" type="Volunteering[]">Each: `title`, `organization`, `organization_url`, `date_range`, `start_year`, `end_year`, `description`.</ResponseField>
+    <ResponseField name="recommendations" type="Recommendation[]">Each: `author_name`, `author_url`, `text`.</ResponseField>
+    <ResponseField name="instructor_courses" type="InstructorCourse[]">Each: `title`, `url`, `instructor`, `duration`, `viewers`.</ResponseField>
+    <ResponseField name="recent_posts" type="Activity[]">Public activity shares with `type`, `url`, `title`, `text`, `published_at`, `like_count`, `comment_count`, `author_name`, and `author_url`.</ResponseField>
+    <ResponseField name="recent_articles" type="Activity[]">Public articles with the same activity shape.</ResponseField>
+    <ResponseField name="similar_profiles" type="SimilarProfile[]">Each: `name`, `headline`, `url`, `follower_count`, `location`.</ResponseField>
+    <ResponseField name="partial_sections" type="string[]">Sections with masked or truncated values. Empty sections are not listed.</ResponseField>
   </Expandable>
 </ResponseField>
 
