@@ -14,6 +14,21 @@ short preview of about 400 characters. Use `apply_links` to open the original
 posting when you need the full text. `job_highlights` contains Google's structured
 qualifications, responsibilities, and benefits when present; it can be `null`.
 
+There is currently no separate public Google Jobs detail endpoint. Switching to
+`mode=rpc` does not expand an aggregator listing; it searches a different source.
+Google's own per-job detail response can contain the same truncated preview.
+To extract text from the original posting, you can make a separate [Web Scraping
+API](/web-scraping/overview) request to an `apply_links` URL. That request
+uses Web Scraping pricing and depends on the job board's accessibility.
+
+Each Jobs search costs **20 credits per request**, not per returned job. In SERP
+mode, the API attempts to recover missing application links from Google's detail
+response for the same job ID, within the existing request deadline. This recovery
+adds no customer credit charge. `url` is the Google listing URL; use `apply_links`
+or `apply_options[].link` for application destinations. If Google does not supply
+a recoverable destination, those arrays can still be empty; the API does not
+invent a link or substitute a different listing.
+
 A successful empty `jobs` array means Google explicitly reported no matching
 jobs. Blocked pages and failed fetches return an error. Requests use a bounded
 retrieval window of up to 45 seconds; allow at least 60 seconds for your client's
