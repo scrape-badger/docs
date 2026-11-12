@@ -1,0 +1,110 @@
+---
+title: "Get Full Profile"
+api: "GET https://scrapebadger.com/v1/linkedin/profiles/{public_id}/full"
+description: "A full LinkedIn member profile through the separately authenticated projection, with paginated positions and richer verticals."
+---
+
+Fetch a full member profile through the server-owned authenticated LinkedIn session. This is a separate tier, never a fallback for the public profile endpoint. Results are limited to what that session is allowed to view.
+
+<Warning>
+  This route requires the service's authenticated projection to be configured.
+  It returns `access_scope: authenticated`. Public-profile calls keep returning
+  `access_scope: public`.
+</Warning>
+
+**Credits:** 16
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Path Parameters
+
+<ParamField path="public_id" type="string" required>
+  Member vanity slug, e.g. `williamhgates`.
+</ParamField>
+
+## Query Parameters
+
+<ParamField query="country" type="string" default="us">
+  Residential proxy country for the request.
+</ParamField>
+
+## Response
+
+<ResponseField name="profile" type="object">
+  The full `Profile`. `access_scope` is `authenticated`.
+
+  <Expandable title="profile">
+    <ResponseField name="public_id" type="string" />
+    <ResponseField name="linkedin_url" type="string" />
+    <ResponseField name="access_scope" type="string">`authenticated`.</ResponseField>
+    <ResponseField name="name" type="string" />
+    <ResponseField name="headline" type="string" />
+    <ResponseField name="location" type="string" />
+    <ResponseField name="about" type="string" />
+    <ResponseField name="current_company" type="string" />
+    <ResponseField name="current_company_url" type="string" />
+    <ResponseField name="experience" type="Experience[]">Paginated position groups. Each role can include `title`, `company`, `company_url`, `location`, `employment_type`, `description`, `date_range`, `duration`, `start_year`, `end_year`, and `is_current`.</ResponseField>
+    <ResponseField name="education" type="Education[]">Each can include `school`, `school_url`, `degree`, `field_of_study`, `description`, `date_range`, `start_year`, and `end_year`.</ResponseField>
+    <ResponseField name="skills" type="string[]" />
+    <ResponseField name="languages" type="string[]" />
+    <ResponseField name="language_details" type="Language[]">Each: `name`, `proficiency`.</ResponseField>
+    <ResponseField name="certifications" type="ProfileEntry[]" />
+    <ResponseField name="honors" type="ProfileEntry[]" />
+    <ResponseField name="awards" type="string[]" />
+    <ResponseField name="award_details" type="Award[]">Each: `title`, `issuer`, `issued_on`, `url`, `description`.</ResponseField>
+    <ResponseField name="publications" type="ProfileEntry[]" />
+    <ResponseField name="projects" type="ProfileEntry[]" />
+    <ResponseField name="courses" type="ProfileEntry[]" />
+    <ResponseField name="organizations" type="ProfileEntry[]" />
+    <ResponseField name="patents" type="ProfileEntry[]" />
+    <ResponseField name="test_scores" type="ProfileEntry[]" />
+    <ResponseField name="counts" type="object">Per-section `shown` and `total` counts, including experience and skills.</ResponseField>
+    <ResponseField name="partial_sections" type="string[]">Sections whose returned rows are truncated by pagination or visibility.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/linkedin/profiles/williamhgates/full" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const profile = await client.linkedin.getFullProfile("williamhgates");
+```
+
+```python Python
+profile = await client.linkedin.get_full_profile("williamhgates")
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "public_id": "williamhgates",
+  "linkedin_url": "https://www.linkedin.com/in/williamhgates",
+  "access_scope": "authenticated",
+  "name": "Bill Gates",
+  "experience": [
+    {
+      "title": "Co-chair",
+      "company": "Gates Foundation",
+      "date_range": "2000 - Present",
+      "is_current": true
+    }
+  ],
+  "skills": ["Leadership"],
+  "counts": {
+    "experience": {"shown": 1, "total": 1},
+    "skills": {"shown": 1, "total": 1}
+  },
+  "partial_sections": []
+}
+```

@@ -1,8 +1,4 @@
 {
-  "api-reference/endpoint/linkedin/get-full-profile.mdx": {
-    "original": "9f1d829ce6acc4be06a74c35d1bd455088337d78",
-    "generated": null
-  },
   "openapi-amazon.json": {
     "original": "9e33317a0c5162c504fdbb47e4b778acac01f273",
     "generated": "c71640875f582f8d0f18cd7baba070620330c8a6417c6ed00a97823d2ba1062c"
@@ -62,9 +58,5 @@
   "openapi-tiktok.json": {
     "original": "94201f21c1ce1c0098c840c29d9c6dfe9b3a1b66",
     "generated": "ac58f6fe7cd75979477186d8fad66f306ffd44b46bf004c833b83455f6a019c0"
-  },
-  "docs.json": {
-    "original": "cbbe29280fd6275809df5b334753b298ccce7ecc",
-    "generated": "8e3ee835691e82a96e15b87b63ec2d40edf1e37371223809a78318d88f6a6262"
   }
 }
