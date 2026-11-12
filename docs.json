@@ -667,8 +667,7 @@
           {
             "group": "Profiles",
             "pages": [
-              "api-reference/endpoint/linkedin/get-profile",
-              "api-reference/endpoint/linkedin/get-full-profile"
+              "api-reference/endpoint/linkedin/get-profile"
             ]
           },
           {
