@@ -18,6 +18,37 @@ and related searches. No `mode` parameter is required on the Light endpoint.
 Legacy `/search?mode=fast` requests remain compatible at the regular route's
 20-credit price. Move to `/light/search` for the 10-credit rate.
 
+## Raw HTML and same-session pages
+
+Pass `output=html` to receive the Google page itself instead of parsed JSON.
+Full Search returns it only when the page is complete. Google's basic
+no-JavaScript page, a challenge page, or an AI Overview that could not be
+loaded (with `ai_overview=true`) fail with **502** and are **not billed**, so
+a retry is free.
+
+With `ai_overview=true`, an overview that Google loads after the page is
+fetched in the same Google session and written into the page, in the place
+where a browser shows "Thinking".
+
+To page through results the way one visitor does, pass `pages=2` (up to 3)
+with `output=html`. All pages come from one Google session (same exit IP and
+cookies), starting at `start`. The response is JSON:
+
+```json
+{
+  "search_metadata": { "session_fingerprint": "5f56c4fd78d3a2e9cf1c", "single_session": true },
+  "pages": [
+    { "page": 1, "start": 0, "url": "https://www.google.com/search?q=...", "html": "<!doctype html>..." },
+    { "page": 2, "start": 10, "url": "https://www.google.com/search?q=...&start=10", "html": "<!doctype html>..." }
+  ]
+}
+```
+
+Each page is billed as one Search request (`pages=2` costs 40 credits). If any
+page cannot be served from that session, the whole request is retried on a
+fresh one and otherwise fails with 502, unbilled. Separate requests with
+`start=0` and `start=10` are independent sessions.
+
 ## Google redirect links
 
 Search attempts to resolve every organic result URL within one short lookup

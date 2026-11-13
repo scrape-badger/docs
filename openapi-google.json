@@ -12,7 +12,7 @@
           "Google Search"
         ],
         "summary": "Google web search",
-        "description": "Search Google and get structured results.\n\nTwo response modes:\n\n- **full** (default): complete SERP with organic, ads,\n  knowledge graph, People Also Ask, AI Overview, local pack, news,\n  related searches, inline videos, etc. ~1.5-2s cold, ~1.5ms warm.\n- **fast** (~40% faster): lite endpoint (`gbv=1`) returning\n  only organic results + related searches. Rich blocks (KG, local,\n  AI Overview, news) are **not** returned \u2014 request ``mode=full`` for\n  those. Auto-upgrades to full if ``ai_overview=true`` is set.\n\nFirst request in either mode triggers a browser warmup (~15s) to\nsolve SearchGuard. Subsequent requests reuse the sticky session.",
+        "description": "Search Google and get structured results.\n\nTwo response modes:\n\n- **full** (default): complete SERP with organic, ads,\n  knowledge graph, People Also Ask, AI Overview, local pack, news,\n  related searches, inline videos, etc. ~1.5-2s cold, ~1.5ms warm.\n- **fast** (~40% faster): lite endpoint (`gbv=1`) returning\n  only organic results + related searches. Rich blocks (KG, local,\n  AI Overview, news) are **not** returned — request ``mode=full`` for\n  those. Auto-upgrades to full if ``ai_overview=true`` is set.\n\nFirst request in either mode triggers a browser warmup (~15s) to\nsolve SearchGuard. Subsequent requests reuse the sticky session.",
         "operationId": "google_search_api_v1_search_get",
         "parameters": [
           {
@@ -100,11 +100,11 @@
                 "tablet"
               ],
               "type": "string",
-              "description": "Device target: desktop, mobile, iphone, android, tablet",
+              "description": "Device target: desktop, mobile, iphone, android, tablet. Any other value is rejected with 422.",
               "default": "desktop",
               "title": "Device"
             },
-            "description": "Device target: desktop, mobile, iphone, android, tablet"
+            "description": "Device target: desktop, mobile, iphone, android, tablet. Any other value is rejected with 422."
           },
           {
             "name": "user_agent",
@@ -136,11 +136,25 @@
                 "html"
               ],
               "type": "string",
-              "description": "Response format: json (parsed) or html (raw SERP)",
+              "description": "Response format: json (parsed) or html (the raw Google page). Full Search returns html only when the page is complete: Google's basic no-JavaScript page, a challenge page, or (with ai_overview=true) an AI Overview that could not be loaded fail with 502 and are not billed.",
               "default": "json",
               "title": "Output"
             },
-            "description": "Response format: json (parsed) or html (raw SERP)"
+            "description": "Response format: json (parsed) or html (the raw Google page). Full Search returns html only when the page is complete: Google's basic no-JavaScript page, a challenge page, or (with ai_overview=true) an AI Overview that could not be loaded fail with 502 and are not billed."
+          },
+          {
+            "name": "pages",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 3,
+              "minimum": 1,
+              "description": "Consecutive result pages to fetch in one Google session (same exit IP and cookies), starting at start. Requires output=html. With pages above 1 the response is JSON: pages[] with each page's html, plus search_metadata.session_fingerprint. Each page is billed as one Search request; a request that cannot deliver every page fails with 502 and is not billed.",
+              "default": 1,
+              "title": "Pages"
+            },
+            "description": "Consecutive result pages to fetch in one Google session (same exit IP and cookies), starting at start. Requires output=html. With pages above 1 the response is JSON: pages[] with each page's html, plus search_metadata.session_fingerprint. Each page is billed as one Search request; a request that cannot deliver every page fails with 502 and is not billed."
           },
           {
             "name": "location",
@@ -386,11 +400,11 @@
             "required": false,
             "schema": {
               "type": "boolean",
-              "description": "Chase deferred AI Overview page_token with a follow-up fetch and merge the result. Adds ~1s when the SERP defers the overview; the request price is unchanged.",
+              "description": "Load Google's deferred AI Overview. JSON: merged into ai_overview. output=html: the overview is loaded in the same Google session and written into the page, so the page never shows the \"Thinking\" placeholder. Adds ~1-3s when the SERP defers the overview; the request price is unchanged.",
               "default": false,
               "title": "Ai Overview"
             },
-            "description": "Chase deferred AI Overview page_token with a follow-up fetch and merge the result. Adds ~1s when the SERP defers the overview; the request price is unchanged."
+            "description": "Load Google's deferred AI Overview. JSON: merged into ai_overview. output=html: the overview is loaded in the same Google session and written into the page, so the page never shows the \"Thinking\" placeholder. Adds ~1-3s when the SERP defers the overview; the request price is unchanged."
           },
           {
             "name": "mode",
@@ -854,6 +868,9 @@
                 }
               }
             }
+          },
+          "502": {
+            "description": "Google did not return a complete page (challenge, basic page, AI Overview not loaded, or a later page lost). Not billed; retry."
           }
         },
         "x-availability": "active"
@@ -1264,7 +1281,7 @@
           "Google Maps"
         ],
         "summary": "Get business posts",
-        "description": "Get Google Business posts / updates for a Maps place.\n\n**Approach**: searches the Google SERP for the business by ``ludocid``\n(derived from the ``data_id``'s low hex part) and parses the knowledge\npanel's ``data-attrid=\"kc:/local:any posts\"`` and\n``kc:/local:merchant_description`` sections. This is the same data\nsurface and other SERP-based scrapers use.\n\nThe Maps protobuf endpoints (``localposts``, ``batchexecute Qt4aBe``)\nreturn empty for virtually all businesses even when they have posts\nin the knowledge panel \u2014 Google deprecated those endpoints in favor\nof the SERP knowledge panel.\n\nRequires ``data_id`` (``0x...:0x...``), available from ``/maps/search``\nresults.",
+        "description": "Get Google Business posts / updates for a Maps place.\n\n**Approach**: searches the Google SERP for the business by ``ludocid``\n(derived from the ``data_id``'s low hex part) and parses the knowledge\npanel's ``data-attrid=\"kc:/local:any posts\"`` and\n``kc:/local:merchant_description`` sections. This is the same data\nsurface and other SERP-based scrapers use.\n\nThe Maps protobuf endpoints (``localposts``, ``batchexecute Qt4aBe``)\nreturn empty for virtually all businesses even when they have posts\nin the knowledge panel — Google deprecated those endpoints in favor\nof the SERP knowledge panel.\n\nRequires ``data_id`` (``0x...:0x...``), available from ``/maps/search``\nresults.",
         "operationId": "maps_posts_api_v1_maps_posts_get",
         "parameters": [
           {
@@ -1273,10 +1290,10 @@
             "required": false,
             "schema": {
               "type": "string",
-              "description": "Google Maps data ID (0x...:0x...) \u2014 from /maps/search results",
+              "description": "Google Maps data ID (0x...:0x...) — from /maps/search results",
               "title": "Data Id"
             },
-            "description": "Google Maps data ID (0x...:0x...) \u2014 from /maps/search results"
+            "description": "Google Maps data ID (0x...:0x...) — from /maps/search results"
           },
           {
             "name": "place_id",
@@ -2024,7 +2041,7 @@
           "Google Trends"
         ],
         "summary": "Interest by region",
-        "description": "Get interest by region for a search term.\n\nGoogle's widget has a resolution hierarchy \u2014 you can't ask for\ncountry-level data inside a specific country. Passing\n``resolution=auto`` (the default) uses whatever resolution the\nwidget itself returned, which is always valid.",
+        "description": "Get interest by region for a search term.\n\nGoogle's widget has a resolution hierarchy — you can't ask for\ncountry-level data inside a specific country. Passing\n``resolution=auto`` (the default) uses whatever resolution the\nwidget itself returned, which is always valid.",
         "operationId": "trends_regions_api_v1_trends_regions_get",
         "parameters": [
           {
@@ -2073,11 +2090,11 @@
                 "auto"
               ],
               "type": "string",
-              "description": "Region granularity. `auto` (default) uses Google's widget default, which is `COUNTRY` for worldwide queries and `REGION` (state/province) for single-country queries. Overriding to `COUNTRY` when `geo` is set returns HTTP 400 from Google \u2014 use `REGION`, `DMA`, or `CITY` in that case.",
+              "description": "Region granularity. `auto` (default) uses Google's widget default, which is `COUNTRY` for worldwide queries and `REGION` (state/province) for single-country queries. Overriding to `COUNTRY` when `geo` is set returns HTTP 400 from Google — use `REGION`, `DMA`, or `CITY` in that case.",
               "default": "auto",
               "title": "Resolution"
             },
-            "description": "Region granularity. `auto` (default) uses Google's widget default, which is `COUNTRY` for worldwide queries and `REGION` (state/province) for single-country queries. Overriding to `COUNTRY` when `geo` is set returns HTTP 400 from Google \u2014 use `REGION`, `DMA`, or `CITY` in that case."
+            "description": "Region granularity. `auto` (default) uses Google's widget default, which is `COUNTRY` for worldwide queries and `REGION` (state/province) for single-country queries. Overriding to `COUNTRY` when `geo` is set returns HTTP 400 from Google — use `REGION`, `DMA`, or `CITY` in that case."
           }
         ],
         "responses": {
@@ -2177,7 +2194,7 @@
           "Google Trends"
         ],
         "summary": "Trending searches",
-        "description": "Get trending searches with related queries via Google's TrendsUi.\n\nPrimary path: ``POST /_/TrendsUi/data/batchexecute?rpcids=i0OFE``,\nGoogle's internal RPC backend for the ``/trending`` page. This\nendpoint is **not** protected by SearchGuard / BotGuard \u2014 no\ncookies or anti-abuse token required \u2014 and returns the trending\nlist **with related queries embedded per trend** (10-25 queries\neach), the same data that powers the trending UI's expanded view.\n\nFallback: ``GET /trending/rss?geo=US`` \u2014 also cookieless but\nreturns only title + approximate traffic, no related queries.\n\nVerified working 2026-05-08 (research from a parallel investigation\nconfirmed 30 rapid bursts from one IP all returned 200, payloads\n145 KB - 1 MB).",
+        "description": "Get trending searches with related queries via Google's TrendsUi.\n\nPrimary path: ``POST /_/TrendsUi/data/batchexecute?rpcids=i0OFE``,\nGoogle's internal RPC backend for the ``/trending`` page. This\nendpoint is **not** protected by SearchGuard / BotGuard — no\ncookies or anti-abuse token required — and returns the trending\nlist **with related queries embedded per trend** (10-25 queries\neach), the same data that powers the trending UI's expanded view.\n\nFallback: ``GET /trending/rss?geo=US`` — also cookieless but\nreturns only title + approximate traffic, no related queries.\n\nVerified working 2026-05-08 (research from a parallel investigation\nconfirmed 30 rapid bursts from one IP all returned 200, payloads\n145 KB - 1 MB).",
         "operationId": "trends_trending_api_v1_trends_trending_get",
         "parameters": [
           {
@@ -2248,7 +2265,7 @@
           "Google Trends"
         ],
         "summary": "Trends topic autocomplete",
-        "description": "Return categorized topic entities from the Google Trends autocomplete API.\n\nUnlike Google Search autocomplete (which returns flat keyword suggestions),\nthis endpoint returns Knowledge Graph entities each tagged with a `type`\nand a machine identifier (`mid`) \u2014 the same data that powers the Trends\nUI's \"Search topic\" picker. Each entry includes a direct link into the\nTrends explore view for that topic.",
+        "description": "Return categorized topic entities from the Google Trends autocomplete API.\n\nUnlike Google Search autocomplete (which returns flat keyword suggestions),\nthis endpoint returns Knowledge Graph entities each tagged with a `type`\nand a machine identifier (`mid`) — the same data that powers the Trends\nUI's \"Search topic\" picker. Each entry includes a direct link into the\nTrends explore view for that topic.",
         "operationId": "trends_autocomplete_api_v1_trends_autocomplete_get",
         "parameters": [
           {
@@ -2317,7 +2334,7 @@
         "tags": [
           "Google Trends"
         ],
-        "summary": "Google Trends \u2014 unified search",
+        "summary": "Google Trends — unified search",
         "description": "Unified Google Trends dispatcher. Pick the shape via `data_type`.",
         "operationId": "trends_search_api_v1_trends_search_get",
         "parameters": [
@@ -2478,7 +2495,7 @@
         "tags": [
           "Google Trends"
         ],
-        "summary": "Google Trends \u2014 current trending searches",
+        "summary": "Google Trends — current trending searches",
         "description": "Current trending searches with the full Google Trends UI filters.\n\n``geo`` honored by the upstream feed. ``category`` is passed through\nas ``cat=<letter>``; when the feed ignores it we still return the\nbase result set so callers get *something* useful. ``status`` and\n``sort`` are applied client-side against the parsed result list.",
         "operationId": "trends_trending_now_api_v1_trends_trending_now_get",
         "parameters": [
@@ -2596,7 +2613,7 @@
           "Google Jobs"
         ],
         "summary": "Search Google Jobs",
-        "description": "Search Google Jobs.\n\nTwo data sources are available via ``mode``:\n\n- ``mode=rpc`` (default) \u2014 Google's own Careers SPA RPC. Very fast\n  (~300 ms), richly structured (title, apply URL, company,\n  locations, responsibilities, qualifications, posted-at,\n  experience levels). Scope limited to Google's openings.\n- ``mode=serp`` \u2014 public Google Jobs SERP (aggregator).\n\nSERP descriptions contain the text Google supplies, which can be an approximately 400-character preview even in its per-job detail response. There is no separate public Jobs detail endpoint. Use apply_links or apply_options[].link for original postings; url is the Google listing URL. Missing links receive bounded, same-job detail recovery within the 45-second retrieval deadline, without an additional customer credit charge. A Jobs search costs 20 credits per request, not per job. Unrecoverable application destinations remain empty.",
+        "description": "Search Google Jobs.\n\nTwo data sources are available via ``mode``:\n\n- ``mode=rpc`` (default) — Google's own Careers SPA RPC. Very fast\n  (~300 ms), richly structured (title, apply URL, company,\n  locations, responsibilities, qualifications, posted-at,\n  experience levels). Scope limited to Google's openings.\n- ``mode=serp`` — public Google Jobs SERP (aggregator).\n\nSERP descriptions contain the text Google supplies, which can be an approximately 400-character preview even in its per-job detail response. There is no separate public Jobs detail endpoint. Use apply_links or apply_options[].link for original postings; url is the Google listing URL. Missing links receive bounded, same-job detail recovery within the 45-second retrieval deadline, without an additional customer credit charge. A Jobs search costs 20 credits per request, not per job. Unrecoverable application destinations remain empty.",
         "operationId": "jobs_search_api_v1_jobs_search_get",
         "parameters": [
           {
@@ -2623,10 +2640,10 @@
                   "type": "null"
                 }
               ],
-              "description": "City / state / region \u2014 concatenated with `q` before sending to Google.",
+              "description": "City / state / region — concatenated with `q` before sending to Google.",
               "title": "Location"
             },
-            "description": "City / state / region \u2014 concatenated with `q` before sending to Google."
+            "description": "City / state / region — concatenated with `q` before sending to Google."
           },
           {
             "name": "gl",
@@ -2694,11 +2711,11 @@
             "required": false,
             "schema": {
               "type": "string",
-              "description": "Google domain for locale-specific results (`google.com`, `google.co.uk`, `google.co.in`, \u2026).",
+              "description": "Google domain for locale-specific results (`google.com`, `google.co.uk`, `google.co.in`, …).",
               "default": "google.com",
               "title": "Domain"
             },
-            "description": "Google domain for locale-specific results (`google.com`, `google.co.uk`, `google.co.in`, \u2026)."
+            "description": "Google domain for locale-specific results (`google.com`, `google.co.uk`, `google.co.in`, …)."
           },
           {
             "name": "job_type",
@@ -2719,10 +2736,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Employment type \u2014 translated into a `chips` filter.",
+              "description": "Employment type — translated into a `chips` filter.",
               "title": "Job Type"
             },
-            "description": "Employment type \u2014 translated into a `chips` filter."
+            "description": "Employment type — translated into a `chips` filter."
           },
           {
             "name": "date_posted",
@@ -2743,10 +2760,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Posted-date window \u2014 translated into a `chips` filter.",
+              "description": "Posted-date window — translated into a `chips` filter.",
               "title": "Date Posted"
             },
-            "description": "Posted-date window \u2014 translated into a `chips` filter."
+            "description": "Posted-date window — translated into a `chips` filter."
           },
           {
             "name": "ltype",
@@ -2767,10 +2784,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Work arrangement \u2014 maps onto Google's remote/hybrid/onsite chips.",
+              "description": "Work arrangement — maps onto Google's remote/hybrid/onsite chips.",
               "title": "Ltype"
             },
-            "description": "Work arrangement \u2014 maps onto Google's remote/hybrid/onsite chips."
+            "description": "Work arrangement — maps onto Google's remote/hybrid/onsite chips."
           },
           {
             "name": "chips",
@@ -2872,11 +2889,11 @@
                 "serp"
               ],
               "type": "string",
-              "description": "Data source. ``rpc`` (default, ~300 ms) replays Google's own ``r06xKb`` batchexecute RPC on the Google Careers portal \u2014 clean JSON, 20 roles per page, scope = Google's internal openings. ``serp`` uses the public Jobs search vertical (``udm=8``, SERP-embedded, 3rd-party aggregator) and uses HTTP retrieval with browser fallback inside a 45-second budget. Descriptions contain the text Google supplies, which can be a preview in some locales; apply_links point to the original listings.",
+              "description": "Data source. ``rpc`` (default, ~300 ms) replays Google's own ``r06xKb`` batchexecute RPC on the Google Careers portal — clean JSON, 20 roles per page, scope = Google's internal openings. ``serp`` uses the public Jobs search vertical (``udm=8``, SERP-embedded, 3rd-party aggregator) and uses HTTP retrieval with browser fallback inside a 45-second budget. Descriptions contain the text Google supplies, which can be a preview in some locales; apply_links point to the original listings.",
               "default": "rpc",
               "title": "Mode"
             },
-            "description": "Data source. ``rpc`` (default, ~300 ms) replays Google's own ``r06xKb`` batchexecute RPC on the Google Careers portal \u2014 clean JSON, 20 roles per page, scope = Google's internal openings. ``serp`` uses the public Jobs search vertical (``udm=8``, SERP-embedded, 3rd-party aggregator) and uses HTTP retrieval with browser fallback inside a 45-second budget. Descriptions contain the text Google supplies, which can be a preview in some locales; apply_links point to the original listings."
+            "description": "Data source. ``rpc`` (default, ~300 ms) replays Google's own ``r06xKb`` batchexecute RPC on the Google Careers portal — clean JSON, 20 roles per page, scope = Google's internal openings. ``serp`` uses the public Jobs search vertical (``udm=8``, SERP-embedded, 3rd-party aggregator) and uses HTTP retrieval with browser fallback inside a 45-second budget. Descriptions contain the text Google supplies, which can be a preview in some locales; apply_links point to the original listings."
           }
         ],
         "responses": {
@@ -3692,7 +3709,7 @@
           "Google Scholar"
         ],
         "summary": "Search Google Scholar author profiles",
-        "description": "Search Google Scholar for author profiles by name.\n\nGoogle auth-gates the direct ``view_op=search_authors`` endpoint for\nunauthenticated clients, so this handler falls back to a regular\n``/scholar?q=<name>`` search and harvests unique\n``/citations?user=<id>`` links from each result's author byline\n(``gs_a`` div). The response schema is unchanged \u2014 each\n``ScholarProfile`` carries ``author_id``, ``name``, and ``link``.\nAffiliation, email domain, cited-by count, interests, and thumbnail\nare intentionally left ``None`` because a search page doesn't carry\nthat metadata; callers who want them should pipe each ``author_id``\nthrough ``/v1/google/scholar/author`` for the full profile.\n\n``after_author`` / ``before_author`` pagination tokens are accepted\nfor API compatibility but ignored, since the fallback uses the main\nScholar search (which paginates via ``page=N``) rather than the\ngated author-search view.",
+        "description": "Search Google Scholar for author profiles by name.\n\nGoogle auth-gates the direct ``view_op=search_authors`` endpoint for\nunauthenticated clients, so this handler falls back to a regular\n``/scholar?q=<name>`` search and harvests unique\n``/citations?user=<id>`` links from each result's author byline\n(``gs_a`` div). The response schema is unchanged — each\n``ScholarProfile`` carries ``author_id``, ``name``, and ``link``.\nAffiliation, email domain, cited-by count, interests, and thumbnail\nare intentionally left ``None`` because a search page doesn't carry\nthat metadata; callers who want them should pipe each ``author_id``\nthrough ``/v1/google/scholar/author`` for the full profile.\n\n``after_author`` / ``before_author`` pagination tokens are accepted\nfor API compatibility but ignored, since the fallback uses the main\nScholar search (which paginates via ``page=N``) rather than the\ngated author-search view.",
         "operationId": "scholar_profiles_api_v1_scholar_profiles_get",
         "parameters": [
           {
@@ -3929,7 +3946,7 @@
           "Google Scholar"
         ],
         "summary": "Get citation formats for a Scholar paper",
-        "description": "Return MLA, APA, Chicago, Harvard, and Vancouver citation formats.\n\n**Currently returns HTTP 501.** Google's cite-dialog endpoint\n(``/scholar?q=info:<cluster>:scholar.google.com/&output=cite``)\nreturns ``HTTP 403 Forbidden`` for every unauthenticated client as of\nlate 2026 \u2014 the dialog is only served to browsers that have an\nactive Scholar JS session established via a prior `/scholar` page\nload. Working around that requires a stateful browser session which\nis not cost-effective for a single citation lookup.\n\n**Recommended workaround:** call ``/v1/google/scholar/search`` for\nthe paper and build a citation string client-side from the fields\nit already returns: ``title``, ``authors`` (list), ``publication_info``\n(which contains journal + year), and ``link``. That's enough to\nassemble MLA / APA / Chicago / Harvard / Vancouver formats without\nmaking a second HTTP hop.\n\nTracked in scrape-badger/scrapebadger#135 follow-up work; this\nendpoint will be re-enabled when we add a browser-session-backed\nfetch path.",
+        "description": "Return MLA, APA, Chicago, Harvard, and Vancouver citation formats.\n\n**Currently returns HTTP 501.** Google's cite-dialog endpoint\n(``/scholar?q=info:<cluster>:scholar.google.com/&output=cite``)\nreturns ``HTTP 403 Forbidden`` for every unauthenticated client as of\nlate 2026 — the dialog is only served to browsers that have an\nactive Scholar JS session established via a prior `/scholar` page\nload. Working around that requires a stateful browser session which\nis not cost-effective for a single citation lookup.\n\n**Recommended workaround:** call ``/v1/google/scholar/search`` for\nthe paper and build a citation string client-side from the fields\nit already returns: ``title``, ``authors`` (list), ``publication_info``\n(which contains journal + year), and ``link``. That's enough to\nassemble MLA / APA / Chicago / Harvard / Vancouver formats without\nmaking a second HTTP hop.\n\nTracked in scrape-badger/scrapebadger#135 follow-up work; this\nendpoint will be re-enabled when we add a browser-session-backed\nfetch path.",
         "operationId": "scholar_cite_api_v1_scholar_cite_get",
         "parameters": [
           {
@@ -4395,7 +4412,7 @@
           "Google AI Mode"
         ],
         "summary": "Google AI Mode search",
-        "description": "Get AI-generated search results from Google AI Mode.\n\nReturns the structured `text_blocks` (paragraphs, headings, comparison\n`table` blocks and lists), a flat `references` source list, a compact\n`markdown` rendering of the whole answer and \u2014 unless `include_html`\nis false \u2014 the raw `answer_html` body.\n\n`location`, `uule` or `lat`/`lon` localise the answer (\"near me\", local\nresults) to that place, down to the city or district, wherever the\nrequest exits from. Located answers echo a `location` object.",
+        "description": "Get AI-generated search results from Google AI Mode.\n\nReturns the structured `text_blocks` (paragraphs, headings, comparison\n`table` blocks and lists), a flat `references` source list, a compact\n`markdown` rendering of the whole answer and — unless `include_html`\nis false — the raw `answer_html` body.\n\n`location`, `uule` or `lat`/`lon` localise the answer (\"near me\", local\nresults) to that place, down to the city or district, wherever the\nrequest exits from. Located answers echo a `location` object.",
         "operationId": "search_ai_mode_api_v1_ai_mode_search_get",
         "parameters": [
           {
@@ -4439,11 +4456,11 @@
             "required": false,
             "schema": {
               "type": "boolean",
-              "description": "Include the raw `answer_html` (full answer body HTML) in the response for maximum parity. It can be 100s of KB \u2014 set false when you only need the structured `text_blocks` + `markdown`.",
+              "description": "Include the raw `answer_html` (full answer body HTML) in the response for maximum parity. It can be 100s of KB — set false when you only need the structured `text_blocks` + `markdown`.",
               "default": true,
               "title": "Include Html"
             },
-            "description": "Include the raw `answer_html` (full answer body HTML) in the response for maximum parity. It can be 100s of KB \u2014 set false when you only need the structured `text_blocks` + `markdown`."
+            "description": "Include the raw `answer_html` (full answer body HTML) in the response for maximum parity. It can be 100s of KB — set false when you only need the structured `text_blocks` + `markdown`."
           },
           {
             "name": "location",
@@ -4553,7 +4570,7 @@
           "Google Lens"
         ],
         "summary": "Google Lens visual search",
-        "description": "Google Lens visual search.\n\nResponse carries ``lens_results`` (Scrapingdog parity alias) with\n``title`` / ``source`` / ``source_favicon`` / ``thumbnail`` /\n``original_thumbnail`` / ``rating`` / ``reviews`` / ``in_stock``, plus\n``price`` (``{value, currency, extracted}``) and the raw ``tag`` chip it\nis parsed from, on shoppable matches. ``related_searches`` chips come\nalongside. Legacy ``results`` alias kept for backwards compat.\n\n``query`` refines the grid with text. ``exact_matches=true`` returns just\nthe pages hosting the image, each flagged ``exact_match: true``, instead\nof the broad grid \u2014 available for most images (8 of 10 in sampling) and\nfalling back to the grid otherwise. ``product=true`` narrows the grid to\nthe tiles Google marked buyable. ``visual_matches=false`` cannot be\nhonoured: visual matches are the only grid served. Anything that could not\nbe applied \u2014 including an exact-match lookup that came back empty \u2014 is\nnamed in the ``warnings`` array rather than silently dropped (SCR-177,\nSCR-180).\n\nWhen Google has no matches for an image \u2014 it filters explicit images and\nmatches removed under DMCA \u2014 the response is ``404`` with\n``error: lens_no_visual_matches``. That is Google's final answer for the\nimage: it is not charged, and retrying will not change it (SCR-325).",
+        "description": "Google Lens visual search.\n\nResponse carries ``lens_results`` (Scrapingdog parity alias) with\n``title`` / ``source`` / ``source_favicon`` / ``thumbnail`` /\n``original_thumbnail`` / ``rating`` / ``reviews`` / ``in_stock``, plus\n``price`` (``{value, currency, extracted}``) and the raw ``tag`` chip it\nis parsed from, on shoppable matches. ``related_searches`` chips come\nalongside. Legacy ``results`` alias kept for backwards compat.\n\n``query`` refines the grid with text. ``exact_matches=true`` returns just\nthe pages hosting the image, each flagged ``exact_match: true``, instead\nof the broad grid — available for most images (8 of 10 in sampling) and\nfalling back to the grid otherwise. ``product=true`` narrows the grid to\nthe tiles Google marked buyable. ``visual_matches=false`` cannot be\nhonoured: visual matches are the only grid served. Anything that could not\nbe applied — including an exact-match lookup that came back empty — is\nnamed in the ``warnings`` array rather than silently dropped (SCR-177,\nSCR-180).\n\nWhen Google has no matches for an image — it filters explicit images and\nmatches removed under DMCA — the response is ``404`` with\n``error: lens_no_visual_matches``. That is Google's final answer for the\nimage: it is not charged, and retrying will not change it (SCR-325).",
         "operationId": "search_lens_api_v1_lens_search_get",
         "parameters": [
           {
@@ -4663,11 +4680,11 @@
             "required": false,
             "schema": {
               "type": "boolean",
-              "description": "Always true in practice \u2014 `false` is reported back in `warnings`",
+              "description": "Always true in practice — `false` is reported back in `warnings`",
               "default": true,
               "title": "Visual Matches"
             },
-            "description": "Always true in practice \u2014 `false` is reported back in `warnings`"
+            "description": "Always true in practice — `false` is reported back in `warnings`"
           },
           {
             "name": "exact_matches",
@@ -4713,7 +4730,7 @@
           "Google Local"
         ],
         "summary": "Google Local Pack search",
-        "description": "Return Google Local Pack listings for a query.\n\nUnlike ``/v1/google/maps/search`` (which targets the Maps Protobuf API and\nis keyed by ``data_id``), this endpoint follows the Web SERP ``tbm=lcl``\nmode \u2014 the same data that populates the \"Places\" block inside regular\nsearch results. Use it when you care about ranking relative to a SERP\nquery (e.g. SEO/local-SEO research), not when you need full place\nmetadata.",
+        "description": "Return Google Local Pack listings for a query.\n\nUnlike ``/v1/google/maps/search`` (which targets the Maps Protobuf API and\nis keyed by ``data_id``), this endpoint follows the Web SERP ``tbm=lcl``\nmode — the same data that populates the \"Places\" block inside regular\nsearch results. Use it when you care about ranking relative to a SERP\nquery (e.g. SEO/local-SEO research), not when you need full place\nmetadata.",
         "operationId": "local_search_api_v1_local_search_get",
         "parameters": [
           {
@@ -4858,7 +4875,7 @@
           "Google Products"
         ],
         "summary": "Google immersive product detail",
-        "description": "Get deep product details from Google's immersive product page.\n\nTwo-step fetch: render the Shopping SERP for ``q`` to extract\nsession-bound tokens, then call ``/async/oapv`` with them. Returns\n404 when the product isn't on the SERP \u2014 the caller's query has to\nsurface the tile because the tokens are session-scoped.\n\nResponse time: ~3 s warm (cached SERP), ~6 s cold (SERP + RPC).\nCredits: 5 per call (matches the Shopping product-detail cost).",
+        "description": "Get deep product details from Google's immersive product page.\n\nTwo-step fetch: render the Shopping SERP for ``q`` to extract\nsession-bound tokens, then call ``/async/oapv`` with them. Returns\n404 when the product isn't on the SERP — the caller's query has to\nsurface the tile because the tokens are session-scoped.\n\nResponse time: ~3 s warm (cached SERP), ~6 s cold (SERP + RPC).\nCredits: 5 per call (matches the Shopping product-detail cost).",
         "operationId": "get_product_detail_api_v1_products_detail_get",
         "parameters": [
           {
@@ -4878,10 +4895,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "Original search query that surfaced the product. Required by Google's ``/async/oapv`` RPC \u2014 the page-level ``ei``/``xsrf`` and per-tile ``oapvfc`` tokens are extracted from the SERP Google renders for this exact query, so the product must be discoverable via this query.",
+              "description": "Original search query that surfaced the product. Required by Google's ``/async/oapv`` RPC — the page-level ``ei``/``xsrf`` and per-tile ``oapvfc`` tokens are extracted from the SERP Google renders for this exact query, so the product must be discoverable via this query.",
               "title": "Q"
             },
-            "description": "Original search query that surfaced the product. Required by Google's ``/async/oapv`` RPC \u2014 the page-level ``ei``/``xsrf`` and per-tile ``oapvfc`` tokens are extracted from the SERP Google renders for this exact query, so the product must be discoverable via this query."
+            "description": "Original search query that surfaced the product. Required by Google's ``/async/oapv`` RPC — the page-level ``ei``/``xsrf`` and per-tile ``oapvfc`` tokens are extracted from the SERP Google renders for this exact query, so the product must be discoverable via this query."
           },
           {
             "name": "gl",
@@ -4896,10 +4913,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Country code (ISO 3166 alpha-2). Defaults to the country implied by ``domain`` (e.g. ``google.com.au`` \u2192 ``au``), falling back to ``us`` when domain doesn't carry a country hint.",
+              "description": "Country code (ISO 3166 alpha-2). Defaults to the country implied by ``domain`` (e.g. ``google.com.au`` → ``au``), falling back to ``us`` when domain doesn't carry a country hint.",
               "title": "Gl"
             },
-            "description": "Country code (ISO 3166 alpha-2). Defaults to the country implied by ``domain`` (e.g. ``google.com.au`` \u2192 ``au``), falling back to ``us`` when domain doesn't carry a country hint."
+            "description": "Country code (ISO 3166 alpha-2). Defaults to the country implied by ``domain`` (e.g. ``google.com.au`` → ``au``), falling back to ``us`` when domain doesn't carry a country hint."
           },
           {
             "name": "hl",
@@ -4919,11 +4936,11 @@
             "required": false,
             "schema": {
               "type": "string",
-              "description": "Google domain (\"google.com\" / \"google.co.uk\" / \u2026) \u2014 used to localise the SERP render that produces the session tokens.",
+              "description": "Google domain (\"google.com\" / \"google.co.uk\" / …) — used to localise the SERP render that produces the session tokens.",
               "default": "google.com",
               "title": "Domain"
             },
-            "description": "Google domain (\"google.com\" / \"google.co.uk\" / \u2026) \u2014 used to localise the SERP render that produces the session tokens."
+            "description": "Google domain (\"google.com\" / \"google.co.uk\" / …) — used to localise the SERP render that produces the session tokens."
           },
           {
             "name": "include_offers",
@@ -4931,11 +4948,11 @@
             "required": false,
             "schema": {
               "type": "boolean",
-              "description": "When true, return the full merchant-offer list with deep product URLs for every merchant Google ships an offer-block for. Offers come from the primary oapv response (top ~5 panel merchants: DICK'S, Kohl's, Zappos, etc.) plus a parallel paginated fan-out of ``/async/oapv`` with ``async_context=MORE_STORES`` at offsets sori=5..60 \u2014 which surfaces an additional ~50 sellers including GOAT, eBay sub-sellers, Macy's, StockX, Poshmark, Flight Club, etc. (+5 parallel RPCs, ~1 s wall-clock).",
+              "description": "When true, return the full merchant-offer list with deep product URLs for every merchant Google ships an offer-block for. Offers come from the primary oapv response (top ~5 panel merchants: DICK'S, Kohl's, Zappos, etc.) plus a parallel paginated fan-out of ``/async/oapv`` with ``async_context=MORE_STORES`` at offsets sori=5..60 — which surfaces an additional ~50 sellers including GOAT, eBay sub-sellers, Macy's, StockX, Poshmark, Flight Club, etc. (+5 parallel RPCs, ~1 s wall-clock).",
               "default": false,
               "title": "Include Offers"
             },
-            "description": "When true, return the full merchant-offer list with deep product URLs for every merchant Google ships an offer-block for. Offers come from the primary oapv response (top ~5 panel merchants: DICK'S, Kohl's, Zappos, etc.) plus a parallel paginated fan-out of ``/async/oapv`` with ``async_context=MORE_STORES`` at offsets sori=5..60 \u2014 which surfaces an additional ~50 sellers including GOAT, eBay sub-sellers, Macy's, StockX, Poshmark, Flight Club, etc. (+5 parallel RPCs, ~1 s wall-clock)."
+            "description": "When true, return the full merchant-offer list with deep product URLs for every merchant Google ships an offer-block for. Offers come from the primary oapv response (top ~5 panel merchants: DICK'S, Kohl's, Zappos, etc.) plus a parallel paginated fan-out of ``/async/oapv`` with ``async_context=MORE_STORES`` at offsets sori=5..60 — which surfaces an additional ~50 sellers including GOAT, eBay sub-sellers, Macy's, StockX, Poshmark, Flight Club, etc. (+5 parallel RPCs, ~1 s wall-clock)."
           },
           {
             "name": "include_variants",
@@ -4955,11 +4972,11 @@
             "required": false,
             "schema": {
               "type": "boolean",
-              "description": "When true (only meaningful with ``include_offers=true``), browser-render the Shopping SERP so additional merchant deep URLs surface from the rendered HTML. Best-effort: catalog-feed retailers (DSW / Famous Footwear / Shoe Carnival / Myer / rebel) get deep URLs; paid-Shopping-Ads merchants (Zappos, GOAT, Academy, etc.) still get their homepage because their click-through URLs are signed by Google's aclk redirect and can't be reproduced server-side. Adds ~5\u20138 s latency.",
+              "description": "When true (only meaningful with ``include_offers=true``), browser-render the Shopping SERP so additional merchant deep URLs surface from the rendered HTML. Best-effort: catalog-feed retailers (DSW / Famous Footwear / Shoe Carnival / Myer / rebel) get deep URLs; paid-Shopping-Ads merchants (Zappos, GOAT, Academy, etc.) still get their homepage because their click-through URLs are signed by Google's aclk redirect and can't be reproduced server-side. Adds ~5–8 s latency.",
               "default": false,
               "title": "Resolve Deep Urls"
             },
-            "description": "When true (only meaningful with ``include_offers=true``), browser-render the Shopping SERP so additional merchant deep URLs surface from the rendered HTML. Best-effort: catalog-feed retailers (DSW / Famous Footwear / Shoe Carnival / Myer / rebel) get deep URLs; paid-Shopping-Ads merchants (Zappos, GOAT, Academy, etc.) still get their homepage because their click-through URLs are signed by Google's aclk redirect and can't be reproduced server-side. Adds ~5\u20138 s latency."
+            "description": "When true (only meaningful with ``include_offers=true``), browser-render the Shopping SERP so additional merchant deep URLs surface from the rendered HTML. Best-effort: catalog-feed retailers (DSW / Famous Footwear / Shoe Carnival / Myer / rebel) get deep URLs; paid-Shopping-Ads merchants (Zappos, GOAT, Academy, etc.) still get their homepage because their click-through URLs are signed by Google's aclk redirect and can't be reproduced server-side. Adds ~5–8 s latency."
           }
         ],
         "responses": {
@@ -4993,7 +5010,7 @@
           "Google Shorts"
         ],
         "summary": "Google Shorts search",
-        "description": "Return Google Shorts \u2014 short-form vertical videos surfaced in search.\n\nTriggers Google's Shorts mode via `udm=39` and parses out the\n`short_videos_results` carousel. Mostly returns YouTube Shorts but also\nincludes TikToks, Facebook Reels, and other short-form sources when\nGoogle surfaces them.",
+        "description": "Return Google Shorts — short-form vertical videos surfaced in search.\n\nTriggers Google's Shorts mode via `udm=39` and parses out the\n`short_videos_results` carousel. Mostly returns YouTube Shorts but also\nincludes TikToks, Facebook Reels, and other short-form sources when\nGoogle surfaces them.",
         "operationId": "shorts_search_api_v1_shorts_search_get",
         "parameters": [
           {
@@ -5133,10 +5150,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "description": "Outbound date \u2014 `YYYY-MM-DD`.",
+              "description": "Outbound date — `YYYY-MM-DD`.",
               "title": "Outbound Date"
             },
-            "description": "Outbound date \u2014 `YYYY-MM-DD`."
+            "description": "Outbound date — `YYYY-MM-DD`."
           },
           {
             "name": "return_date",
@@ -5151,10 +5168,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Return date (`YYYY-MM-DD`) \u2014 required for `trip_type=round_trip`.",
+              "description": "Return date (`YYYY-MM-DD`) — required for `trip_type=round_trip`.",
               "title": "Return Date"
             },
-            "description": "Return date (`YYYY-MM-DD`) \u2014 required for `trip_type=round_trip`."
+            "description": "Return date (`YYYY-MM-DD`) — required for `trip_type=round_trip`."
           },
           {
             "name": "trip_type",
@@ -5291,11 +5308,11 @@
                 "two_stops"
               ],
               "type": "string",
-              "description": "Max stops filter \u2014 applied client-side.",
+              "description": "Max stops filter — applied client-side.",
               "default": "any",
               "title": "Stops"
             },
-            "description": "Max stops filter \u2014 applied client-side."
+            "description": "Max stops filter — applied client-side."
           },
           {
             "name": "max_price",
@@ -5311,10 +5328,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Max price filter \u2014 applied client-side.",
+              "description": "Max price filter — applied client-side.",
               "title": "Max Price"
             },
-            "description": "Max price filter \u2014 applied client-side."
+            "description": "Max price filter — applied client-side."
           },
           {
             "name": "sort_by",
@@ -5326,11 +5343,11 @@
                 "price"
               ],
               "type": "string",
-              "description": "`top` (default) returns Google's ~6-8 'best' picks \u2014 fast. `price` returns the full price-sorted inventory (every carrier, the cheap long-layover fares) plus Google's own price floor / typical range / history. `price` is slower (a heavier render) and falls back to the 'top' set under load. Round-trip initial search only.",
+              "description": "`top` (default) returns Google's ~6-8 'best' picks — fast. `price` returns the full price-sorted inventory (every carrier, the cheap long-layover fares) plus Google's own price floor / typical range / history. `price` is slower (a heavier render) and falls back to the 'top' set under load. Round-trip initial search only.",
               "default": "top",
               "title": "Sort By"
             },
-            "description": "`top` (default) returns Google's ~6-8 'best' picks \u2014 fast. `price` returns the full price-sorted inventory (every carrier, the cheap long-layover fares) plus Google's own price floor / typical range / history. `price` is slower (a heavier render) and falls back to the 'top' set under load. Round-trip initial search only."
+            "description": "`top` (default) returns Google's ~6-8 'best' picks — fast. `price` returns the full price-sorted inventory (every carrier, the cheap long-layover fares) plus Google's own price floor / typical range / history. `price` is slower (a heavier render) and falls back to the 'top' set under load. Round-trip initial search only."
           },
           {
             "name": "departure_token",
@@ -5417,7 +5434,7 @@
           "Google Flights"
         ],
         "summary": "Google Flights booking options for a selected itinerary",
-        "description": "Return the provider booking list (airline + OTAs) for a selected flight.\n\nThe provider list is rendered client-side, so this does a JS render of the\nGoogle Flights ``/booking`` page (slower/pricier than search). Each option\nhas the provider name and price; the actual per-provider booking links open\nfrom the returned ``booking_url`` (Google exposes them only as JS actions,\nnot stable URLs).\n\nReturns an empty ``booking_options`` for an incomplete round-trip selection\n(one that has not chosen a return leg) \u2014 follow that offer's ``booking_url``\nto pick a return first.",
+        "description": "Return the provider booking list (airline + OTAs) for a selected flight.\n\nThe provider list is rendered client-side, so this does a JS render of the\nGoogle Flights ``/booking`` page (slower/pricier than search). Each option\nhas the provider name and price; the actual per-provider booking links open\nfrom the returned ``booking_url`` (Google exposes them only as JS actions,\nnot stable URLs).\n\nReturns an empty ``booking_options`` for an incomplete round-trip selection\n(one that has not chosen a return leg) — follow that offer's ``booking_url``\nto pick a return first.",
         "operationId": "googleFlightsBookingOptions",
         "parameters": [
           {
@@ -6525,7 +6542,7 @@
         },
         "type": "object",
         "title": "AiOverview",
-        "description": "Google AI Overview (AI-generated summary).\n\nGoogle increasingly serves the AI Overview as a **deferred** block \u2014 the\ninitial SERP HTML contains only a placeholder plus a `page_token` that\nthe client has to POST back to retrieve the actual content. When that\nhappens, the SERP parser populates `page_token` and leaves\n`text_blocks`/`references` empty. Callers of `/v1/google/search` can pass\n`ai_overview=true` to have the scraper chase the token automatically and\nmerge the result back into this object."
+        "description": "Google AI Overview (AI-generated summary).\n\nGoogle increasingly serves the AI Overview as a **deferred** block — the\ninitial SERP HTML contains only a placeholder plus a `page_token` that\nthe client has to POST back to retrieve the actual content. When that\nhappens, the SERP parser populates `page_token` and leaves\n`text_blocks`/`references` empty. Callers of `/v1/google/search` can pass\n`ai_overview=true` to have the scraper chase the token automatically and\nmerge the result back into this object."
       },
       "AiOverviewListItem": {
         "properties": {
@@ -7347,7 +7364,7 @@
         },
         "type": "object",
         "title": "FlightLeg",
-        "description": "One segment of a flight itinerary (e.g. SFO \u2192 LHR on a connection)."
+        "description": "One segment of a flight itinerary (e.g. SFO → LHR on a connection)."
       },
       "FlightOffer": {
         "properties": {
@@ -7357,7 +7374,7 @@
             },
             "type": "array",
             "title": "Legs",
-            "description": "Flight segments. On a round-trip search these are the **outbound** segments only (Google Flights picks the return in a second step) \u2014 pass the offer's `departure_token` back to `/flights/search` to list the return-leg options."
+            "description": "Flight segments. On a round-trip search these are the **outbound** segments only (Google Flights picks the return in a second step) — pass the offer's `departure_token` back to `/flights/search` to list the return-leg options."
           },
           "layovers": {
             "items": {
@@ -7414,7 +7431,7 @@
               }
             ],
             "title": "Price Type",
-            "description": "`total` \u2014 `price` covers the full itinerary (both legs of a round trip) for all travelers combined."
+            "description": "`total` — `price` covers the full itinerary (both legs of a round trip) for all travelers combined."
           },
           "booking_token": {
             "anyOf": [
@@ -7657,7 +7674,7 @@
               }
             ],
             "title": "Search Url",
-            "description": "Canonical Google Flights `tfs` URL for this search (in the requested language; market and prices follow `gl`/`currency`) \u2014 open to view and book the listed flights."
+            "description": "Canonical Google Flights `tfs` URL for this search (in the requested language; market and prices follow `gl`/`currency`) — open to view and book the listed flights."
           }
         },
         "type": "object",
@@ -8600,7 +8617,7 @@
               }
             ],
             "title": "Via",
-            "description": "Source platform (\"Talent.com\", \"Built In NYC\", \u2026) parsed from \"via X\"."
+            "description": "Source platform (\"Talent.com\", \"Built In NYC\", …) parsed from \"via X\"."
           },
           "url": {
             "anyOf": [
@@ -12540,7 +12557,7 @@
           "title"
         ],
         "title": "ShoppingClickResponse",
-        "description": "Response for GET /api/v1/shopping/product/click.\n\nReturns the direct merchant URL for a given product title by using\nGoogle's \"I'm Feeling Lucky\" redirect. Mirrors \nimmersive product link pattern \u2014 an on-demand per-product\nenrichment that materializes the merchant link that Google strips from\norganic Shopping HTML."
+        "description": "Response for GET /api/v1/shopping/product/click.\n\nReturns the direct merchant URL for a given product title by using\nGoogle's \"I'm Feeling Lucky\" redirect. Mirrors \nimmersive product link pattern — an on-demand per-product\nenrichment that materializes the merchant link that Google strips from\norganic Shopping HTML."
       },
       "ShoppingFilter": {
         "properties": {
