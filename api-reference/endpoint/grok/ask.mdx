@@ -1,0 +1,100 @@
+---
+title: "Ask Grok"
+api: "GET https://scrapebadger.com/v1/grok/ask"
+description: "Ask the real Grok assistant and get the answer, web citations, X post references, tool usage, and follow-up suggestions."
+---
+
+Ask the real Grok assistant and receive structured JSON with web and X grounding. Accepts `GET` query parameters or a `POST` JSON body with the same fields.
+
+**Credits:** 20
+
+<Warning>Set your client timeout to **at least 90 seconds** for grounded answers.</Warning>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>Your ScrapeBadger API key.</ParamField>
+
+## Parameters
+
+<ParamField query="prompt" type="string" required>The prompt to send. Maximum 4,000 characters.</ParamField>
+<ParamField query="conversation_id" type="string">The complete ID from a previous response. Includes prior-turn context and pins the follow-up to the owning X account.</ParamField>
+<ParamField query="mode" type="string" default="auto">Assistant mode: `auto`, `fast`, or `expert`.</ParamField>
+<ParamField query="web_search" type="string" default="auto">`auto` lets Grok decide, `force` requests web and X research, and `off` disables those tools.</ParamField>
+
+## Response
+
+<ResponseField name="answer" type="string">The answer without thinking text, tool-card markup, or inline citation tags.</ResponseField>
+<ResponseField name="answer_markdown" type="string">The answer with inline citations rendered as Markdown links.</ResponseField>
+<ResponseField name="conversation_id" type="string">Opaque identifier used for follow-ups and conversation history. Preserve the complete value.</ResponseField>
+<ResponseField name="response_id" type="string | null">Identifier of the assistant response.</ResponseField>
+<ResponseField name="model" type="string">The upstream model option used.</ResponseField>
+<ResponseField name="mode" type="string">The requested assistant mode.</ResponseField>
+<ResponseField name="citations" type="Citation[]">Inline citation cards with `card_id`, `url`, `domain`, `citation_index`, `start_index`, and `end_index`. X citations can also include `post_id` and `username`.</ResponseField>
+<ResponseField name="search_results" type="SearchResult[]">Web results with `url`, `title`, `snippet`, and `domain`.</ResponseField>
+<ResponseField name="x_search_results" type="XPost[]">X post references with `id` and `url`.</ResponseField>
+<ResponseField name="source_domains" type="string[]">Distinct domains across web results and citations.</ResponseField>
+<ResponseField name="follow_up_suggestions" type="string[]">Suggested follow-up prompts.</ResponseField>
+<ResponseField name="tool_usages" type="ToolUsage[]">Tool calls with `card_id`, `tool_name`, and parsed `tool_args`.</ResponseField>
+<ResponseField name="web_search_triggered" type="boolean">Whether Grok invoked web search.</ResponseField>
+<ResponseField name="x_search_triggered" type="boolean">Whether Grok invoked X keyword or semantic search.</ResponseField>
+<ResponseField name="truncated" type="boolean">Whether the upstream stream lacked its normal completion marker.</ResponseField>
+<ResponseField name="elapsed_ms" type="integer">End-to-end time in milliseconds.</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/grok/ask?prompt=What%20is%20the%20capital%20of%20Lithuania%3F&mode=fast&web_search=off" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  --max-time 90
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/grok/ask", {
+  method: "POST",
+  headers: {
+    "X-API-Key": process.env.SCRAPEBADGER_API_KEY,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ prompt: "Best web scraping APIs", web_search: "force" }),
+  signal: AbortSignal.timeout(90_000),
+});
+const data = await res.json();
+console.log(data.answer);
+```
+
+```python Python
+import requests
+
+res = requests.post(
+    "https://scrapebadger.com/v1/grok/ask",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    json={"prompt": "Best web scraping APIs", "web_search": "force"},
+    timeout=90,
+)
+print(res.json()["answer"])
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "answer": "The capital of Lithuania is Vilnius.",
+  "answer_markdown": "The capital of Lithuania is Vilnius.",
+  "conversation_id": "187055:2121372254449864788",
+  "response_id": "2121372258530926593",
+  "model": "grok-3-latest",
+  "mode": "fast",
+  "citations": [],
+  "search_results": [],
+  "x_search_results": [],
+  "source_domains": [],
+  "follow_up_suggestions": ["Explore Vilnius history", "Baltic states capitals"],
+  "tool_usages": [],
+  "web_search_triggered": false,
+  "x_search_triggered": false,
+  "truncated": false,
+  "elapsed_ms": 6845
+}
+```
