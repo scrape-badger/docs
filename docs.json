@@ -1514,41 +1514,6 @@
         ]
       },
       {
-        "tab": "Grok",
-        "groups": [
-          {
-            "group": "Overview",
-            "pages": [
-              "grok/overview"
-            ]
-          },
-          {
-            "group": "Ask",
-            "pages": [
-              "api-reference/endpoint/grok/ask"
-            ]
-          },
-          {
-            "group": "Brand Visibility",
-            "pages": [
-              "api-reference/endpoint/grok/brand-visibility"
-            ]
-          },
-          {
-            "group": "Conversations",
-            "pages": [
-              "api-reference/endpoint/grok/get-conversation"
-            ]
-          },
-          {
-            "group": "Reference",
-            "pages": [
-              "api-reference/endpoint/grok/list-models"
-            ]
-          }
-        ]
-      },
-      {
         "tab": "Gemini",
         "groups": [
           {
