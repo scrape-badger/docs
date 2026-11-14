@@ -1,0 +1,112 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Amazon Rufus Scraper API",
+    "version": "1.0.0",
+    "description": "Ask Alexa for Shopping (Rufus) and receive complete answers and product cards."
+  },
+  "servers": [{"url": "https://scrapebadger.com"}],
+  "paths": {
+    "/v1/rufus/ask": {
+      "get": {
+        "summary": "Ask Amazon Rufus",
+        "parameters": [
+          {"name": "prompt", "in": "query", "required": true, "schema": {"type": "string", "maxLength": 4000}},
+          {"name": "asin", "in": "query", "required": false, "schema": {"type": "string", "pattern": "^[A-Z0-9]{10}$"}}
+        ],
+        "responses": {"200": {"$ref": "#/components/responses/RufusAnswer"}}
+      },
+      "post": {
+        "summary": "Ask Amazon Rufus",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["prompt"],
+                "properties": {
+                  "prompt": {"type": "string", "maxLength": 4000},
+                  "asin": {"type": "string", "pattern": "^[A-Z0-9]{10}$"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {"200": {"$ref": "#/components/responses/RufusAnswer"}}
+      }
+    },
+    "/v1/rufus/models": {
+      "get": {
+        "summary": "List Amazon Rufus models",
+        "responses": {
+          "200": {
+            "description": "Assistant surfaces",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "models": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {"type": "string"},
+                          "name": {"type": "string"},
+                          "description": {"type": "string"}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "responses": {
+      "RufusAnswer": {
+        "description": "Complete Rufus answer",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": ["answer", "products", "model", "domain", "stream_terminated", "elapsed_ms"],
+              "properties": {
+                "answer": {"type": "string"},
+                "products": {"type": "array", "items": {"$ref": "#/components/schemas/RufusProduct"}},
+                "thread_id": {"type": ["string", "null"]},
+                "model": {"type": "string", "enum": ["rufus"]},
+                "domain": {"type": "string", "enum": ["com"]},
+                "asin": {"type": ["string", "null"]},
+                "stream_terminated": {"type": "boolean"},
+                "elapsed_ms": {"type": "integer"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "RufusProduct": {
+        "type": "object",
+        "required": ["asin", "url", "rank"],
+        "properties": {
+          "asin": {"type": "string"},
+          "title": {"type": ["string", "null"]},
+          "url": {"type": "string", "format": "uri"},
+          "price": {"type": ["string", "null"]},
+          "rating": {"type": ["number", "null"]},
+          "rating_count": {"type": ["integer", "null"]},
+          "badge": {"type": ["string", "null"]},
+          "image_url": {"type": ["string", "null"], "format": "uri"},
+          "rank": {"type": "integer"}
+        }
+      }
+    }
+  }
+}
