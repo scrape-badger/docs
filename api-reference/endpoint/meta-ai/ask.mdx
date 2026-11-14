@@ -1,0 +1,110 @@
+---
+title: "Ask Meta AI"
+api: "GET https://scrapebadger.com/v1/meta-ai/ask"
+description: "Send a prompt to the real Meta AI assistant (meta.ai) and get its answer as structured JSON. Anonymous: no Meta account needed."
+---
+
+Send one prompt to Meta AI and receive its complete answer. Every request is a fresh, anonymous conversation.
+
+**Credits:** 20 per successful answer
+
+<Warning>
+  Most answers take **10–40 seconds**. Allow up to **120 seconds**. Blocked, empty, and failed answers return non-2xx responses and are not billed.
+</Warning>
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Parameters
+
+<ParamField query="prompt" type="string" required>
+  The question or instruction to send. **1 to 4,000 characters.** Include all the context the question needs, because no earlier conversation is carried over.
+</ParamField>
+
+<ParamField query="country" type="string" default="US">
+  Two-letter ISO 3166-1 alpha-2 code for the country the question is asked from, such as `US`, `GB`, or `DE`. Location-sensitive questions are answered for that country.
+</ParamField>
+
+## Response
+
+<ResponseField name="answer" type="string">
+  The assistant's answer as Markdown-style text. Web-grounded answers can include inline source links.
+</ResponseField>
+<ResponseField name="conversation_id" type="string | null">
+  Meta AI's identifier for this exchange, returned for tracing. You cannot use it to continue the conversation.
+</ResponseField>
+<ResponseField name="mode" type="string">
+  The assistant mode that produced the answer. Currently always `default`.
+</ResponseField>
+<ResponseField name="stream_terminated" type="boolean">
+  `true` when Meta AI's response stream ended with its own end marker.
+</ResponseField>
+<ResponseField name="used_dom_fallback" type="boolean">
+  `true` when the answer was read from the rendered page rather than the response stream. It is still the assistant's full answer.
+</ResponseField>
+<ResponseField name="elapsed_ms" type="integer">
+  Time spent in the Meta AI session, in milliseconds. `0` when the request path does not measure it.
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/meta-ai/ask?prompt=What%20is%20the%20tallest%20mountain%20in%20Africa%3F&country=US" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  --max-time 120
+```
+
+```javascript Node.js
+const params = new URLSearchParams({
+  prompt: "What is the tallest mountain in Africa?",
+  country: "US",
+});
+const res = await fetch(`https://scrapebadger.com/v1/meta-ai/ask?${params}`, {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+  signal: AbortSignal.timeout(120_000),
+});
+const data = await res.json();
+console.log(data.answer);
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/meta-ai/ask",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"prompt": "What is the tallest mountain in Africa?", "country": "US"},
+    timeout=120,
+)
+data = res.json()
+print(data["answer"])
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "answer": "**Mount Kilimanjaro** in Tanzania.\n\nIts highest point, **Uhuru Peak**, reaches **5,895 meters (19,341 feet)** above sea level. [1](https://mountainfieldguide.com/mount-kilimanjaro/)",
+  "conversation_id": "80211fff-69c7-479b-8f8f-2e33818d5e4d",
+  "mode": "default",
+  "stream_terminated": true,
+  "used_dom_fallback": false,
+  "elapsed_ms": 9183
+}
+```
+
+## Errors
+
+Upstream errors use `{"detail":{"code":"...","message":"..."}}`. Non-2xx responses are not billed.
+
+| Code | HTTP | Meaning |
+| ---- | ---- | ------- |
+| _validation_ | 422 | `prompt` is missing, empty, or longer than 4,000 characters, or `country` is not two letters. |
+| `blocked` | 422 | Meta AI served a challenge page instead of the assistant. Retry. |
+| `rate_limited` | 429 | Meta AI's anonymous quota was reached for the session. Retry after a short pause. |
+| `composer_not_found`, `no_frames`, `render_failed`, `native_failed`, `native_timeout`, `upstream_error` | 502 | The live session did not produce an answer. Retry with backoff. |

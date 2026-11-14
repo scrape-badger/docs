@@ -1,0 +1,67 @@
+---
+title: "List Meta AI Models"
+api: "GET https://scrapebadger.com/v1/meta-ai/models"
+description: "List the Meta AI assistant modes available through the Meta AI API."
+---
+
+Return the assistant modes Meta AI serves to anonymous visitors. The catalogue is read-only. `/ask` does not take a model or mode parameter.
+
+**Credits:** 1
+
+## Authorization
+
+<ParamField header="X-API-Key" type="string" required>
+  Your ScrapeBadger API key.
+</ParamField>
+
+## Response
+
+<ResponseField name="models" type="Model[]">
+  The available assistant modes.
+
+  <Expandable title="Model">
+    <ResponseField name="id" type="string">Stable identifier, `meta-ai`.</ResponseField>
+    <ResponseField name="name" type="string">Display name, `Meta AI`.</ResponseField>
+    <ResponseField name="description" type="string">What the mode is for.</ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Example
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/meta-ai/models" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/meta-ai/models", {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+});
+console.log((await res.json()).models);
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/meta-ai/models",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+)
+print(res.json()["models"])
+```
+
+</CodeGroup>
+
+```json Response
+{
+  "models": [
+    {
+      "id": "meta-ai",
+      "name": "Meta AI",
+      "description": "The default meta.ai assistant (Muse Spark family) — general questions, web-grounded answers, image understanding."
+    }
+  ]
+}
+```

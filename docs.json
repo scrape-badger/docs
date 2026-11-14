@@ -19,6 +19,7 @@
       "openapi-vinted.json",
       "openapi-amazon.json",
       "openapi-rufus.json",
+      "openapi-meta-ai.json",
       "openapi-ebay.json",
       "openapi-realtor.json",
       "openapi-zillow.json",
@@ -1568,6 +1569,29 @@
             "group": "Reference",
             "pages": [
               "api-reference/endpoint/rufus/list-models"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Meta AI",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "meta-ai/overview"
+            ]
+          },
+          {
+            "group": "Ask",
+            "pages": [
+              "api-reference/endpoint/meta-ai/ask"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "api-reference/endpoint/meta-ai/list-models"
             ]
           }
         ]
