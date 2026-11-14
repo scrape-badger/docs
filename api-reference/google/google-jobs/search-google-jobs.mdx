@@ -34,6 +34,30 @@ jobs in Spain without adding "España" to the query. A place in `q` or `location
 still narrows the search, for example `marinero Cádiz`. To pick a different
 location, send Google's `uule` value; it replaces the country default.
 
+## More results (pagination)
+
+Each SERP page returns about 10 jobs. When Google has more, `pagination.next` holds an
+opaque token such as `2.EswB…`. Send it back as `next_page_token`, with the same `q`,
+`gl` and `hl`, to get the next page; `pagination.current` is the page number. When
+`pagination.next` is `null`, there are no more results. Each page is one search
+(20 credits).
+
+## Filters
+
+Google ignores most `job_type` and `ltype` values now; `date_posted` still works.
+`filters` lists Google's own filter options for the search, each with a `name`
+(for example "Tiempo parcial" or "Última semana"), a refined `q` and a `uds` token.
+To apply one, repeat the request with that `q` and `uds`.
+
+## Job fields
+
+Besides `title`, `company_name`, `location`, `via`, `description` and the apply links,
+each job carries the facts Google shows on its card: `posted_at`, `salary` (as Google
+writes it, for example "De 30 mil € a 46 mil € al año"), `schedule_type`
+(also in `job_type`), and `detected_extensions` with the same facts plus
+`work_from_home` and `qualifications` when present. `job_id` is Google's stable
+listing ID, useful for removing duplicates across pages and searches.
+
 A successful empty `jobs` array means Google explicitly reported no matching
 jobs for that location. Blocked pages and failed fetches return an error. Requests use a bounded
 retrieval window of up to 45 seconds; allow at least 60 seconds for your client's
