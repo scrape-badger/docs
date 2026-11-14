@@ -1550,29 +1550,6 @@
         ]
       },
       {
-        "tab": "Amazon Rufus",
-        "groups": [
-          {
-            "group": "Overview",
-            "pages": [
-              "rufus/overview"
-            ]
-          },
-          {
-            "group": "Ask",
-            "pages": [
-              "api-reference/endpoint/rufus/ask"
-            ]
-          },
-          {
-            "group": "Reference",
-            "pages": [
-              "api-reference/endpoint/rufus/list-models"
-            ]
-          }
-        ]
-      },
-      {
         "tab": "Gemini",
         "groups": [
           {
