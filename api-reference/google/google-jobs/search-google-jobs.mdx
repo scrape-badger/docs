@@ -7,11 +7,10 @@ openapi: "GET /v1/google/jobs/search"
 Use `mode=serp` for public job listings from employers and job boards. The default
 `mode=rpc` searches Google's own Careers openings.
 
-In SERP mode, `description` contains the text Google includes for that listing.
-When Google supplies a full description, the response includes the text hidden
-behind “Show more.” Some markets, including Spanish results, may expose only a
-short preview of about 400 characters. Use `apply_links` to open the original
-posting when you need the full text. `job_highlights` contains Google's structured
+In SERP mode, `description` contains the full text Google includes for that
+listing, including the part hidden behind “Show more,” with its paragraph and line
+breaks. A few listings carry only a short text in Google itself; for those, use
+`apply_links` to open the original posting. `job_highlights` contains Google's structured
 qualifications, responsibilities, and benefits when present; it can be `null`.
 
 There is currently no separate public Google Jobs detail endpoint. Switching to
