@@ -1,16 +1,4 @@
 {
-  "rufus/overview.mdx": {
-    "original": "16ee71689c54840e5355123005cf242ae0244b41",
-    "generated": null
-  },
-  "api-reference/endpoint/rufus/list-models.mdx": {
-    "original": "e8003be132028f7c58fd94e2f884fef57b447bb4",
-    "generated": null
-  },
-  "api-reference/endpoint/rufus/ask.mdx": {
-    "original": "054e11c4e553ee7dccb4506335bbc2ed9cdd80da",
-    "generated": null
-  },
   "openapi-amazon.json": {
     "original": "9e33317a0c5162c504fdbb47e4b778acac01f273",
     "generated": "c71640875f582f8d0f18cd7baba070620330c8a6417c6ed00a97823d2ba1062c"
@@ -57,7 +45,7 @@
   },
   "openapi-rufus.json": {
     "original": "267569cb2c262e9c959f6ac4970aa5ab87482f8f",
-    "generated": "41f3023b15c710e8811160afdd0d4ffeca0b54a2a1acba294875563eb03c66c5"
+    "generated": "b9134d086650d21462a27c89b4cdf8f0479aa63d99882b85330f5e8482b8d454"
   },
   "openapi-twitter.json": {
     "original": "fb14a59d7704aa4975018ddaabfe1358de1a637b",
@@ -78,9 +66,5 @@
   "openapi-tiktok.json": {
     "original": "94201f21c1ce1c0098c840c29d9c6dfe9b3a1b66",
     "generated": "ac58f6fe7cd75979477186d8fad66f306ffd44b46bf004c833b83455f6a019c0"
-  },
-  "docs.json": {
-    "original": "28d661cd4007bc7336cee918dfba32606c6dba3e",
-    "generated": "4fc5b0567873e983c66b3cbe4d4e543bcd705881d37a1b58af89509f56155cb6"
   }
 }
