@@ -29,8 +29,14 @@ or `apply_options[].link` for application destinations. If Google does not suppl
 a recoverable destination, those arrays can still be empty; the API does not
 invent a link or substitute a different listing.
 
+Google Jobs only lists jobs near where it believes the searcher is. In SERP mode the
+search is located in the `gl` (or `country`) country, so `q=camarero&gl=es` returns
+jobs in Spain without adding "España" to the query. A place in `q` or `location`
+still narrows the search, for example `marinero Cádiz`. To pick a different
+location, send Google's `uule` value; it replaces the country default.
+
 A successful empty `jobs` array means Google explicitly reported no matching
-jobs. Blocked pages and failed fetches return an error. Requests use a bounded
+jobs for that location. Blocked pages and failed fetches return an error. Requests use a bounded
 retrieval window of up to 45 seconds; allow at least 60 seconds for your client's
 timeout, including network overhead.
 

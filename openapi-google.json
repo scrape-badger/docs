@@ -2640,10 +2640,10 @@
                   "type": "null"
                 }
               ],
-              "description": "City / state / region \u2014 concatenated with `q` before sending to Google.",
+              "description": "City / state / region \u2014 concatenated with `q` before sending to Google. The search is also located in the `gl`/`country` country.",
               "title": "Location"
             },
-            "description": "City / state / region \u2014 concatenated with `q` before sending to Google."
+            "description": "City / state / region \u2014 concatenated with `q` before sending to Google. The search is also located in the `gl`/`country` country."
           },
           {
             "name": "gl",
@@ -2651,11 +2651,11 @@
             "required": false,
             "schema": {
               "type": "string",
-              "description": "Country code (ISO 3166 alpha-2).",
+              "description": "Country code (ISO 3166 alpha-2). In `mode=serp` the search is also located in this country (Google Jobs only lists jobs near where it believes the searcher is), unless you send `uule`. A place named in `q` or `location` still narrows it.",
               "default": "us",
               "title": "Gl"
             },
-            "description": "Country code (ISO 3166 alpha-2)."
+            "description": "Country code (ISO 3166 alpha-2). In `mode=serp` the search is also located in this country (Google Jobs only lists jobs near where it believes the searcher is), unless you send `uule`. A place named in `q` or `location` still narrows it."
           },
           {
             "name": "country",
@@ -2838,10 +2838,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Google's UULE-encoded location (e.g. `w+CAIQIFJlbGF5IFN0YXRlcw==`).",
+              "description": "Google's UULE-encoded location (e.g. `w+CAIQICIFU3BhaW4` for Spain). Overrides the default `gl`/`country` location in `mode=serp`.",
               "title": "Uule"
             },
-            "description": "Google's UULE-encoded location (e.g. `w+CAIQIFJlbGF5IFN0YXRlcw==`)."
+            "description": "Google's UULE-encoded location (e.g. `w+CAIQICIFU3BhaW4` for Spain). Overrides the default `gl`/`country` location in `mode=serp`."
           },
           {
             "name": "lrad",
