@@ -2736,10 +2736,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Employment type \u2014 translated into a `chips` filter.",
+              "description": "Employment type \u2014 translated into a `chips` filter. Google often ignores it now; use a `filters` entry (`q` + `uds`) from a previous response instead.",
               "title": "Job Type"
             },
-            "description": "Employment type \u2014 translated into a `chips` filter."
+            "description": "Employment type \u2014 translated into a `chips` filter. Google often ignores it now; use a `filters` entry (`q` + `uds`) from a previous response instead."
           },
           {
             "name": "date_posted",
@@ -2874,10 +2874,10 @@
                   "type": "null"
                 }
               ],
-              "description": "Opaque token from the previous response's `pagination.next`.",
+              "description": "Opaque token from the previous response's `pagination.next` (SERP mode: `<page>.<cursor>`); send it with the same `q`, `gl` and `hl` for the next page.",
               "title": "Next Page Token"
             },
-            "description": "Opaque token from the previous response's `pagination.next`."
+            "description": "Opaque token from the previous response's `pagination.next` (SERP mode: `<page>.<cursor>`); send it with the same `q`, `gl` and `hl` for the next page."
           },
           {
             "name": "mode",
