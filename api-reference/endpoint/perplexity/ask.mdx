@@ -115,6 +115,8 @@ Accepts `GET` (query params) or `POST` (JSON body) with identical fields.
 <ResponseField name="web_search_triggered" type="boolean">Whether Perplexity searched the web for this answer.</ResponseField>
 <ResponseField name="truncated" type="boolean">`true` when the stream budget expired mid-answer, so `answer` is partial.</ResponseField>
 <ResponseField name="search_queries" type="string[]">The sub-queries Perplexity sent to its search backend (its retrieval fan-out).</ResponseField>
+<ResponseField name="search_query_str" type="string">The phrase this answer's web search ran under. For a prompt of up to 35 characters it is the prompt itself. For a longer prompt it is usually a shorter phrase made of the prompt's own key words. See [What was searched](#what-was-searched).</ResponseField>
+<ResponseField name="whole_prompt" type="boolean">`true` when the search ran under your whole prompt, `false` when it ran under the shorter `search_query_str`. The answer is written for your whole prompt either way.</ResponseField>
 <ResponseField name="focus" type="string">The retrieval focus used.</ResponseField>
 <ResponseField name="model" type="string | null">Which model answered. Reported, not requestable.</ResponseField>
 <ResponseField name="backend_uuid" type="string | null">Perplexity's id for this answer.</ResponseField>
@@ -170,6 +172,39 @@ for c in data["citations"]:
 ```
 
 </CodeGroup>
+
+## What was searched
+
+Perplexity's anonymous tier limits how long a search phrase can be. A prompt of
+up to 35 characters is searched exactly as you wrote it. A longer prompt is
+still answered in full, but its web search usually runs under a shorter phrase
+made of the prompt's own key words:
+
+| Prompt | `search_query_str` |
+| --- | --- |
+| `Best CRM for a small agency?` | `Best CRM for a small agency?` |
+| `What are the best CRM tools for small businesses in the US?` | `CRM tools small businesses US` |
+| `Welche Steuerberater in München sind auf Start-ups und junge GmbHs spezialisiert?` | `Steuerberater München Start-ups` |
+
+Every response tells you which case you got. `search_query_str` is the phrase
+that was searched, and `whole_prompt` is `true` when that phrase was your whole
+prompt:
+
+```json
+{
+  "search_query_str": "CRM tools small businesses US",
+  "whole_prompt": false
+}
+```
+
+Log both fields when you compare answers over time: two answers to the same
+prompt are only comparable search for search when their `search_query_str`
+matches.
+
+The phrase is built from the nouns, names and acronyms of your prompt, earlier
+words first. Question words and words such as `best`, `which` or `recommend`
+never enter it. To steer the search of a long prompt, name the topic with
+specific nouns near the start.
 
 ## Strict country
 
