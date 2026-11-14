@@ -108,7 +108,7 @@ Identical shape to [`/v1/ebay/search`](/api-reference/endpoint/ebay/search), exc
     <ResponseField name="title" type="string">Listing title.</ResponseField>
     <ResponseField name="url" type="string">Full URL to the listing.</ResponseField>
     <ResponseField name="image" type="string">Primary image URL.</ResponseField>
-    <ResponseField name="price" type="object">Final **sold** price with `value`, `currency`, `symbol`, `raw`.</ResponseField>
+    <ResponseField name="price" type="object">Final **sold** price with `value`, `currency`, `symbol`, `raw`. For a listing that sold through an accepted Best Offer, eBay's sold index carries the listed price; [Get Item Detail](/api-reference/endpoint/ebay/get-item-detail#accepted-best-offers) returns the accepted amount.</ResponseField>
     <ResponseField name="condition" type="string">Item condition label.</ResponseField>
     <ResponseField name="buying_format" type="string">`Buy It Now`, `Auction`, or `Best Offer`.</ResponseField>
     <ResponseField name="is_auction" type="boolean">Whether the listing was an auction.</ResponseField>

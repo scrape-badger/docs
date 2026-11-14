@@ -1870,6 +1870,11 @@
                           "description": "True when the listing has closed (sold or ended), any buying format. Defaults to false.",
                           "default": false
                         },
+                        "is_sold": {
+                          "type": "boolean",
+                          "default": false,
+                          "description": "True when the closed listing carries eBay's Sold label rather than Ended. Always false on a live listing."
+                        },
                         "end_time_utc": {
                           "type": [
                             "number",
@@ -1922,6 +1927,11 @@
                             "boolean",
                             "null"
                           ]
+                        },
+                        "best_offer_accepted": {
+                          "type": "boolean",
+                          "default": false,
+                          "description": "True when the listing closed on an accepted Best Offer. With original_price set, price is the accepted amount; with original_price null, eBay did not publish the amount on this read and price is the listed price."
                         },
                         "brand": {
                           "type": [
