@@ -2613,7 +2613,7 @@
           "Google Jobs"
         ],
         "summary": "Search Google Jobs",
-        "description": "Search Google Jobs.\n\nTwo data sources are available via ``mode``:\n\n- ``mode=rpc`` (default) \u2014 Google's own Careers SPA RPC. Very fast\n  (~300 ms), richly structured (title, apply URL, company,\n  locations, responsibilities, qualifications, posted-at,\n  experience levels). Scope limited to Google's openings.\n- ``mode=serp`` \u2014 public Google Jobs SERP (aggregator).\n\nSERP descriptions contain the text Google supplies, which can be an approximately 400-character preview even in its per-job detail response. There is no separate public Jobs detail endpoint. Use apply_links or apply_options[].link for original postings; url is the Google listing URL. Missing links receive bounded, same-job detail recovery within the 45-second retrieval deadline, without an additional customer credit charge. A Jobs search costs 20 credits per request, not per job. Unrecoverable application destinations remain empty.",
+        "description": "Search Google Jobs.\n\nTwo data sources are available via ``mode``:\n\n- ``mode=rpc`` (default) \u2014 Google's own Careers SPA RPC. Very fast\n  (~300 ms), richly structured (title, apply URL, company,\n  locations, responsibilities, qualifications, posted-at,\n  experience levels). Scope limited to Google's openings.\n- ``mode=serp`` \u2014 public Google Jobs SERP (aggregator).\n\nSERP descriptions contain the full text Google supplies for each listing, including the part hidden behind Show more. There is no separate public Jobs detail endpoint. Use apply_links or apply_options[].link for original postings; url is the Google listing URL. Missing links receive bounded, same-job detail recovery within the 45-second retrieval deadline, without an additional customer credit charge. A Jobs search costs 20 credits per request, not per job. Unrecoverable application destinations remain empty.",
         "operationId": "jobs_search_api_v1_jobs_search_get",
         "parameters": [
           {
@@ -2889,11 +2889,11 @@
                 "serp"
               ],
               "type": "string",
-              "description": "Data source. ``rpc`` (default, ~300 ms) replays Google's own ``r06xKb`` batchexecute RPC on the Google Careers portal \u2014 clean JSON, 20 roles per page, scope = Google's internal openings. ``serp`` uses the public Jobs search vertical (``udm=8``, SERP-embedded, 3rd-party aggregator) and uses HTTP retrieval with browser fallback inside a 45-second budget. Descriptions contain the text Google supplies, which can be a preview in some locales; apply_links point to the original listings.",
+              "description": "Data source. ``rpc`` (default, ~300 ms) replays Google's own ``r06xKb`` batchexecute RPC on the Google Careers portal \u2014 clean JSON, 20 roles per page, scope = Google's internal openings. ``serp`` uses the public Jobs search vertical (``udm=8``, SERP-embedded, 3rd-party aggregator) and uses HTTP retrieval with browser fallback inside a 45-second budget. Descriptions contain the full text Google supplies; apply_links point to the original listings.",
               "default": "rpc",
               "title": "Mode"
             },
-            "description": "Data source. ``rpc`` (default, ~300 ms) replays Google's own ``r06xKb`` batchexecute RPC on the Google Careers portal \u2014 clean JSON, 20 roles per page, scope = Google's internal openings. ``serp`` uses the public Jobs search vertical (``udm=8``, SERP-embedded, 3rd-party aggregator) and uses HTTP retrieval with browser fallback inside a 45-second budget. Descriptions contain the text Google supplies, which can be a preview in some locales; apply_links point to the original listings."
+            "description": "Data source. ``rpc`` (default, ~300 ms) replays Google's own ``r06xKb`` batchexecute RPC on the Google Careers portal \u2014 clean JSON, 20 roles per page, scope = Google's internal openings. ``serp`` uses the public Jobs search vertical (``udm=8``, SERP-embedded, 3rd-party aggregator) and uses HTTP retrieval with browser fallback inside a 45-second budget. Descriptions contain the full text Google supplies; apply_links point to the original listings."
           }
         ],
         "responses": {
