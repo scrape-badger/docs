@@ -136,13 +136,15 @@ Pass the `after` value as a query parameter to get the next page of results. The
 
 ### Search pagination
 
-Post, community, and user search return Reddit's current web search results in the order Reddit provides them. Community and user search support pagination beyond the first matches.
+Search results come back in the order Reddit provides them. Treat every search cursor as opaque: pass `pagination.after` unchanged with the same query, subreddit scope, sort, and time filter. Search pagination moves forward only; `pagination.before` is `null`.
 
-Search cursors start with `rs1.`. Treat them as opaque: pass `pagination.after` unchanged with the same query, subreddit scope, sort, and time filter. They expire after 30 minutes. An invalid, expired, or mismatched cursor returns `422`; restart the search without `after`.
+**Post search** returns up to `limit` posts (at most 100) per request, as full post objects. Its cursor is usually a Reddit post id such as `t3_1xw22lw`. If Reddit's search API is briefly unavailable, a first page can come from Reddit's web search instead: that page holds fewer posts and its cursor starts with `rs1.`. Keep paginating while `pagination.after` is present, even when `count` is smaller than `limit`.
 
-`limit` is the maximum number of results to return. Reddit's native page may contain fewer rows. Keep paginating while `pagination.after` is present, even when `count` is smaller than `limit`. Search pagination moves forward only; `pagination.before` is `null`.
+**Community and user search** return Reddit's current web search results. Their cursors start with `rs1.` and expire after 30 minutes. `limit` is the maximum number of results; Reddit's native page may contain fewer rows.
 
-Community search includes `weekly_visitors` and `weekly_contributions` when Reddit supplies them. These activity counters are separate from `subscribers`. Post search can include `search_snippet`, the excerpt shown in search results; `selftext` remains the full post body when available.
+An invalid, expired, or mismatched cursor returns `422`; restart the search without `after`. Searching a subreddit that does not exist returns `404`, and a private or restricted one returns `403`.
+
+Community search includes `weekly_visitors` and `weekly_contributions` when Reddit supplies them. These activity counters are separate from `subscribers`. Post search includes `search_snippet`, the excerpt shown in Reddit's web search, only on pages served from web search; otherwise it is `null`. `selftext` is the full post body when available.
 
 ### Search time filters
 
