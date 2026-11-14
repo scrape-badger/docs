@@ -34,8 +34,8 @@ description: "Full detail for a single eBay listing (price, condition, specifics
     <ResponseField name="condition" type="string">Item condition label.</ResponseField>
     <ResponseField name="condition_id" type="string">eBay numeric condition id (nullable).</ResponseField>
     <ResponseField name="condition_description" type="string">Seller's free-text condition note (nullable).</ResponseField>
-    <ResponseField name="price" type="object">Current price with `value`, `currency`, `symbol`, `raw`.</ResponseField>
-    <ResponseField name="original_price" type="object">Strikethrough original price (nullable).</ResponseField>
+    <ResponseField name="price" type="object">The price the listing's buy box shows, with `value`, `currency`, `symbol`, `raw`. On a listing that sold through an accepted Best Offer this is the accepted amount, where eBay publishes it. See [Accepted Best Offers](#accepted-best-offers).</ResponseField>
+    <ResponseField name="original_price" type="object">Strikethrough original price (nullable). On a listing priced at its accepted Best Offer, the listed price.</ResponseField>
     <ResponseField name="discount_percent" type="number">Discount percentage off original price (nullable).</ResponseField>
     <ResponseField name="currency" type="string">ISO 4217 currency code.</ResponseField>
     <ResponseField name="availability" type="string">Availability/stock message.</ResponseField>
@@ -48,10 +48,12 @@ description: "Full detail for a single eBay listing (price, condition, specifics
     <ResponseField name="time_left" type="string">Relative time remaining for auctions, e.g. `12h 16m` (auctions only, nullable).</ResponseField>
     <ResponseField name="current_bid" type="object">Current high bid for auction listings with `value`, `currency`, `symbol`, `raw`; mirrors `price`. Null for non-auction (fixed-price) listings.</ResponseField>
     <ResponseField name="is_ended" type="boolean">`true` when the listing has closed (sold or ended), any buying format. Defaults to `false`.</ResponseField>
+    <ResponseField name="is_sold" type="boolean">`true` when the closed listing carries eBay's "Sold" label rather than "Ended". Always `false` on a live listing, however many units it has sold. Defaults to `false`.</ResponseField>
     <ResponseField name="end_time_utc" type="number">Listing end time as a Unix timestamp (float seconds): the auction close time, or the exact sold/ended time for ended listings of any format. Null for active fixed-price listings.</ResponseField>
     <ResponseField name="end_time_at" type="string">Listing end time as an ISO-8601 UTC string, e.g. `2026-06-22T19:50:51Z`: the auction close time, or the exact sold/ended time for ended listings of any format (nullable).</ResponseField>
     <ResponseField name="buy_it_now_price" type="object">Buy It Now price for fixed-price listings (mirrors `price`) or auction-with-Buy-It-Now listings, with `value`, `currency`, `symbol`, `raw`. Null for pure auctions.</ResponseField>
     <ResponseField name="best_offer_enabled" type="boolean">Whether the seller accepts best offers (nullable).</ResponseField>
+    <ResponseField name="best_offer_accepted" type="boolean">`true` when the listing closed on an accepted Best Offer. Read it with `price` and `original_price`. Defaults to `false`.</ResponseField>
     <ResponseField name="brand" type="string">Brand name (nullable).</ResponseField>
     <ResponseField name="mpn" type="string">Manufacturer part number (nullable).</ResponseField>
     <ResponseField name="model" type="string">Model name (nullable).</ResponseField>
@@ -103,10 +105,12 @@ description: "Full detail for a single eBay listing (price, condition, specifics
     "time_left": null,
     "current_bid": null,
     "is_ended": false,
+    "is_sold": false,
     "end_time_utc": null,
     "end_time_at": null,
     "buy_it_now_price": { "value": 299.99, "currency": "USD", "symbol": "$", "raw": "$299.99" },
     "best_offer_enabled": true,
+    "best_offer_accepted": false,
     "brand": "Nintendo",
     "mpn": "HEGSKAAAA",
     "gtin": "0045496883414",
@@ -126,6 +130,38 @@ description: "Full detail for a single eBay listing (price, condition, specifics
   }
 }
 ```
+
+### Accepted Best Offers
+
+When a listing sells through an accepted Best Offer, `best_offer_accepted` is `true`. eBay's item page publishes the accepted amount on most such listings. There are two cases:
+
+- **Amount published.** `price` is the accepted amount. `original_price` and `buy_it_now_price` are the listed price, and `discount_percent` is the difference.
+- **Amount not published.** eBay only strikes the listed price through. `price` stays the listed price and `original_price` is `null`.
+
+So `best_offer_accepted: true` with a `null` `original_price` means the listing sold below `price` and eBay did not publish the amount on that read.
+
+On a listing from another eBay site, eBay publishes the accepted amount only in the listing's own currency. The API converts it to the marketplace's currency at the rate eBay applied to the listed price on the same page. `price.raw` keeps the amount as eBay rendered it.
+
+```json
+{
+  "domain": "co.uk",
+  "item": {
+    "item_id": "147676706828",
+    "price": { "value": 210.0, "currency": "GBP", "symbol": null, "raw": "£210.00" },
+    "original_price": { "value": 239.9, "currency": "GBP", "symbol": null, "raw": "£239.90" },
+    "discount_percent": 12.5,
+    "currency": "GBP",
+    "buying_format": "Buy It Now",
+    "is_ended": true,
+    "is_sold": true,
+    "end_time_at": "2026-11-13T13:38:12Z",
+    "buy_it_now_price": { "value": 239.9, "currency": "GBP", "symbol": null, "raw": "£239.90" },
+    "best_offer_accepted": true
+  }
+}
+```
+
+[Completed listings](/api-reference/endpoint/ebay/completed) carry the listed price for these listings, because eBay's sold index does. Look the item up here for the accepted amount.
 
 ### Auction data
 
