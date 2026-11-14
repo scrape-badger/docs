@@ -1,0 +1,135 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Meta AI Scraper API",
+    "version": "1.0.0",
+    "description": "Ask the real Meta AI assistant (meta.ai) anonymously and receive its answer as structured JSON."
+  },
+  "servers": [
+    {
+      "url": "https://scrapebadger.com"
+    }
+  ],
+  "paths": {
+    "/v1/meta-ai/ask": {
+      "get": {
+        "summary": "Ask Meta AI",
+        "parameters": [
+          {
+            "name": "prompt",
+            "in": "query",
+            "required": true,
+            "description": "The question or instruction to send (1 to 4,000 characters).",
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4000
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "description": "ISO 3166-1 alpha-2 country the question is asked from. Defaults to US.",
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 2,
+              "default": "US"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/MetaAIAnswer"
+          }
+        },
+        "x-availability": "active"
+      }
+    },
+    "/v1/meta-ai/models": {
+      "get": {
+        "summary": "List Meta AI models",
+        "responses": {
+          "200": {
+            "description": "Assistant modes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "models": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-availability": "active"
+      }
+    }
+  },
+  "components": {
+    "responses": {
+      "MetaAIAnswer": {
+        "description": "Meta AI answer",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "answer",
+                "mode",
+                "stream_terminated",
+                "used_dom_fallback",
+                "elapsed_ms"
+              ],
+              "properties": {
+                "answer": {
+                  "type": "string",
+                  "description": "Answer text (Markdown-style); can include inline source links."
+                },
+                "conversation_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "Meta AI's identifier for this exchange, for tracing only."
+                },
+                "mode": {
+                  "type": "string",
+                  "description": "Assistant mode used; currently always default."
+                },
+                "stream_terminated": {
+                  "type": "boolean"
+                },
+                "used_dom_fallback": {
+                  "type": "boolean"
+                },
+                "elapsed_ms": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

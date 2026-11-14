@@ -1,0 +1,112 @@
+---
+title: "Meta AI API Overview"
+description: "Ask the real Meta AI assistant (meta.ai) a question and get its answer as structured JSON. Anonymous: no Meta account needed."
+---
+
+## Overview
+
+The ScrapeBadger **Meta AI API** sends a prompt to the real **Meta AI** assistant at `meta.ai` (the Muse Spark model family) and returns its answer as structured JSON. This is the consumer assistant people use on meta.ai, not Meta's developer model API.
+
+Requests are **anonymous**: you need no Meta account, Meta app, or cookies. You authenticate only with your ScrapeBadger API key. ScrapeBadger runs the live meta.ai session, the residential exit, and the answer capture.
+
+<Info>
+  All endpoints live under `https://scrapebadger.com/v1/meta-ai/*` and authenticate with the `X-API-Key` header. Pass parameters as query parameters. Successful responses report the credits charged on the `X-Credits-Used` response header.
+</Info>
+
+<Warning>
+  Each answer is produced live, so most take **10–40 seconds**. Set your HTTP client timeout to **120 seconds**. At volume, run asks [asynchronously](/long-running-requests).
+</Warning>
+
+## Features
+
+- **Real Meta AI answers** come from the meta.ai assistant itself, not a generic model imitating it.
+- **Web-grounded answers**: for current questions, Meta AI searches the web, and the answer text can include inline source links.
+- **Country targeting**: `country` picks the country the question is asked from, so local questions get local answers.
+- **Traceable responses**: `conversation_id` identifies each exchange. `used_dom_fallback` shows how the answer was recovered.
+- **No Meta account**: access is anonymous on the upstream side.
+
+## Honesty caveat
+
+<Warning>
+  Each request is a **single, fresh, anonymous question**. There is no conversation memory and no follow-up. `conversation_id` identifies the exchange for tracing. You cannot continue a conversation with it.
+
+  `answer` is Markdown-style text. Meta AI decides when to search the web, and source links appear inline in the text. The API does not return a separate structured citation list.
+
+  Meta AI is non-deterministic. The same prompt asked twice can produce different wording.
+</Warning>
+
+## Credit Costs
+
+| Endpoint | Path | Cost |
+| -------- | ---- | ---- |
+| Ask | `GET /v1/meta-ai/ask` | 20 credits |
+| List models | `GET /v1/meta-ai/models` | 1 credit |
+| Health | `GET`/`HEAD` `/v1/meta-ai/health` | Free |
+
+At PAYG, 20 credits is **$0.003 per answer**, or **$3.00 per 1,000 answers**. Subscription tiers reduce that rate. Blocked, empty, and failed answers return non-2xx responses and are not billed.
+
+## Quickstart
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/meta-ai/ask?prompt=What%20is%20the%20tallest%20mountain%20in%20Africa%3F" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  --max-time 120
+```
+
+```javascript Node.js
+const params = new URLSearchParams({
+  prompt: "What is the tallest mountain in Africa?",
+  country: "US",
+});
+const res = await fetch(`https://scrapebadger.com/v1/meta-ai/ask?${params}`, {
+  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+  signal: AbortSignal.timeout(120_000),
+});
+const data = await res.json();
+console.log(data.answer);
+```
+
+```python Python
+import requests
+
+res = requests.get(
+    "https://scrapebadger.com/v1/meta-ai/ask",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    params={"prompt": "What is the tallest mountain in Africa?", "country": "US"},
+    timeout=120,
+)
+data = res.json()
+print(data["answer"])
+```
+
+</CodeGroup>
+
+## What you can build
+
+<CardGroup cols={2}>
+  <Card title="AI visibility tracking" icon="chart-line">
+    Ask the questions your customers ask and track whether Meta AI mentions your brand, product, or website.
+  </Card>
+  <Card title="Answer-engine comparison" icon="scale-balanced">
+    Put Meta AI next to [ChatGPT](/chatgpt/overview), [Gemini](/gemini/overview), [Perplexity](/api-reference/endpoint/perplexity/ask), [Copilot](/copilot/overview), and [Grok](/grok/overview) on the same prompt set.
+  </Card>
+  <Card title="Local answer monitoring" icon="globe">
+    Use `country` to see how Meta AI answers the same question in different markets.
+  </Card>
+  <Card title="Research datasets" icon="database">
+    Collect real assistant answers for evaluation, content research, or trend analysis.
+  </Card>
+</CardGroup>
+
+## Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Ask Meta AI" icon="message" href="/api-reference/endpoint/meta-ai/ask">
+    Send a prompt and get Meta AI's answer.
+  </Card>
+  <Card title="List models" icon="list" href="/api-reference/endpoint/meta-ai/list-models">
+    The assistant modes Meta AI serves anonymously.
+  </Card>
+</CardGroup>
