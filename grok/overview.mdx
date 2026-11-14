@@ -1,0 +1,123 @@
+---
+title: "Grok API Overview"
+description: "Ask the real Grok assistant and get structured answers with web citations, X post references, multi-turn conversations, and brand-visibility analysis."
+---
+
+## Overview
+
+The ScrapeBadger **Grok API** sends prompts to the real Grok assistant and returns structured JSON. Responses include the answer, cited web sources, X post references, tool usage, follow-up suggestions, and a conversation ID for follow-ups.
+
+You authenticate only with a ScrapeBadger API key. No xAI developer key is required.
+
+<Info>
+  All endpoints live under `https://scrapebadger.com/v1/grok/*` and authenticate with the `X-API-Key` header. `/ask` and `/brand-visibility` accept `GET` and `POST`. Credits are reported in `X-Credits-Used`.
+</Info>
+
+<Warning>
+  Simple answers often take seconds. Grounded answers can take a minute or longer. Set your HTTP client timeout to **at least 90 seconds**. At volume, run asks [asynchronously](/long-running-requests).
+</Warning>
+
+## Features
+
+- **Real Grok answers** with plain text and Markdown variants.
+- **Web and X grounding** — `search_results` contains web sources; `x_search_results` contains X post IDs and URLs.
+- **Anchored citations** with insertion offsets in `answer`.
+- **Actual tool activity** — `web_search_triggered` and `x_search_triggered` report what Grok did rather than assuming a search occurred.
+- **Multi-turn conversations** — pass the returned `conversation_id` to retain prior-turn context.
+- **Brand visibility** — deterministic mentions, share of voice, position, competitor metrics, and citation rank.
+- **Three assistant modes** — `auto`, `fast`, and `expert`.
+
+## Credits
+
+| Endpoint | Path | Credits |
+| -------- | ---- | ------- |
+| Ask | `GET`/`POST` `/v1/grok/ask` | 20 |
+| Brand visibility | `GET`/`POST` `/v1/grok/brand-visibility` | 25 |
+| Conversation history | `GET /v1/grok/conversations/{conversation_id}` | 3 |
+| List models | `GET /v1/grok/models` | 1 |
+| Health | `GET`/`HEAD` `/v1/grok/health` | 0 |
+
+Non-2xx responses are not billed.
+
+## Quickstart
+
+<CodeGroup>
+
+```bash cURL
+curl "https://scrapebadger.com/v1/grok/ask?prompt=What%20are%20the%20best%20web%20scraping%20APIs%3F&web_search=force" \
+  -H "X-API-Key: YOUR_API_KEY" \
+  --max-time 90
+```
+
+```javascript Node.js
+const res = await fetch("https://scrapebadger.com/v1/grok/ask", {
+  method: "POST",
+  headers: {
+    "X-API-Key": process.env.SCRAPEBADGER_API_KEY,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    prompt: "What are the best web scraping APIs?",
+    web_search: "force",
+    mode: "auto",
+  }),
+  signal: AbortSignal.timeout(90_000),
+});
+const data = await res.json();
+console.log(data.answer);
+console.log(data.x_search_results);
+```
+
+```python Python
+import requests
+
+res = requests.post(
+    "https://scrapebadger.com/v1/grok/ask",
+    headers={"X-API-Key": "YOUR_API_KEY"},
+    json={"prompt": "What are the best web scraping APIs?", "web_search": "force"},
+    timeout=90,
+)
+data = res.json()
+print(data["answer"])
+print(data["x_search_results"])
+```
+
+</CodeGroup>
+
+## Continue a conversation
+
+Pass the entire `conversation_id` from the first response. Treat it as an opaque identifier and do not split or rewrite it.
+
+```javascript Node.js
+const followUp = await fetch("https://scrapebadger.com/v1/grok/ask", {
+  method: "POST",
+  headers: {
+    "X-API-Key": process.env.SCRAPEBADGER_API_KEY,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    prompt: "Tell me more about the first recommendation.",
+    conversation_id: data.conversation_id,
+  }),
+  signal: AbortSignal.timeout(90_000),
+});
+```
+
+Fetch the normalized history with `GET /v1/grok/conversations/{conversation_id}`. Messages include `id`, `role`, `content`, `created_utc`, and `created_at`.
+
+## FAQ
+
+<AccordionGroup>
+  <Accordion title="Is this the paid xAI developer API?">
+    No. It returns the real consumer Grok answer, including the product's web and X grounding. You need only a ScrapeBadger API key.
+  </Accordion>
+  <Accordion title="Which search mode should I use?">
+    `web_search=auto` lets Grok decide, `force` requests web and X research, and `off` disables those tools. Check the response's trigger fields for what actually happened.
+  </Accordion>
+  <Accordion title="Can I continue a conversation?">
+    Yes. Pass the complete `conversation_id` from the previous answer. The service pins follow-ups to the X account that owns the conversation.
+  </Accordion>
+  <Accordion title="Will the same prompt always return the same answer?">
+    No. Grok is non-deterministic and live sources change. For monitoring, sample repeatedly and aggregate the results.
+  </Accordion>
+</AccordionGroup>
