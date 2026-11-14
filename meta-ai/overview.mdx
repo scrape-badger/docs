@@ -10,7 +10,7 @@ The ScrapeBadger **Meta AI API** sends a prompt to the real **Meta AI** assistan
 Requests are **anonymous**: you need no Meta account, Meta app, or cookies. You authenticate only with your ScrapeBadger API key. ScrapeBadger runs the live meta.ai session, the residential exit, and the answer capture.
 
 <Info>
-  All endpoints live under `https://scrapebadger.com/v1/meta-ai/*` and authenticate with the `X-API-Key` header. Pass parameters as query parameters. Successful responses report the credits charged on the `X-Credits-Used` response header.
+  All endpoints live under `https://scrapebadger.com/v1/meta-ai/*` and authenticate with the `X-API-Key` header. `/ask` accepts `GET` with query parameters or `POST` with the same fields in a JSON body. Successful responses report the credits charged on the `X-Credits-Used` response header.
 </Info>
 
 <Warning>
@@ -20,8 +20,8 @@ Requests are **anonymous**: you need no Meta account, Meta app, or cookies. You 
 ## Features
 
 - **Real Meta AI answers** come from the meta.ai assistant itself, not a generic model imitating it.
-- **Web-grounded answers**: for current questions, Meta AI searches the web, and the answer text can include inline source links.
-- **Country targeting**: `country` picks the country the question is asked from, so local questions get local answers.
+- **Web-grounded answers with citations**: for current questions, Meta AI searches the web, and the answer cites its sources as inline Markdown links, such as `[1](https://…)`.
+- **Country targeting**: `country` picks the country the question is asked from, so local questions get local answers. US, GB, and CA are served. Meta AI does not serve its assistant on every country's exits; see the caveat below.
 - **Traceable responses**: `conversation_id` identifies each exchange. `used_dom_fallback` shows how the answer was recovered.
 - **No Meta account**: access is anonymous on the upstream side.
 
@@ -32,6 +32,8 @@ Requests are **anonymous**: you need no Meta account, Meta app, or cookies. You 
 
   `answer` is Markdown-style text. Meta AI decides when to search the web, and source links appear inline in the text. The API does not return a separate structured citation list.
 
+  Meta AI is not served everywhere. In our testing, German (`DE`) and French (`FR`) exits did not show the assistant, and those asks fail with an unbilled `502`.
+
   Meta AI is non-deterministic. The same prompt asked twice can produce different wording.
 </Warning>
 
@@ -39,7 +41,7 @@ Requests are **anonymous**: you need no Meta account, Meta app, or cookies. You 
 
 | Endpoint | Path | Cost |
 | -------- | ---- | ---- |
-| Ask | `GET /v1/meta-ai/ask` | 20 credits |
+| Ask | `GET`/`POST` `/v1/meta-ai/ask` | 20 credits |
 | List models | `GET /v1/meta-ai/models` | 1 credit |
 | Health | `GET`/`HEAD` `/v1/meta-ai/health` | Free |
 
@@ -56,12 +58,16 @@ curl "https://scrapebadger.com/v1/meta-ai/ask?prompt=What%20is%20the%20tallest%2
 ```
 
 ```javascript Node.js
-const params = new URLSearchParams({
-  prompt: "What is the tallest mountain in Africa?",
-  country: "US",
-});
-const res = await fetch(`https://scrapebadger.com/v1/meta-ai/ask?${params}`, {
-  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+const res = await fetch("https://scrapebadger.com/v1/meta-ai/ask", {
+  method: "POST",
+  headers: {
+    "X-API-Key": process.env.SCRAPEBADGER_API_KEY,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    prompt: "What is the tallest mountain in Africa?",
+    country: "US",
+  }),
   signal: AbortSignal.timeout(120_000),
 });
 const data = await res.json();
@@ -71,10 +77,10 @@ console.log(data.answer);
 ```python Python
 import requests
 
-res = requests.get(
+res = requests.post(
     "https://scrapebadger.com/v1/meta-ai/ask",
     headers={"X-API-Key": "YOUR_API_KEY"},
-    params={"prompt": "What is the tallest mountain in Africa?", "country": "US"},
+    json={"prompt": "What is the tallest mountain in Africa?", "country": "US"},
     timeout=120,
 )
 data = res.json()

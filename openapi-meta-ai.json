@@ -45,6 +45,43 @@
           }
         },
         "x-availability": "active"
+      },
+      "post": {
+        "summary": "Ask Meta AI",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "prompt"
+                ],
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 4000,
+                    "description": "The question or instruction to send (1 to 4,000 characters)."
+                  },
+                  "country": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 2,
+                    "default": "US",
+                    "description": "ISO 3166-1 alpha-2 country the question is asked from. Defaults to US."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/MetaAIAnswer"
+          }
+        },
+        "x-availability": "active"
       }
     },
     "/v1/meta-ai/models": {
@@ -103,7 +140,7 @@
               "properties": {
                 "answer": {
                   "type": "string",
-                  "description": "Answer text (Markdown-style); can include inline source links."
+                  "description": "Answer text (Markdown-style); web-grounded answers cite sources as inline Markdown links."
                 },
                 "conversation_id": {
                   "type": [

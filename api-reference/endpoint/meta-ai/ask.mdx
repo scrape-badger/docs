@@ -4,7 +4,7 @@ api: "GET https://scrapebadger.com/v1/meta-ai/ask"
 description: "Send a prompt to the real Meta AI assistant (meta.ai) and get its answer as structured JSON. Anonymous: no Meta account needed."
 ---
 
-Send one prompt to Meta AI and receive its complete answer. Every request is a fresh, anonymous conversation.
+Send one prompt to Meta AI and receive its complete answer. Every request is a fresh, anonymous conversation. `GET` accepts query parameters; `POST` accepts the same fields in a JSON body.
 
 **Credits:** 20 per successful answer
 
@@ -25,13 +25,13 @@ Send one prompt to Meta AI and receive its complete answer. Every request is a f
 </ParamField>
 
 <ParamField query="country" type="string" default="US">
-  Two-letter ISO 3166-1 alpha-2 code for the country the question is asked from, such as `US`, `GB`, or `DE`. Location-sensitive questions are answered for that country.
+  Two-letter ISO 3166-1 alpha-2 code for the country the question is asked from, such as `US`, `GB`, or `CA`. Location-sensitive questions are answered for that country. Meta AI does not serve every country: German (`DE`) and French (`FR`) asks currently fail with an unbilled `502`.
 </ParamField>
 
 ## Response
 
 <ResponseField name="answer" type="string">
-  The assistant's answer as Markdown-style text. Web-grounded answers can include inline source links.
+  The assistant's answer as Markdown-style text. Web-grounded answers cite their sources as inline Markdown links, such as `[1](https://…)`.
 </ResponseField>
 <ResponseField name="conversation_id" type="string | null">
   Meta AI's identifier for this exchange, returned for tracing. You cannot use it to continue the conversation.
@@ -46,7 +46,7 @@ Send one prompt to Meta AI and receive its complete answer. Every request is a f
   `true` when the answer was read from the rendered page rather than the response stream. It is still the assistant's full answer.
 </ResponseField>
 <ResponseField name="elapsed_ms" type="integer">
-  Time spent in the Meta AI session, in milliseconds. `0` when the request path does not measure it.
+  Time spent in the Meta AI session, in milliseconds.
 </ResponseField>
 
 ## Example
@@ -60,12 +60,16 @@ curl "https://scrapebadger.com/v1/meta-ai/ask?prompt=What%20is%20the%20tallest%2
 ```
 
 ```javascript Node.js
-const params = new URLSearchParams({
-  prompt: "What is the tallest mountain in Africa?",
-  country: "US",
-});
-const res = await fetch(`https://scrapebadger.com/v1/meta-ai/ask?${params}`, {
-  headers: { "X-API-Key": process.env.SCRAPEBADGER_API_KEY },
+const res = await fetch("https://scrapebadger.com/v1/meta-ai/ask", {
+  method: "POST",
+  headers: {
+    "X-API-Key": process.env.SCRAPEBADGER_API_KEY,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    prompt: "What is the tallest mountain in Africa?",
+    country: "US",
+  }),
   signal: AbortSignal.timeout(120_000),
 });
 const data = await res.json();
@@ -75,10 +79,10 @@ console.log(data.answer);
 ```python Python
 import requests
 
-res = requests.get(
+res = requests.post(
     "https://scrapebadger.com/v1/meta-ai/ask",
     headers={"X-API-Key": "YOUR_API_KEY"},
-    params={"prompt": "What is the tallest mountain in Africa?", "country": "US"},
+    json={"prompt": "What is the tallest mountain in Africa?", "country": "US"},
     timeout=120,
 )
 data = res.json()
@@ -100,7 +104,7 @@ print(data["answer"])
 
 ## Errors
 
-Upstream errors use `{"detail":{"code":"...","message":"..."}}`. Non-2xx responses are not billed.
+Upstream errors use `{"detail":{"code":"...","message":"..."}}`. A `502` can also arrive as a plain-text `error code: 502` body from our edge. Non-2xx responses are not billed.
 
 | Code | HTTP | Meaning |
 | ---- | ---- | ------- |
