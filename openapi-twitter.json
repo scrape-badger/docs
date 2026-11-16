@@ -3180,42 +3180,32 @@
     "/v1/twitter/stream/filter-rules-pricing": {
       "get": {
         "operationId": "getFilterRulePricingTiers",
-        "summary": "Get filter rule pricing tiers",
-        "description": "Retrieve the pricing tiers for filter rules. Each tier defines a maximum polling interval and the corresponding credit cost per rule per day. Use this to estimate costs before creating filter rules.",
+        "summary": "Get filter rule per-poll rates",
+        "description": "Retrieve the current per-poll rates for filter rules. Every poll is charged: a flat rate when it returns nothing, and a rate per tweet when it returns tweets (up to 20 per poll, including tweets an earlier poll already returned). Rates are in pay-as-you-go credits; subscription credits are deducted at the pay-as-you-go equivalent.",
         "tags": [
           "Filter Rules"
         ],
         "responses": {
           "200": {
-            "description": "Successfully retrieved pricing tiers.",
+            "description": "Successfully retrieved the per-poll rates.",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
+                  "required": [
+                    "credits_per_empty_call",
+                    "credits_per_tweet_returned"
+                  ],
                   "properties": {
-                    "tiers": {
-                      "type": "array",
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "tier_label": {
-                            "type": "string",
-                            "description": "Human-readable tier name.",
-                            "example": "Real-time (0.1s)"
-                          },
-                          "max_interval_seconds": {
-                            "type": "number",
-                            "description": "Maximum polling interval for this tier in seconds.",
-                            "example": 1
-                          },
-                          "credits_per_rule_per_day": {
-                            "type": "number",
-                            "description": "Credit cost per rule per day at this tier.",
-                            "example": 1000
-                          }
-                        }
-                      },
-                      "description": "List of pricing tiers ordered by interval."
+                    "credits_per_empty_call": {
+                      "type": "number",
+                      "description": "Credits charged for a poll that returns no tweets.",
+                      "example": 0.8
+                    },
+                    "credits_per_tweet_returned": {
+                      "type": "number",
+                      "description": "Credits charged for each tweet a poll returns, whether or not an earlier poll already returned it.",
+                      "example": 1.0
                     }
                   }
                 }
@@ -5018,7 +5008,7 @@
           },
           "max_results_per_poll": {
             "type": "integer",
-            "description": "Maximum number of tweets returned per poll cycle.",
+            "description": "Maximum number of tweets returned per poll cycle. X returns at most 20, so higher values have no effect.",
             "example": 20
           },
           "status": {
@@ -5048,14 +5038,9 @@
             "type": "boolean",
             "description": "Whether a webhook secret is configured. The actual secret is never returned."
           },
-          "credits_per_rule_per_day": {
+          "total_credits_burned": {
             "type": "number",
-            "description": "Credit cost per day for this rule at the current interval."
-          },
-          "pricing_tier": {
-            "type": "string",
-            "description": "Current pricing tier label based on interval.",
-            "example": "1-minute"
+            "description": "Credits this rule has been charged since it was created."
           },
           "created_at": {
             "type": "string",

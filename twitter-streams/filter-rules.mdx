@@ -27,24 +27,42 @@ curl -X POST "https://scrapebadger.com/v1/twitter/stream/filter-rules" \
 - **Up to 50 rules** per API key
 - **Advanced Search syntax** -- use `from:`, `to:`, `lang:`, `is:reply`, `has:media`, and more
 - **Configurable polling interval** from 0.1s to 86,400s
-- **Up to 100 results per poll**
+- **Up to 20 results per poll** (set a lower limit with `max_results_per_poll`)
 - **Webhook + WebSocket delivery**
 - **Query validation** endpoint to check syntax before creating
 
-## Interval pricing tiers
+## Pricing
 
-Faster polling intervals cost more credits per day:
+Filter rules are billed per poll, not per day. Each poll is one live search on X.
 
-| Tier | Max Interval | Credits / rule / day |
-|------|-------------|---------------------|
-| Turbo | 0.5s | 30,000 |
-| Fast | 5s | 10,000 |
-| Standard | 60s | 1,500 |
-| Relaxed | 600s (10min) | 500 |
-| Daily | 86,400s (24h) | 100 |
+| Poll result | Credits |
+|-------------|---------|
+| No tweets | 0.8 |
+| Tweets | 1 per tweet returned, up to 20 per poll |
+
+Three things decide what a rule costs:
+
+- **Every tweet a poll returns is charged, including tweets an earlier poll already returned.** Deduplication decides what is delivered to you, not what is billed. A query that always matches, such as a `from:` list of active accounts, returns a full page on every poll.
+- **Rates are in pay-as-you-go credits.** Filter rules cost the same in dollars on every plan, so subscription credits are deducted at the pay-as-you-go equivalent. On a plan whose credits cost 40% of the pay-as-you-go price, a poll that returns 20 tweets takes about 50 plan credits.
+- **Cost scales with how often you poll.** Credits per day = polls per day × credits per poll.
+
+| Rule | Polls / day | Credits / day (pay-as-you-go) |
+|------|-------------|-------------------------------|
+| Quiet keyword query every 60s, 5% of polls return 1 tweet | 1,440 | about 1,170 |
+| `from:` list of active accounts every 5 min | 288 | 5,760 |
+| `from:` list of active accounts every 60s | 1,440 | 28,800 |
+
+The dashboard shows each rule's measured credits per day once it has been running, and the possible range before that.
+
+### Keeping the cost down
+
+- **Poll less often.** Cost is proportional to the number of polls.
+- **Lower `max_results_per_poll`.** A poll that returns 10 tweets costs half of one that returns 20. Values above 20 have no effect.
+
+Both trade against completeness. A poll sees only the newest tweets, up to `max_results_per_poll`. If more new tweets arrive between two polls than that, the older ones are not delivered. Choose the interval and limit for the busiest hour of your query, not the average.
 
 <Note>
-Fetch current pricing dynamically via the [pricing tiers endpoint](/api-reference/endpoint/filter-rules/get-filter-rule-pricing).
+Read the current rates from the [pricing endpoint](/api-reference/endpoint/filter-rules/get-filter-rule-pricing).
 </Note>
 
 ## Query syntax examples
@@ -65,7 +83,7 @@ Fetch current pricing dynamically via the [pricing tiers endpoint](/api-referenc
 
 ## Deduplication
 
-Filter rules automatically deduplicate tweets. If the same tweet matches across multiple polls, it is delivered only once.
+Filter rules automatically deduplicate tweets. If the same tweet matches across multiple polls, it is delivered only once. It is still charged on each poll that returns it: see [Pricing](#pricing).
 
 ## API endpoints
 
@@ -88,7 +106,7 @@ Filter rules automatically deduplicate tweets. If the same tweet matches across 
   <Card title="Validate Query" icon="check" href="/api-reference/endpoint/filter-rules/validate-filter-rule">
     POST /v1/twitter/stream/filter-rules/validate
   </Card>
-  <Card title="Pricing Tiers" icon="credit-card" href="/api-reference/endpoint/filter-rules/get-filter-rule-pricing">
+  <Card title="Pricing" icon="credit-card" href="/api-reference/endpoint/filter-rules/get-filter-rule-pricing">
     GET /v1/twitter/stream/filter-rules-pricing
   </Card>
 </CardGroup>
