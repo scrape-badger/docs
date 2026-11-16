@@ -17,7 +17,7 @@ Both deliver tweets via **WebSocket** and/or **Webhook** with sub-second latency
 | Feature | Stream Monitors | Filter Rules |
 |---------|----------------|--------------|
 | **What it watches** | Specific accounts (by username) | Search queries (Advanced Search syntax) |
-| **Billing** | Per-account-per-day (volume tiers) | Per-rule-per-day (interval tiers) |
+| **Billing** | Per-account-per-day (volume tiers) | Per poll: 0.8 credits when empty, 1 per tweet returned |
 | **Max per API key** | 100 accounts per monitor | 50 rules |
 | **Delivery** | WebSocket + Webhook | WebSocket + Webhook |
 | **Polling interval** | Global (100ms default) | Configurable per rule (0.1s -- 86400s) |
