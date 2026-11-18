@@ -66,6 +66,11 @@
             "group": "Account",
             "pages": [
               "api-reference/endpoint/account/get-account-info",
+              "api-reference/endpoint/account/poll-async-request",
+              "api-reference/endpoint/account/get-callback-status",
+              "api-reference/endpoint/account/list-webhook-deliveries",
+              "api-reference/endpoint/account/get-webhook-secret",
+              "api-reference/endpoint/account/rotate-webhook-secret",
               "delete-account"
             ]
           }

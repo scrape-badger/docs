@@ -22,6 +22,373 @@
         "name": "x-api-key",
         "description": "Your ScrapeBadger API key. You can find this in your dashboard at https://scrapebadger.com/dashboard/api-keys?utm_source=docs&utm_medium=referral"
       }
+    },
+    "schemas": {
+      "AsyncAccepted": {
+        "title": "AsyncAccepted",
+        "type": "object",
+        "description": "The call is still running. Poll `next_action.url` (free) until it answers with the call's own status and body; do not re-submit the call (that would run and bill it again).",
+        "properties": {
+          "request_id": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "running"
+            ]
+          },
+          "retry_after_seconds": {
+            "type": "integer",
+            "example": 5
+          },
+          "next_action": {
+            "type": "object",
+            "properties": {
+              "method": {
+                "type": "string",
+                "enum": [
+                  "GET"
+                ]
+              },
+              "url": {
+                "type": "string",
+                "example": "/v1/requests/6ca4ab7a-..."
+              }
+            },
+            "required": [
+              "method",
+              "url"
+            ]
+          },
+          "detail": {
+            "type": "string"
+          },
+          "callback": {
+            "type": "object",
+            "description": "Only on a poll of a call submitted with a callback: the delivery state so far (`status`, `attempts`, `last_error`)."
+          }
+        },
+        "required": [
+          "request_id",
+          "status",
+          "retry_after_seconds",
+          "next_action"
+        ]
+      },
+      "AsyncCallbackStatus": {
+        "title": "AsyncCallbackStatus",
+        "type": "object",
+        "description": "Webhook delivery state of a call submitted with a callback URL.",
+        "properties": {
+          "request_id": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "delivering",
+              "delivered",
+              "failed"
+            ],
+            "description": "`pending`: the call is still running. `delivering`: an attempt is under way or the next retry is due at `next_attempt_at`. `delivered`: the endpoint answered 2xx. `failed`: every attempt failed, a final status (not 408/429/5xx) came back, or a gateway restart interrupted the delivery (`last_error` \"interrupted (gateway restart)\")."
+          },
+          "attempts": {
+            "type": "integer"
+          },
+          "last_status": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "HTTP status of the last attempt."
+          },
+          "last_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Short error class of the last attempt, e.g. `HTTP 503`, `timeout`."
+          },
+          "next_attempt_at": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Unix time of the next retry."
+          },
+          "delivered_at": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Unix time."
+          },
+          "callback_host": {
+            "type": "string",
+            "description": "Host of the callback URL only (never its path or query)."
+          }
+        },
+        "required": [
+          "request_id",
+          "state",
+          "attempts",
+          "callback_host"
+        ]
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "WebhookDeliveries": {
+        "title": "WebhookDeliveries",
+        "type": "object",
+        "properties": {
+          "deliveries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WebhookDelivery"
+            }
+          },
+          "window_hours": {
+            "type": "integer",
+            "example": 24
+          }
+        },
+        "required": [
+          "deliveries",
+          "window_hours"
+        ]
+      },
+      "WebhookDelivery": {
+        "title": "WebhookDelivery",
+        "type": "object",
+        "properties": {
+          "request_id": {
+            "type": "string"
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Path of the call, e.g. `/v1/perplexity/ask` (never its query)."
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "delivering",
+              "delivered",
+              "failed"
+            ],
+            "description": "`pending`: the call is still running. `delivering`: an attempt is under way or the next retry is due at `next_attempt_at`. `delivered`: the endpoint answered 2xx. `failed`: every attempt failed, a final status (not 408/429/5xx) came back, or a gateway restart interrupted the delivery (`last_error` \"interrupted (gateway restart)\")."
+          },
+          "attempts": {
+            "type": "integer"
+          },
+          "last_status": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "last_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "type": "integer",
+            "description": "Unix time the call was submitted."
+          },
+          "delivered_at": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "callback_host": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "request_id",
+          "endpoint",
+          "state",
+          "attempts",
+          "created_at",
+          "callback_host"
+        ]
+      },
+      "WebhookEvent": {
+        "title": "WebhookEvent",
+        "type": "object",
+        "description": "The `request.completed` webhook. Signed: `X-ScrapeBadger-Signature` is `sha256=` + hex HMAC-SHA256 of the raw body with the account's webhook secret (`GET /v1/account/webhook-secret`). Deliveries can repeat: deduplicate on `request_id`.",
+        "properties": {
+          "event": {
+            "type": "string",
+            "enum": [
+              "request.completed"
+            ]
+          },
+          "request_id": {
+            "type": "string"
+          },
+          "batch_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Set for an item of `POST /v1/batch`."
+          },
+          "status": {
+            "type": "integer",
+            "description": "The call's own HTTP status."
+          },
+          "headers": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "The call's kept response headers, lower-case (content-type, x-credits-used, x-request-duration-ms, x-api-tier)."
+          },
+          "result_url": {
+            "type": "string"
+          },
+          "result_expires_at": {
+            "type": "integer",
+            "description": "Unix time."
+          },
+          "body_size": {
+            "type": "integer"
+          },
+          "body": {
+            "description": "The call's body: parsed JSON for a JSON response, else text; null when omitted."
+          },
+          "body_omitted": {
+            "type": "boolean",
+            "description": "Present (true) when the body was over 1 MB: fetch `result_url`."
+          },
+          "attempt": {
+            "type": "integer"
+          },
+          "sent_at": {
+            "type": "integer",
+            "description": "Unix time of this attempt."
+          }
+        },
+        "required": [
+          "event",
+          "request_id",
+          "batch_id",
+          "status",
+          "headers",
+          "result_url",
+          "result_expires_at",
+          "body_size",
+          "body",
+          "attempt",
+          "sent_at"
+        ]
+      },
+      "WebhookSecret": {
+        "properties": {
+          "secret": {
+            "type": "string",
+            "title": "Secret"
+          },
+          "signature_header": {
+            "type": "string",
+            "title": "Signature Header",
+            "default": "X-ScrapeBadger-Signature"
+          },
+          "algorithm": {
+            "type": "string",
+            "title": "Algorithm",
+            "default": "sha256=<hex HMAC-SHA256 of the raw request body>"
+          }
+        },
+        "type": "object",
+        "required": [
+          "secret"
+        ],
+        "title": "WebhookSecret",
+        "description": "Signs every X-Callback-URL / batch webhook of this account (SCR-470)."
+      }
     }
   },
   "paths": {
@@ -48,11 +415,11 @@
                   "properties": {
                     "credits_balance": {
                       "type": "integer",
-                      "description": "PAYG (pay-as-you-go) credit balance \u2014 never expires"
+                      "description": "PAYG (pay-as-you-go) credit balance — never expires"
                     },
                     "subscription_credits_balance": {
                       "type": "integer",
-                      "description": "Subscription wallet \u2014 current period's monthly allowance (0 if no subscription)"
+                      "description": "Subscription wallet — current period's monthly allowance (0 if no subscription)"
                     },
                     "total_credits_balance": {
                       "type": "integer",
@@ -186,6 +553,321 @@
           },
           "401": {
             "description": "Invalid or missing API key"
+          }
+        }
+      }
+    },
+    "/v1/requests/{request_id}": {
+      "get": {
+        "tags": [
+          "Agent",
+          "Agent"
+        ],
+        "summary": "Poll an async request",
+        "description": "Status or final response of a call made with ``Prefer: respond-async``.\nWhile it runs: 202. When done: the original status, headers and body.\n\nThe final response carries `X-Callback-Status`, `X-Callback-Attempts` and `X-Callback-Error` for a call submitted with a callback; while it runs, the `202` body has a `callback` object. Full delivery state: `GET /v1/requests/{request_id}/callback`.",
+        "operationId": "poll_request_v1_requests__request_id__get",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Request Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "202": {
+            "description": "The call is still running.",
+            "headers": {
+              "Location": {
+                "description": "`/v1/requests/{request_id}`.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds until the next poll.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AsyncAccepted"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`request_not_found`: unknown, another account's, or expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "detail"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-availability": "active"
+      }
+    },
+    "/v1/requests/{request_id}/callback": {
+      "get": {
+        "tags": [
+          "Agent"
+        ],
+        "summary": "Callback status",
+        "description": "Webhook delivery state of a call submitted with `X-Callback-URL` / `callback_url`: kept for 24 h. Free. `404 callback_not_found` for a request without a callback, of another account, or older than 24 h.",
+        "operationId": "callback_status_v1_requests__request_id__callback_get",
+        "parameters": [
+          {
+            "name": "request_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Request Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AsyncCallbackStatus"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "`callback_not_found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "detail"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-availability": "active"
+      }
+    },
+    "/v1/account/webhook-deliveries": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "summary": "Webhook deliveries",
+        "description": "This account's async-request webhook deliveries of the last 24 h, newest first. Free. Needs a full-access API key, like the webhook secret: a trial key gets `403 trial_not_allowed`, a key restricted to some APIs `403 full_access_required`.",
+        "operationId": "webhook_deliveries_v1_account_webhook_deliveries_get",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            },
+            "description": "How many deliveries to return (1-200)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookDeliveries"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "`trial_not_allowed` or `full_access_required`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    },
+                    "detail": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error",
+                    "detail"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "x-availability": "active"
+      }
+    },
+    "/v1/account/webhook-secret": {
+      "get": {
+        "tags": [
+          "Account",
+          "Account"
+        ],
+        "summary": "Get the webhook signing secret",
+        "description": "The secret that signs this account's async-request webhooks, created on first\nread. Verify a delivery by comparing ``X-ScrapeBadger-Signature`` with\n``sha256=`` + hex HMAC-SHA256(secret, raw body).",
+        "operationId": "get_webhook_secret_v1_account_webhook_secret_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookSecret"
+                }
+              }
+            }
+          }
+        },
+        "x-availability": "active"
+      }
+    },
+    "/v1/account/webhook-secret/rotate": {
+      "post": {
+        "tags": [
+          "Account",
+          "Account"
+        ],
+        "summary": "Rotate the webhook signing secret",
+        "description": "Replace the signing secret. Deliveries that start from now on are signed with\nthe new one; retries of a delivery already under way keep the old one.",
+        "operationId": "rotate_webhook_secret_v1_account_webhook_secret_rotate_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookSecret"
+                }
+              }
+            }
+          }
+        },
+        "x-availability": "active"
+      }
+    }
+  },
+  "webhooks": {
+    "request.completed": {
+      "post": {
+        "summary": "An async call finished",
+        "description": "POSTed to the callback URL of an async call when it completes. Answer any 2xx; a timeout, connection error, 408, 429 or 5xx is retried after 10 s, 60 s and 5 min.",
+        "parameters": [
+          {
+            "name": "X-ScrapeBadger-Signature",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "`sha256=` + hex HMAC-SHA256 of the raw body."
+          },
+          {
+            "name": "X-ScrapeBadger-Event",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "request.completed"
+              ]
+            }
+          },
+          {
+            "name": "X-ScrapeBadger-Delivery-Id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "The request_id."
+          },
+          {
+            "name": "X-ScrapeBadger-Timestamp",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Unix time of the attempt (`sent_at`)."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebhookEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Any 2xx acknowledges the delivery."
           }
         }
       }
