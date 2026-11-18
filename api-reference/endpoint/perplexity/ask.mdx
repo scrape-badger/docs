@@ -81,6 +81,16 @@ Accepts `GET` (query params) or `POST` (JSON body) with identical fields.
   (discussions and forums).
 </ParamField>
 
+<ParamField query="html" type="boolean" default="false">
+  Also return `answer_html`: the answer rendered as an HTML fragment, with each
+  `[n]` citation linked to its source. See [Answer HTML](#answer-html). Same price.
+</ParamField>
+
+<ParamField query="raw" type="boolean" default="false">
+  Also return `raw`: Perplexity's own answer object, exactly as it sent it. See
+  [Raw response](#raw-response). Same price.
+</ParamField>
+
 ## Response
 
 <ResponseField name="prompt" type="string">Echo of the prompt you sent.</ResponseField>
@@ -130,6 +140,8 @@ Accepts `GET` (query params) or `POST` (JSON body) with identical fields.
 <ResponseField name="latency_ms" type="integer">End-to-end time in milliseconds.</ResponseField>
 <ResponseField name="created_utc" type="number | null">Answer creation time as a Unix timestamp.</ResponseField>
 <ResponseField name="created_at" type="string | null">Answer creation time as an ISO-8601 UTC string.</ResponseField>
+<ResponseField name="answer_html" type="string">Only with `html=true`. The answer as an HTML fragment. See [Answer HTML](#answer-html).</ResponseField>
+<ResponseField name="raw" type="object | null">Only with `raw=true`. Perplexity's final answer object as received. See [Raw response](#raw-response).</ResponseField>
 
 ## Example
 
@@ -270,6 +282,37 @@ is not billed:
   "detail": "location must be a city (tokyo, osaka, seoul, new-york, london, ...) or 'lat,lng' in decimal degrees"
 }
 ```
+
+## Answer HTML
+
+Perplexity has no server-side HTML for an answer. Its website builds the answer
+page in the browser from a JSON stream, and that stream is what we read. With
+`html=true` we render the answer's Markdown as HTML for you:
+
+- **Formatting:** headings, paragraphs, bold and italics, lists, tables, code
+  and links, as Perplexity wrote them.
+- **Citations:** each `[n]` marker becomes a link to its source:
+  `<a class="citation" data-ref="n" href="https://source.example/page">[n]</a>`.
+  `data-ref` matches `ref_index` in `citations`.
+- **Safe to embed:** raw HTML inside the answer is dropped, and so are
+  `javascript:` and `data:` links.
+- **A fragment, not a page:** no `<html>` or `<body>` and no styles. Wrap it in
+  your own page and style `a.citation` as you like.
+
+```html
+<h2>Tallest buildings in Vilnius</h2>
+<p>The <strong>Europa Tower</strong> is 148 m tall<a class="citation" data-ref="1" href="https://en.wikipedia.org/wiki/Europa_Tower" title="Europa Tower - Wikipedia" target="_blank" rel="noopener nofollow">[1]</a>.</p>
+```
+
+## Raw response
+
+With `raw=true` the response also carries `raw`: Perplexity's final answer
+object exactly as its app API sent it. Every other field in the response is
+parsed from it. It includes the answer `blocks` (Markdown, web results, the
+search fan-out), `related_queries`, `display_model`, `mode`, `thread_url_slug`
+and `status`. Field names and shapes are Perplexity's and can change without
+notice, so prefer the parsed fields when they cover what you need. The thread's
+write token (`read_write_token`) is removed. It adds about 100 KB to the response, so ask for it only when you need it.
 
 ## Run this asynchronously
 
