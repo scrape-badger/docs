@@ -423,7 +423,7 @@ Send `Idempotency-Key: <key>` (or `idempotency_key=<key>`) with an async call. A
 
 - **Same key, same request:** the call is not run again and not billed again. You get what `GET /v1/requests/{request_id}` returns now: `202` while the first call runs, or its stored result. The response carries `Idempotent-Replayed: true`. No second webhook is sent.
 - **Same key, different request:** `409 idempotency_key_reused`.
-- **Key without async:** `400 idempotency_requires_async`. A callback counts as async. Synchronous results are never stored, so there would be nothing to replay.
+- **Key on a synchronous call:** ignored. The call runs as usual. Idempotency applies to async calls only (a callback counts as async), because synchronous results are never stored.
 - "The same request" means the same method, path, query and body. The async options and the response-shaping parameters (`_fields`, `_jq` and the others) don't count, and neither do headers.
 - Keys belong to your account, so all your API keys share them. A key is kept for about 15 minutes. After that, the same key starts a new call.
 - A replay returns the stored result, errors included. To retry a call that failed, use a new key, such as `job-4815-try-2`.
@@ -480,7 +480,6 @@ Async errors answer before the call runs, so they are not billed. The body is `{
 | `400` | `invalid_async_param` | `async` or `async_wait` has a value that isn't valid. `async` takes `true` or `1`; `async_wait` takes whole seconds from 0 to 120. |
 | `400` | `invalid_callback_url` | The callback URL breaks a [rule above](#callback-url-rules). |
 | `400` | `invalid_idempotency_key` | The key isn't 1–200 visible ASCII characters. |
-| `400` | `idempotency_requires_async` | You sent an idempotency key with a synchronous call. |
 | `400` | `async_not_supported` | The route can't run asynchronously (see below). |
 | `400` | `trial_not_allowed` | An unclaimed trial key asked for a webhook. |
 | `409` | `idempotency_key_reused` | The key was already used for a different request. |
