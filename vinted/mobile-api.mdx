@@ -1,13 +1,13 @@
 ---
 title: "Vinted mobile data"
-description: "Read listings, seller reviews, sold comparables, prices, categories, shipping references and help data through 77 public operations."
+description: "Read listings, seller reviews, sold comparables, prices, categories, shipping references and help data through 76 public operations."
 ---
 
 The Vinted API now uses mobile JSON requests for search, item details, seller
 profiles, wardrobes, brands, colors and conditions. You do not need a Vinted account.
 The existing endpoints keep their response envelopes and pricing.
 
-For the wider data set, use **77 public read operations**. These include sold
+For the wider data set, use **76 public read operations**. These include sold
 comparables, suggested prices, reviews, followers, related listings, category trees,
 homepage feeds, ISBN metadata, package sizes, and help articles.
 
@@ -188,10 +188,13 @@ It is `null` if the reference table is briefly unavailable, in which case every 
 | `public-photos` | `item_ids[]`, `photo_size` | `photos` |
 | `item-translatable` | `item_id` | `plugins` |
 | `related-items` | `item_id`, `content_source` | `items`, `title`, `next_page_token` |
-| `item-shipping` | `item_id` | `shipping_details` |
 | `item-share` | `item_id` | `share_url` |
 
-`item-details` returns Vinted's payload unchanged except for one field we add: `item.uploaded_at`, an ISO 8601 UTC timestamp taken from the earliest photo upload. It is approximate in both directions. A seller who replaces a photo after listing moves it later, and a photo uploaded before the listing is published can predate it by about 30 minutes. Related items carry no upload time.
+Since 17 November 2026 Vinted shows full item details only to signed-in users. `item-details` now builds the same `item` and `plugins` shape from the public item page. Most fields are filled, but `view_count` is 0, `can_bundle`, `can_reserve` and `package_size_id` take their defaults, and `plugins` holds only `attributes`.
+
+`item-shipping` was retired on 18 November 2026: Vinted no longer serves an item's shipping details to anonymous readers. For delivery and buyer-protection prices, use `item-services`.
+
+`item-details` also adds one field: `item.uploaded_at`, an ISO 8601 UTC timestamp taken from the earliest photo upload. It is approximate in both directions. A seller who replaces a photo after listing moves it later, and a photo uploaded before the listing is published can predate it by about 30 minutes. Related items carry no upload time.
 
 `related-items` takes `content_source` `similar_items` or `other_user_items`. To get the next page, send the previous response's `next_page_token`. When it is `null` there are no more pages.
 
@@ -218,7 +221,7 @@ It is `null` if the reference table is briefly unavailable, in which case every 
 | `popular-brands` | None (`letter` A–Z or 0 is optional) | `brands` |
 | `size-groups` | `catalog_ids[]` | `size_groups` |
 | `catalog-filters` | None | `filters`, `selected_filters` |
-| `catalog-filter-facets` | `filter_code` | `filter_code`, `total_count`, `total_count_max` |
+| `catalog-filter-facets` | `filter_code` | `filter_code`, `options`, `total_count_max` (same as `filter-facets`) |
 | `catalog-filter-search` | `filter_search_code`, `filter_search_text` | `options`, `is_selection_highlighted`, `selected_filters` |
 | `wardrobe-categories` | None | `catalogs` |
 | `seller-filters` | None | `filters` |
@@ -257,7 +260,7 @@ It is `null` if the reference table is briefly unavailable, in which case every 
 |---|---|---|
 | `help-tree` | `country`, `language` | `faq_entries`, `faq_entries_parent_code`, `faq_entries_parent_id`, `faq_entries_parent_title` |
 | `help-entry` | `faq_entry_id`, `country`, `language` | `faq_entry` |
-| `help-entry-core` | `faq_entry_id` | `faq_entry` |
+| `help-entry-core` | `faq_entry_id` | `faq_entry` (same as `help-entry`, in the market's language) |
 | `help-feedback-options` | `faq_entry_id` | `feedback_uuid`, `feedback_ratings` |
 | `terms` | None | `terms_and_conditions` |
 
