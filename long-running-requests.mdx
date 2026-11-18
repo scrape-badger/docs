@@ -1,9 +1,19 @@
 ---
-title: Long-running and async requests
-description: How long a synchronous call can run, what happens when it is cut off, and how to run slow calls such as ChatGPT, Gemini and AI Overviews asynchronously at production volume.
+title: Async requests and webhooks
+description: Run any call in the background, poll for the result for free or have it sent to your server as a signed webhook, and resend submits safely with an idempotency key.
 ---
 
-Most calls answer in a few seconds. Some render a live page or wait for an AI answer: ChatGPT, Gemini, Perplexity and Copilot asks usually take 15–40 s and sometimes over a minute. At volume, run these asynchronously.
+Most calls answer in a few seconds. Some render a live page or wait for an AI answer: ChatGPT, Gemini, Perplexity and Copilot asks usually take 15–40 s and sometimes over a minute. You can run any of these calls asynchronously. You get a `request_id` back, and then you either poll for the result or have it sent to your server.
+
+## When to use async
+
+Run a call asynchronously when:
+- it can take longer than your HTTP client, proxy or serverless platform allows (AI asks, JavaScript-rendered pages, AI Overviews);
+- you send many calls at once and don't want to hold a connection open for each one;
+- you want the result pushed to your server as a webhook instead of polling for it;
+- you need to resend a submit after a timeout or a network error without running, and paying for, the call twice.
+
+For a quick call that you need right away, a normal synchronous call is simpler.
 
 ## Synchronous calls have about two minutes
 
@@ -12,67 +22,143 @@ A normal (synchronous) call has about **115 s** to return. Long-running endpoint
 - Set your HTTP client timeout to **130 s** for AI endpoints. A shorter timeout aborts answers that would have arrived.
 - If your connection drops before the response arrives, the call is **not billed**.
 
-## Run slow calls asynchronously
+Async calls are not bound by that window.
 
-Add `Prefer: respond-async, wait=25` to any read request. Async calls are not bound by that window.
+## Run a call asynchronously
 
-- **If the call finishes within `wait` seconds** (1–120), you get the normal response.
-- **Otherwise** you get `202 Accepted` with a `request_id`:
+Each async option has a header form and a query-parameter form. They mean the same thing.
 
-  ```json
-  {"request_id": "…", "status": "running", "retry_after_seconds": 5,
-   "next_action": {"method": "GET", "url": "/v1/requests/…"}}
-  ```
+| Header | Query parameter | What it does |
+|---|---|---|
+| `Prefer: respond-async` | `async=true` (or `1`) | Run the call asynchronously. |
+| `Prefer: respond-async, wait=N` | `async_wait=N` | Wait up to `N` seconds (0–120) for the result before answering `202`. Implies async. |
+| `X-Callback-URL: <url>` | `callback_url=<url>` | POST the result to your URL when the call completes. Implies async. |
+| `Idempotency-Key: <key>` | `idempotency_key=<key>` | Return the first call when you resend the same submit. See [Resend safely with an idempotency key](#resend-safely-with-an-idempotency-key). |
 
-Poll `GET /v1/requests/{request_id}`. Polling is free. It returns `202` while the call runs, then the original status, headers and body. The finished result is held in memory only, never written to disk, for at most 15 minutes so you can collect it. After that, polling returns `404 request_not_found`.
-
-The call is billed once, when it completes. A call that never completes is not billed. Don't re-send the original request while it runs: that starts, and bills, a second call.
+- **If the call finishes within the wait,** you get the normal response.
+- **Otherwise** you get `202 Accepted` with a `request_id`.
+- Without a wait, the call waits 25 s. With a callback and no wait, it waits 0 s, so the `202` comes back at once.
+- When you send both forms of the same option, the header wins.
+- Put the query parameters in the query string, also on a `POST`. Fields in a JSON body go to the endpoint and are not read as async options.
+- The async parameters are removed before the call reaches the endpoint, so they never change what the endpoint sees or what it costs.
 
 <CodeGroup>
 
-```bash cURL
-curl -s -i "https://scrapebadger.com/v1/gemini/ask?prompt=best+crm+for+startups" \
+```bash Header
+curl -sG "https://scrapebadger.com/v1/gemini/ask" \
   -H "X-API-Key: $SCRAPEBADGER_API_KEY" \
-  -H "Prefer: respond-async, wait=25"
-# 202 → poll the Location header:
-curl -s "https://scrapebadger.com/v1/requests/$REQUEST_ID" -H "X-API-Key: $SCRAPEBADGER_API_KEY"
+  -H "Prefer: respond-async, wait=25" \
+  --data-urlencode "prompt=best crm for startups"
 ```
 
-```python Python
-import time, httpx
-
-def ask_async(client: httpx.Client, path: str, params: dict) -> httpx.Response:
-    r = client.get(path, params=params, headers={"Prefer": "respond-async, wait=25"})
-    while r.status_code == 202:
-        time.sleep(int(r.headers.get("Retry-After", "5")))
-        r = client.get(r.json()["next_action"]["url"])
-    return r
-
-with httpx.Client(base_url="https://scrapebadger.com",
-                  headers={"X-API-Key": "YOUR_API_KEY"}, timeout=130) as client:
-    print(ask_async(client, "/v1/chatgpt/ask", {"prompt": "best crm for startups"}).json())
+```bash Query parameter
+curl -sG "https://scrapebadger.com/v1/gemini/ask" \
+  -H "X-API-Key: $SCRAPEBADGER_API_KEY" \
+  --data-urlencode "prompt=best crm for startups" \
+  --data-urlencode "async_wait=25"
 ```
 
-```javascript JavaScript
-async function askAsync(path, params) {
-  const headers = { 'X-API-Key': process.env.SCRAPEBADGER_API_KEY };
-  let r = await fetch(`https://scrapebadger.com${path}?${new URLSearchParams(params)}`, {
-    headers: { ...headers, Prefer: 'respond-async, wait=25' },
-  });
-  while (r.status === 202) {
-    const { next_action, retry_after_seconds } = await r.json();
-    await new Promise((ok) => setTimeout(ok, retry_after_seconds * 1000));
-    r = await fetch(`https://scrapebadger.com${next_action.url}`, { headers });
-  }
-  return r.json();
-}
+```bash POST with a JSON body
+curl -s "https://scrapebadger.com/v1/perplexity/ask?async=true" \
+  -H "X-API-Key: $SCRAPEBADGER_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "best crm for startups", "country": "US"}'
 ```
 
 </CodeGroup>
 
+<Note>
+  `X-Callback-URL` used to need `Prefer: respond-async` and failed with `400 callback_requires_async` without it. A callback now makes the call async by itself.
+</Note>
+
+### The 202 response
+
+Every async-capable endpoint answers `202` in the same shape:
+
+```json
+{
+  "request_id": "6ca4ab7a-…",
+  "status": "running",
+  "retry_after_seconds": 5,
+  "next_action": {"method": "GET", "url": "/v1/requests/6ca4ab7a-…"},
+  "detail": "Still running. Poll next_action.url; do not re-submit the call (that would run and bill it again)."
+}
+```
+
+The response also carries a `Location` header with the poll URL and a `Retry-After` header in seconds.
+
+## Poll for the result
+
+Poll `GET /v1/requests/{request_id}` with any API key on the same account. Polling is free.
+
+- While the call runs, it returns `202` in the shape above.
+- When the call completes, it returns the call's own status, headers and body, as if you had made the call synchronously.
+- The result is held in memory only, never written to disk, for about **15 minutes** after the call completes. After that, polling returns `404 request_not_found`.
+- Wait `retry_after_seconds` between polls.
+
+The SDKs poll for you. `client.requests.wait()` honours `Retry-After` and raises a timeout error if the call isn't done in time. To check once without waiting, use `client.requests.get(request_id)`.
+
+<CodeGroup>
+
+```bash cURL
+curl -s -i "https://scrapebadger.com/v1/gemini/ask?prompt=best+crm+for+startups&async=true" \
+  -H "X-API-Key: $SCRAPEBADGER_API_KEY"
+# 202 → poll the Location header:
+curl -s "https://scrapebadger.com/v1/requests/$REQUEST_ID" \
+  -H "X-API-Key: $SCRAPEBADGER_API_KEY"
+```
+
+```python Python SDK
+import asyncio
+from scrapebadger import ScrapeBadger
+
+async def main():
+    async with ScrapeBadger(api_key="YOUR_API_KEY") as client:
+        req = await client.requests.submit(
+            "/v1/gemini/ask",
+            params={"prompt": "best crm for startups"},
+            wait=25,
+        )
+        if req.status == "running":
+            req = await client.requests.wait(req.request_id, timeout=600)
+        print(req.status_code, req.body)
+
+asyncio.run(main())
+```
+
+```typescript Node SDK
+import { ScrapeBadger } from "scrapebadger";
+
+const client = new ScrapeBadger({ apiKey: process.env.SCRAPEBADGER_API_KEY });
+
+let req = await client.requests.submit("/v1/gemini/ask", {
+  params: { prompt: "best crm for startups" },
+  wait: 25,
+});
+if (req.status === "running") {
+  req = await client.requests.wait(req.requestId, { timeoutMs: 600_000 });
+}
+console.log(req.statusCode, req.body);
+```
+
+</CodeGroup>
+
+When a call was submitted with a callback, the poll also reports the delivery: as a `callback` object in the `202` body, and as `X-Callback-Status`, `X-Callback-Attempts` and `X-Callback-Error` headers on the final response. For the full delivery state, use [`GET /v1/requests/{request_id}/callback`](#check-one-delivery).
+
 ## Get the result by webhook
 
-Add `X-Callback-URL: https://your-server.example/hook` to an async call (it needs `Prefer: respond-async`). When the call completes, ScrapeBadger POSTs the result there as JSON. A call that finishes within `wait` still gets its webhook, as well as the normal response.
+Add a callback URL to a call. When the call completes, ScrapeBadger POSTs the result to that URL as JSON, signed with your account's webhook secret.
+
+```bash
+curl -sG "https://scrapebadger.com/v1/chatgpt/ask" \
+  -H "X-API-Key: $SCRAPEBADGER_API_KEY" \
+  --data-urlencode "prompt=best crm for startups" \
+  --data-urlencode "callback_url=https://hooks.example.com/scrapebadger"
+```
+
+That returns `202` at once. If you also set a wait and the call finishes within it, you get the normal response and the webhook as well.
+
+### The payload
 
 ```json
 {
@@ -90,38 +176,329 @@ Add `X-Callback-URL: https://your-server.example/hook` to an async call (it need
 }
 ```
 
-- `status` and `body` are the call's own, errors included. A body over 1 MB is left out (`"body": null, "body_omitted": true`): fetch it from `result_url` within 15 minutes.
-- The URL must be `https` on a public address. Private, loopback and cloud-metadata addresses are refused, and redirects are not followed. A bad URL gets `400 invalid_callback_url` before the call runs, and nothing is billed.
-- Answer with any `2xx`. On a timeout, a connection error, `408`, `429` or `5xx`, the delivery is retried after 10 s, 60 s and 5 min (4 attempts in total). Other statuses are final. Deliveries can repeat, so deduplicate on `request_id`.
-- `GET /v1/requests/{request_id}` reports the delivery: as a `callback` object (`status`: `pending` / `delivered` / `failed`, `attempts`, `last_error`) while the call runs, and as `X-Callback-Status` and `X-Callback-Attempts` headers on the final response.
+- `status`, `headers` and `body` are the call's own, errors included. Header names are lower case.
+- `body` is decoded JSON when the call returned JSON, and text otherwise.
+- A body over 1 MB is left out: you get `"body": null` and `"body_omitted": true`. Fetch it from `result_url` before `result_expires_at`.
+- `batch_id` is set when the call came from a [batch](#submit-a-batch).
+- `attempt` and `sent_at` (Unix seconds) change on every attempt, and each attempt is signed again.
+
+Each delivery carries these headers:
+
+| Header | Value |
+|---|---|
+| `Content-Type` | `application/json` |
+| `User-Agent` | `ScrapeBadger-Webhook/1.0` |
+| `X-ScrapeBadger-Event` | `request.completed` |
+| `X-ScrapeBadger-Delivery-Id` | The `request_id`, the same on every attempt |
+| `X-ScrapeBadger-Timestamp` | The attempt's `sent_at` |
+| `X-ScrapeBadger-Signature` | `sha256=` and the hex HMAC-SHA256 of the raw body |
+
+### Callback URL rules
+
+- The URL must be `https`, on a public address, at most 2,048 characters long, with no user name or password in it.
+- Private, loopback, link-local and cloud-metadata addresses are refused. So are `localhost` and names ending in `.local` or `.internal`.
+- Redirects are not followed.
+- A bad URL gets `400 invalid_callback_url` before the call runs. Nothing is billed.
+- URL-encode the URL when you pass it as `callback_url`.
+
+### Retries and duplicates
+
+- Answer with any `2xx` within **10 s**.
+- On a timeout, a connection error, `408`, `425`, `429`, `500`, `502`, `503` or `504`, the delivery is retried after **10 s, 60 s and 300 s**: four attempts in total. Any other status is final.
+- Delivery is **at least once**. The same result can arrive more than once, for example when your server handled it but the response didn't reach us in time. Deduplicate on `request_id`.
+- Answer first and do the work after. A slow handler times out, and the result is sent again.
 - Calls refused before they run (invalid key, no credits, rate limit) answer synchronously and send no webhook.
-- Deliveries in progress don't survive a restart of our gateway. If a restart interrupts retries, the poll reports the delivery as `failed` with `last_error: "interrupted (gateway restart)"`. Fetch the result from `result_url` while it is still kept.
+- Deliveries in progress don't survive a restart of our gateway. If a restart interrupts retries, the delivery is reported as `failed` with `last_error: "interrupted (gateway restart)"`. Fetch the result from `result_url` while it is still kept.
 
 ### Verify the signature
 
-Every delivery is signed with your account's webhook secret. Get the secret from `GET /v1/account/webhook-secret`, and rotate it with `POST /v1/account/webhook-secret/rotate`. Both need a full-access API key: a key restricted to some APIs gets `403 full_access_required`. `X-ScrapeBadger-Signature` is `sha256=` followed by the hex HMAC-SHA256 of the **raw** request body. Check it before you parse the body, and reject stale `sent_at` values to stop replays. This is the same scheme stream monitors use.
+`X-ScrapeBadger-Signature` is `sha256=` followed by the hex HMAC-SHA256 of the **raw** request body, keyed with your webhook secret. This is the same scheme stream monitors use.
+
+- Compute the HMAC over the exact bytes you received, before any JSON parsing or re-encoding.
+- Compare in constant time.
+- Reject stale deliveries to stop replays: check that `sent_at` is within a few minutes of now. Take `sent_at` from the body, which the signature covers. The `X-ScrapeBadger-Timestamp` header has the same value but is not signed.
+
+The SDKs do all three. `verify_signature` and `verifyWebhookSignature` return `true` only when the signature matches and, when you pass `sent_at`, it is within `tolerance_s` (default 300 s) of now.
 
 <CodeGroup>
 
-```python Python
-import hashlib, hmac
+```python Python SDK
+import json
+from scrapebadger.webhooks import verify_signature
 
-def verify(secret: str, raw_body: bytes, signature: str) -> bool:
-    expected = "sha256=" + hmac.new(secret.encode(), raw_body, hashlib.sha256).hexdigest()
-    return hmac.compare_digest(expected, signature)
+event = json.loads(raw_body)
+ok = verify_signature(secret, raw_body, signature, sent_at=event["sent_at"])
 ```
 
-```javascript JavaScript
-import { createHmac, timingSafeEqual } from 'node:crypto';
+```typescript Node SDK
+import { verifyWebhookSignature } from "scrapebadger";
 
-function verify(secret, rawBody, signature) {
-  const expected = 'sha256=' + createHmac('sha256', secret).update(rawBody).digest('hex');
-  return expected.length === signature.length &&
-    timingSafeEqual(Buffer.from(expected), Buffer.from(signature));
+const event = JSON.parse(rawBody.toString("utf8"));
+const ok = verifyWebhookSignature(secret, rawBody, signature, { sentAt: event.sent_at });
+```
+
+```python Python (no SDK)
+import hashlib, hmac, time
+
+def verify(secret: str, raw_body: bytes, signature: str, sent_at: int, tolerance_s: int = 300) -> bool:
+    expected = "sha256=" + hmac.new(secret.encode(), raw_body, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, signature) and abs(time.time() - sent_at) <= tolerance_s
+```
+
+```javascript Node (no SDK)
+import { createHmac, timingSafeEqual } from "node:crypto";
+
+function verify(secret, rawBody, signature, sentAt, toleranceS = 300) {
+  const expected = Buffer.from("sha256=" + createHmac("sha256", secret).update(rawBody).digest("hex"));
+  const given = Buffer.from(signature ?? "");
+  return expected.length === given.length && timingSafeEqual(expected, given) &&
+    Math.abs(Date.now() / 1000 - sentAt) <= toleranceS;
 }
 ```
 
 </CodeGroup>
+
+`scrapebadger.webhooks.parse_event(raw_body)` and `parseWebhookEvent(rawBody)` parse the payload into a typed event if you prefer that to plain JSON.
+
+### Receive webhooks
+
+Both receivers read the raw body, verify it, skip repeats and answer before doing any work. Store the `request_id`s you have handled somewhere shared, such as Redis or your database, and keep them for at least an hour.
+
+<CodeGroup>
+
+```python Python (FastAPI)
+import json
+import os
+
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
+from scrapebadger.webhooks import verify_signature
+
+app = FastAPI()
+SECRET = os.environ["SCRAPEBADGER_WEBHOOK_SECRET"]
+seen: set[str] = set()  # use Redis or your database in production
+
+
+@app.post("/hooks/scrapebadger")
+async def scrapebadger_hook(request: Request, background: BackgroundTasks):
+    raw = await request.body()  # the exact bytes that were signed
+    try:
+        event = json.loads(raw)
+    except ValueError:
+        raise HTTPException(status_code=400)
+    signature = request.headers.get("X-ScrapeBadger-Signature", "")
+    if not verify_signature(SECRET, raw, signature, sent_at=event.get("sent_at")):
+        raise HTTPException(status_code=401)
+    if event["request_id"] in seen:
+        return {"ok": True}  # a repeat delivery: already handled
+    seen.add(event["request_id"])
+    background.add_task(handle, event)  # answer now, work after
+    return {"ok": True}
+
+
+def handle(event: dict) -> None:
+    if 200 <= event["status"] < 300:
+        print(event["request_id"], event["body"])
+    else:
+        print("call failed", event["status"], event["body"])
+```
+
+```javascript Node (Express)
+import express from "express";
+import { verifyWebhookSignature } from "scrapebadger";
+
+const app = express();
+const secret = process.env.SCRAPEBADGER_WEBHOOK_SECRET;
+const seen = new Set(); // use Redis or your database in production
+
+// express.raw() keeps the exact bytes that were signed. Don't let an app-wide
+// express.json() run on this route first, and raise the 100 KB default limit.
+app.post(
+  "/hooks/scrapebadger",
+  express.raw({ type: "application/json", limit: "5mb" }),
+  (req, res) => {
+    let event;
+    try {
+      event = JSON.parse(req.body.toString("utf8"));
+    } catch {
+      return res.sendStatus(400);
+    }
+    const signature = req.get("X-ScrapeBadger-Signature") ?? "";
+    if (!verifyWebhookSignature(secret, req.body, signature, { sentAt: event.sent_at })) {
+      return res.sendStatus(401);
+    }
+    res.sendStatus(200); // answer now, work after
+    if (seen.has(event.request_id)) return; // a repeat delivery: already handled
+    seen.add(event.request_id);
+    handle(event);
+  },
+);
+
+function handle(event) {
+  if (event.status >= 200 && event.status < 300) console.log(event.request_id, event.body);
+  else console.log("call failed", event.status, event.body);
+}
+
+app.listen(3000);
+```
+
+</CodeGroup>
+
+A `400` or `401` from your receiver is final, so a delivery that fails verification is not retried. You can still fetch its result from `result_url`.
+
+### Your webhook secret
+
+Every account has one webhook secret. It is created the first time you ask for it.
+
+```bash
+curl -s https://scrapebadger.com/v1/account/webhook-secret -H "X-API-Key: $SCRAPEBADGER_API_KEY"
+```
+
+```json
+{"secret": "whsec_…", "signature_header": "X-ScrapeBadger-Signature",
+ "algorithm": "sha256=<hex HMAC-SHA256 of the raw request body>"}
+```
+
+- Rotate it with `POST /v1/account/webhook-secret/rotate`, which returns the new secret.
+- The SDKs have `client.account.webhook_secret()` and `client.account.rotate_webhook_secret()` (Node: `webhookSecret()` and `rotateWebhookSecret()`).
+- Both endpoints need a full-access API key. A key restricted to some APIs gets `403 full_access_required`.
+- New deliveries use a rotated secret at once. A delivery that was already retrying keeps the secret it started with, for up to about 7 minutes. Accept both secrets for that long after you rotate.
+- Keep the secret on your server. Anyone who has it can sign payloads that pass your check.
+
+## Check a delivery
+
+Both endpoints are free.
+
+### Check one delivery
+
+`GET /v1/requests/{request_id}/callback` returns the delivery state of a request that was submitted with a callback. Other requests get `404 callback_not_found`.
+
+```json
+{
+  "request_id": "6ca4ab7a-…",
+  "state": "delivered",
+  "attempts": 2,
+  "last_status": 200,
+  "last_error": null,
+  "next_attempt_at": null,
+  "delivered_at": 1793138912,
+  "callback_host": "hooks.example.com"
+}
+```
+
+- `state` is `pending` (not sent yet), `delivering` (being sent or waiting to retry), `delivered` (your server answered `2xx`) or `failed` (a final status, or all four attempts used).
+- `last_status` is your server's last HTTP status, and `last_error` a short reason such as `HTTP 503` or `timeout`.
+- `next_attempt_at` and `delivered_at` are Unix seconds.
+- In the SDKs: `client.requests.callback_status(request_id)` (Node: `callbackStatus(id)`).
+
+### List recent deliveries
+
+`GET /v1/account/webhook-deliveries` lists your account's deliveries of the last 24 hours, newest first. Pass `limit` for up to 200 (default 50). It needs a full-access API key.
+
+```json
+{
+  "deliveries": [
+    {
+      "request_id": "6ca4ab7a-…",
+      "endpoint": "/v1/perplexity/ask",
+      "state": "failed",
+      "attempts": 4,
+      "last_status": 503,
+      "last_error": "HTTP 503",
+      "created_at": 1793138851,
+      "delivered_at": null,
+      "callback_host": "hooks.example.com"
+    }
+  ],
+  "window_hours": 24
+}
+```
+
+`endpoint` is the path only, without the query. In the SDKs: `client.account.webhook_deliveries(limit=50)` (Node: `webhookDeliveries({ limit })`).
+
+## Resend safely with an idempotency key
+
+A submit can time out, or the connection can drop, before you see the `202`. Without a key, resending it starts, and bills, a second call. With a key, the resend returns the first call.
+
+Send `Idempotency-Key: <key>` (or `idempotency_key=<key>`) with an async call. A key is 1–200 visible ASCII characters, with no spaces. Make it from your own job id, such as `job-4815-try-1`.
+
+- **Same key, same request:** the call is not run again and not billed again. You get what `GET /v1/requests/{request_id}` returns now: `202` while the first call runs, or its stored result. The response carries `Idempotent-Replayed: true`. No second webhook is sent.
+- **Same key, different request:** `409 idempotency_key_reused`.
+- **Key without async:** `400 idempotency_requires_async`. A callback counts as async. Synchronous results are never stored, so there would be nothing to replay.
+- "The same request" means the same method, path, query and body. The async options and the response-shaping parameters (`_fields`, `_jq` and the others) don't count, and neither do headers.
+- Keys belong to your account, so all your API keys share them. A key is kept for about 15 minutes. After that, the same key starts a new call.
+- A replay returns the stored result, errors included. To retry a call that failed, use a new key, such as `job-4815-try-2`.
+
+<CodeGroup>
+
+```bash cURL
+curl -s -i "https://scrapebadger.com/v1/perplexity/ask" \
+  -H "X-API-Key: $SCRAPEBADGER_API_KEY" \
+  -H "Idempotency-Key: job-4815-try-1" \
+  -H "X-Callback-URL: https://hooks.example.com/scrapebadger" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "best crm for startups", "country": "US"}'
+# Same command again: the first call's 202 (or result), with Idempotent-Replayed: true
+```
+
+```python Python SDK
+req = await client.requests.submit(
+    "/v1/perplexity/ask",
+    method="POST",
+    json={"prompt": "best crm for startups", "country": "US"},
+    callback_url="https://hooks.example.com/scrapebadger",
+    idempotency_key="job-4815-try-1",
+)
+print(req.request_id, req.replayed)
+```
+
+```typescript Node SDK
+const req = await client.requests.submit("/v1/perplexity/ask", {
+  method: "POST",
+  body: { prompt: "best crm for startups", country: "US" },
+  callbackUrl: "https://hooks.example.com/scrapebadger",
+  idempotencyKey: "job-4815-try-1",
+});
+console.log(req.requestId, req.replayed);
+```
+
+</CodeGroup>
+
+## Billing
+
+- An async call is billed **once, when it completes**, at the endpoint's normal price. The result's `x-credits-used` header says how much.
+- As with synchronous calls, only `2xx` results are billed. A call that never completes is not billed.
+- Submitting, polling, delivery status, the delivery list, the webhook secret and webhook deliveries (retries included) are free.
+- A replay with an idempotency key is not billed.
+- Resending the original request **without** an idempotency key starts, and bills, a second call.
+
+## Errors
+
+Async errors answer before the call runs, so they are not billed. The body is `{"error": "<code>", "detail": "<what to fix>"}`.
+
+| Status | `error` | When |
+|---|---|---|
+| `400` | `invalid_async_param` | `async` or `async_wait` has a value that isn't valid. `async` takes `true` or `1`; `async_wait` takes whole seconds from 0 to 120. |
+| `400` | `invalid_callback_url` | The callback URL breaks a [rule above](#callback-url-rules). |
+| `400` | `invalid_idempotency_key` | The key isn't 1–200 visible ASCII characters. |
+| `400` | `idempotency_requires_async` | You sent an idempotency key with a synchronous call. |
+| `400` | `async_not_supported` | The route can't run asynchronously (see below). |
+| `400` | `trial_not_allowed` | An unclaimed trial key asked for a webhook. |
+| `409` | `idempotency_key_reused` | The key was already used for a different request. |
+| `403` | `full_access_required` | The webhook secret or the delivery list was requested with a key restricted to some APIs. |
+| `404` | `request_not_found` | No such request on this account, or its result has expired. |
+| `404` | `callback_not_found` | The request was submitted without a callback. |
+
+These routes can't run asynchronously and answer `400 async_not_supported` to any async option, in header or query form:
+- `/v1/requests/*`, `/v1/batch`, `/v1/quote`, `/v1/feedback` and `/v1/results/*`;
+- `/v1/account/*`;
+- the Twitter stream routes under `/v1/twitter/stream/*`: managing monitors, webhooks and filter rules, their logs, and the live stream itself.
+
+## Data retention
+
+- **Results** (the response body and headers) are held in memory only, never written to disk, for about **15 minutes** after the call completes.
+- **Idempotency keys** are kept for about 15 minutes, as a hash of your key and a hash of the request. Neither the key nor the request is stored.
+- **Delivery metadata** is kept for **24 hours**: the callback **host** only (never the path or query, which can hold your tokens), the endpoint **path** only (never the query, which holds your parameters), status codes, attempt counts, short error reasons and timestamps.
+- **The webhook secret** is kept with your account until you rotate it.
 
 ## Submit a batch
 
@@ -153,7 +530,10 @@ curl -s https://scrapebadger.com/v1/batch \
 - At most 10 items of one batch run at a time. The others wait their turn and show as `running` when polled.
 - A batch over 100 items gets `413 batch_too_large`.
 - Items still waiting for a slot when our gateway restarts are dropped. They are not billed, and polling them returns `404 request_not_found` within about 5 minutes. Resubmit those.
-- Unclaimed trial keys can't batch (`403 trial_not_allowed`) or use webhooks. They can still use `Prefer: respond-async`, one call at a time: a second call while the first is still running gets `429 trial_concurrency`.
+
+## Trial keys
+
+Unclaimed trial keys can't batch (`403 trial_not_allowed`) or use webhooks (`trial_not_allowed`). They can still run calls asynchronously and poll for them, one call at a time: a second call while the first is still running gets `429 trial_concurrency`.
 
 ## Concurrency
 
