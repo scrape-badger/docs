@@ -3,6 +3,8 @@ title: "Facebook Scraper by ScrapeBadger — Overview"
 description: "Facebook Marketplace listings, search, Pages, profiles, Groups, posts, comments and the Ad Library as clean JSON — no Meta developer app, App Review or access token required."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Scraper API for Facebook
 
 The ScrapeBadger **Facebook API** turns `facebook.com` into a clean JSON feed:
@@ -170,6 +172,10 @@ Every datetime ships in **both** forms: `*_utc` (Unix seconds, e.g.
   [`/groups/{group_id}`](/api-reference/endpoint/facebook/get-group) for full
   detail — search results are deliberately shallow discovery records.
 </Tip>
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ---
 

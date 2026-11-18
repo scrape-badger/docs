@@ -1,0 +1,17 @@
+Calls on this API can run in the background, so you don't hold a connection open while they work. Add one of these to the call:
+
+| Add | What you get |
+|---|---|
+| `async=true` | The normal response if the call finishes within 25 s. Otherwise `202` with a `request_id`, which you poll at `GET /v1/requests/{request_id}` for free. |
+| `callback_url=https://…` | `202` at once. When the call completes, the result is POSTed to your URL, signed with your webhook secret. |
+| `Idempotency-Key: <your id>` header | A resent submit returns the first call instead of running it again. |
+
+```bash
+curl -s "https://scrapebadger.com/v1/...?your=params&async=true" \
+  -H "X-API-Key: $SCRAPEBADGER_API_KEY"
+# 202 {"request_id": "…", "status": "running", …}, then:
+curl -s "https://scrapebadger.com/v1/requests/REQUEST_ID" \
+  -H "X-API-Key: $SCRAPEBADGER_API_KEY"
+```
+
+An async call is billed once, when it completes. See [Async requests and webhooks](/long-running-requests) for webhooks, signatures and the SDK helpers.

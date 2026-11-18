@@ -3,6 +3,8 @@ title: "YouTube Scraper by ScrapeBadger — Overview"
 description: "Scrape YouTube videos, Shorts, channels, playlists, comments, transcripts, trending, and community posts across regions with structured JSON responses."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Scraper API for YouTube
 
 Search YouTube, pull full **video and Shorts detail**, fetch comments and replies, export **transcripts** (SRT/VTT/plain text), enumerate a channel's videos, shorts, streams, playlists, and community posts, and retrieve trending feeds, hashtags, and playlists — from the world's largest video platform. The API handles authentication, anti-bot bypass, and region routing automatically.
@@ -190,6 +192,10 @@ YouTube protects its data with IP-reputation scoring, TLS/HTTP-2 fingerprinting,
 <Note>
   For accurate, localized results, requests are routed through proxies in the `gl` region. This is handled automatically. Some fields (such as `dislike_count` and direct media `url`s) are restricted by YouTube platform-wide and may be `null`.
 </Note>
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ## Next Steps
 

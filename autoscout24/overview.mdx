@@ -3,6 +3,8 @@ title: "AutoScout24 Search and Listing API"
 description: "Search vehicles and retrieve full specifications, equipment, photos and public seller details across eight European markets."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 Search current vehicle listings with prices, mileage, registration, seller and location data. Use your ScrapeBadger API key; you do not need an AutoScout24 account or upstream API subscription.
 
 ## Supported markets
@@ -52,3 +54,7 @@ Start with page 1 and follow `next_page`. Native pages normally contain 20 cards
 AutoScout24 caps browsing at 200 pages per query, even when `total_results` is larger than 4,000. Narrow your price, year, mileage, make/model or location filters to reach more inventory. Inventory changes between requests, so a page walk is not a snapshot.
 
 Search returns cards and listing links. Pass a result URL or UUID to [full listing details](/api-reference/endpoint/autoscout24/listing) for full native specifications, equipment, photo collection, pricing and public seller/contact/location information. Successful detail costs 10 credits; removed or missing listings return an unbilled 404. Registration has month precision (`YYYY-MM`); no day or UTC timestamp is invented. A field can be null when the source card does not disclose it.
+
+## Run this asynchronously
+
+<AsyncRequests />

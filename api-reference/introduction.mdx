@@ -3,6 +3,8 @@ title: API Reference
 description: Complete API reference for web scraping and Twitter data. 50+ endpoints for scraping any website and accessing Twitter data.
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Base URL
 
 ```
@@ -76,6 +78,10 @@ All errors return a JSON object with a `detail` field:
 ### Credits
 
 Each endpoint has its own credit cost, shown on its page and in each API's Credit Costs table. Failed requests (4xx/5xx) do not consume credits. See [Credits & Pricing](/credits-and-pricing) for details.
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ---
 

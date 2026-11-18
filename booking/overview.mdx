@@ -3,6 +3,8 @@ title: "Booking.com Scraper by ScrapeBadger — Overview"
 description: "Scrape Booking.com hotel search with filters and sorting, destination autocomplete, full property detail, complete room rate tables, and paginated guest reviews — worldwide, with structured JSON responses."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Scraper API for Booking.com
 
 Search hotels, apartments and every other stay type Booking.com sells, resolve
@@ -147,6 +149,10 @@ curl "https://scrapebadger.com/v1/booking/search?location=Rome%2C%20Italy" \
 
 Credits are charged per request (see the table above) and reported on the
 `X-Credits-Used` response header.
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ## Next Steps
 

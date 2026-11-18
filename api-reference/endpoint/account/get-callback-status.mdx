@@ -1,0 +1,5 @@
+---
+openapi: get /v1/requests/{request_id}/callback
+---
+
+Shows whether the webhook for a request submitted with a callback URL was delivered: its state, attempts, the last status your server answered and the next retry. Free. Only the callback **host** is kept, never its path or query. See [Async requests and webhooks](/long-running-requests#receive-webhooks).

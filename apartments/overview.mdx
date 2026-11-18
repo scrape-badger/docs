@@ -3,6 +3,8 @@ title: "Apartments.com Scraper by ScrapeBadger — Overview"
 description: "Scrape apartments.com US rental listings as structured JSON — search by location with bed and price filters, plus unit-level pricing: every rentable unit's rent, beds, baths, square footage and availability date."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Scraper API for Apartments.com
 
 Search **US rental listings** and pull **unit-level inventory** — not just a property's advertised range, but every individual rentable unit with its own rent, beds, baths, square footage and availability date. Authentication and anti-bot bypass are handled automatically.
@@ -140,6 +142,10 @@ scrapebadger apartments units "https://www.apartments.com/urbane-kansas-city-mo/
     If you scrape apartments.com through the general [Web Scraping API](/web-scraping/overview) instead of this one, do **not** pass `render_js: true`. The whole page is server-rendered, so JS rendering only forces the slow browser path — 100+ seconds per page, which can exceed the CDN timeout and return a `524`.
   </Accordion>
 </AccordionGroup>
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ---
 

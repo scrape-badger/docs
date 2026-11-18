@@ -3,6 +3,8 @@ title: "Web Scraping Overview"
 description: "Scrape any website with automatic anti-bot bypass, JavaScript rendering, and AI-powered data extraction."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 # Web Scraping API
 
 Scrape any public webpage and get back clean HTML, Markdown, or plain text. The API handles anti-bot protection, JavaScript rendering, and proxy rotation automatically.
@@ -149,6 +151,10 @@ console.log(data.content);
 |----------|--------|-------------|
 | [`/v1/web/scrape`](/api-reference/endpoint/web-scraping/scrape) | POST | Scrape a URL and return content |
 | [`/v1/web/detect`](/api-reference/endpoint/web-scraping/detect) | POST | Detect anti-bot and CAPTCHA systems on a URL |
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ## Next Steps
 

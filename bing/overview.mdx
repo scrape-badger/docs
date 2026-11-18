@@ -3,6 +3,8 @@ title: "Bing Scraper by ScrapeBadger — Overview"
 description: "Search Bing's web SERP with organic results, ads and related searches, plus image, video and news search and query autocomplete — across 30+ markets, no Bing API key required."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Scraper API for Bing
 
 The ScrapeBadger **Bing API** turns `bing.com` into a clean JSON feed: the web
@@ -134,6 +136,10 @@ server-rendered densely, so the default `count=35` is genuinely reachable.
   (2 credits) to expand a seed term into real Bing queries, then run
   [`/search`](/api-reference/endpoint/bing/search) on each suggestion.
 </Tip>
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ---
 

@@ -3,6 +3,8 @@ title: "Vinted Scraper API — Overview"
 description: "Search Vinted by text or photo, inspect listings and sellers, compare sold prices, and explore reference data."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 Search Vinted listings by **text or image**, inspect items and sellers, and compare
 sold listings and suggested prices. ScrapeBadger handles mobile authentication and
 market routing. You need a ScrapeBadger API key; no Vinted account is required.
@@ -124,3 +126,7 @@ by item ID because listings can change while you paginate.
 
 Failed requests are free. Check `X-Credits-Used` for the billed amount and the
 [live pricing page](https://scrapebadger.com/ecommerce-scraper-api/vinted#pricing) for current rates.
+
+## Run this asynchronously
+
+<AsyncRequests />

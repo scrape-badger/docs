@@ -4,6 +4,8 @@ api: "GET https://scrapebadger.com/v1/perplexity/ask"
 description: "Send a prompt to the real perplexity.ai and get the grounded answer as structured JSON, with its cited sources, search queries and related questions."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 Ask **the real `perplexity.ai`** a question anonymously and get the answer back
 as JSON, plus every source Perplexity retrieved, which of those it cited, and
 the sub-queries it searched for.
@@ -16,6 +18,7 @@ Accepts `GET` (query params) or `POST` (JSON body) with identical fields.
   A call can take up to about 75 s while exits are tried, so set your client
   timeout to at least 90 s. Every call renders a fresh answer: nothing is
   cached, so the same prompt sent again gets a new answer and is billed again.
+  At volume, run asks [asynchronously](#ask-at-volume).
 </Warning>
 
 ## Authorization
@@ -267,6 +270,188 @@ is not billed:
   "detail": "location must be a city (tokyo, osaka, seoul, new-york, london, ...) or 'lat,lng' in decimal degrees"
 }
 ```
+
+## Run this asynchronously
+
+<AsyncRequests />
+
+## Ask at volume
+
+To run thousands of asks, don't hold a connection open for each one. Submit
+every ask with a callback and an idempotency key. Each submit returns `202` at
+once, and each answer arrives at your server as a signed webhook.
+
+1. **Submit** each ask with `X-Callback-URL` (or `callback_url`) and an
+   `Idempotency-Key` made from your own job id. Store the `request_id` you get
+   back with the job.
+2. **Verify** each delivery's `X-ScrapeBadger-Signature` with your
+   [webhook secret](/long-running-requests#your-webhook-secret).
+3. **Deduplicate** on `request_id`. Deliveries are at least once, so the same
+   answer can arrive twice.
+4. **Resubmit `5xx` failures with a new key.** A failed ask is not billed. Its
+   old key would only replay the same failure. Don't resubmit a `4xx`: fix the
+   request instead.
+
+### Submit
+
+Resending a submit with the same key, after a timeout or a network error, is
+safe: you get the first ask's `202` back with `Idempotent-Replayed: true`, and
+nothing is billed twice. A `429` on submit is not billed either; resend it later
+with the same key.
+
+<CodeGroup>
+
+```bash cURL
+curl -s "https://scrapebadger.com/v1/perplexity/ask?async_wait=0" \
+  -H "X-API-Key: $SCRAPEBADGER_API_KEY" \
+  -H "Idempotency-Key: job-4815-try-1" \
+  -H "X-Callback-URL: https://hooks.example.com/scrapebadger" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "Which companies lead the web scraping API market?", "country": "US"}'
+```
+
+```python Python SDK
+import asyncio
+from scrapebadger import ScrapeBadger
+
+HOOK = "https://hooks.example.com/scrapebadger"
+jobs = [("job-4815", "Which companies lead the web scraping API market?")]
+
+
+async def submit(client, job_id: str, prompt: str, attempt: int = 1) -> str:
+    req = await client.requests.submit(
+        "/v1/perplexity/ask",
+        method="POST",
+        json={"prompt": prompt, "country": "US"},
+        callback_url=HOOK,
+        idempotency_key=f"{job_id}-try-{attempt}",
+        wait=0,
+    )
+    return req.request_id  # store it with the job to match the webhook
+
+
+async def main():
+    async with ScrapeBadger(api_key="YOUR_API_KEY") as client:
+        for job_id, prompt in jobs:
+            print(job_id, await submit(client, job_id, prompt))
+
+asyncio.run(main())
+```
+
+```typescript Node SDK
+import { ScrapeBadger } from "scrapebadger";
+
+const client = new ScrapeBadger({ apiKey: process.env.SCRAPEBADGER_API_KEY });
+
+async function submit(jobId: string, prompt: string, attempt = 1): Promise<string> {
+  const req = await client.requests.submit("/v1/perplexity/ask", {
+    method: "POST",
+    body: { prompt, country: "US" },
+    callbackUrl: "https://hooks.example.com/scrapebadger",
+    idempotencyKey: `${jobId}-try-${attempt}`,
+    wait: 0,
+  });
+  return req.requestId; // store it with the job to match the webhook
+}
+```
+
+</CodeGroup>
+
+<Note>
+  **Keep `async_wait` at 0.** A callback already means `async_wait=0` unless
+  you set a wait, and the webhook is sent either way. A wait only delays the
+  `202`. At volume it costs you an open connection per ask for up to that many
+  seconds, so Perplexity's answer time, not your
+  [rate limit](/rate-limits), sets how fast you can submit.
+</Note>
+
+### Receive
+
+The receiver checks the signature, skips repeats and answers before it does any
+work. A `2xx` within 10 s counts as delivered. Anything slower is sent again.
+
+<CodeGroup>
+
+```python Python (FastAPI)
+import json
+import os
+
+import redis
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
+from scrapebadger.webhooks import verify_signature
+
+app = FastAPI()
+SECRET = os.environ["SCRAPEBADGER_WEBHOOK_SECRET"]
+r = redis.Redis()
+
+
+def first_time(request_id: str) -> bool:
+    return bool(r.set(f"sb:seen:{request_id}", 1, nx=True, ex=86400))
+
+
+@app.post("/hooks/scrapebadger")
+async def perplexity_hook(request: Request, background: BackgroundTasks):
+    raw = await request.body()  # the exact bytes that were signed
+    try:
+        event = json.loads(raw)
+    except ValueError:
+        raise HTTPException(status_code=400)
+    signature = request.headers.get("X-ScrapeBadger-Signature", "")
+    if not verify_signature(SECRET, raw, signature, sent_at=event.get("sent_at")):
+        raise HTTPException(status_code=401)
+    if first_time(event["request_id"]):
+        background.add_task(handle, event)
+    return {"ok": True}
+
+
+def handle(event: dict) -> None:
+    if 200 <= event["status"] < 300:
+        answer = event["body"]
+        print(event["request_id"], answer["answer"], len(answer["citations"]))
+    elif event["status"] >= 500:
+        ...  # not billed: resubmit the job with attempt + 1
+```
+
+```javascript Node (Express)
+import express from "express";
+import { verifyWebhookSignature } from "scrapebadger";
+
+const app = express();
+const secret = process.env.SCRAPEBADGER_WEBHOOK_SECRET;
+const seen = new Set(); // use Redis (SET NX with a TTL) in production
+
+app.post(
+  "/hooks/scrapebadger",
+  express.raw({ type: "application/json", limit: "5mb" }), // the exact signed bytes
+  (req, res) => {
+    let event;
+    try {
+      event = JSON.parse(req.body.toString("utf8"));
+    } catch {
+      return res.sendStatus(400);
+    }
+    const signature = req.get("X-ScrapeBadger-Signature") ?? "";
+    if (!verifyWebhookSignature(secret, req.body, signature, { sentAt: event.sent_at })) {
+      return res.sendStatus(401);
+    }
+    res.sendStatus(200);
+    if (seen.has(event.request_id)) return; // a repeat delivery
+    seen.add(event.request_id);
+    if (event.status >= 200 && event.status < 300) {
+      console.log(event.request_id, event.body.answer, event.body.citations.length);
+    } else if (event.status >= 500) {
+      // not billed: resubmit the job with attempt + 1
+    }
+  },
+);
+
+app.listen(3000);
+```
+
+</CodeGroup>
+
+See [Async requests and webhooks](/long-running-requests) for the full payload,
+retries, delivery status and the webhook secret.
 
 <Warning>
   Perplexity is non-deterministic. The same prompt can return different wording

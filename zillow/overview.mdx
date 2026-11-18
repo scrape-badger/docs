@@ -3,6 +3,8 @@ title: "Zillow Scraper by ScrapeBadger — Overview"
 description: "Scrape Zillow (zillow.com) real-estate listings — search, maximal property detail with resoFacts, price/tax/Zestimate history, schools, and agent profiles — with structured JSON responses."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Scraper API for Zillow
 
 Search for-sale, for-rent, and sold listings, pull **maximal property detail** with the full `resoFacts` home-facts block, price / tax / Zestimate history, schools, and listing-agent attribution, look up agent profiles with reviews and past sales, and autocomplete locations across **zillow.com** — a dedicated Zillow real-estate API. The API handles authentication, anti-bot bypass, and session/proxy routing automatically.
@@ -142,6 +144,10 @@ Every property carries a deep set of structured fields:
 | **Context** | `schools[]`, `home_insights[]`, `open_house_schedule[]`, `nearby_cities/neighborhoods/zipcodes`, `agent` attribution, `mortgage_rates` |
 
 Search returns each result as a `Listing` (~50 fields); the [property detail](/api-reference/endpoint/zillow/get-property) endpoint returns a full `Property` with the nested `home_facts`, history, schools, and agent blocks.
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ## Next Steps
 

@@ -3,6 +3,8 @@ title: "LinkedIn Scraper by ScrapeBadger — Overview"
 description: "Pull public LinkedIn data — job listings, companies, schools, profiles, posts and courses — as clean JSON, with no LinkedIn login or API key required."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Scraper API for LinkedIn
 
 The ScrapeBadger **LinkedIn API** turns `linkedin.com`'s public, logged-out
@@ -125,6 +127,10 @@ print(len(res.json()["jobs"]), "jobs")
   [`/jobs/search`](/api-reference/endpoint/linkedin/search-jobs) filters on,
   then page results in blocks of 25 with `start`.
 </Tip>
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ---
 

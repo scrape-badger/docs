@@ -3,6 +3,8 @@ title: "ASOS API \u2014 Overview"
 description: "Search ASOS fashion products, retrieve rich product detail, monitor stock and prices, and browse navigation and search facets across storefronts."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 Search ASOS fashion products, retrieve rich product detail, monitor stock and prices, and browse navigation and search facets across storefronts.
 
 Authenticate with `X-API-Key`. Requests use `https://scrapebadger.com/v1/asos`.
@@ -42,3 +44,7 @@ ASOS uses semantic search and may return approximate or related matches even for
 Minimum and maximum prices apply to the requested market currency. When you provide only a minimum, the API resolves the current price range before applying the bound. A zero maximum returns only genuinely zero-priced products.
 
 Product currency, country, store and language overrides refresh live stock and prices for that context. Use a supported storefront combination from List Markets.
+
+## Run this asynchronously
+
+<AsyncRequests />

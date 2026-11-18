@@ -3,6 +3,8 @@ title: "Gumtree Scraper by ScrapeBadger — Overview"
 description: "Search Gumtree classifieds in the UK (gumtree.com), Australia (gumtree.com.au) and South Africa (gumtree.co.za) by keyword, category, location and filters, and pull full listings with vehicle spec, seller profile and similar ads — no Gumtree account required."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Scraper API for Gumtree
 
 The ScrapeBadger **Gumtree API** turns three Gumtree classifieds sites —
@@ -214,6 +216,10 @@ print(res.json()["total_results"], "listings")
   build the right `category` and `location` before spending credits on a
   search.
 </Tip>
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ---
 

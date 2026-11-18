@@ -3,6 +3,8 @@ title: "eBay Scraper by ScrapeBadger — Overview"
 description: "Scrape eBay active listings, item details, reviews, and seller data across 18 marketplaces with structured JSON responses."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Scraper API for eBay
 
 Search active listings by keyword or by image, fetch full item detail, list reviews, and retrieve seller profiles, storefronts, and feedback from eBay — one of the world's largest online marketplaces. The API handles authentication, anti-bot bypass, and marketplace routing automatically.
@@ -163,6 +165,10 @@ Auction listings are fully supported across search cards and item detail. When a
 | `buy_it_now_price` | detail | Buy It Now price (an `EbayPrice`); `null` for pure auctions. |
 
 For non-auction (fixed-price) listings, `current_bid`, `end_time_utc`, and `end_time_at` are `null`, and `buy_it_now_price` mirrors `price`. Use [`buying_format=auction`](/api-reference/endpoint/ebay/search) on search, or [`sort_by=ending_soonest`](/api-reference/endpoint/ebay/search), to surface auctions.
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ## Next Steps
 

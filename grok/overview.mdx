@@ -3,6 +3,8 @@ title: "Grok API Overview"
 description: "Ask the real Grok assistant and get structured answers with web citations, X post references, multi-turn conversations, and brand-visibility analysis."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Overview
 
 The ScrapeBadger **Grok API** sends prompts to the real Grok assistant and returns structured JSON. Responses include the answer, cited web sources, X post references, tool usage, follow-up suggestions, and a conversation ID for follow-ups.
@@ -104,6 +106,10 @@ const followUp = await fetch("https://scrapebadger.com/v1/grok/ask", {
 ```
 
 Fetch the normalized history with `GET /v1/grok/conversations/{conversation_id}`. Messages include `id`, `role`, `content`, `created_utc`, and `created_at`.
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ## FAQ
 

@@ -3,6 +3,8 @@ title: "App Store Scraper by ScrapeBadger — Overview"
 description: "Search the App Store, pull full app detail with the star histogram, in-app-purchase list and App Privacy label, read customer reviews, browse a developer's catalogue and the top charts — across 170 storefronts."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Scraper API for the Apple App Store
 
 The ScrapeBadger **App Store API** returns Apple's app catalogue as JSON: full
@@ -132,6 +134,10 @@ print(app["name"], app["version"], app["rating"])
   Search results carry the same ~40 fields as the detail endpoint, so a search
   hit rarely needs a follow-up lookup unless you want `extras`.
 </Tip>
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ---
 

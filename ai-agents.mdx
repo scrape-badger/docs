@@ -107,8 +107,8 @@ ScrapeBadger does not cache or store responses. Each call fetches fresh data and
 
 ## Run long calls asynchronously
 
-Send `Prefer: respond-async, wait=25` on any read request.
-- **If the call finishes within `wait` seconds** (1–120), you get the normal response.
+Add `async=true` to the query string, or send `Prefer: respond-async, wait=25`. This works on almost every endpoint and with any HTTP method.
+- **If the call finishes within the wait** (0–120 s, default 25), you get the normal response.
 - **Otherwise** you get `202` with a `request_id` and `next_action`:
 
   ```json
@@ -118,7 +118,9 @@ Send `Prefer: respond-async, wait=25` on any read request.
 
 Poll `GET /v1/requests/{request_id}`. It is free. It returns `202` while the call runs, then the original status, headers and body. The finished result is held in memory only, never written to disk, for at most 15 minutes so you can collect it.
 
-The call is billed once, when it completes. A call that never completes is never billed. Don't re-send the original request: that runs, and bills, a second call.
+The call is billed once, when it completes. A call that never completes is never billed. Don't re-send the original request: that runs, and bills, a second call. To make a resend safe, give the submit an `Idempotency-Key` header: a resend with the same key returns the first call instead.
+
+To have the result POSTed to your server instead of polling, add `callback_url=https://…`. See [Async requests and webhooks](/long-running-requests).
 
 ## Report a problem
 

@@ -3,6 +3,8 @@ title: "GitHub API"
 description: "Public GitHub user and organization profiles, pinned or popular repositories, README, contribution activity and public repository detail."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 <Note>
   Optional fields depend on public source visibility. Examples illustrate the request
   contract; client timeout settings are not endpoint latency guarantees.
@@ -91,3 +93,7 @@ response costs **10 credits**; health and failed requests cost zero.
 Representative integrations: `scrapebadger github repository cli cli` and
 `github_get_repository(owner="cli", repo="cli")` through MCP.
 See [repository parameters and fields](/github/repositories).
+
+## Run this asynchronously
+
+<AsyncRequests />

@@ -3,6 +3,8 @@ title: "AliExpress API \u2014 Overview"
 description: "AliExpress public ecommerce search, product, seller and review data."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 AliExpress public ecommerce search, product, seller and review data.
 
 Authenticate with `X-API-Key`. Requests use `https://scrapebadger.com/v1/aliexpress`.
@@ -39,3 +41,7 @@ Follow each endpoint’s pagination fields and retain product IDs to deduplicate
 ## Search filters
 
 Keyword, price, sorting and pagination controls are available on Search. The Categories endpoints provide navigation data; category filtering is not offered on Search.
+
+## Run this asynchronously
+
+<AsyncRequests />

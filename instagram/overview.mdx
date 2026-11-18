@@ -3,6 +3,8 @@ title: "Instagram Scraper by ScrapeBadger — Overview"
 description: "Pull public Instagram data — profiles, posts, reels, stories, followers, media, comments, hashtags, locations, audio and search — as clean JSON, with no Instagram login or API key required."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Scraper API for Instagram
 
 The ScrapeBadger **Instagram API** turns `instagram.com` into a clean JSON feed:
@@ -154,6 +156,10 @@ print(res.json()["user"]["follower_count"], "followers")
   [`/users/{username}/posts`](/api-reference/endpoint/instagram/user-posts) by
   passing the returned `next_cursor` back as `cursor` until `has_more` is false.
 </Tip>
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ---
 

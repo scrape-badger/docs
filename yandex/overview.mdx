@@ -3,6 +3,8 @@ title: "Yandex Scraper by ScrapeBadger — Overview"
 description: "Search Yandex's web SERP with organic results, ads, inline images and videos, plus image search and reverse image search — across yandex.com.tr, .com, .ru, .by, .kz and .uz, no Yandex API key required."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Scraper API for Yandex
 
 The ScrapeBadger **Yandex API** turns Yandex Search into a clean JSON feed: the
@@ -109,6 +111,10 @@ print(data["result_count"], "organic results")
   specifically need another country's ranking, and expect a lower clear rate on
   `com`/`ru`.
 </Tip>
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ---
 

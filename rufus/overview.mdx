@@ -3,6 +3,8 @@ title: "Amazon Rufus API Overview"
 description: "Ask Amazon Rufus (Alexa for Shopping) and get complete answers and recommended product cards as structured JSON, with optional ASIN product context."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Overview
 
 The ScrapeBadger **Amazon Rufus API** sends shopping questions to the real **Alexa for Shopping** experience, formerly branded Rufus. It returns the complete answer and any recommended products as structured JSON.
@@ -102,3 +104,7 @@ print(data["products"])
     Track which products Rufus recommends for the buying questions your customers ask.
   </Card>
 </CardGroup>
+
+## Run this asynchronously
+
+<AsyncRequests />

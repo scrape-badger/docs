@@ -1,0 +1,5 @@
+---
+openapi: get /v1/requests/{request_id}
+---
+
+Poll a call you submitted asynchronously. While it runs you get `202` with `Retry-After`; when it finishes you get the call's own status, headers and body. Polling is free. See [Async requests and webhooks](/long-running-requests).
