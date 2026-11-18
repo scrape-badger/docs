@@ -37,7 +37,8 @@ Each async option has a header form and a query-parameter form. They mean the sa
 
 - **If the call finishes within the wait,** you get the normal response.
 - **Otherwise** you get `202 Accepted` with a `request_id`.
-- Without a wait, the call waits 25 s. With a callback and no wait, it waits 0 s, so the `202` comes back at once.
+- Without a wait, the call waits 25 s. A callback with no other async option waits 0 s, so the `202` comes back at once. A callback sent with `Prefer: respond-async` or `async=true` and no wait keeps the 25 s.
+- `async_wait` (or `wait=`) outside 0–120 is clamped to that range.
 - When you send both forms of the same option, the header wins.
 - Put the query parameters in the query string, also on a `POST`. Fields in a JSON body go to the endpoint and are not read as async options.
 - The async parameters are removed before the call reaches the endpoint, so they never change what the endpoint sees or what it costs.
@@ -477,20 +478,24 @@ Async errors answer before the call runs, so they are not billed. The body is `{
 
 | Status | `error` | When |
 |---|---|---|
-| `400` | `invalid_async_param` | `async` or `async_wait` has a value that isn't valid. `async` takes `true` or `1`; `async_wait` takes whole seconds from 0 to 120. |
+| `400` | `invalid_async_param` | `async` or `async_wait` has a value that isn't valid. `async` takes `true`/`1` (or `false`/`0`); `async_wait` takes whole seconds. |
 | `400` | `invalid_callback_url` | The callback URL breaks a [rule above](#callback-url-rules). |
 | `400` | `invalid_idempotency_key` | The key isn't 1–200 visible ASCII characters. |
 | `400` | `async_not_supported` | The route can't run asynchronously (see below). |
 | `400` | `trial_not_allowed` | An unclaimed trial key asked for a webhook. |
 | `409` | `idempotency_key_reused` | The key was already used for a different request. |
+| `400` | `invalid_limit` | `limit` on the delivery list isn't a whole number from 1 to 200. |
+| `503` | `idempotency_unavailable` | The idempotency store couldn't be read. Retry the submit with the same key. |
 | `403` | `full_access_required` | The webhook secret or the delivery list was requested with a key restricted to some APIs. |
 | `404` | `request_not_found` | No such request on this account, or its result has expired. |
 | `404` | `callback_not_found` | The request was submitted without a callback. |
 
-These routes can't run asynchronously and answer `400 async_not_supported` to any async option, in header or query form:
+These routes can't run asynchronously. They answer `400 async_not_supported` to `async`, `async_wait`, `callback_url`, `idempotency_key` and `X-Callback-URL`. A bare `Prefer: respond-async` or `Idempotency-Key` header is ignored there, so clients that send those on every call keep working.
 - `/v1/requests/*`, `/v1/batch`, `/v1/quote`, `/v1/feedback` and `/v1/results/*`;
 - `/v1/account/*`;
-- the Twitter stream routes under `/v1/twitter/stream/*`: managing monitors, webhooks and filter rules, their logs, and the live stream itself.
+- the Twitter stream routes under `/v1/twitter/stream/*`: managing monitors, webhooks and filter rules, their logs, and the live stream itself;
+- `/v1/web/unblock/{job_id}`;
+- every call that changes something (`PUT`, `PATCH`, `DELETE`, and `POST` other than the read endpoints such as the AI `ask` routes and `/v1/web/scrape`).
 
 ## Data retention
 
