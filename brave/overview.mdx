@@ -3,6 +3,8 @@ title: "Brave Search API"
 description: "Search native Brave web results and rich blocks, images, videos and news with locale, safe-search and pagination controls."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 Search Brave's public index with your ScrapeBadger key. Get organic results and
 source-provided rich blocks, including knowledge blocks when available, or use the image, video and news endpoints.
 You do not need a Brave account or a separate Brave API key.
@@ -100,5 +102,11 @@ scrapebadger brave locales
 ```
 
 MCP tools: `brave_search`, `brave_images`, `brave_videos`, `brave_news`, `brave_autocomplete`, `brave_locales`.
+
+## Run this asynchronously
+
+<AsyncRequests />
+
+---
 
 ScrapeBadger is independent and is not affiliated with or endorsed by Brave.

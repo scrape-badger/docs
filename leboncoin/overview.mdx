@@ -3,6 +3,8 @@ title: "Leboncoin Scraper by ScrapeBadger — Overview"
 description: "Scrape Leboncoin classified ads, ad details, sellers, and storefronts across France with region, department, and city filters and structured JSON responses."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Scraper API for Leboncoin
 
 Search classified ads, pull full ad detail, fetch similar ads, and retrieve seller profiles and storefronts from **Leboncoin** — France's largest classifieds marketplace. The API handles authentication, DataDome anti-bot bypass, and French location routing automatically.
@@ -137,6 +139,10 @@ Leboncoin protects its catalog with **DataDome**, which combines IP-reputation s
 <Note>
   For accurate pricing, availability, and DataDome trust, requests are routed through French proxies. This is handled automatically.
 </Note>
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ## Next Steps
 

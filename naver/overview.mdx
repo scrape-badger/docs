@@ -3,6 +3,8 @@ title: "Naver API Overview"
 description: "Search Naver — South Korea's dominant portal — across web, news, blog, cafe, Knowledge iN, image, video and local, plus the full Naver Shopping stack: rankings, catalog search, SmartStore/Brand storefronts, product detail, reviews & Q&A, and Shopping Live. Clean JSON, no Naver API key required."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Overview
 
 The ScrapeBadger **Naver API** turns `naver.com` — the search portal most of
@@ -159,3 +161,7 @@ print(data["result_count"], "results returned")
   (2 credits) to expand a seed term into real Naver queries, then run
   [`/search`](/api-reference/endpoint/naver/search) on each suggestion.
 </Tip>
+
+## Run this asynchronously
+
+<AsyncRequests />

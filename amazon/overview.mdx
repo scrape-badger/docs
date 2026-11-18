@@ -3,6 +3,8 @@ title: "Amazon Scraper by ScrapeBadger — Overview"
 description: "Scrape Amazon products, offers, reviews, listings, and seller data across 20 marketplaces with structured JSON responses."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Scraper API for Amazon
 
 Search products, fetch full product detail, list offers and reviews, pull bestsellers, new releases, and deals, and retrieve seller storefronts from Amazon — the world's largest online marketplace. The API handles authentication, anti-bot bypass, and marketplace routing automatically.
@@ -145,6 +147,10 @@ Amazon protects its catalog with AWS WAF, IP-reputation scoring, and TLS/HTTP-2 
 <Note>
   For accurate pricing and availability, requests are routed through residential proxies in the marketplace's country. This is handled automatically based on the `domain` parameter.
 </Note>
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ## Next Steps
 

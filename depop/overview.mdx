@@ -3,6 +3,8 @@ title: "Depop Scraper by ScrapeBadger — Overview"
 description: "Scrape Depop second-hand fashion across 10 markets — search items, pull full product detail, and look up seller shops and their listings — as structured JSON."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Scraper API for Depop
 
 Search **second-hand fashion** items, pull **full product detail** (title, description, brand, condition, price, and photos), and look up **seller shops** and their listings across Depop's **10 localised markets** — US, UK, Australia, Ireland, Italy, France, Germany, Spain, Netherlands, and New Zealand. Authentication, anti-bot bypass, and market localisation are handled automatically.
@@ -125,6 +127,10 @@ Depop serves all of its data through a browser-rendered front end. ScrapeBadger 
 <Note>
   Because every response is served through a real browser, Depop requests take a **few seconds** each — slower than plain-HTTP scrapers.
 </Note>
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ## Next Steps
 

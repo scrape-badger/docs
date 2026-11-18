@@ -3,6 +3,8 @@ title: "Immobiliare.it Scraper by ScrapeBadger — Overview"
 description: "Scrape Immobiliare Group real-estate listings, full property detail, agency profiles, and €/m² price insights across Italy, Spain, Greece, and Luxembourg with structured JSON responses."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Scraper API for Immobiliare.it
 
 Search listings, pull full property detail, fetch agency profiles and their active inventory, and read €/m² price-history insights from **Immobiliare.it** — Italy's #1 real-estate portal — and the whole **Immobiliare Group**. One API covers four portals that share the same platform: Italy (`immobiliare.it`), Spain (`indomio.es`), Greece (`indomio.gr`), and Luxembourg (`immotop.lu`). ScrapeBadger handles authentication, rotating proxies, anti-bot evasion, and parsing automatically — no upstream API key required.
@@ -131,6 +133,10 @@ Credits are charged per request (see the table above) and reported on the `X-Cre
 ## Anti-Bot & Proxies
 
 Immobiliare Group portals protect their catalog with IP-reputation scoring and TLS/HTTP fingerprinting. ScrapeBadger clears these automatically using rotating proxies and browser fingerprint rotation on market-appropriate sessions. You never manage proxies, sessions, or CAPTCHAs, and you never need an upstream API key.
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ## Next Steps
 

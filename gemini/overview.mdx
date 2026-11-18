@@ -3,6 +3,8 @@ title: "Gemini API Overview"
 description: "Ask the real gemini.google.com a question and get the answer back as structured JSON — with the web sources it cited, anchored to the exact text they support. No Google account or API key required."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Overview
 
 The ScrapeBadger **Gemini API** sends a prompt to **the real `gemini.google.com`** —
@@ -156,6 +158,10 @@ print(data["source_domains"])
     each model cites is a diff, not a project.
   </Card>
 </CardGroup>
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ## FAQ
 

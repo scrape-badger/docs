@@ -3,6 +3,8 @@ title: "Yelp Search API"
 description: "Search ranked Yelp businesses for any location with ratings, review counts, categories, price, address and opening hours. Ads come back separately."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 Search the public Yelp business listings a visitor sees for a location, with your ScrapeBadger key.
 Results keep Yelp's own ranking; sponsored listings are returned separately. You do not need a Yelp
 account or a Yelp Places API key. Business detail pages and reviews are not part of this API.
@@ -117,3 +119,7 @@ page, or its own no-results page. A search Yelp itself marks as having no result
 | `403 insufficient_scope` | The key does not include the `yelp` scope. |
 | `422` | Invalid or unsupported input, or `filter_not_applied`. Not billed. |
 | `503 source_unavailable` | Yelp did not return a verified search page. Not billed; retry later. |
+
+## Run this asynchronously
+
+<AsyncRequests />

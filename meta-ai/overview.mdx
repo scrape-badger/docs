@@ -3,6 +3,8 @@ title: "Meta AI API Overview"
 description: "Ask the real Meta AI assistant (meta.ai) a question and get its answer as structured JSON. Anonymous: no Meta account needed."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Overview
 
 The ScrapeBadger **Meta AI API** sends a prompt to the real **Meta AI** assistant at `meta.ai` (the Muse Spark model family) and returns its answer as structured JSON. This is the consumer assistant people use on meta.ai, not Meta's developer model API.
@@ -116,3 +118,7 @@ print(data["answer"])
     The assistant modes Meta AI serves anonymously.
   </Card>
 </CardGroup>
+
+## Run this asynchronously
+
+<AsyncRequests />

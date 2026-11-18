@@ -3,6 +3,8 @@ title: "LoopNet Scraper by ScrapeBadger — Overview"
 description: "Scrape LoopNet commercial real estate across 5 markets (US, CA, UK, FR, ES) — for-lease, for-sale, and auction listings with full detail, spaces, broker contacts, and media — as structured JSON."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Scraper API for LoopNet
 
 Search **for-lease**, **for-sale**, and **auction** commercial listings, pull **full listing detail** (rent/price with $/SF, building class and size, spaces, amenities, walk score, photos and 3D tours, the complete facts table), and look up **broker profiles** across **loopnet.com (US)**, **loopnet.ca (CA)**, **loopnet.co.uk (UK)**, **loopnet.fr (FR)**, and **loopnet.es (ES)** — the widest LoopNet commercial-real-estate API. Authentication, anti-bot bypass, and market routing are handled automatically.
@@ -141,6 +143,10 @@ Every listing carries a deep set of structured fields:
 | **Context** | `spaces[]` (per-unit size/rent/term/floor), `brokers[]` (name, company, phone, email), `amenities[]`, `highlights[]`, `additional_facts[]` (the full LoopNet facts table) |
 
 Search returns each result as a `ListingCard`; the [listing detail](/api-reference/endpoint/loopnet/get-listing-detail) endpoint returns a `ListingDetail` that adds spaces, amenities, media, and every fact LoopNet publishes. All datetime fields ship both as Unix timestamps (`*_utc`) and ISO-8601 strings (`*_at`).
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ## Next Steps
 

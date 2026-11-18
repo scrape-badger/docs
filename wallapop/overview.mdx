@@ -3,6 +3,8 @@ title: "Wallapop Scraper by ScrapeBadger — Overview"
 description: "Scrape Wallapop second-hand listings in Spain, Italy, and Portugal — search with Wallapop's own filters (cars included), pull full listing detail, and look up seller profiles, listings, and reviews — as structured JSON."
 ---
 
+import AsyncRequests from "/snippets/async-requests.mdx";
+
 ## Scraper API for Wallapop
 
 Search **second-hand listings** with Wallapop's own filters, pull **full listing detail** (description, attributes, photos, views, and favorites), and look up **seller profiles**, their live listings, and the **reviews** they received across Wallapop's **3 markets** — Spain, Italy, and Portugal. Prices are in EUR.
@@ -156,6 +158,10 @@ All requests require your API key in the `X-API-Key` header:
 curl "https://scrapebadger.com/v1/wallapop/items/nzxeknm5x562" \
   -H "X-API-Key: YOUR_API_KEY"
 ```
+
+## Run this asynchronously
+
+<AsyncRequests />
 
 ## Next Steps
 
