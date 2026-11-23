@@ -113,7 +113,8 @@
             "group": "Search",
             "pages": [
               "api-reference/google/google-search/google-web-search",
-              "api-reference/endpoint/google/light-search"
+              "api-reference/endpoint/google/light-search",
+              "api-reference/endpoint/google/resolve"
             ]
           },
           {

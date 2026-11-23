@@ -28,11 +28,23 @@ Set `output=html` to receive the raw Google response instead of parsed JSON.
 
 `search_information.organic_results_state` is `Results for exact spelling`, `Results for spelling correction` (Google showed results for a corrected spelling), `Results with suggested correction` (Google suggested a spelling with "Did you mean" but kept your query) or `no_results`. `total_results` and `time_taken` are filled only when Google prints them. Light usually gets Google's basic page, which shows no result count or search time, so both are often `null` on Light. Use [regular Search](/api-reference/google/google-search/google-web-search) when you need them.
 
-Light attempts to resolve every organic result URL within one short lookup
-budget, without waiting for Google's verification timers. If Google delays a
-link or changes its response, that link can remain a `google.com/goto` redirect.
-Every result keeps its position. Treat a redirect as an unresolved destination
-when tracking rankings; do not count `google.com` as the ranking website.
+Google hides a result's URL behind a redirect link
+(`https://www.google.com/goto?url=...`) and paces how fast the links of a
+result page can be followed. Light answers within seconds and does not wait for
+that. Today it returns the real URL for the first one to four results of a
+result page. Each other `organic_results` item has a `link` that is still a
+Google redirect, and two more fields:
+
+- `link_token`: send it to
+  [`POST /v1/google/resolve`](/api-reference/endpoint/google/resolve) to get
+  the result's own URL. Resolving costs 0 credits.
+- `retry_after_seconds`: how long to wait before resolving this link. `0` means
+  you can send it right away.
+
+Both fields are `null` on a result whose `link` is already the real URL. Every
+result keeps its position. When you track rankings, do not count `google.com`
+as the ranking website of a result whose `link` is a Google redirect. Resolve
+the link first.
 
 Light has a 12-second processing budget, including fetching, fallback and
 parsing. If the budget expires, the response is `503` with `Retry-After`.
