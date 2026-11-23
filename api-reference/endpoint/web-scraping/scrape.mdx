@@ -379,6 +379,44 @@ per host and applies it for you:
 - **When an override stops working**, the search runs again and replaces it only
   if the new configuration does measurably better.
 
+### Waiting for a search to finish
+
+A `422` that says `discovering` also names the search: `unblock_job_id` in the
+body and the `X-Unblock-Job` header. Sending the same request again while the
+search is running gets the same block, so poll the job and retry when it is
+done. A search usually takes about a minute; a site that only a browser gets
+through is at the long end of that.
+
+```bash
+curl "https://scrapebadger.com/v1/web/unblock/d1b44a702e16a753" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+```json
+{
+  "job_id": "d1b44a702e16a753",
+  "status": "unblocked",
+  "origin": "shop.example.com",
+  "detected_vendor": "cloudflare",
+  "attempts": 9,
+  "total_combos": 24,
+  "progress": [],
+  "winning_override_id": "1b697b4c-d33a-417c-ad6a-a4f8d1d1d477",
+  "error": null,
+  "poll_url": "/v1/web/unblock/d1b44a702e16a753"
+}
+```
+
+| `status` | Meaning | What to do |
+|---|---|---|
+| `running` | The search is still trying configurations | Poll again in a few seconds |
+| `unblocked` | A working configuration was saved for the host | Send your request again, a few seconds later |
+| `kept` | The host already had a configuration; it was re-checked and nothing better was found | Send your request again: the existing configuration does not get through every time |
+| `failed` | Nothing got through | The host goes on `cooldown`; contact support if you need it |
+
+The poll is free and is not rate limited. It answers `404` for a few seconds
+after the `422`, until the search has started: keep polling.
+
 ## Response
 
 <ResponseField name="success" type="boolean">
@@ -802,7 +840,7 @@ Infinite scroll:
 | `200` with `success: false` | `error: "fetch_failed"`: no response from the target at all, including when no proxy exit is available in the requested `country`. Never charged. |
 | `400` | Invalid URL (including a hostname confirmed not to exist), cost exceeds `max_cost`, or requested engine not available. Never charged. |
 | `402` | Insufficient credits |
-| `422` | Blocking detected after all retries exhausted (`error: "blocking_page_detected"`, with `block_kind`, `vendor`, `vendors`, `unblock` and, for a CAPTCHA wall, the gating `captcha` at the top level; the scrape result is in `data`). `vendors` lists every protection vendor seen on the page, the block's own first: a site can put two in front of one page, such as a Cloudflare challenge before PerimeterX. A request that runs out of time while retrying (about 165 s) returns this 422 rather than a gateway timeout; the `wait_for` selector never appeared (`error: "wait_for_timeout"`); a `js_scenario` step failed (`error: "js_scenario_failed"`); or the body contained an unknown field (`error: "unknown_request_field"`). Never charged. |
+| `422` | Blocking detected after all retries exhausted (`error: "blocking_page_detected"`, with `block_kind`, `vendor`, `vendors`, `unblock` (plus `unblock_job_id` while a search is running) and, for a CAPTCHA wall, the gating `captcha` at the top level; the scrape result is in `data`). `vendors` lists every protection vendor seen on the page, the block's own first: a site can put two in front of one page, such as a Cloudflare challenge before PerimeterX. A request that runs out of time while retrying (about 165 s) returns this 422 rather than a gateway timeout; the `wait_for` selector never appeared (`error: "wait_for_timeout"`); a `js_scenario` step failed (`error: "js_scenario_failed"`); or the body contained an unknown field (`error: "unknown_request_field"`). Never charged. |
 | `429` | Rate limit exceeded |
 | `500` | Unexpected server error |
 
@@ -907,6 +945,7 @@ There is no `return_cookies` or `form_data` parameter. To read cookies use
   "vendor": "perimeterx",
   "vendors": ["perimeterx"],
   "unblock": "discovering",
+  "unblock_job_id": "d1b44a702e16a753",
   "captcha": {
     "system": "perimeterx_press_hold",
     "confidence": 0.95,
