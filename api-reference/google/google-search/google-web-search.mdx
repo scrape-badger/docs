@@ -51,14 +51,44 @@ fresh one and otherwise fails with 502, unbilled. Separate requests with
 
 ## Google redirect links
 
-Search attempts to resolve every organic result URL within one short lookup
-budget, without waiting for Google's verification timers. If Google delays a
-link or changes its response, that link can remain a `google.com/goto` redirect.
-Rich-feature links can also remain redirects.
+Google hides a result's URL behind a redirect link
+(`https://www.google.com/goto?url=...`). It also paces how fast the links of a
+result page can be followed: a few at once, the rest over about a minute, and
+every link once the result page is about 160 seconds old. A search answers
+within seconds and does not wait for that.
 
-Every result keeps its position. Treat a Google redirect as an unresolved
-destination when tracking rankings; do not count `google.com` as the ranking
-website. This policy applies to full Search, `mode=fast` and Light Search.
+Today a search returns the real URL for the first few results of a
+result page, usually one to three. Each other `organic_results` item has a `link` that is still a
+Google redirect, and two more fields:
+
+| Field | Type | Meaning |
+|---|---|---|
+| `link_token` | string | Send it to [`POST /v1/google/resolve`](/api-reference/endpoint/google/resolve) to get the result's own URL. |
+| `retry_after_seconds` | integer | How long to wait before resolving this link. `0` means you can send it right away. |
+
+Both fields are `null` on a result whose `link` is already the real URL.
+
+```json
+{
+  "position": 5,
+  "title": "Pricing - Example",
+  "link": "https://www.google.com/goto?url=...",
+  "link_token": "sbl1.MTc5NTQ2NDAwMHx8Q0FFU2xBRUJ4Q0pG...",
+  "retry_after_seconds": 0
+}
+```
+
+Resolving costs 0 credits. See
+[Resolve Google result links](/api-reference/endpoint/google/resolve) for the
+request, the response rows and the recommended loop.
+
+Every result keeps its position. When you track rankings, do not count
+`google.com` as the ranking website of a result whose `link` is a Google
+redirect. Resolve the link first. This applies to `/v1/google/search` and
+`/v1/google/light/search`.
+
+Links in other blocks of the response can also be Google redirects. Only
+`organic_results` items have a `link_token`.
 
 ## People Also Ask answers
 

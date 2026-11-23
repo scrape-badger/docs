@@ -1,0 +1,196 @@
+---
+title: "Resolve Google result links"
+openapi: "POST /v1/google/resolve"
+description: "Get the real URL of each Google search result whose link is still a Google redirect."
+---
+
+Send the `link_token` of a search result here to get the result's own URL.
+[Google Search](/api-reference/google/google-search/google-web-search) and
+[Google Light Search](/api-reference/endpoint/google/light-search) set a
+`link_token` on each `organic_results` item whose `link` is still a Google
+redirect (`https://www.google.com/goto?url=...`). One call takes 1 to 25
+results. Each result comes back with its own URL in `link`, with the time to
+wait before you send it again, or with an `error`.
+
+A call costs **0 credits**.
+
+## Where a `link_token` comes from
+
+Google hides a result's URL behind a redirect link. It also paces how fast the
+links of a result page can be followed: a few at once, the rest over about a
+minute, and every link once the result page is about 160 seconds old. A
+search answers within seconds and does not wait for that.
+
+Today a search returns the real URL for the first few results of a result
+page, usually one to three. Each of the other results has two more fields:
+
+| Field | Type | Meaning |
+|---|---|---|
+| `link_token` | string | Send it to this endpoint to get the result's own URL. |
+| `retry_after_seconds` | integer | How long to wait before resolving this link. `0` means you can send it right away. |
+
+Both fields are `null` on a result whose `link` is already the real URL.
+
+## Body parameters
+
+<ParamField body="results" type="object[]" required>
+  The results to resolve. Send 1 to 25 items.
+
+  Each item needs a non-empty string `link_token`. Any other fields on an item
+  (`position`, `title`, your own id) are returned unchanged on its row. You can
+  send the `organic_results` items of a search response as they are. Leave out
+  the items whose `link_token` is `null`.
+
+  <Expandable title="item fields">
+    <ParamField body="link_token" type="string" required>
+      The `link_token` of a result. Take it from a search response, or from the
+      row of an earlier call to this endpoint.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+## Response
+
+The response has two fields:
+
+- `results`: one row per item, in the order sent.
+- `retry_after_seconds`: the smallest wait among the not-ready rows, or `null`
+  when no row is waiting.
+
+Each row is one of three kinds:
+
+| Row | How to tell | What to do |
+|---|---|---|
+| Resolved | No `link_token`. `link` is the result's own URL. | Use `link`. |
+| Not ready | `link_token` and `retry_after_seconds` (1 or more). | Wait that many seconds, then send the row's `link_token` again. The token can differ from the one you sent. Always keep the latest. |
+| Failed | `link_token` and `error`. | Do not send it again. Run the search again if you need the link. |
+
+```json
+{
+  "results": [
+    { "position": 2, "link": "https://example.com/pricing" },
+    {
+      "position": 3,
+      "link_token": "sbl1.MTc5NTQ2NDAwMHx8Q0FFU2xBRUJ4Q0pG...",
+      "retry_after_seconds": 12
+    },
+    {
+      "position": 4,
+      "link_token": "sbl1.MTc5NTQ2NDAwMHx8Q0FFU2xBRUJ4Q0pG...",
+      "error": "Google no longer answers this link. Run the search again for a fresh token."
+    }
+  ],
+  "retry_after_seconds": 12
+}
+```
+
+The call never waits for Google. It answers in about a second.
+
+A token sent before its wait is over is not an error and costs nothing. Its row
+comes back not ready, with the wait that is left.
+
+## Recommended loop
+
+1. Send the results that have a `link_token`.
+2. Keep the rows that still have a `link_token` and no `error`. Every other row
+   is final.
+3. If no rows are left, stop.
+4. Wait the number of seconds in the response's top-level
+   `retry_after_seconds`, then send the rows you kept. Go back to step 2.
+
+In the SDKs, `resolve_all` (Python) and `resolveAll` (Node) keep calling until
+every link is resolved or the time is up. See the [examples](#examples).
+
+## Timing
+
+Measured on 2026-11-23:
+
+| Method | Calls | All ten links of the result page known |
+|---|---|---|
+| Call again after each top-level `retry_after_seconds` | 5 | 46 seconds after the search |
+| Call once, wait for the longest row's `retry_after_seconds`, call again | 2 | 49 seconds after the search |
+| Wait until the result page is 160 seconds old, then call once | 1 | 163 seconds after the search |
+
+A token can be resolved much later too. Links were resolved 22 hours after
+their search. Google can stop answering an old link. That link comes back as a
+failed row, with `error`.
+
+## Errors
+
+| Status | Meaning |
+|---|---|
+| `422` | The body is invalid: no `results`, more than 25 items, or an item without `link_token`. |
+| `503` | Link resolution is temporarily unavailable. The response has a `Retry-After` header. Wait that long, then call again. |
+
+The async request forms (`async`, `callback_url`) are not available on this
+endpoint.
+
+## Examples
+
+The SDK examples need `scrapebadger` 0.82.0 or later, on PyPI and on npm.
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST 'https://scrapebadger.com/v1/google/resolve' \
+  -H 'x-api-key: YOUR_API_KEY' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "results": [
+      {"position": 2, "link_token": "sbl1.MTc5NTQ2NDAwMHx8Q0FFU2xBRUJ4Q0pG..."},
+      {"position": 3, "link_token": "sbl1.MTc5NTQ2NDAwMHx8Q0FFU2xBRUJ4Q0pG..."},
+      {"position": 4, "link_token": "sbl1.MTc5NTQ2NDAwMHx8Q0FFU2xBRUJ4Q0pG..."}
+    ]
+  }'
+```
+
+```python Python
+from scrapebadger import ScrapeBadger  # SDK 0.82.0 or later
+
+async with ScrapeBadger(api_key="YOUR_API_KEY") as client:
+    serp = await client.google.search.search("vinted api")
+
+    # One call. Send only the results that have a link_token.
+    pending = [r for r in serp["organic_results"] if r.get("link_token")]
+    if pending:
+        response = await client.google.search.resolve(pending)
+        print(response["results"], response["retry_after_seconds"])
+
+    # Or keep calling until every link is resolved or 240 seconds have passed.
+    results = await client.google.search.resolve_all(
+        serp["organic_results"], max_wait=240.0
+    )
+    for r in results:
+        if r.get("error"):
+            print(r["position"], "failed:", r["error"])
+        elif r.get("link_token"):
+            print(r["position"], "not ready, wait", r["retry_after_seconds"], "s")
+        else:
+            print(r["position"], r["link"])
+```
+
+```typescript Node
+import { ScrapeBadger } from 'scrapebadger' // SDK 0.82.0 or later
+
+const client = new ScrapeBadger({ apiKey: 'YOUR_API_KEY' })
+
+const serp = await client.google.search.search({ q: 'vinted api' })
+const organic = serp.organic_results as any[]
+
+// One call. Send only the results that have a link_token.
+const pending = organic.filter((r) => r.link_token)
+if (pending.length > 0) {
+  const response = await client.google.search.resolve({ results: pending })
+  console.log(response.results, response.retry_after_seconds)
+}
+
+// Or keep calling until every link is resolved or 240 seconds have passed.
+const results = await client.google.search.resolveAll(organic, { maxWaitMs: 240000 })
+for (const r of results) {
+  if (r.error) console.log(r.position, 'failed:', r.error)
+  else if (r.link_token) console.log(r.position, 'not ready, wait', r.retry_after_seconds, 's')
+  else console.log(r.position, r.link)
+}
+```
+
+</CodeGroup>

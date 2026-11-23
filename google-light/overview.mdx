@@ -38,10 +38,15 @@ same query and locale.
 scrapebadger google light-search "vinted api" --gl us --hl en
 ```
 
-Light attempts to resolve every organic result URL within one short lookup
-budget and skips Google's verification timers. Unresolved links remain
-`google.com/goto` redirects. All results and ranks are retained.
-See [redirect-link behavior](/api-reference/google/google-search/google-web-search#google-redirect-links).
+Google hides a result's URL behind a redirect link
+(`https://www.google.com/goto?url=...`) and paces how fast the links of a
+result page can be followed. Light does not wait for that. Today it returns the
+real URL for the first few results of a result page, usually one to three. Each other
+`organic_results` item has a `link` that is still a Google redirect, a
+`link_token` and a `retry_after_seconds`. Send the `link_token` to
+[`POST /v1/google/resolve`](/api-reference/endpoint/google/resolve) to get the
+result's own URL. Resolving costs 0 credits. All results and ranks are retained.
+See [Google redirect links](/api-reference/google/google-search/google-web-search#google-redirect-links).
 
 The MCP tool is `google_light_search`. Both the CLI and MCP call the dedicated
 Light endpoint. Existing `/search?mode=fast` clients still work, but that is

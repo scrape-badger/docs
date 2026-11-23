@@ -6315,6 +6315,125 @@
         },
         "x-availability": "active"
       }
+    },
+    "/v1/google/resolve": {
+      "post": {
+        "tags": [
+          "Google Search"
+        ],
+        "summary": "Resolve Google result links",
+        "description": "Get the real URLs of search results whose `link` is still a Google redirect (`https://www.google.com/goto?url=...`).\n\nSend the `link_token` values from a Google Search or Light Search response, 1 to 25 results per call. Each row comes back in the order sent, as one of:\n\n- **resolved**: no `link_token`; `link` is the result's own URL.\n- **not ready**: `link_token` and `retry_after_seconds`. Wait that long, then send the row's `link_token` again. The token can differ from the one sent: always keep the latest.\n- **failed**: `link_token` and `error`. Do not send it again; run the search again if you need the link.\n\nThe call never waits for Google and answers in about a second. A token sent before its wait is over is not an error and costs nothing: the row comes back not ready with the wait that is left.\n\nCosts 0 credits. The async request forms (`async`, `callback_url`) are not available on this endpoint.",
+        "operationId": "google_resolve_api_v1_resolve_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResolveRequest"
+              },
+              "examples": {
+                "tokens": {
+                  "summary": "Three results from one search",
+                  "value": {
+                    "results": [
+                      {
+                        "position": 2,
+                        "link_token": "sbl1.MTc5NTQ2NDAwMHx8Q0FFU2xBRUJ4Q0pG..."
+                      },
+                      {
+                        "position": 3,
+                        "link_token": "sbl1.MTc5NTQ2NDAwMHx8Q0FFU2xBRUJ4Q0pG..."
+                      },
+                      {
+                        "position": 4,
+                        "link_token": "sbl1.MTc5NTQ2NDAwMHx8Q0FFU2xBRUJ4Q0pG..."
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleResolveResponse"
+                },
+                "examples": {
+                  "mixed": {
+                    "summary": "One resolved row, one not-ready row, one failed row",
+                    "value": {
+                      "results": [
+                        {
+                          "position": 2,
+                          "link": "https://example.com/pricing"
+                        },
+                        {
+                          "position": 3,
+                          "link_token": "sbl1.MTc5NTQ2NDAwMHx8Q0FFU2xBRUJ4Q0pG...",
+                          "retry_after_seconds": 12
+                        },
+                        {
+                          "position": 4,
+                          "link_token": "sbl1.MTc5NTQ2NDAwMHx8Q0FFU2xBRUJ4Q0pG...",
+                          "error": "Google no longer answers this link. Run the search again for a fresh token."
+                        }
+                      ],
+                      "retry_after_seconds": 12
+                    }
+                  },
+                  "resolved": {
+                    "summary": "Every row resolved",
+                    "value": {
+                      "results": [
+                        {
+                          "position": 2,
+                          "link": "https://example.com/pricing"
+                        },
+                        {
+                          "position": 3,
+                          "link": "https://example.org/docs/api"
+                        },
+                        {
+                          "position": 4,
+                          "link": "https://example.net/blog/guide"
+                        }
+                      ],
+                      "retry_after_seconds": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error: the body has no `results`, more than 25 items, or an item without `link_token`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Link resolution is temporarily unavailable. Wait the time in the `Retry-After` header, then call again.",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds to wait before calling again.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          }
+        },
+        "x-availability": "active"
+      }
     }
   },
   "components": {
@@ -10682,6 +10801,32 @@
             "type": "string",
             "title": "Link"
           },
+          "link_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Set when `link` is still a Google redirect (`https://www.google.com/goto?url=...`). Send it to `POST /v1/google/resolve` to get the result's own URL. `null` when `link` is already the real URL.",
+            "title": "Link Token"
+          },
+          "retry_after_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Set with `link_token`: how long to wait, in seconds, before resolving this link. `0` means it can be sent to `POST /v1/google/resolve` right away. `null` when `link` is already the real URL.",
+            "title": "Retry After Seconds"
+          },
           "displayed_link": {
             "anyOf": [
               {
@@ -14839,6 +14984,103 @@
         ],
         "title": "AiModeLocation",
         "description": "What a located AI Mode request asked for and what Google received."
+      },
+      "ResolveItem": {
+        "properties": {
+          "link_token": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Link Token",
+            "description": "The `link_token` of an organic result, from a Google Search or Light Search response or from an earlier resolve response."
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "link_token"
+        ],
+        "title": "ResolveItem",
+        "description": "One result to resolve: its `link_token`, plus any other fields. The other fields are returned unchanged on its row."
+      },
+      "ResolveRequest": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/ResolveItem"
+            },
+            "type": "array",
+            "maxItems": 25,
+            "minItems": 1,
+            "title": "Results",
+            "description": "The results to resolve, 1 to 25 items. Each item needs a non-empty string `link_token`. Any other fields on an item (`position`, `title`, your own id) are returned unchanged on its row, so a search response's `organic_results` items can be sent as they are."
+          }
+        },
+        "type": "object",
+        "required": [
+          "results"
+        ],
+        "title": "ResolveRequest",
+        "description": "Request body of `POST /v1/google/resolve`."
+      },
+      "ResolvedItem": {
+        "properties": {
+          "link": {
+            "type": "string",
+            "title": "Link",
+            "description": "On a resolved row: the result's own URL. On any other row: the `link` that was sent, if any."
+          },
+          "link_token": {
+            "type": "string",
+            "title": "Link Token",
+            "description": "Not present on a resolved row. On a not-ready row: the token to send next time. It can differ from the one sent, so always keep the latest. A failed row has it together with `error`."
+          },
+          "retry_after_seconds": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Retry After Seconds",
+            "description": "Only on a not-ready row: how long to wait, in seconds, before sending the row's `link_token` again."
+          },
+          "error": {
+            "type": "string",
+            "title": "Error",
+            "description": "Only on a failed row: why the link could not be resolved. Do not send this `link_token` again. Run the search again if you need the link."
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "title": "ResolvedItem",
+        "description": "One row of the response. Resolved: no `link_token`, and `link` is the result's own URL. Not ready: `link_token` and `retry_after_seconds`. Failed: `link_token` and `error`. Other fields sent on the item are returned unchanged."
+      },
+      "GoogleResolveResponse": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/ResolvedItem"
+            },
+            "type": "array",
+            "title": "Results",
+            "description": "One row per item sent, in the order sent."
+          },
+          "retry_after_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retry After Seconds",
+            "description": "The smallest wait, in seconds, among the not-ready rows. `null` when no row is waiting."
+          }
+        },
+        "type": "object",
+        "required": [
+          "results",
+          "retry_after_seconds"
+        ],
+        "title": "GoogleResolveResponse",
+        "description": "Response of `POST /v1/google/resolve`."
       }
     },
     "securitySchemes": {
