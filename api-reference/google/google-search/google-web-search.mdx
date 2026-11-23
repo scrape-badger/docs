@@ -54,11 +54,11 @@ fresh one and otherwise fails with 502, unbilled. Separate requests with
 Google hides a result's URL behind a redirect link
 (`https://www.google.com/goto?url=...`). It also paces how fast the links of a
 result page can be followed: a few at once, the rest over about a minute, and
-every link once the result page is about three minutes old. A search answers
+every link once the result page is about 160 seconds old. A search answers
 within seconds and does not wait for that.
 
-Today a search returns the real URL for the first one to four results of a
-result page. Each other `organic_results` item has a `link` that is still a
+Today a search returns the real URL for the first few results of a
+result page, usually one to three. Each other `organic_results` item has a `link` that is still a
 Google redirect, and two more fields:
 
 | Field | Type | Meaning |

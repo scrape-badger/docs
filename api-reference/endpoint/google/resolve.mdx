@@ -18,11 +18,11 @@ A call costs **0 credits**.
 
 Google hides a result's URL behind a redirect link. It also paces how fast the
 links of a result page can be followed: a few at once, the rest over about a
-minute, and every link once the result page is about three minutes old. A
+minute, and every link once the result page is about 160 seconds old. A
 search answers within seconds and does not wait for that.
 
-Today a search returns the real URL for the first one to four results of a
-result page. Each of the other results has two more fields:
+Today a search returns the real URL for the first few results of a result
+page, usually one to three. Each of the other results has two more fields:
 
 | Field | Type | Meaning |
 |---|---|---|
@@ -105,10 +105,11 @@ every link is resolved or the time is up. See the [examples](#examples).
 
 Measured on 2026-11-23:
 
-| Method | Result |
-|---|---|
-| Call again after each `retry_after_seconds` | All ten links of a result page were known 46 seconds after the search in one run (5 calls) and 49 seconds after the search in another (2 calls). |
-| Wait until the result page is 160 seconds old | One call returned all nine remaining links. |
+| Method | Calls | All ten links of the result page known |
+|---|---|---|
+| Call again after each top-level `retry_after_seconds` | 5 | 46 seconds after the search |
+| Call once, wait for the longest row's `retry_after_seconds`, call again | 2 | 49 seconds after the search |
+| Wait until the result page is 160 seconds old, then call once | 1 | 163 seconds after the search |
 
 A token can be resolved much later too. Links were resolved 22 hours after
 their search. Google can stop answering an old link. That link comes back as a

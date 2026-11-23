@@ -31,8 +31,8 @@ Set `output=html` to receive the raw Google response instead of parsed JSON.
 Google hides a result's URL behind a redirect link
 (`https://www.google.com/goto?url=...`) and paces how fast the links of a
 result page can be followed. Light answers within seconds and does not wait for
-that. Today it returns the real URL for the first one to four results of a
-result page. Each other `organic_results` item has a `link` that is still a
+that. Today it returns the real URL for the first few results of a
+result page, usually one to three. Each other `organic_results` item has a `link` that is still a
 Google redirect, and two more fields:
 
 - `link_token`: send it to

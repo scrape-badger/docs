@@ -41,7 +41,7 @@ scrapebadger google light-search "vinted api" --gl us --hl en
 Google hides a result's URL behind a redirect link
 (`https://www.google.com/goto?url=...`) and paces how fast the links of a
 result page can be followed. Light does not wait for that. Today it returns the
-real URL for the first one to four results of a result page. Each other
+real URL for the first few results of a result page, usually one to three. Each other
 `organic_results` item has a `link` that is still a Google redirect, a
 `link_token` and a `retry_after_seconds`. Send the `link_token` to
 [`POST /v1/google/resolve`](/api-reference/endpoint/google/resolve) to get the
