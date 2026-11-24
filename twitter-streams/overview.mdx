@@ -33,11 +33,13 @@ Both deliver tweets via **WebSocket** and/or **Webhook** with sub-second latency
 
 ### WebSocket
 
-Connect to `wss://scrapebadger.com/v1/twitter/stream` with your API key to receive real-time tweet events.
+Connect to `wss://scrapebadger.com/v1/twitter/stream` with your API key in the `x-api-key` header to receive real-time tweet events.
 
 ```bash
-wscat -c "wss://scrapebadger.com/v1/twitter/stream?api_key=YOUR_API_KEY"
+wscat -c "wss://scrapebadger.com/v1/twitter/stream" -H "x-api-key: YOUR_API_KEY"
 ```
+
+Clients that can't set headers, such as the browser `WebSocket` API, can pass the key as `?api_key=YOUR_API_KEY` instead. See [WebSocket delivery](/twitter-streams/websocket).
 
 Each message is a JSON object containing the tweet data, monitor/rule metadata, and timing information.
 
