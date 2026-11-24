@@ -428,7 +428,11 @@ after the `422`, until the search has started: keep polling.
 </ResponseField>
 
 <ResponseField name="status_code" type="integer">
-  HTTP status code from the target URL.
+  HTTP status code from the target URL. When the target answers with its own
+  error, such as `404` or `410` for a page that does not exist, you get that
+  answer as it is: a `200` response with `success: true`, the target's
+  `status_code`, and its body in `content` (which can be empty). It is charged
+  like any other page. Only a block by the site's bot protection is a `422`.
 </ResponseField>
 
 <ResponseField name="content" type="string">
@@ -837,6 +841,7 @@ Infinite scroll:
 
 | Status | Description |
 |--------|-------------|
+| `200` with a `4xx` `status_code` | The target's own answer, for example `404` for a page that does not exist. Charged like any other page. |
 | `200` with `success: false` | `error: "fetch_failed"`: no response from the target at all, including when no proxy exit is available in the requested `country`. Never charged. |
 | `400` | Invalid URL (including a hostname confirmed not to exist), cost exceeds `max_cost`, or requested engine not available. Never charged. |
 | `402` | Insufficient credits |
