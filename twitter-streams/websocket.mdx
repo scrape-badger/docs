@@ -9,15 +9,22 @@ Connect to the ScrapeBadger WebSocket endpoint to receive real-time tweet events
 
 ## Connection
 
+Open a WebSocket to the stream endpoint and send your API key in the `x-api-key` header of the handshake:
+
 ```
-wss://scrapebadger.com/v1/twitter/stream?api_key=YOUR_API_KEY
+wss://scrapebadger.com/v1/twitter/stream
+x-api-key: YOUR_API_KEY
 ```
+
+<Note>
+  If your client can't set headers, such as the browser `WebSocket` API, pass the key as the `api_key` query parameter instead: `wss://scrapebadger.com/v1/twitter/stream?api_key=YOUR_API_KEY`. A key in the URL can end up in proxy and server logs, so use the header wherever you can.
+</Note>
 
 ### Using wscat
 
 ```bash
 npm install -g wscat
-wscat -c "wss://scrapebadger.com/v1/twitter/stream?api_key=YOUR_API_KEY"
+wscat -c "wss://scrapebadger.com/v1/twitter/stream" -H "x-api-key: YOUR_API_KEY"
 ```
 
 ### Using Python
@@ -28,13 +35,15 @@ import json
 
 import websockets
 
-URI = "wss://scrapebadger.com/v1/twitter/stream?api_key=YOUR_API_KEY"
+URI = "wss://scrapebadger.com/v1/twitter/stream"
+HEADERS = {"x-api-key": "YOUR_API_KEY"}
 
 async def listen():
     backoff = 1
     while True:
         try:
-            async with websockets.connect(URI) as ws:
+            # websockets 14+; older versions name this argument extra_headers
+            async with websockets.connect(URI, additional_headers=HEADERS) as ws:
                 backoff = 1
                 async for message in ws:
                     event = json.loads(message)
@@ -57,9 +66,9 @@ asyncio.run(listen())
 const WebSocket = require('ws');
 
 function connect(backoff = 1000) {
-  const ws = new WebSocket(
-    'wss://scrapebadger.com/v1/twitter/stream?api_key=YOUR_API_KEY'
-  );
+  const ws = new WebSocket('wss://scrapebadger.com/v1/twitter/stream', {
+    headers: { 'x-api-key': 'YOUR_API_KEY' },
+  });
 
   ws.on('open', () => { backoff = 1000; });
 
@@ -113,7 +122,7 @@ Tweets from a filter rule also carry `"source": "filter_rule"`, `rule_id` and `t
 
 ## Connection behavior
 
-- **Authentication** is done via the `api_key` query parameter
+- **Authentication** uses the `x-api-key` header. Clients that can't set headers can use the `api_key` query parameter instead
 - **Keepalive:** the server sends `{"type": "ping"}` every 40 seconds. If your client doesn't reply with `{"type": "pong"}` within 30 seconds, the connection is closed with code `1001`
 - **Restarts:** the server closes all connections with code `1001` when it restarts. Reconnect right away
 - **All monitors and filter rules** for the API key deliver to the same connection
