@@ -4,10 +4,6 @@ openapi: "GET /v1/tiktok/ads/search"
 description: "Search TikTok's EU Commercial Content (ad transparency) Library by keyword or advertiser id."
 ---
 
-<Warning>
-  **Temporarily unavailable.** Since 23 November 2026, TikTok answers every Ad Library search with a CAPTCHA check. Until that changes, this endpoint returns `503` with "TikTok Ad Library search is temporarily unavailable" within a few seconds, and you are not charged. [Get ad detail](/api-reference/endpoint/tiktok/get-ad-detail) and [Search advertisers](/api-reference/endpoint/tiktok/search-advertisers) keep working.
-</Warning>
-
 <Note>
   The TikTok Ad Library is **EU-only** (EU Digital Services Act ad transparency). Use an EU `region` such as `DE`, `FR`, `IE`, or `NL`. Pass `advertiser_id` to scope to a single advertiser, or `query` for a keyword search.
 </Note>
