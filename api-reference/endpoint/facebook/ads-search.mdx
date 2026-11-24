@@ -61,7 +61,8 @@ look one up directly by its archive id.
 ## Response
 
 <ResponseField name="ads" type="AdLibraryAd[]">
-  Each `AdLibraryAd` includes `ad_archive_id`, `page_id`, `page_name`,
+  Each `AdLibraryAd` includes `ad_archive_id`, `collation_id`,
+  `collation_count`, `page_id`, `page_name`,
   `ad_creative_body`, `ad_creative_link_title`, `ad_creative_link_caption`,
   `ad_creative_link_description`, `ad_snapshot_url` (Facebook-hosted rendered
   preview), `start_date_utc`, `start_date`, `end_date_utc`, `end_date` (`null`
@@ -69,6 +70,21 @@ look one up directly by its archive id.
   (`FACEBOOK`, `INSTAGRAM`, `MESSENGER`, `AUDIENCE_NETWORK`), `images[]`,
   `videos[]`, `cta_text` (button label) and `cta_type` (Facebook's CTA enum,
   e.g. `SHOP_NOW`, `LEARN_MORE`, `SIGN_UP`).
+</ResponseField>
+<ResponseField name="ads[].collation_id" type="string | null">
+  The Ad Library's group of ads that share one creative and text — the
+  website's "This ad has multiple versions". Every ad of a group returns the
+  same `collation_id`, so you can link the versions together. `null` for an ad
+  that is not grouped.
+</ResponseField>
+<ResponseField name="ads[].collation_count" type="integer | null">
+  How many ads are in that group — the website's "N ads use this creative and
+  text". It is Meta's count, or the number of grouped ads listed when Meta
+  leaves the count empty, and it is the same on every ad of the group. A rising
+  count is the clearest public sign that an advertiser is scaling a creative.
+  `1` for an ad that is not grouped. On `/ads/{ad_archive_id}` both grouping
+  fields are `null` when the ad's page does not show its group. No extra
+  request or credits.
 </ResponseField>
 <ResponseField name="ads[].transparency" type="AdTransparency">
   Lookup endpoint only, when `country` is an EU/UK market or the ad targets
@@ -126,6 +142,8 @@ data = res.json()
   "ads": [
     {
       "ad_archive_id": "1284772093418206",
+      "collation_id": "1618078092872958",
+      "collation_count": 7,
       "page_id": "15087023444",
       "page_name": "Nike",
       "ad_creative_body": "Built for the long run. The new Pegasus 42 lands today.",
