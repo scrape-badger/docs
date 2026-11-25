@@ -882,7 +882,7 @@
           "Google Maps"
         ],
         "summary": "Search Google Maps places",
-        "description": "Search Google Maps for places.\n\nReturns place names, ratings, addresses, phone numbers, coordinates,\nhours, and service options.",
+        "description": "Search Google Maps for places.\n\nReturns place names, ratings, addresses, phone numbers, coordinates,\nopening hours (``open_state``, ``hours``, ``operating_hours``) and a\n``thumbnail``/``image`` per place. ``price_level`` is set only when the\nsearch result carries it. Call ``/maps/place`` for a place's price per person.\n``service_options`` is null.",
         "operationId": "maps_search_api_v1_maps_search_get",
         "parameters": [
           {
@@ -983,7 +983,7 @@
           "Google Maps"
         ],
         "summary": "Get place details",
-        "description": "Get detailed place information from Google Maps via the protobuf API.\n\nRequires either ``place_id`` (e.g. ``ChIJN1t_tDeuEmsRUsoyG83frY4``) or\n``data_id`` (e.g. ``0x89c259617ae5b78b:0xe919ce17bb09920e``). The\ndata_id is available in the ``data_id`` field of ``/maps/search``\nresults. Returns name, address, rating, review count, phone, website,\nGPS coordinates, categories, and up to 20 photo URLs.",
+        "description": "Get detailed place information from Google Maps.\n\nRequires either ``place_id`` (e.g. ``ChIJN1t_tDeuEmsRUsoyG83frY4``) or\n``data_id`` (e.g. ``0x89c259617ae5b78b:0xe919ce17bb09920e``). The\ndata_id is available in the ``data_id`` field of ``/maps/search``\nresults. Returns name, address, rating, review count, phone, website,\nGPS coordinates, categories, opening hours (``open_state``, ``hours``,\n``operating_hours``), ``thumbnail`` and ``image``, and up to 20 photo URLs.\n\n``price_level`` is the price per person Google shows for the place (e.g.\n``\u0e3f2,000+`` or ``$30\u201340``), or null when Google has none.\n``service_options`` is null: Google no longer exposes dine-in, takeout\nand delivery flags to signed-out clients. Amenity groups Google does\nreturn appear in ``extensions``.",
         "operationId": "maps_place_api_v1_maps_place_get",
         "parameters": [
           {
@@ -1211,7 +1211,7 @@
           "Google Maps"
         ],
         "summary": "Get place photos",
-        "description": "Get photos for a Google Maps place.\n\nPhotos are extracted from the ``/maps/preview/place`` response\n(field ``data[6][37]``). Returns up to 20 photo URLs with\nconfigurable width/height via the Google CDN pattern\n``lh3.googleusercontent.com/gps-cs-s/{id}=w{w}-h{h}-k-no``.",
+        "description": "Get photos for a Google Maps place.\n\nReturns the photos Google exposes to signed-out clients, usually the\nfirst 8 of the place's gallery, as ``thumbnail`` (400x300) and ``image``\n(1200x900) URLs. ``pagination.total_results`` is the place's total photo\ncount on Google, not the number returned. There is no further page:\n``total_pages`` is 1 and ``next`` is null.\n\nPhoto URLs are Google CDN URLs\n(``https://lh3.googleusercontent.com/<path>/<token>=w{w}-h{h}-k-no``). To\nget another size, replace the ``=w..-h..-k-no`` suffix. The path\n(``gps-cs-s``, ``grass-cs``, ``p``) is part of the token and must be kept.",
         "operationId": "maps_photos_api_v1_maps_photos_get",
         "parameters": [
           {
@@ -9490,7 +9490,8 @@
             "title": "Photos"
           },
           "pagination": {
-            "$ref": "#/components/schemas/Pagination"
+            "$ref": "#/components/schemas/Pagination",
+            "description": "total_results is the place's photo count on Google; the response holds the photos Google exposes (one page)."
           }
         },
         "type": "object",
@@ -9581,7 +9582,8 @@
                 "type": "null"
               }
             ],
-            "title": "Price Level"
+            "title": "Price Level",
+            "description": "Price per person as Google shows it, e.g. \"\u0e3f2,000+\" or \"$30\u201340\"; null when Google has none."
           },
           "type": {
             "anyOf": [
@@ -9668,7 +9670,8 @@
                 "type": "null"
               }
             ],
-            "title": "Open State"
+            "title": "Open State",
+            "description": "Today's status line as Google shows it, e.g. \"Open \u00b7 Closes 11 PM\" or \"Closed \u00b7 Opens 12:30 PM\"."
           },
           "hours": {
             "anyOf": [
@@ -9679,14 +9682,16 @@
                 "type": "null"
               }
             ],
-            "title": "Hours"
+            "title": "Hours",
+            "description": "Today's opening hours, e.g. \"12:30\u201310:30 PM\". Several ranges are joined with \", \"."
           },
           "operating_hours": {
             "additionalProperties": {
               "type": "string"
             },
             "type": "object",
-            "title": "Operating Hours"
+            "title": "Operating Hours",
+            "description": "Opening hours for the coming seven days keyed by English weekday (monday \u2026 sunday), as Google shows them, holiday hours included."
           },
           "description": {
             "anyOf": [
@@ -9708,7 +9713,8 @@
                 "type": "null"
               }
             ],
-            "title": "Thumbnail"
+            "title": "Thumbnail",
+            "description": "First photo of the place, 400x300."
           },
           "image": {
             "anyOf": [
@@ -9774,7 +9780,8 @@
               {
                 "type": "null"
               }
-            ]
+            ],
+            "description": "Always null: Google no longer exposes dine-in/takeout/delivery flags to signed-out clients. See extensions for the amenity groups Google returns."
           },
           "provider_id": {
             "anyOf": [
@@ -9910,7 +9917,8 @@
                 "type": "null"
               }
             ],
-            "title": "Price Level"
+            "title": "Price Level",
+            "description": "Price per person as Google shows it, e.g. \"\u0e3f2,000+\" or \"$30\u201340\"; null when Google has none."
           },
           "type": {
             "anyOf": [
@@ -10002,7 +10010,8 @@
                 "type": "null"
               }
             ],
-            "title": "Open State"
+            "title": "Open State",
+            "description": "Today's status line as Google shows it, e.g. \"Open \u00b7 Closes 11 PM\" or \"Closed \u00b7 Opens 12:30 PM\"."
           },
           "hours": {
             "anyOf": [
@@ -10013,14 +10022,16 @@
                 "type": "null"
               }
             ],
-            "title": "Hours"
+            "title": "Hours",
+            "description": "Today's opening hours, e.g. \"12:30\u201310:30 PM\". Several ranges are joined with \", \"."
           },
           "operating_hours": {
             "additionalProperties": {
               "type": "string"
             },
             "type": "object",
-            "title": "Operating Hours"
+            "title": "Operating Hours",
+            "description": "Opening hours for the coming seven days keyed by English weekday (monday \u2026 sunday), as Google shows them, holiday hours included."
           },
           "description": {
             "anyOf": [
@@ -10042,7 +10053,8 @@
                 "type": "null"
               }
             ],
-            "title": "Thumbnail"
+            "title": "Thumbnail",
+            "description": "First photo of the place, 400x300."
           },
           "image": {
             "anyOf": [
@@ -10108,7 +10120,8 @@
               {
                 "type": "null"
               }
-            ]
+            ],
+            "description": "Always null: Google no longer exposes dine-in/takeout/delivery flags to signed-out clients. See extensions for the amenity groups Google returns."
           }
         },
         "type": "object",
