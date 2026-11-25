@@ -64,8 +64,9 @@ Accepts `GET` (query params) or `POST` (JSON body).
 
 <ParamField query="web_search" type="string" default="force">
   One of `auto`, `force`, `off`. **Defaults to `force`** here — visibility
-  tracking usually wants Gemini to actually ground the answer. Check
-  `web_search_triggered` for what happened.
+  tracking usually wants Gemini to actually ground the answer. With `force`, an
+  answer that cites no source is asked once more. Check `web_search_triggered`
+  and `citations` for what happened.
 </ParamField>
 
 ## Response

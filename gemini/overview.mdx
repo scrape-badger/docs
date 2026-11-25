@@ -190,9 +190,11 @@ print(data["source_domains"])
   <Accordion title="I got an answer with no citations. Is that a bug?">
     Check `web_search_triggered`. If it is `false`, Gemini answered from its
     training data and there were no sources to cite — that is normal for
-    general-knowledge prompts. Set `web_search=force` to make grounding more
-    likely. It does not guarantee a search or citations, and a `2xx` answer is
-    billed whether or not it has citations.
+    general-knowledge prompts. If it is `true`, Gemini searched but used none of
+    the pages: they are in `search_results` with `cited: false`. Set
+    `web_search=force` to make grounding more likely: an answer that cites
+    nothing is asked once more. It does not guarantee a search or citations,
+    and a `2xx` answer is billed whether or not it has citations.
   </Accordion>
   <Accordion title="Will the same prompt always give the same answer?">
     No. Gemini is non-deterministic, and the live web changes. For tracking,
