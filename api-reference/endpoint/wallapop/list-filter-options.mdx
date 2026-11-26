@@ -27,7 +27,7 @@ The options for filters too long to inline in [`/v1/wallapop/filters`](/api-refe
 </ParamField>
 
 <ParamField query="subcategory_ids" type="string">
-  Comma-separated subcategory ids to scope the options to. For example `brand` with `subcategory_ids=9447` lists phone brands, and with `10310` laptop brands.
+  Comma-separated subcategory ids to scope the options to. Needs the `category_id` they belong to; without it the request returns `422`. For example `brand` with `category_id=24200&subcategory_ids=9447` lists phone brands, and with `subcategory_ids=10310` laptop brands.
 </ParamField>
 
 <ParamField query="query" type="string">

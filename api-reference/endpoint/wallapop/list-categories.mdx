@@ -4,7 +4,7 @@ api: "GET https://scrapebadger.com/v1/wallapop/categories"
 description: "Wallapop's full category tree with localised names — the ids are the category_id and subcategory_ids values search and filters accept."
 ---
 
-Wallapop's full category tree. A top-level `id` is a `category_id`; every id under it in `subcategories`, at any depth, goes in `subcategory_ids` — both in [search](/api-reference/endpoint/wallapop/search-items) and [filters](/api-reference/endpoint/wallapop/list-filters). For example, Smartphones is `category_id=24200&subcategory_ids=9447`.
+Wallapop's full category tree. A top-level `id` is a `category_id`; every id under it in `subcategories`, at any depth, goes in `subcategory_ids` — both in [search](/api-reference/endpoint/wallapop/search-items) and [filters](/api-reference/endpoint/wallapop/list-filters). For example, Smartphones is `category_id=24200&subcategory_ids=9447`. Search accepts `subcategory_ids` alone; the filters endpoints need the `category_id` too.
 
 **Credits:** 1
 

@@ -23,7 +23,7 @@ Filters with long option lists, such as `brand` and `model`, return no options h
 </ParamField>
 
 <ParamField query="subcategory_ids" type="string">
-  Comma-separated subcategory ids the filters apply to, e.g. `9447` (Smartphones). Same format as in [search](/api-reference/endpoint/wallapop/search-items).
+  Comma-separated subcategory ids the filters apply to, e.g. `9447` (Smartphones). Same format as in [search](/api-reference/endpoint/wallapop/search-items). Needs the `category_id` they belong to (e.g. `category_id=24200&subcategory_ids=9447`); without it the request returns `422`.
 </ParamField>
 
 <ParamField query="query" type="string">

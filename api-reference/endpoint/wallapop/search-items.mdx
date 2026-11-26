@@ -41,7 +41,7 @@ Search Wallapop listings, **40 per page**, with the same filters the Wallapop ap
 </ParamField>
 
 <ParamField query="subcategory_ids" type="string">
-  Comma-separated subcategory ids from [`/v1/wallapop/categories`](/api-reference/endpoint/wallapop/list-categories) — the `subcategories` of a category, at any depth. For example `24201` (Phones), `9447` (Smartphones), or `9447,10310` (smartphones and laptops); a listing in any of them matches. Works with or without `category_id`; a subcategory from another category than `category_id` matches nothing. Spaces and empty entries are ignored; anything other than numeric ids returns `422`. A `next_page` cursor keeps the subcategories.
+  Comma-separated subcategory ids from [`/v1/wallapop/categories`](/api-reference/endpoint/wallapop/list-categories) — the `subcategories` of a category, at any depth. For example `24201` (Phones), `9447` (Smartphones), or `9447,10310` (smartphones and laptops); a listing in any of them matches. Works with or without `category_id` (the [filters](/api-reference/endpoint/wallapop/list-filters) endpoints need it); a subcategory from another category than `category_id` matches nothing. Spaces and empty entries are ignored; anything other than numeric ids returns `422`. A `next_page` cursor keeps the subcategories.
 </ParamField>
 
 <ParamField query="min_price" type="number">
