@@ -1,10 +1,10 @@
 ---
 title: "Search Listings"
 api: "GET https://scrapebadger.com/v1/wallapop/search"
-description: "Search Wallapop second-hand listings in Spain, Italy, or Portugal with Wallapop's own filters — price, condition, brand, model, colour, distance, listing age, shipping, and car filters."
+description: "Search Wallapop second-hand listings in Spain, Italy, or Portugal with Wallapop's own filters — category and subcategory, price, condition, brand, model, colour, distance, listing age, shipping, and car filters."
 ---
 
-Search Wallapop listings, **40 per page**, with the same filters the Wallapop app offers. Send a `query`, a `category_id`, or both.
+Search Wallapop listings, **40 per page**, with the same filters the Wallapop app offers. Send a `query`, a `category_id`, `subcategory_ids`, or any combination.
 
 **Credits:** 5 per page. Empty results are not charged.
 
@@ -17,7 +17,7 @@ Search Wallapop listings, **40 per page**, with the same filters the Wallapop ap
 ## Query Parameters
 
 <ParamField query="query" type="string">
-  Search text, e.g. `iphone 14`, `bicicleta montaña`. Required unless you pass `category_id`; requests with neither return `422`.
+  Search text, e.g. `iphone 14`, `bicicleta montaña`. Required unless you pass `category_id` or `subcategory_ids`; requests with none of them return `422`.
 </ParamField>
 
 <ParamField query="market" type="string" default="es">
@@ -37,7 +37,11 @@ Search Wallapop listings, **40 per page**, with the same filters the Wallapop ap
 </ParamField>
 
 <ParamField query="category_id" type="integer">
-  Category id from [`/v1/wallapop/categories`](/api-reference/endpoint/wallapop/list-categories), e.g. `24200` (Technology & electronics) or `100` (Cars). Required unless you pass `query`.
+  Top-level category id from [`/v1/wallapop/categories`](/api-reference/endpoint/wallapop/list-categories), e.g. `24200` (Technology & electronics) or `100` (Cars). Wallapop matches only top-level ids here: a subcategory id sent as `category_id` returns no results, so send subcategories in `subcategory_ids`.
+</ParamField>
+
+<ParamField query="subcategory_ids" type="string">
+  Comma-separated subcategory ids from [`/v1/wallapop/categories`](/api-reference/endpoint/wallapop/list-categories) — the `subcategories` of a category, at any depth. For example `24201` (Phones), `9447` (Smartphones), or `9447,10310` (smartphones and laptops); a listing in any of them matches. Works with or without `category_id`; a subcategory from another category than `category_id` matches nothing. Spaces and empty entries are ignored; anything other than numeric ids returns `422`. A `next_page` cursor keeps the subcategories.
 </ParamField>
 
 <ParamField query="min_price" type="number">
@@ -236,6 +240,15 @@ scrapebadger wallapop search "iphone" --market es --shippable
 ```
 
 </CodeGroup>
+
+Subcategory search — smartphones (`9447`, under Technology & electronics `24200`) up to €300, newest first:
+
+```bash
+curl "https://scrapebadger.com/v1/wallapop/search?query=iphone&category_id=24200&subcategory_ids=9447&max_price=300&order_by=newest" \
+  -H "X-API-Key: YOUR_API_KEY"
+```
+
+Each listing's `taxonomy` shows the full category path it sits in, e.g. Technology & electronics › Phones › Smartphones.
 
 Car search — manual cars from 2015 on with under 100,000 km, closest to Madrid first:
 
