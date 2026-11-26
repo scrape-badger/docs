@@ -19,7 +19,11 @@ Filters with long option lists, such as `brand` and `model`, return no options h
 ## Query Parameters
 
 <ParamField query="category_id" type="integer">
-  Category the filters apply to, from [`/v1/wallapop/categories`](/api-reference/endpoint/wallapop/list-categories). Use `100` for car filters.
+  Top-level category the filters apply to, from [`/v1/wallapop/categories`](/api-reference/endpoint/wallapop/list-categories). Use `100` for car filters.
+</ParamField>
+
+<ParamField query="subcategory_ids" type="string">
+  Comma-separated subcategory ids the filters apply to, e.g. `9447` (Smartphones). Same format as in [search](/api-reference/endpoint/wallapop/search-items).
 </ParamField>
 
 <ParamField query="query" type="string">

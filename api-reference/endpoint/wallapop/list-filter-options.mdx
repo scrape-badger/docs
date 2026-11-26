@@ -23,7 +23,11 @@ The options for filters too long to inline in [`/v1/wallapop/filters`](/api-refe
 ## Query Parameters
 
 <ParamField query="category_id" type="integer">
-  Category to scope the options to, e.g. `100` for car makes and models.
+  Top-level category to scope the options to, e.g. `100` for car makes and models.
+</ParamField>
+
+<ParamField query="subcategory_ids" type="string">
+  Comma-separated subcategory ids to scope the options to. For example `brand` with `subcategory_ids=9447` lists phone brands, and with `10310` laptop brands.
 </ParamField>
 
 <ParamField query="query" type="string">
