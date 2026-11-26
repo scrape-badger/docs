@@ -47,12 +47,13 @@ Accepts `GET` (query params) or `POST` (JSON body) with identical fields.
   Whether Gemini should ground the answer with a web search. One of:
 
   - `auto` — let Gemini decide (default).
-  - `force` — instruct it to search the web.
+  - `force` — instruct it to search the web. If the answer cites no source, it
+    is asked once more, and the answer that cites sources is returned.
   - `off` — answer from the model's own knowledge only.
 
-  Check `web_search_triggered` in the response for what actually happened.
-  `force` makes grounding more likely but does not guarantee it, or any
-  citations. A `2xx` answer is billed whether or not it has citations.
+  Check `web_search_triggered` and `citations` in the response for what
+  actually happened. `force` makes a grounded answer more likely but does not
+  guarantee one. A `2xx` answer is billed whether or not it has citations.
 </ParamField>
 
 <ParamField query="image_url" type="string" deprecated>
@@ -119,7 +120,7 @@ Accepts `GET` (query params) or `POST` (JSON body) with identical fields.
 </ResponseField>
 
 <ResponseField name="source_domains" type="string[]">Distinct hostnames across the cited sources — a quick view of who Gemini trusted.</ResponseField>
-<ResponseField name="web_search_triggered" type="boolean">Whether Gemini **actually** grounded this answer with a web search.</ResponseField>
+<ResponseField name="web_search_triggered" type="boolean">Whether Gemini **actually** ran a web search for this answer. It can be `true` with an empty `citations` list: Gemini searched (the pages are in `search_results`, all `cited: false`) but did not use any of them.</ResponseField>
 <ResponseField name="truncated" type="boolean">`true` when the render budget expired while Gemini was still writing, so `answer` is the partial text produced so far.</ResponseField>
 <ResponseField name="model" type="string | null">Which model answered — a Gemini Flash-Lite build. Reported, not requestable.</ResponseField>
 <ResponseField name="conversation_id" type="string | null">Identifier of the one-shot exchange. Not a handle you can continue from.</ResponseField>
@@ -255,7 +256,8 @@ for c in data["citations"]:
   `search_results` is the full retrieved set; `citations` is the subset that made
   it into the answer. When `web_search_triggered` is `false`, both are empty and
   Gemini answered from its own knowledge — that is a valid response, not an
-  error.
+  error. An answer with `search_results` but no `citations` was not grounded in
+  them either, whatever its text says.
 </Note>
 
 
