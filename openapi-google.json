@@ -846,6 +846,18 @@
               ],
               "default": "UTF-8"
             }
+          },
+          {
+            "name": "defer_links",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Skip inline organic URL lookups; redeem result link_tokens with POST /v1/google/resolve. JSON only; price unchanged.",
+              "default": false,
+              "title": "Defer Links"
+            },
+            "description": "Skip inline organic URL lookups; redeem result link_tokens with POST /v1/google/resolve. JSON only; price unchanged."
           }
         ],
         "responses": {
@@ -6288,6 +6300,18 @@
               ],
               "default": "UTF-8"
             }
+          },
+          {
+            "name": "defer_links",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Skip inline organic URL lookups; redeem result link_tokens with POST /v1/google/resolve. JSON only; price unchanged.",
+              "default": false,
+              "title": "Defer Links"
+            },
+            "description": "Skip inline organic URL lookups; redeem result link_tokens with POST /v1/google/resolve. JSON only; price unchanged."
           }
         ],
         "responses": {

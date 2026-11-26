@@ -119,6 +119,13 @@ curl "https://scrapebadger.com/v1/google/search?q=are+noise+cancelling+headphone
 
 ## Fast search timeout
 
+For faster JSON responses, set `defer_links=true` to skip inline organic URL
+lookups. Direct URLs stay direct; unresolved results keep their ranks and carry
+`link_token` and `retry_after_seconds` fields. Redeem them through
+[`POST /v1/google/resolve`](/api-reference/endpoint/google/resolve) when needed.
+This option also works on Light Search, preserves the request price, and does
+not change `output=html`, which already skips parsing and URL lookups.
+
 With `mode=fast`, search has a 12-second processing budget shared by fetching, retries, fallback and parsing. If no result is ready within that budget, the API returns `503` with `Retry-After: 60`. Wait at least 60 seconds before retrying. Network transit and gateway processing can add to the time you observe.
 
 This budget also applies to `/v1/google/light/search`. The dedicated Light endpoint cannot enable rich SERP features through `mode=full` or `ai_overview=true`. The budget does not apply to regular full Search.

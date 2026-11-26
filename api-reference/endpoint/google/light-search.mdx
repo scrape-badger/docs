@@ -26,6 +26,25 @@ Use `start=10`, `20`, and so on for later pages. Google may return fewer results
 than requested by `num`; a page commonly contains about ten organic results.
 Set `output=html` to receive the raw Google response instead of parsed JSON.
 
+## Faster responses
+
+Set `defer_links=true` to skip inline organic URL lookups while keeping parsed
+JSON. URLs already present in the page stay direct. Every unresolved organic
+result keeps its position and carries a `link_token` with
+`retry_after_seconds: 0`. Send those rows to
+[`POST /v1/google/resolve`](/api-reference/endpoint/google/resolve) when you need
+their destination URLs. A resolve response may ask you to wait before retrying.
+The Search price is unchanged, and resolving costs 0 credits.
+
+With `output=html`, you receive the page without parsing or URL lookups;
+`defer_links` has no additional effect. These options remove processing steps;
+Google blocks, proxy latency and retries can still affect response time.
+
+```python
+serp = await client.google.search.light("vinted api", defer_links=True)
+results = await client.google.search.resolve_all(serp["organic_results"])
+```
+
 `search_information.organic_results_state` is `Results for exact spelling`, `Results for spelling correction` (Google showed results for a corrected spelling), `Results with suggested correction` (Google suggested a spelling with "Did you mean" but kept your query) or `no_results`. `total_results` and `time_taken` are filled only when Google prints them. Light usually gets Google's basic page, which shows no result count or search time, so both are often `null` on Light. Use [regular Search](/api-reference/google/google-search/google-web-search) when you need them.
 
 Google hides a result's URL behind a redirect link
