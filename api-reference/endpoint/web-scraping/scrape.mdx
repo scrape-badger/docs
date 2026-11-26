@@ -167,6 +167,16 @@ openapi: POST /v1/web/scrape
   }
   ```
 
+  `click` and `fill` wait up to 8 seconds for their element to become
+  actionable. To wait longer for something the page adds later, such as an
+  answer that is still streaming in, poll for it in an `evaluate` script:
+  `evaluate` waits for a returned Promise, and a script that throws fails the
+  step. Its return value is not reported.
+
+  ```json
+  { "action": "evaluate", "script": "async () => { for (let i = 0; i < 60; i++) { const b = document.querySelector('button.show-sources'); if (b) { b.click(); return; } await new Promise(r => setTimeout(r, 500)); } throw new Error('button never appeared'); }" }
+  ```
+
   Steps run one after another and stop at the first one that fails (a selector
   that never becomes actionable, a script that throws). A failed step fails the
   request with `422 js_scenario_failed` and nothing is charged. Every response
