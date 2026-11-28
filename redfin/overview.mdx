@@ -1,0 +1,255 @@
+---
+title: "Redfin Scraper by ScrapeBadger — Overview"
+description: "Scrape Redfin (redfin.com) for-sale listings across the US and Canada — search, full property detail with the Redfin Estimate, price and tax history, schools, amenities, and agent profiles — with structured JSON responses."
+---
+
+import AsyncRequests from "/snippets/async-requests.mdx";
+
+## Scraper API for Redfin
+
+Search **active for-sale homes** with 15+ filters and map-bound tiling, pull **full property detail** with the Redfin Estimate, rent estimate, price and tax history, schools, and grouped amenities, look up agent profiles with ratings, sales stats, and active listings, and autocomplete locations across the **US and Canada** — a dedicated Redfin real-estate API. ScrapeBadger handles anti-bot bypass, sessions, and proxies automatically, and you don't need a Redfin API key.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="Redfin Estimate & History" icon="clock-rotate-left">
+    Every property detail returns Redfin's own valuation estimate and rent estimate alongside the complete **price history** (listed / price-change / sold events) and **tax history** (yearly tax paid and assessed value).
+  </Card>
+  <Card title="Deep Property Detail" icon="house">
+    Beds, baths, sqft, year built, headline key facts, assigned schools with ratings, grouped amenities, listing agent and MLS attribution, and listing photos with captions.
+  </Card>
+  <Card title="Lookup by ID or URL" icon="link">
+    Fetch a home by its numeric Redfin property ID, or pass a full Redfin home URL and get the same detail back.
+  </Card>
+  <Card title="Agent Profiles" icon="user-tie">
+    Agent ratings, review counts, recent and total deals, years of experience, service areas, and their active listings.
+  </Card>
+  <Card title="Map-Bounds Tiling" icon="map">
+    Every search returns the `map_bounds` it covered. Re-issue the search over smaller `north`/`south`/`east`/`west` boxes to get past Redfin's per-query result cap.
+  </Card>
+  <Card title="Anti-Bot Bypass" icon="shield-halved">
+    Chrome impersonation over residential proxies, automatic block detection, and a real-browser fallback when needed — no CAPTCHAs on your end.
+  </Card>
+</CardGroup>
+
+<Note>
+  Search returns **active for-sale listings only** — there is no sold or rental status. To see prior sales for a specific home, read the `price_history` array on [property detail](#property-detail).
+</Note>
+
+## Coverage
+
+Redfin covers the **United States** and **Canada**. Both are served from redfin.com behind a US residential IP, so there is no `market` or currency parameter to manage. Search accepts any US or Canadian city, state, ZIP, county, or neighborhood as the `location`.
+
+| Market | Country |
+|--------|---------|
+| :us: `US` | United States |
+| :canada: `CA` | Canada |
+
+<Tip>
+  Use [`/v1/redfin/markets`](#list-markets) to get the advertised coverage programmatically. Markets are informational only — there is no routing parameter.
+</Tip>
+
+## Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/redfin/search`](#search-properties) | GET | Search active for-sale homes |
+| [`/v1/redfin/autocomplete`](#autocomplete) | GET | Resolve a location term to a place suggestion |
+| [`/v1/redfin/property/{property_id}`](#property-detail) | GET | Full detail for a single property |
+| [`/v1/redfin/property`](#property-by-url) | GET | Full detail resolved from a Redfin home URL |
+| [`/v1/redfin/agent`](#agent-profile) | GET | Agent profile, sales stats, and active listings |
+| [`/v1/redfin/markets`](#list-markets) | GET | List supported coverage regions |
+
+All endpoints use the base URL `https://scrapebadger.com` and authenticate with your API key in the `x-api-key` header.
+
+### Search properties
+
+`GET /v1/redfin/search`
+
+Search active for-sale homes with filters and map-bound tiling.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `location` | string | Yes | — | City/state, ZIP, county, or neighborhood (e.g. `Austin, TX`) |
+| `page` | integer | No | `1` | Page number (1–20) |
+| `sort` | string | No | — | Sort order. One of `relevant`, `newest`, `price_low_to_high`, `price_high_to_low`, `square_feet`, `lot_size`, `price_per_sqft`, `beds`, `baths` |
+| `price_min` | integer | No | — | Minimum price |
+| `price_max` | integer | No | — | Maximum price |
+| `beds_min` | integer | No | — | Minimum bedrooms |
+| `baths_min` | number | No | — | Minimum bathrooms |
+| `home_type` | string | No | — | Property type. One of `house`, `condo`, `townhouse`, `multi_family`, `land`, `other`, `mobile`, `coop` |
+| `sqft_min` | integer | No | — | Minimum living area (sqft) |
+| `sqft_max` | integer | No | — | Maximum living area (sqft) |
+| `lot_min` | integer | No | — | Minimum lot size (sqft) |
+| `lot_max` | integer | No | — | Maximum lot size (sqft) |
+| `year_built_min` | integer | No | — | Earliest year built |
+| `year_built_max` | integer | No | — | Latest year built |
+| `max_days_on_market` | integer | No | — | Maximum days on market |
+| `north` | number | No | — | Map bounds north latitude (for tiling) |
+| `south` | number | No | — | Map bounds south latitude |
+| `east` | number | No | — | Map bounds east longitude |
+| `west` | number | No | — | Map bounds west longitude |
+
+```bash
+curl "https://scrapebadger.com/v1/redfin/search?location=Austin,+TX&price_max=700000" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+<Tip>
+  For dense metros, split the area into smaller tiles. Take the `map_bounds` box from a search response, subdivide it, and pass each tile's `north`/`south`/`east`/`west` back to `/v1/redfin/search`.
+</Tip>
+
+### Autocomplete
+
+`GET /v1/redfin/autocomplete`
+
+Resolve a location term to a geocoded place suggestion.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `query` | string | Yes | — | Partial location — city, ZIP, county, or neighborhood |
+
+```bash
+curl "https://scrapebadger.com/v1/redfin/autocomplete?query=Austin" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+### Property detail
+
+`GET /v1/redfin/property/{property_id}`
+
+Full detail — price and tax history, schools, amenities, and photos.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `property_id` | string (path) | Yes | — | Redfin property ID (the number at the end of a Redfin home URL, e.g. `12345678`) |
+
+```bash
+curl "https://scrapebadger.com/v1/redfin/property/12345678" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+### Property by URL
+
+`GET /v1/redfin/property`
+
+The same full detail, resolved from a full Redfin home URL.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `url` | string | Yes | — | Full Redfin home URL (URL-encode it in the query string) |
+
+```bash
+curl -G "https://scrapebadger.com/v1/redfin/property" \
+  --data-urlencode "url=https://www.redfin.com/TX/Austin/1200-Barton-Hills-Dr/home/12345678" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+### Agent profile
+
+`GET /v1/redfin/agent`
+
+Agent profile with ratings, sales stats, and their active listings.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `url` | string | One of `url` / `agent_id` | — | Full Redfin agent URL |
+| `agent_id` | string | One of `url` / `agent_id` | — | Redfin agent slug (the last segment of `https://www.redfin.com/real-estate-agents/<slug>`) |
+
+```bash
+curl "https://scrapebadger.com/v1/redfin/agent?agent_id=AGENT_SLUG" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+### List markets
+
+`GET /v1/redfin/markets`
+
+Supported coverage regions — United States and Canada. This endpoint takes no parameters.
+
+```bash
+curl "https://scrapebadger.com/v1/redfin/markets" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+## Credit Costs
+
+| Endpoint | Cost |
+|----------|------|
+| Search | 8 credits |
+| Get property detail (by ID or URL) | 8 credits |
+| Get agent profile | 8 credits |
+| Autocomplete | 3 credits |
+| List markets | 0 credits |
+| Failed requests | 0 credits |
+
+## Authentication
+
+All requests require your API key in the `X-API-Key` header:
+
+```bash
+curl "https://scrapebadger.com/v1/redfin/search?location=Miami,+FL" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+Credits are charged per successful request (see the table above) and reported on the `X-Credits-Used` response header.
+
+## Anti-Bot Handling
+
+Redfin combines bot detection, IP-reputation scoring, and TLS/HTTP fingerprinting on suspicious traffic. ScrapeBadger uses Chrome impersonation over residential proxies, detects blocks, and falls back to a real browser when needed — all automatically. You never configure proxies, manage fingerprints, or solve CAPTCHAs.
+
+## Rich Datapoints
+
+Search returns listing cards with `property_id`, price, beds/baths, sqft, address, coordinates, days on market, and photos. Property detail returns the full record:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `property_id` | integer | Redfin property identifier |
+| `price` | integer | List price (or last sold price) |
+| `redfin_estimate` | integer | Redfin home value estimate |
+| `rent_estimate` | integer | Estimated monthly rent |
+| `beds` | float | Number of bedrooms |
+| `baths` | float | Number of bathrooms |
+| `sqft` | integer | Interior square footage |
+| `year_built` | integer | Year the home was built |
+| `key_facts` | array | Headline facts — parking, HOA, style, construction… |
+| `price_history` | array | Listed / price-change / sold events |
+| `tax_history` | array | Yearly tax paid and assessed value |
+| `schools` | array | Assigned schools with ratings and distance |
+| `amenities` | array | Grouped amenities from the listing detail page |
+| `listing_agent_name` | string | Listing agent and MLS attribution |
+| `photos` | array | Listing photos with captions |
+
+The agent endpoint returns:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `agent_id` | string | Redfin agent slug |
+| `name` | string | Agent display name |
+| `brokerage` | string | Brokerage name |
+| `rating` | float | Average review rating |
+| `review_count` | integer | Number of client reviews |
+| `deals_last_year` | integer | Recently closed deals |
+| `total_deals` | integer | Total deals closed |
+| `years_experience` | integer | Years in the business |
+| `service_areas` | array | Areas the agent serves |
+| `listings` | array | The agent's active listings |
+
+## Run this asynchronously
+
+<AsyncRequests />
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="API Playground" icon="play" href="https://scrapebadger.com/dashboard/redfin-scraper">
+    Try every Redfin endpoint from your dashboard with your own API key
+  </Card>
+  <Card title="Zillow API" icon="house" href="/zillow/overview">
+    Search Zillow for-sale, for-rent, and sold listings with Zestimate history
+  </Card>
+</CardGroup>
+
+---
+
+*ScrapeBadger is an independent tool and is not affiliated with, endorsed by, or sponsored by Redfin Corporation or any of its subsidiaries or affiliates. "Redfin" is a trademark of Redfin Corporation, used here only to describe the platform this scraper is designed to work with.*

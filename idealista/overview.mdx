@@ -1,0 +1,318 @@
+---
+title: "Idealista Scraper by ScrapeBadger — Overview"
+description: "Scrape Idealista real-estate listings across Spain, Italy, and Portugal — location codes, listing search, full-inventory search, property detail and engagement stats, and agency profiles — with structured JSON responses."
+---
+
+import AsyncRequests from "/snippets/async-requests.mdx";
+
+## Scraper API for Idealista
+
+Resolve free-text places into **Idealista location codes**, search sale and rent listings with price, size, and room filters, pull a location's **full inventory** past Idealista's result cap, fetch full property detail and engagement stats, and look up agencies by microsite slug or phone number across **Spain, Italy, and Portugal**. ScrapeBadger handles authentication, request signing, and market routing server-side — no upstream API key, no proxy setup.
+
+## Key Features
+
+<CardGroup cols={3}>
+  <Card title="Three Markets, One API" icon="earth-europe">
+    Spain (`es`), Italy (`it`), and Portugal (`pt`) through a single `market` parameter, each accessed with the correct domain and locale. Prices are in EUR.
+  </Card>
+  <Card title="Location Codes" icon="location-dot">
+    [`/suggest`](#location-suggest) turns free text such as a city, district, or landmark into the precise location code that [`/search`](#search-listings) takes.
+  </Card>
+  <Card title="Full-Inventory Search" icon="layer-group">
+    [`/search/all`](#search-all) tiles the price range to return a location's whole inventory — past Idealista's ~1,800-result cap — deduplicated into one list.
+  </Card>
+  <Card title="Full Property Detail" icon="house">
+    Price, price per m², characteristics, features, parking, energy certification, geolocation, all media (images, videos, 3D tours), and advertiser contact.
+  </Card>
+  <Card title="Engagement Stats" icon="chart-simple">
+    Per-listing views, contact mails, shares, and favorites from [`/properties/{property_code}/stats`](#property-stats).
+  </Card>
+  <Card title="Agency Lookups" icon="address-book">
+    Agency microsite profiles with a page of their listings, plus a reverse lookup of the agency behind a listing's contact phone.
+  </Card>
+</CardGroup>
+
+<Note>
+  `/search` and `/search/all` take an Idealista **location code**, not a place name. Call [`/suggest`](#location-suggest) first: entries of type `location` carry a `locationId` (e.g. `0-EU-ES-28-07-001-079`) that you pass as `location`.
+</Note>
+
+## Coverage & Markets
+
+Pick a market with the `market` query parameter. It defaults to `es`.
+
+| Code | Country | Portal | Currency |
+|------|---------|--------|----------|
+| `es` | 🇪🇸 Spain | www.idealista.com | EUR |
+| `it` | 🇮🇹 Italy | www.idealista.it | EUR |
+| `pt` | 🇵🇹 Portugal | www.idealista.pt | EUR |
+
+<Tip>
+  Use [`/v1/idealista/markets`](#list-markets) to get the supported markets with their domain, currency, and locale programmatically.
+</Tip>
+
+## Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/idealista/suggest`](#location-suggest) | GET | Resolve free text into location codes |
+| [`/v1/idealista/search`](#search-listings) | GET | Search listings by location code |
+| [`/v1/idealista/search/all`](#search-all) | GET | Full inventory for a location via price-range tiling |
+| [`/v1/idealista/properties/{property_code}`](#property-detail) | GET | Full detail for a single listing |
+| [`/v1/idealista/properties/{property_code}/stats`](#property-stats) | GET | Listing engagement stats |
+| [`/v1/idealista/agency/{short_name}`](#get-agency) | GET | Agency profile plus a page of its listings |
+| [`/v1/idealista/agency/by-phone/{phone}`](#get-agency-by-phone) | GET | Reverse-lookup an agency by contact phone |
+| [`/v1/idealista/markets`](#list-markets) | GET | List supported markets |
+
+All endpoints use the base URL `https://scrapebadger.com` and authenticate with your API key in the `x-api-key` header. Every endpoint except `/markets` accepts the `market` parameter (`es`, `it`, or `pt`; default `es`).
+
+### Location suggest
+
+`GET /v1/idealista/suggest`
+
+Resolve free-text locations into Idealista location codes for use in `/search`.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `query` | string | Yes | — | Free-text location (e.g. `sagrada familia`) |
+| `operation` | string | No | `sale` | Listing operation. One of `sale`, `rent` |
+| `property_type` | string | No | `homes` | Property type. One of `homes`, `offices`, `premises`, `garages`, `bedrooms`, `newDevelopments`, `lands`, `storageRooms`, `buildings` |
+| `market` | string | No | `es` | Idealista market. One of `es`, `it`, `pt` |
+| `locale` | string | No | — | Response locale. One of `en`, `es`, `it`, `pt` |
+
+```bash
+curl "https://scrapebadger.com/v1/idealista/suggest?query=sagrada+familia&market=es" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+### Search listings
+
+`GET /v1/idealista/search`
+
+Search property listings by location code with price, size, and room filters.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `location` | string | Yes | — | Idealista location code (e.g. `0-EU-ES-28-07-001-079`) |
+| `operation` | string | No | `sale` | Listing operation. One of `sale`, `rent` |
+| `property_type` | string | No | `homes` | Property type. One of `homes`, `offices`, `premises`, `garages`, `newDevelopments`, `lands`, `storageRooms`, `buildings` |
+| `market` | string | No | `es` | Idealista market. One of `es`, `it`, `pt` |
+| `page` | integer | No | `1` | Page number |
+| `max_items` | integer | No | `30` | Items per page (1–50) |
+| `sort_by` | string | No | — | Sort field. One of `distance`, `size`, `rooms`, `floor`, `ratioeurm2`, `price`, `street`, `photos`, `modificationDate`, `publicationDate`, `weigh`, `priceDown`, `preservationTypeAndPrice`, `privateAds` |
+| `sort_order` | string | No | `desc` | Sort direction. One of `asc`, `desc` |
+| `min_price` | number | No | — | Minimum price |
+| `max_price` | number | No | — | Maximum price |
+| `min_size` | number | No | — | Minimum size (m²) |
+| `max_size` | number | No | — | Maximum size (m²) |
+| `min_rooms` | integer | No | — | Minimum rooms |
+| `max_rooms` | integer | No | — | Maximum rooms |
+| `locale` | string | No | — | Response locale. One of `en`, `es`, `it`, `pt` |
+
+```bash
+curl "https://scrapebadger.com/v1/idealista/search?location=0-EU-ES-28-07-001-079&market=es&operation=sale&max_price=500000" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+<Note>
+  `property_type=bedrooms` is accepted by `/suggest` only. `/search`, `/search/all`, and the agency endpoints don't take it.
+</Note>
+
+### Search all
+
+`GET /v1/idealista/search/all`
+
+Full inventory for a location via price-range tiling — beats Idealista's ~1,800-result cap. Billed per page fetched.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `location` | string | Yes | — | Idealista location code (e.g. `0-EU-ES-28-07-001-079`) |
+| `operation` | string | No | `sale` | Listing operation. One of `sale`, `rent` |
+| `property_type` | string | No | `homes` | Property type. One of `homes`, `offices`, `premises`, `garages`, `newDevelopments`, `lands`, `storageRooms`, `buildings` |
+| `market` | string | No | `es` | Idealista market. One of `es`, `it`, `pt` |
+| `max_results` | integer | No | `500` | Maximum unique listings to return (1–3000) |
+| `min_price` | number | No | — | Minimum price |
+| `max_price` | number | No | — | Maximum price |
+| `min_size` | number | No | — | Minimum size (m²) |
+| `max_size` | number | No | — | Maximum size (m²) |
+| `min_rooms` | integer | No | — | Minimum rooms |
+| `max_rooms` | integer | No | — | Maximum rooms |
+| `locale` | string | No | — | Response locale. One of `en`, `es`, `it`, `pt` |
+
+```bash
+curl "https://scrapebadger.com/v1/idealista/search/all?location=0-EU-ES-28-07-001-079&market=es&max_results=500" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+<Warning>
+  `/search/all` is billed **per page fetched**, not per call. A larger `max_results` fetches more pages and costs more credits. Check the `X-Credits-Used` response header for the actual charge.
+</Warning>
+
+### Property detail
+
+`GET /v1/idealista/properties/{property_code}`
+
+Full single-listing detail — price, characteristics, media, contact, and energy certification.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `property_code` | string (path) | Yes | — | Idealista property code (`propertyCode` on a search result) |
+| `market` | string | No | `es` | Idealista market. One of `es`, `it`, `pt` |
+| `locale` | string | No | `en` | Response locale. One of `en`, `es`, `it`, `pt` |
+
+```bash
+curl "https://scrapebadger.com/v1/idealista/properties/104928374?market=es" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+### Property stats
+
+`GET /v1/idealista/properties/{property_code}/stats`
+
+Listing engagement stats — views, contact mails, shares, and favorites.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `property_code` | string (path) | Yes | — | Idealista property code |
+| `market` | string | No | `es` | Idealista market. One of `es`, `it`, `pt` |
+| `locale` | string | No | `en` | Response locale. One of `en`, `es`, `it`, `pt` |
+
+```bash
+curl "https://scrapebadger.com/v1/idealista/properties/104928374/stats?market=es" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+### Get agency
+
+`GET /v1/idealista/agency/{short_name}`
+
+Agency microsite profile plus a page of its listings, by URL slug. The slug is the `contactInfo.micrositeShortName` value on a listing.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `short_name` | string (path) | Yes | — | Agency URL slug (microsite short name) |
+| `market` | string | No | `es` | Idealista market. One of `es`, `it`, `pt` |
+| `operation` | string | No | — | Filter listings by operation. One of `sale`, `rent` |
+| `property_type` | string | No | — | Filter listings by property type. One of `homes`, `offices`, `premises`, `garages`, `newDevelopments`, `lands`, `storageRooms`, `buildings` |
+| `page` | integer | No | `1` | Listings page number |
+| `max_items` | integer | No | `30` | Listings per page (1–50) |
+| `include_listings` | boolean | No | `true` | Include a page of listings |
+
+```bash
+curl "https://scrapebadger.com/v1/idealista/agency/AGENCY_SHORT_NAME?market=es" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+### Get agency by phone
+
+`GET /v1/idealista/agency/by-phone/{phone}`
+
+Reverse-lookup the agency behind a contact phone number.
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `phone` | string (path) | Yes | — | National phone number, without the country prefix (e.g. no `+34`) |
+| `market` | string | No | `es` | Idealista market. One of `es`, `it`, `pt` |
+| `operation` | string | No | — | Filter listings by operation. One of `sale`, `rent` |
+| `property_type` | string | No | — | Filter listings by property type. One of `homes`, `offices`, `premises`, `garages`, `newDevelopments`, `lands`, `storageRooms`, `buildings` |
+| `page` | integer | No | `1` | Listings page number |
+| `max_items` | integer | No | `30` | Listings per page (1–50) |
+| `include_listings` | boolean | No | `true` | Include a page of listings |
+
+```bash
+curl "https://scrapebadger.com/v1/idealista/agency/by-phone/PHONE_NUMBER?market=es" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+### List markets
+
+`GET /v1/idealista/markets`
+
+List all supported Idealista markets (`es`, `it`, `pt`) with domain, currency, and locale. This endpoint takes no parameters.
+
+```bash
+curl "https://scrapebadger.com/v1/idealista/markets" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+## Credit Costs
+
+| Endpoint | Cost |
+|----------|------|
+| Location suggest | 3 credits |
+| Search listings | 8 credits |
+| Search all | 8 credits per page fetched |
+| Get property detail | 15 credits |
+| Get property stats | 3 credits |
+| Get agency | 8 credits |
+| Get agency by phone | 8 credits |
+| List markets | 0 credits |
+| Failed requests | 0 credits |
+
+## Authentication
+
+All requests require your API key in the `X-API-Key` header:
+
+```bash
+curl "https://scrapebadger.com/v1/idealista/suggest?query=madrid" \
+  -H "x-api-key: YOUR_API_KEY"
+```
+
+Credits are charged per successful request (see the table above) and reported on the `X-Credits-Used` response header.
+
+## Anti-Bot & Authentication Handling
+
+ScrapeBadger handles Idealista's authentication and request signing server-side and routes each request with the correct domain and locale for its market. You never configure proxies, manage tokens, or handle anti-bot challenges, and you never need an upstream API key.
+
+## Rich Datapoints
+
+Responses are normalized across markets: prices are in EUR, and property types, features, and operations are standardized regardless of the listing's language. `/search` returns listings in `elementList`, with `total` and `totalPages` for pagination. Each listing carries:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `propertyCode` | string | Idealista listing identifier |
+| `url` | string | Listing URL on Idealista |
+| `price` | number | Asking price in local currency (EUR) |
+| `priceByArea` | number | Price per m² |
+| `propertyType` | string | Flat, house, chalet, etc. |
+| `operation` | string | Sale or rent |
+| `size` | number | Floor area in m² |
+| `rooms` | integer | Number of rooms |
+| `bathrooms` | integer | Number of bathrooms |
+| `floor` | string | Floor level |
+| `features` | object | Lift, pool, terrace, air-con, garden… |
+| `parkingSpace` | object | Parking availability and price |
+| `address` | string | Municipality, district, neighborhood |
+| `multimedia` | object | Images, videos, and 3D tours |
+
+Listings also carry advertiser contact and location data, and property detail adds the full characteristics, energy certification, and richer contact and location blocks:
+
+| Field | Description |
+|-------|-------------|
+| `contactInfo.commercialName` | Agency or advertiser name |
+| `contactInfo.contactName` | Contact person |
+| `contactInfo.userType` | Private, professional, or agency |
+| `contactInfo.phone1` | Formatted phone number and prefix |
+| `contactInfo.micrositeShortName` | Agency microsite slug — pass it to [`/agency/{short_name}`](#get-agency) |
+| `latitude`, `longitude` | Listing coordinates (under `ubication` on property detail) |
+| `energyCertification` | Energy consumption and emissions rating (property detail) |
+| `priceDropInfo` | Former price and price-drop percentage (inside the price block) |
+| `modificationDate` | Last update to the listing |
+
+## Run this asynchronously
+
+<AsyncRequests />
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="API Playground" icon="play" href="https://scrapebadger.com/dashboard/idealista-scraper">
+    Try every Idealista endpoint from your dashboard with your own API key
+  </Card>
+  <Card title="Immobiliare API" icon="house" href="/immobiliare/overview">
+    Immobiliare Group listings, agencies, and €/m² insights across Italy, Spain, Greece, and Luxembourg
+  </Card>
+</CardGroup>
+
+---
+
+*ScrapeBadger is an independent tool and is not affiliated with, endorsed by, or sponsored by idealista, S.A.U. or any of its subsidiaries or affiliates. "Idealista" is a trademark of idealista, S.A.U., used here only to describe the platform this scraper is designed to work with.*

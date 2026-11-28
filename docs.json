@@ -1013,6 +1013,17 @@
         ]
       },
       {
+        "tab": "Idealista",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "idealista/overview"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "LoopNet",
         "groups": [
           {
@@ -1182,6 +1193,17 @@
             "group": "Reference",
             "pages": [
               "api-reference/endpoint/zillow/list-markets"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Redfin",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "redfin/overview"
             ]
           }
         ]
@@ -1955,5 +1977,22 @@
       "x": "https://x.com/scrapebadger",
       "github": "https://github.com/scrape-badger"
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/perplexity/overview",
+      "destination": "/api-reference/endpoint/perplexity/ask",
+      "permanent": false
+    },
+    {
+      "source": "/quick-start",
+      "destination": "/quickstart",
+      "permanent": true
+    },
+    {
+      "source": "/api-reference/google/google-trends/trending-searches",
+      "destination": "/api-reference/google/google-trends/trending",
+      "permanent": true
+    }
+  ]
 }
