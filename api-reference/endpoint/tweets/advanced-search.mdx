@@ -13,20 +13,32 @@ openapi: get /v1/twitter/tweets/advanced_search
 
 Use `Latest` when you need a fresh, chronological feed (e.g. monitoring), and `Top` when you want maximum coverage of relevant tweets for a query.
 
+## Filtering by language
+
+`lang:` matches the language code X gives each tweet. For most languages that is the usual ISO 639-1 code (`en`, `ko`, `ja`). Indonesian and Hebrew are the exceptions: X uses `in` and `iw`.
+
+You can write either code. `lang:id` and `lang:in` return the same Indonesian tweets, and `lang:he` and `lang:iw` the same Hebrew tweets. The `lang` field of each returned tweet holds X's code, so Indonesian tweets come back with `"lang": "in"`.
+
 ## Pagination
 
 Paginate with the **`cursor`** parameter. Each response includes a top-level **`next_cursor`** — pass it back as `cursor` to fetch the next page.
 
 ```python Python
-resp = client.twitter.advanced_search(query="from:nasa", query_type="Latest")
-tweets = resp["tweets"]
+from scrapebadger import ScrapeBadger
+from scrapebadger.twitter import QueryType
 
-# Next page
-if resp.get("next_cursor"):
-    page2 = client.twitter.advanced_search(
-        query="from:nasa", query_type="Latest", cursor=resp["next_cursor"]
-    )
+async with ScrapeBadger(api_key="YOUR_API_KEY") as client:
+    page = await client.twitter.tweets.search("from:nasa", query_type=QueryType.LATEST)
+    tweets = page.data
+
+    # Next page
+    if page.next_cursor:
+        page2 = await client.twitter.tweets.search(
+            "from:nasa", query_type=QueryType.LATEST, cursor=page.next_cursor
+        )
 ```
+
+Pass `next_cursor` back unchanged, with the same query. A value that is not a cursor returns HTTP `400`. Leave `cursor` out for the first page.
 
 <Note>
   The response has **no `meta` field**. Pagination state lives in the top-level `next_cursor` — don't read `data["meta"]`.
